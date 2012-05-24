@@ -1,6 +1,8 @@
-BPSRES ;BHAM ISC/BEE - ECME SCREEN RESUBMIT W/EDITS ;3/12/08  14:01
- ;;1.0;E CLAIMS MGMT ENGINE;**3,5,7,8,10**;JUN 2004;Build 27
+BPSRES ;BHAM ISC/BEE - ECME SCREEN RESUBMIT W/EDITS ;19-MAY-06
+ ;;1.0;E CLAIMS MGMT ENGINE;**3,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;
+ Q
  ;
  ;ECME Resubmit w/EDITS Protocol (Hidden) - Called by [BPS USER SCREEN]
  ;
@@ -29,7 +31,6 @@ XRESED Q
  ;                  1 - Claim was resubmitted
  ;
 DOSELCTD(BPRXI) N BP02,BP59,BPBILL,BPCLTOT,BPDFN,BPDOSDT,BPOVRIEN,BPQ,BPRXIEN,BPRXR,BPSTATUS,BPUPDFLG
- N BPBILL,BPCOB,BPDOCOB,BPSURE,BPPTRES,BPPHSRV,BPDLYRS
  S (BPQ)=""
  S (BPCLTOT,BPUPDFLG)=0
  ;
@@ -54,25 +55,15 @@ DOSELCTD(BPRXI) N BP02,BP59,BPBILL,BPCLTOT,BPDFN,BPDOSDT,BPOVRIEN,BPQ,BPRXIEN,BP
  S BPSTATUS=$P($$CLAIMST^BPSSCRU3(BP59),U)
  I BPSTATUS["IN PROGRESS" W !!,"The claim: ",!,@VALMAR@(+$P(BPRXI,U,5),0),!,"is still In Progress and cannot be Resubmitted w/EDITS",! G XRES
  I BPSTATUS'["E REJECTED" W !!,"The claim: ",!,@VALMAR@(+$P(BPRXI,U,5),0),!,"is NOT Rejected and cannot be Resubmitted w/EDITS",! G XRES
- I $P($G(^BPST(BP59,0)),U,14)<2,$$PAYABLE^BPSOSRX5(BPSTATUS),$$PAYBLSEC^BPSUTIL2(BP59) D  G XRES
- . W !,"The claim: ",!,@VALMAR@(+$P(BPRXI,U,5),0),!,"cannot be Resubmitted if the secondary claim is payable.",!,"Please reverse the secondary claim first."
- S BPBILL=0
- ;I $P($G(^BPST(BP59,0)),U,14)=2 S BPBILL=$$PAYBLPRI^BPSUTIL2(BP59) I BPBILL=0 D G XRES
- ;. W !,"The claim: ",!,@VALMAR@(+$P(BPRXI,U,5),0),!,"cannot be Resubmitted if the primary is NOT 
- ;can't resubmit a closed claim. The user must reopen first.
- I $$CLOSED02^BPSSCR03($P($G(^BPST(BP59,0)),U,4)) W !!,"The claim: ",!,@VALMAR@(+$P(BPRXI,U,5),0),!,"is Closed and cannot be Resubmitted w/EDITS.",! G XRES
  ;
- S BPCOB=$$COB59^BPSUTIL2(BP59)
  ;Prompt for EDIT Information
- S BPOVRIEN=$$PROMPTS(BP59,BP02,BPCOB) I BPOVRIEN=-1 G XRES
+ S BPOVRIEN=$$PROMPTS(BP59,BP02) I BPOVRIEN=-1 G XRES
  ;
  ;Retrieve DOS
  S BPDOSDT=$$DOSDATE^BPSSCRRS(BPRXIEN,BPRXR)
  ;
- ; If secondary, call COBFLDS
- ; Otherwise, submit claim
- I BPCOB=2 S BPBILL=$$COBFLDS(BP59,BPRXIEN,BPRXR,BPDOSDT,"ERES",BPOVRIEN)
- I BPCOB'=2 S BPBILL=$$EN^BPSNCPDP(BPRXIEN,BPRXR,BPDOSDT,"ERES","","ECME RESUBMIT","",BPOVRIEN,,,BPCOB)
+ ;Resubmit Claim
+ S BPBILL=$$EN^BPSNCPDP(BPRXIEN,BPRXR,BPDOSDT,"ERES","","ECME RESUBMIT","",BPOVRIEN)
  ;
  ;Print Return Value Message
  W !!
@@ -91,142 +82,89 @@ DOSELCTD(BPRXI) N BP02,BP59,BPBILL,BPCLTOT,BPDFN,BPDOSDT,BPOVRIEN,BPQ,BPRXIEN,BP
  ;10 Reversal Processed But Claim Was Not Resubmitted
  ;
  I +BPBILL=0 D
- . N BPSCOB S BPSCOB=$$COB59^BPSUTIL2(BP59) ;get COB for the BPS TRANSACTION IEN
- . D ECMEACT^PSOBPSU1(+BPRXIEN,+BPRXR,"Claim resubmitted to 3rd party payer: ECME USER's SCREEN-"_$S(BPSCOB=1:"p",BPSCOB=2:"s",1:"")_$$INSNAME^BPSSCRU6(BP59))
+ . D ECMEACT^PSOBPSU1(+BPRXIEN,+BPRXR,"Claim resubmitted to 3rd party payer: ECME USER's SCREEN")
  . S BPUPDFLG=1,BPCLTOT=1
 XRES I BPCLTOT W !,BPCLTOT," claim",$S(BPCLTOT'=1:"s have",1:" has")," been resubmitted.",!
  D PAUSE^VALM1
  Q BPUPDFLG
  ;
-XRES2 I BPCLTOT W !,BPCLTOT," claim",$S(BPCLTOT'=1:"s have",1:" has")," been resubmitted.",!
- Q BPUPDFLG
  ;Enter EDIT information for claim
  ;
  ;  Input Values -> BP59 - The BPS TRANSACTION entry
  ;                  BP02 - The BPS CLAIMS entry
- ;                  BPCOB - (optional) payer sequence (1-primary, 2 -secondary)
  ;  Output Value -> BPQ  - -1 - The user chose to quit
  ;                         "" - The user completed the EDITS
-PROMPTS(BP59,BP02,BPCOB) ;
- N %,BP300,BP35401,BPCLCD1,BPCLCD2,BPCLCD3,BPFDA,BPFLD,BPOVRIEN,BPMED,BPMSG,BPPSNCD,BPPREAUT,BPPRETYP,BPQ,BPRELCD,DIC,DIR,DIROUT,DTOUT,DUOUT,X,Y,DIRUT,DUP
+PROMPTS(BP59,BP02) N %,BP300,BPCLCD,BPFDA,BPFLD,BPOVRIEN,BPMED,BPMSG,BPPSNCD,BPPREAUT,BPPRETYP,BPQ,BPRELCD,DIC,DIR,DIROUT,DTOUT,DUOUT,X,Y
  ;
  S BPQ=""
- I +$G(BPCOB)=0 S BPCOB=1
+ ;
  ;Pull Information from Claim
  S BP300=$G(^BPSC(BP02,300))
  S BPRELCD=$TR($E($P(BP300,U,6),3,99)," ")
  S BPPSNCD=$TR($E($P(BP300,U,3),3,99)," ")
- S (BPPRETYP,BPPREAUT,BPDLYRS,BPPHSRV)=""
- S BPMED=0 F  S BPMED=$O(^BPSC(BP02,400,BPMED)) Q:'BPMED  D  I BPPREAUT]"" Q
- . N BP460 S BP460=$G(^BPSC(BP02,400,BPMED,460))
- . S:BPPREAUT="" BPPREAUT=$TR($E($P(BP460,U,2),3,99)," "),BPPRETYP=$TR($E($P(BP460,U),3,99)," ")
- . S:BPDLYRS="" BPDLYRS=$TR($E($P($G(^BPSC(BP02,400,BPMED,350)),U,7),3,99)," ") I BPDLYRS]"" S BPDLYRS=+BPDLYRS
- . S:BPPHSRV="" BPPHSRV=$TR($E($P($G(^BPSC(BP02,400,BPMED,140)),U,7),3,99)," ")
- . F BP35401=1:1:3 S @("BPCLCD"_BP35401)=$TR($E($P($G(^BPSC(BP02,400,BPMED,354.01,BP35401,1)),U),3,99)," ")
- . S BPCLCD1=+BPCLCD1 I BPCLCD1=0 S BPCLCD1=1
- S BPPTRES=$TR($E($P($G(^BPSC(BP02,380)),U,4),3,99)," ") I BPPTRES="" S BPPTRES=1
- S:BPPHSRV="" BPPHSRV=1
+ S (BPPRETYP,BPPREAUT,BPCLCD)="",BPMED=0 F  S BPMED=$O(^BPSC(BP02,400,BPMED)) Q:'BPMED  D  I BPPREAUT]"",BPCLCD]"" Q
+ .N BP460 S BP460=$G(^BPSC(BP02,400,BPMED,460))
+ .S:BPPREAUT="" BPPREAUT=$TR($E($P(BP460,U,2),3,99)," "),BPPRETYP=$TR($E($P(BP460,U),3,99)," ")
+ .S:BPCLCD="" BPCLCD=$TR($E($P($G(^BPSC(BP02,400,BPMED,400)),U,20),3,99)," ")
  ;
- ;Relationship Code
- N X,DIC,Y
- S DIC("B")=BPRELCD
- S DIC(0)="QEAM",DIC=9002313.19,DIC("A")="Relationship Code: "
- D ^DIC
- ;Check for "^" or timeout
- I ($D(DUOUT))!($D(DTOUT)) S BPQ=-1 K X,DIC,Y G XPROMPTS
- S BPRELCD=$P(Y,U,2)
- K X,DIC,Y
+ W ! S DIR(0)="FO^1:1",DIR("A")="Relationship Code"
+ S DIR("B")=BPRELCD
+ K DIR("?")
+ S DIR("?",1)="Select the relationship code that describes the relationship this patient has"
+ S DIR("?",2)="to the holder of this insurance policy. The standard NCPDP Patient"
+ S DIR("?",3)="Relationship Code list is shown below.  However, it is important to note"
+ S DIR("?",4)="that some payers use their own set of codes for this field so the field"
+ S DIR("?",5)="should be populated based upon the payer's expectations."
+ S DIR("?",6)=" "
+ S DIR("?",7)="Choose from:"
+ S DIR("?",8)="  0   Not Specified"
+ S DIR("?",9)="  1   Cardholder"
+ S DIR("?",10)="  2   Spouse"
+ S DIR("?",11)="  3   Child"
+ S DIR("?")="  4   Other"
+ D ^DIR
+ I $G(DTOUT)!$G(DUOUT) S BPQ=-1 G XPROMPTS
+ S BPRELCD=Y
  ;
  ;Person Code
  K DIR("?") S DIR(0)="FO^1:3",DIR("A")="Person Code",DIR("?")="Enter the Specific Person Code Assigned to the Patient by the Payer"
  S DIR("B")=BPPSNCD
  D ^DIR
- I $D(DTOUT)!$D(DUOUT) S BPQ=-1 G XPROMPTS
+ I $G(DTOUT)!$G(DUOUT) S BPQ=-1 G XPROMPTS
  S BPPSNCD=Y
  ;
  ;Pre-Authorization
  K DIR("?") S DIR(0)="FO^1:11",DIR("A")="Prior Authorization Number",DIR("?")="Enter the Number Submitted by the Provider to Identify the Prior Authorization"
  S DIR("B")=BPPREAUT
  D ^DIR
- I $D(DTOUT)!$D(DUOUT) S BPQ=-1 G XPROMPTS
+ I $G(DTOUT)!$G(DUOUT) S BPQ=-1 G XPROMPTS
  S BPPREAUT=Y
  ;
  ;Prior-Authorization Type Code
  N X,DIC,Y
  S DIC("B")=+BPPRETYP
- S DIC(0)="QEAM",DIC=9002313.26,DIC("A")="Prior Authorization Type Code: "
+ S DIC(0)="QEAM",DIC=9002313.82461,DIC("A")="Prior Authorization Type Code: "
  D ^DIC
+ ;
  ;Check for "^" or timeout
- I ($D(DUOUT))!($D(DTOUT)) S BPQ=-1 K X,DIC,Y G XPROMPTS
+ I ($G(DUOUT)=1)!($G(DTOUT)=1)!(Y=-1) S BPQ=-1 K X,DIC,Y G XPROMPTS
  S BPPRETYP=$P(Y,U,2)
  K X,DIC,Y
  ;
- ;Submission Clarification Code 1
- S DIC("B")=BPCLCD1
- S DIC(0)="QEAM",DIC=9002313.25,DIC("A")="Submission Clarification Code 1: "
- D ^DIC
- ;Check for "^" or timeout
- I ($D(DUOUT))!($D(DTOUT)) S BPQ=-1 K X,DIC,Y G XPROMPTS
- S BPCLCD1=$P(Y,U,2)
- K X,DIC,Y
- ;
- ;Submission Clarification Code 2
- I +BPCLCD2 S BPCLCD2=+BPCLCD2 S DIC("B")=BPCLCD2
- S DIC(0)="QEAM",DIC=9002313.25,DIC("A")="Submission Clarification Code 2: ",DUP=0
- F  D  Q:BPQ=-1  Q:'DUP
- . D ^DIC
- . ;Check for "^" or timeout
- . I ($D(DUOUT))!($D(DTOUT)) S BPQ=-1 K X,DIC,Y Q
- . S BPCLCD2=$P(Y,U,2)
- . S DUP=0 I BPCLCD2=BPCLCD1 S BPCLCD2="" W !,"  Duplicates not allowed" S DUP=1
- K X,DIC,Y
- I BPQ=-1 G XPROMPTS
- ;
- ;Submission Clarification Code 3
- I BPCLCD2'="" D  I BPQ=-1 G XPROMPTS
- . I +BPCLCD3 S BPCLCD3=+BPCLCD3 S DIC("B")=BPCLCD3
- . S DIC(0)="QEAM",DIC=9002313.25,DIC("A")="Submission Clarification Code 3: ",DUP=0
- . F  D  Q:'DUP  I BPQ=-1 Q
- .. D ^DIC
- .. ;Check for "^" or timeout
- .. I ($D(DUOUT))!($D(DTOUT)) S BPQ=-1 K X,DIC,Y Q
- .. S BPCLCD3=$P(Y,U,2)
- .. S DUP=0 I BPCLCD3=BPCLCD1!(BPCLCD3=BPCLCD2) S BPCLCD3="" W !,"  Duplicates not allowed" S DUP=1
- . K X,DIC,Y
- ;
- ;Patient Residence Code
+ ;Submission Clarification Code
  N X,DIC,Y
- S DIC("B")=+BPPTRES
- S DIC(0)="QEAM",DIC=9002313.27,DIC("A")="Patient Residence Code: "
+ S DIC("B")=+BPCLCD
+ S DIC(0)="QEAM",DIC=9002313.8242,DIC("A")="Submission Clarification Code: "
  D ^DIC
- ;Check for "^" or timeout
- I ($D(DUOUT))!($D(DTOUT)) S BPQ=-1 K X,DIC,Y G XPROMPTS
- S BPPTRES=$P(Y,U,2)
- K X,DIC,Y
  ;
- ;Pharmacy Service Type Code
- N X,DIC,Y
- S DIC("B")=+BPPHSRV
- S DIC(0)="QEAM",DIC=9002313.28,DIC("A")="Pharmacy Service Type Code: "
- D ^DIC
  ;Check for "^" or timeout
- I ($D(DUOUT))!($D(DTOUT)) S BPQ=-1 K X,DIC,Y G XPROMPTS
- S BPPHSRV=$P(Y,U,2)
- K X,DIC,Y
- ;
- ;Delay Reason Code
- N X,DIC,Y
- S DIC("B")=BPDLYRS
- S DIC(0)="QEAM",DIC=9002313.29,DIC("A")="Delay Reason Code: "
- D ^DIC
- ;Check for "^" or timeout
- I ($D(DUOUT))!($D(DTOUT)) S BPQ=-1 K X,DIC,Y G XPROMPTS
- S BPDLYRS=$P(Y,U,2)
+ I ($G(DUOUT)=1)!($G(DTOUT)=1)!(Y=-1) S BPQ=-1 K X,DIC,Y G XPROMPTS
+ S BPCLCD=$P(Y,U,2)
  K X,DIC,Y
  ;
  ;Ask to proceed
- I BPCOB=1 W ! S BPQ=$$YESNO^BPSSCRRS("Are you sure?(Y/N)") I BPQ'=1 S BPQ=-1 G XPROMPTS
- S BPQ=1
+ W ! S BPQ=$$YESNO^BPSSCRRS("Are you sure?(Y/N)")
+ I BPQ'=1 S BPQ=-1 G XPROMPTS
  ;
  ;Save into BPS NCPDP OVERRIDES (#9002313.511)
  S BPFDA(9002313.511,"+1,",.01)=BP59
@@ -236,16 +174,12 @@ PROMPTS(BP59,BP02,BPCOB) ;
  S BPFLD=$O(^BPSF(9002313.91,"B",306,"")) I BPFLD]"" S BPFDA(9002313.5111,"+3,+1,",.01)=BPFLD,BPFDA(9002313.5111,"+3,+1,",.02)=BPRELCD
  S BPFLD=$O(^BPSF(9002313.91,"B",462,"")) I BPFLD]"" S BPFDA(9002313.5111,"+4,+1,",.01)=BPFLD,BPFDA(9002313.5111,"+4,+1,",.02)=BPPREAUT
  S BPFLD=$O(^BPSF(9002313.91,"B",461,"")) I BPFLD]"" S BPFDA(9002313.5111,"+5,+1,",.01)=BPFLD,BPFDA(9002313.5111,"+5,+1,",.02)=BPPRETYP
- S BPFLD=$O(^BPSF(9002313.91,"B",420,"")) I BPFLD]"" S BPFDA(9002313.5111,"+6,+1,",.01)=BPFLD,BPFDA(9002313.5111,"+6,+1,",.02)=BPCLCD1_"~"_$G(BPCLCD2)_"~"_$G(BPCLCD3)
- S BPFLD=$O(^BPSF(9002313.91,"B",384,"")) I BPFLD]"" S BPFDA(9002313.5111,"+7,+1,",.01)=BPFLD,BPFDA(9002313.5111,"+7,+1,",.02)=BPPTRES
- S BPFLD=$O(^BPSF(9002313.91,"B",147,"")) I BPFLD]"" S BPFDA(9002313.5111,"+8,+1,",.01)=BPFLD,BPFDA(9002313.5111,"+8,+1,",.02)=BPPHSRV
- S BPFLD=$O(^BPSF(9002313.91,"B",357,"")) I BPFLD]"" S BPFDA(9002313.5111,"+9,+1,",.01)=BPFLD,BPFDA(9002313.5111,"+9,+1,",.02)=BPDLYRS
+ S BPFLD=$O(^BPSF(9002313.91,"B",420,"")) I BPFLD]"" S BPFDA(9002313.5111,"+6,+1,",.01)=BPFLD,BPFDA(9002313.5111,"+6,+1,",.02)=BPCLCD
  D UPDATE^DIE("","BPFDA","BPOVRIEN","BPMSG")
  ;
  I $D(BPMSG("DIERR")) W !!,"Could Not Save Override information into BPS NCPDP OVERRIDES FILES",! S BPQ=-1 G XPROMPTS
  ;
-XPROMPTS ;
- S BPOVRIEN=$S(BPQ=-1:BPQ,$G(BPOVRIEN(1))]"":BPOVRIEN(1),1:-1)
+XPROMPTS S BPOVRIEN=$S(BPQ=-1:BPQ,$G(BPOVRIEN(1))]"":BPOVRIEN(1),1:-1)
  Q BPOVRIEN
  ;
  ;Prompt User for Claim to Resubmit (w/EDITS)
@@ -275,25 +209,3 @@ ASKLINE(BPROMPT,BPERRMES) ;
  . I BPRET=-3 W "Please specify RX line."
  . I ",-1,-8,-4,-2,-3,"'[(","_BPRET_",") W "Incorrect format." ; Corrupted array (",BPRET,")"
  Q BPRET
- ;
- ;
-COBFLDS(BP59,BPRXIEN,BPRXR,BPDOSDT,BPSWHERE,BPOVRIEN) ;
- N BPSECOND,BPSPL59,BPRTTP59,BPRET,BPENGINE,BPSPLAN,BPRATTYP
- S BPSECOND("PRESCRIPTION")=BPRXIEN
- S BPSECOND("FILL NUMBER")=BPRXR
- S BPSECOND("FILL DATE")=BPDOSDT
- S BPSPLAN=$$GETPL59^BPSPRRX5(BP59)
- S BPRATTYP=$$GETRTP59^BPSPRRX5(BP59)
- S BPSECOND("PRIMARY BILL")=$$GETBIL59^BPSPRRX5(BP59)
- I $$RES2NDCL^BPSPRRX6(BP59,.BPSPL59,.BPSECOND,.BPRTTP59)
- ; BPSECOND("RXCOB"),BPSECOND("PLAN"),BPSECOND("RTYPE") will be added in BPSNCPD4 and BPSNCPD5
- ; Note: BPSECOND("PRIMARY BILL") will be populated by the following call
- S BPRET=$$PRIMDATA^BPSPRRX4($$IEN59^BPSOSRX(BPRXIEN,BPRXR,1),.BPSECOND,1,1)
- I BPRET=0 D GETFR52^BPSPRRX4(BPRXIEN,BPRXR,.BPSECOND)
- ;
- I $$PROMPTS^BPSPRRX3(.BPSECOND)=-1 Q "-100^Action cancelled"
- S BPSECOND("NEW COB DATA")=1
- S BPENGINE=$$SUBMCLM^BPSPRRX2(BPSECOND("PRESCRIPTION"),BPSECOND("FILL NUMBER"),BPSECOND("FILL DATE"),BPSWHERE,BPSECOND("BILLNDC"),2,BPSECOND("PLAN"),.BPSECOND,BPSECOND("RTYPE"),"ECME RESUBMIT",BPOVRIEN)
- I +BPENGINE=4 W !!,$P(BPENGINE,U,2),!
- Q BPENGINE
- ;

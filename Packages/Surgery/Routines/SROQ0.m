@@ -1,5 +1,5 @@
-SROQ0 ;BIR/ADM - QUARTERLY REPORT (CONTINUED) ;05/25/10
- ;;3.0; Surgery ;**62,70,77,50,95,123,129,153,174**;24 Jun 93;Build 8
+SROQ0 ;BIR/ADM - QUARTERLY REPORT (CONTINUED) ;03/21/06
+ ;;3.0; Surgery ;**62,70,77,50,95,123,129,153**;24 Jun 93;Build 11
  ;** NOTICE: This routine is part of an implementation of a nationally
  ;**         controlled procedure. Local modifications to this routine
  ;**         are prohibited.
@@ -18,7 +18,7 @@ SROQ0 ;BIR/ADM - QUARTERLY REPORT (CONTINUED) ;05/25/10
 COMP ; check for post-op complications
  S SRPOC=0 I $O(^SRF(SRTN,16,0)) S SRPOC=1,SRCOMP=SRCOMP+1
 ASA ; find ASA class for major procedures
- I SRMM="J" S Z=$E(SRASA) S:Z=""!(Z="N") Z=7 S SRASA(Z)=SRASA(Z)+1
+ I SRMM="J" S Z=$E(SRASA) S:Z="" Z=7 S SRASA(Z)=SRASA(Z)+1
 SP ; find specialty data
  S X=$P(SR(0),"^",4),Y=$S(X:$P(^SRO(137.45,X,0),"^",2),1:"ZZ") S SRSS=$S(Y:$P(^DIC(45.3,Y,0),"^"),1:Y) I '$D(SRSPEC(SRSS)) S SRSS="ZZ"
  F I=1:1:4 S SRP(I)=$P(^TMP("SRSS",$J,SRSS),"^",I)

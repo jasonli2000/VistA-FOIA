@@ -1,6 +1,6 @@
 PRCHREC1 ;ID/RSD,SF/TKW/RHD-CONT. OF RECEIVING ;2/9/93  14:53
-V ;;5.1;IFCAP;**133**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 EN1 S PRCHRQ3="",DA=PRCHPO,D="C",DIC="^PRC(442,DA,2,",DIC(0)="QZXE" W !!?3,"Item: ",X D IX^DIC Q:Y<0
  S PRCHRDY=+$O(^PRC(442,DA,2,"AB",PRCHRD,+Y,0)) S:'$D(^PRC(442,DA,2,+Y,3,PRCHRDY,0)) PRCHRDY=0 S:PRCHRDY PRCHRQ3=$P(^(0),U,2),$P(^(0),U,2)=0
@@ -8,21 +8,9 @@ EN1 S PRCHRQ3="",DA=PRCHPO,D="C",DIC="^PRC(442,DA,2,",DIC(0)="QZXE" W !!?3,"Item
  W !,"UNIT OF PRCH: ",$P($G(^PRCD(420.5,+$P(Y(0),U,3),0)),U,1),"        QTY ORDERED: ",PRCHRQ1,"        PREVIOUSLY RECEIVED: ",PRCHRQ2,!
  I $D(^TMP("PRCHREC4",$J)) W !
  F I=0:0 S I=$O(^TMP("PRCHREC4",$J,+$P(^PRC(442,DA,2,+PRCHRIT,0),U,1),I)) Q:'I  S X=^(I) W ?10,"Delv.Location: ",$P($G(^PRCS(410.8,+X,0)),U,1),?56,"Delv.Qty.:"_$J(+$P(X,U,2),4),!
- N PRCCKER,PRCHITCV,PRCHITIN,PRCHITRQ,PRCHMULT,PRCHCALC
- S PRCHITRQ=$P(^PRC(442,DA,2,+PRCHRIT,0),U,11) I PRCHITRQ'="" S PRCHITIN=$P($G(^PRCS(410,PRCHITRQ,0)),U,6)
- S PRCHITCV=$P(^PRC(442,DA,2,+PRCHRIT,0),U,17),PRCHMULT=+$P(^PRC(442,DA,2,+PRCHRIT,0),U,12)
-ENQTY W !?3,"QTY BEING RECEIVED: ",PRCHRQ3 W:PRCHRQ3]"" "// "
- S PRCHRTP=0,PRCCKER=0 R PRCHRQ:DTIME I PRCHRDY G DEL1^PRCHREC2:PRCHRQ="@" S:PRCHRQ3&((PRCHRQ="")!(PRCHRQ["^")) PRCHRQ=PRCHRQ3
+ W !?3,"QTY BEING RECEIVED: ",PRCHRQ3 W:PRCHRQ3]"" "// "
+ S PRCHRTP=0 R PRCHRQ:DTIME I PRCHRDY G DEL1^PRCHREC2:PRCHRQ="@" S:PRCHRQ3&((PRCHRQ="")!(PRCHRQ["^")) PRCHRQ=PRCHRQ3
  Q:PRCHRQ=""!(PRCHRQ["^")  G:PRCHRQ'=+PRCHRQ!(PRCHRQ<0)!(PRCHRQ?.E1"."3N.N) HLP
- I $P(PRCHRQ,".",2)>0 D
- . I PRCHMULT>0 S PRCHCALC=PRCHRQ*PRCHMULT I +$P(PRCHCALC,".",2)=0 Q
- . I PRCHITCV>0 S PRCHCALC=PRCHRQ*PRCHITCV I +$P(PRCHCALC,".",2)=0 Q
- . W !,"This appears to be an inventory item that will have PURCHASE ORDER RECEIVING TO"
- . W !,"INVENTORY. You CANNOT enter a fractional quantity as it WILL NOT be allowed to"
- . W !,"be received into Inventory.  Please OK the fractional amount is for a non"
- . W !,"inventory receipt.",!
- . W $C(7) S %A="Receiving a fractional quantity, is this a non-inventory item receipt",%B="",%=2 D ^PRCFYN I %'=1 S PRCCKER=1
- I PRCCKER=1 G ENQTY
  I PRCHRQ>(PRCHRQ1-PRCHRQ2) W $C(7) S %A="  You are receiving an overage, do you want to continue",%B="",%=2 D ^PRCFYN Q:%'=1  S PRCHROV=""
  ;
 EN3 I PRCHRQ'=PRCHRQ1 S PRCHRAM=$P(^PRC(442,PRCHPO,2,+PRCHRIT,0),U,9),PRCHRAM=$J(PRCHRAM*PRCHRQ,0,2),PRCHRDA=PRCHRDA/PRCHRQ1*PRCHRQ

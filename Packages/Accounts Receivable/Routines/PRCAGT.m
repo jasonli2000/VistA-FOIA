@@ -1,6 +1,6 @@
 PRCAGT ;WASH-ISC@ALTOONA,PA/CMS-Patient Statement Build Tran List ;8/19/93
-V ;;4.5;Accounts Receivable;**100,162,165,169,219**;Mar 20, 1995;Build 18
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;4.5;Accounts Receivable;**100,162,165,169**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;SEND (DEB=340-IFN,BEG,END,TRANTYPE=430.3-IFN)
  ;BUILD ^TMP("PRCAGT",$J,DEB,DATE,BILL,TN)=TAMT^TTY
  ;IF (TN,TTY)=0 TAMT=BILL'S ORIG AMT
@@ -17,10 +17,9 @@ F430 ;
  .I $P(^PRCA(430,BN,0),U,3) S ^TMP("PRCAGT",$J,DEB,DAT,BN,0)=$P(^PRCA(430,BN,0),"^",3)_"^0"
  Q
 F433 ;
- NEW DAT,TN,TN0,TN1 S COMM=0
+ NEW DAT,TN,TN0,TN1
  F DAT=BEG:0 S DAT=$O(^PRCA(433,"ATD",DEB,DAT)) Q:('DAT)!(DAT>END)  F TN=0:0 S TN=$O(^PRCA(433,"ATD",DEB,DAT,TN)) Q:'TN  D
  .S TN0=$G(^PRCA(433,TN,0)) Q:TN0=""  S TN1=$G(^PRCA(433,TN,1))
- .I $P(TN1,U,2)=45 S COMM=1
  .I $G(TTY)'="" Q:TTY'=$P(TN1,U,2)
  .I TTY="",",3,4,5,6,7,24,25,30,"[(","_$P(TN1,U,2)_",") Q
  .I ($P(TN0,U,2)="")!($P(TN0,U,4)'=2) Q

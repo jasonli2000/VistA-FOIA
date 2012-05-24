@@ -1,5 +1,5 @@
 ECXAECS ;ALB/JAP - ECS Extract Audit Report ;Oct 15, 1997
- ;;3.0;DSS EXTRACTS;**8,33,123**;Dec 22, 1997;Build 8
+ ;;3.0;DSS EXTRACTS;**8,33**;Dec 22, 1997
  ;
 EN ;entry point for ECS extract audit report
  N %X,%Y,X,Y,DIC,DA,DR,DIQ,DIR,CNT
@@ -79,7 +79,7 @@ PROCESS ;process data in file #727.815
  ...I PRSYN]"" S PROCN=PRSYN
  ..;procedures from file #81
  ..I PIEN=0,PROCN="" D
- ...S PIEN=$$CODEN^ICPTCOD(PROC) I +PIEN>0 S PROCN=$P($$CPT^ICPTCOD(PROC,DATE),U,3)
+ ...S PIEN=$O(^ICPT("B",PROC,"")) I +PIEN>0 S PROCN=$P($G(^ICPT(PIEN,0)),U,2)
  ...S PRXF=PIEN_";ICPT("
  ...S PRI=+$O(^ECJ("AP",DIV,UNIT,CAT,PRXF,0)),PRSYN=$P($G(^ECJ(PRI,"PRO")),U,2)
  ...I PRSYN]"" S PROCN=PRSYN

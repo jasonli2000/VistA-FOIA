@@ -1,6 +1,6 @@
-FBAASCB ;AISC/GRR - SUPERVISOR RELEASE ;12/20/2010
- ;;3.5;FEE BASIS;**38,61,116,117**;JAN 30, 1995;Build 9
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+FBAASCB ;AISC/GRR-SUPERVISOR RELEASE ;8/6/2003
+ ;;3.5;FEE BASIS;**38,61**;JAN 30, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  S FBERR=0 D DT^DICRW
  I '$D(^FBAA(161.7,"AC","C"))&('$D(^FBAA(161.7,"AC","A"))) W !!,*7,"There are no batches Pending Release!" Q
 BT W !! S DIC="^FBAA(161.7,",DIC(0)="AEQ",DIC("S")="I ($G(^(""ST""))=""C""!($G(^(""ST""))=""A""))&('$G(^XTMP(""FBAASCB"",+Y)))" D ^DIC K DIC("S") G Q:X="^"!(X=""),BT:Y<0 S FBN=+Y,^XTMP("FBAASCB",FBN)=1
@@ -11,13 +11,6 @@ BT W !! S DIC="^FBAA(161.7,",DIC(0)="AEQ",DIC("S")="I ($G(^(""ST""))=""C""!($G(^
  S FBSTAT=^FBAA(161.7,FBN,"ST"),FBSTAT=$S(FBSTAT="C":"S",FBSTAT="A":"R",1:FBSTAT)
  S FBAAOB=$P(FZ,"^",8)_"-"_FBAAON,FBAAMT=$P(FZ,"^",9),FBCOMM="Release of batch "_FBAAB
  I '$D(^XUSEC("FBAASUPERVISOR",DUZ)) W !!,*7,"Sorry, only Supervisor can Release batch!" D Q G FBAASCB
- ; enforce segregation of duties (FB*3.5*117)
- D UOKCERT^PRCEMOA(.FBUOK,FBAAOB,DUZ) ; IA #5573
- I 'FBUOK D  D Q G FBAASCB
- . W $C(7),!,$P(FBUOK,U,2) ; display text returned by IFCAP API
- . I $P(FBUOK,U)="0" W !,"Due to segregation of duties, you cannot also certify an invoice for payment."
- . I $P(FBUOK,U)="E" W !,"This 1358 error must be resolved before the batch can be released."
- ;
  S DA=FBN,DR="0;ST" W !! D EN^DIQ
 RD S B=FBN S DIR(0)="Y",DIR("A")="Want line items listed",DIR("B")="NO" D ^DIR K DIR G Q:$D(DIRUT) W:Y @IOF D:Y LIST^FBAACCB:FBTYPE="B3",LISTP^FBAACCB:FBTYPE="B5",LISTT^FBAACCB0:FBTYPE="B2",LISTC^FBAACCB1:FBTYPE="B9"
 RDD S DIR(0)="Y",DIR("A")="Do you want to Release Batch as Correct",DIR("B")="NO" D ^DIR K DIR G Q:$D(DIRUT) I 'Y W !!,"Batch has NOT been Released!",*7 D Q G FBAASCB
@@ -25,22 +18,19 @@ RDD S DIR(0)="Y",DIR("A")="Do you want to Release Batch as Correct",DIR("B")="NO
  D POST I $D(FBERR) G SHORT
  G:FBTYPE="B5" FIN
  G:FBTYPE="B9" FIN
-FIN ;
- ; use FileMan to update fields 5 and 6, store date & time (FB*3.5*117)
- S DA=FBN,DIE="^FBAA(161.7,"
- S DR="11////^S X=FBSTAT;6////^S X=DUZ;5////^S X=$$NOW^XLFDT" D ^DIE
- K DA,DIE,DIC,DR
+FIN S $P(FZ,"^",6)=DT,$P(FZ,"^",7)=DUZ,^FBAA(161.7,FBN,0)=FZ
+ S DA=FBN,(DIC,DIE)="^FBAA(161.7,",DIC(0)="LQ",DR="11////"_FBSTAT,DLAYGO=161.7 D ^DIE K DA,DIE,DIC,DR,DLAYGO
  D UCAUTOP
+ ;S DA=FBN,DR="0;ST",DIC="^FBAA(161.7," W !! D EN^DIQ W !!," Batch has been Released!" D Q G FBAASCB
  S DA=FBN,DR="0;ST",DIC="^FBAA(161.7," W !! D EN^DIQ W !!," Batch has been Released!"
+ ; process batch to queue 0.00 paid EDI invoices for FPPS, patch *61
+ D LOG^FBFHLL(FBN,FBTYPE)
  D Q G FBAASCB
 Q I $G(FBN) K ^XTMP("FBAASCB",FBN) L -^FBAA(161.7,FBN)
  K B,J,K,L,M,X,Y,Z,DIC,FBN,A,A1,A2,BE,CPTDESC,D0,DA,DL,DR,DRX,DX,FBAACB,FBAACPT,FBAAON,FBAAOUT,FBVP,FBIN,DK,N,XY,FBINOLD,FBINTOT,FBTYPE,FZ,P3,P4,Q,S,T,V,VID,ZS,FBAAB,FBAAMT,FBAAOB,FBCOMM,FBAUT,FBSITE,I,X,Y,Z,FBERR,DIRUT,FBSTAT,FBLOCK
- K FBAC,FBAP,FBCNH,FBFD,FBI,FBLISTC,FBPDT,FBSC,FBTD,PRCSCPAN,DFN,FBINV
- K FBUOK
+ K FBAC,FBAP,FBCNH,FBFD,FBI,FBLISTC,FBPDT,FBSC,FBTD,PRCSCPAN,DFN
  Q
-SHORT ;
- I '$D(FBINV) W !!,*7,"This batch CANNOT be released. Check your 1358.",!
- L -^FBAA(161.7,FBN) D Q G FBAASCB
+SHORT W !!,*7,"This batch CANNOT be released. Check your 1358.",! L -^FBAA(161.7,FBN) D Q G FBAASCB
 POST ;FBAAOB=FULL OBLIGATION NUMBER(STA-CXXXXX)
  ;FBCOMM=COMMENT FOR 1358
  ;FBAAMT=TOTAL AMOUNT OF BATCH
@@ -95,4 +85,3 @@ UCAUTOP ; Unauthorized Claims Autoprint
  ;
  K ^TMP("FBUC",$J)
  Q
- ;

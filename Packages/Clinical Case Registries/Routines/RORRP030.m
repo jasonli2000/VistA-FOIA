@@ -1,9 +1,6 @@
-RORRP030 ;HCIOFO/SG - RPC: PATIENT DELETE ;11/29/05 3:04pm
- ;;1.5;CLINICAL CASE REGISTRIES;**10**;Feb 17, 2006;Build 32
+RORRP030 ;HCIOFO/SG - RPC: PATIENT DELETE ; 11/29/05 3:04pm
+ ;;1.5;CLINICAL CASE REGISTRIES;;Feb 17, 2006
  ;
- ; This routine uses the following IAs:
- ;
- ; #2053    FILE^DIE (supported)
  Q
  ;
  ;***** MARKS THE PATIENT'S RECORD AS DELETED FROM THE REGISTRY
@@ -45,13 +42,10 @@ DELETE(RESULTS,REGIEN,RORDFN,FORCE) ;
  I IENS'>0  D  D RPCSTK^RORERR(.RESULTS,RC)  Q
  . S RC=$$ERROR^RORERR(-97,,,RORDFN,REGNAME)
  ;
- ;I $$PENDING^RORUTL18(+IENS)  D
- ;. ;--- Delete the pending record immediately
- ;. N DA,DIK  S DIK=$$ROOT^DILFD(798),DA=+IENS  D ^DIK
- ;E  D
- ;
- ;Patch 10: mark any deleted record as deleted (don't delete pending record immediately)
- D
+ I $$PENDING^RORUTL18(+IENS)  D
+ . ;--- Delete the pending record immediately
+ . N DA,DIK  S DIK=$$ROOT^DILFD(798),DA=+IENS  D ^DIK
+ E  D
  . ;--- Mark the record as deleted
  . S RORFDA(798,IENS,3)=5
  . D FILE^DIE(,"RORFDA","RORMSG")

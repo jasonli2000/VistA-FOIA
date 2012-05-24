@@ -1,50 +1,50 @@
 RMPOPST1 ;EDS/JAM,RVD - HOME OXYGEN BILLING TRANSACTIONS/POSTING,Part 2 ;7/24/98
- ;;3.0;PROSTHETICS;**29,44,55,154**;Feb 09, 1996;Build 6
+ ;;3.0;PROSTHETICS;**29,44,55**;Feb 09, 1996
  ; RVD #55  - corrected the typo (missing '^' on TMP global).
  ;
  ;Processing of 1358 and Purchase Cards to IFCAP
  Q
 IFCAP ;process payment type - Purchase Card or 1358
  D @$S($P(PAYINF,U)="P":"PRHCARD",1:"1358")
- I $P(^TMP($J,FCP),U,2) D 
+ I $P(^TMP($J,FCP),U,2) D
  . W !!,FCP,"   ...Posted" D FCPUPD ;update global ^RMPO(665.72
  K A
  Q  ;IFCAP
  ;
 PRHCARD ;Processing IFCAP Purchase Card
- N DFN,PRCA,PRCB,PRCC,INDVITM,ITMSTR,RMPOA,X,CNT,CURDT,CNTR,TOTD
+ N DFN,PRCA,PRCB,PRCC,INDVITM,ITMSTR,RMPOA,X,CNT,CURDT
  S PRCA=PCTOT+FCPTOT,PRCB=IEN442,PRCC="RMPOA"
  ;Store individual patient in array RMPOA for posting
- S DFN="",TOTD=0,CNTR=0  F CNT=1:1 S DFN=$O(^TMP($J,FCP,DFN)) Q:DFN=""  D
- . S ITMSTR=^TMP($J,FCP,DFN),TOTD=TOTD+$P(ITMSTR,U),CNTR=CNTR+1
- I CNTR>0 S RMPOA(1)=$J(TOTD,10,2)_"  TOTAL PATIENTS= "_CNTR
+ S DFN=""  F CNT=1:1 S DFN=$O(^TMP($J,FCP,DFN)) Q:DFN=""  D
+ . S ITMSTR=^TMP($J,FCP,DFN)
+ . S RMPOA(CNT)=$TR($P(ITMSTR,U,5),","," ")_"  "_$P(ITMSTR,U) ;pat name & total
  D EDITIC^PRCH7D(PRCA,PRCB,PRCC)
  I X="^" D  Q  ;PRHCARD
  . S $P(^TMP($J,FCP),U,2)=0,$P(^TMP($J,FCP),U,3)="Posting of PC aborted"
  . ;W "  ",$P(^TMP($J,FCP),U,3)
  S $P(^TMP($J,FCP),U,2)=1,$P(^TMP($J,FCP),U,4)=PRCA
  D NOW^%DTC S CURDT=%
- ;Update file 660 and ^RMPO(665.72 
+ ;Update file 660 and ^RMPO(665.72
  S DFN="" F  S DFN=$O(^TMP($J,FCP,DFN)) Q:DFN=""  D
  . S $P(^TMP($J,FCP,DFN),U,3)=1
  . D GBLUPD
  Q  ;PRHCARD
  ;
 1358 ;processing IFCAP 1358
- N DFN,IEN424,BAL,CURDT,Y,PATOT,PATINF,PSTFLG,PRCSX,PATINFW
+ N DFN,IEN424,BAL,CURDT,Y,PATOT,PATINF,PSTFLG,PRCSX
  ;Check balance on 1358
  S BAL=$$BAL(IEN442) I BAL<FCPTOT D  Q
  . S $P(^TMP($J,FCP),U,2)=0,$P(^TMP($J,FCP),U,3)="Insufficient balance"
  . ;W "  ",$P(^TMP($J,FCP),U,3)
  S PSTFLG=0,DFN=""
- F I=1:1 S DFN=$O(^TMP($J,FCP,DFN)) Q:DFN=""  D
- . S PATOT=+^TMP($J,FCP,DFN),PATINF="PAT ID "_DFN,PATINFW=$P(^TMP($J,FCP,DFN),U,2)
+ F  S DFN=$O(^TMP($J,FCP,DFN)) Q:DFN=""  D
+ . S PATOT=+^TMP($J,FCP,DFN),PATINF=$P(^TMP($J,FCP,DFN),U,2)
  . ;authorize amount to be posted
  . D NOW^%DTC S CURDT=%
  . S X=SRVORD_"^"_CURDT_"^"_PATOT_"^^"_PATINF,Y=$$AUTH(X)
  . I '+Y D  Q
  . . S $P(^TMP($J,FCP,DFN),U,3)=0,$P(^TMP($J,FCP,DFN),U,4)=$P(Y,U)_$P(Y,U,2)
- . . W !!,"Authorization failed for: ",PATINFW,!
+ . . W !!,"Authorization failed for: ",PATINF,!
  . . W "IFCAP reason: ",$S($P(Y,U,2)'="":$P(Y,U,2),1:$P(Y,U))
  . S IEN424=$P(Y,U,2)
  . ;post patient total to authorized IEN 424 and closeout posting
@@ -52,7 +52,7 @@ PRHCARD ;Processing IFCAP Purchase Card
  . S Y=$$COMPST(PRCSX)
  . I '+Y D  Q
  . . S $P(^TMP($J,FCP,DFN),U,3)=0,$P(^TMP($J,FCP,DFN),U,4)=$P(Y,U,2)
- . . W !!,"Post Completion failed for: "_PATINFW,!
+ . . W !!,"Post Completion failed for: "_PATINF,!
  . . W "IFCAP reason: "_$P(Y,U,2)
  . . W "Patient IEN(424): ",IEN424
  . S $P(^TMP($J,FCP,DFN),U,3)=1,PSTFLG=1

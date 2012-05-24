@@ -1,8 +1,8 @@
-IBCNERP9 ;DAOU/BHS - eIV STATISTICAL REPORT PRINT ;12-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERP9 ;DAOU/BHS - IIV STATISTICAL REPORT PRINT ;12-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification Interface
+ ; IIV - Insurance Identification and Verification Interface
  ;
  ; Input variables from IBCNERP7:
  ;  IBCNERTN = "IBCNERP7"
@@ -21,16 +21,16 @@ IBCNERP9 ;DAOU/BHS - eIV STATISTICAL REPORT PRINT ;12-JUN-2002
  ;   Assumes report data exists in ^TMP($J,IBCNERTN,...)
  ;   Based on IBCNESPC("SECTS") parameter the following scratch globals
  ;   will be built
- ;   1 OR contains 2 --> 
+ ;   1 OR contains 2 -->
  ;    ^TMP($J,RTN,"OUT")=TotInq^InsBufExtSubtotal^PreRegExtSubtotal^...
  ;                       NonVerifInsExtSubtotal^NoActInsExtSubtotal
- ;   1 OR contains 3 --> 
+ ;   1 OR contains 3 -->
  ;    ^TMP($J,RTN,"IN")=TotResp^InsBufExtSubtotal^PreRegExtSubtotal^...
  ;                       NonVerifInsExtSubtotal^NoActInsExtSubtotal
- ;   1 OR contains 4 --> 
+ ;   1 OR contains 4 -->
  ;    ^TMP($J,RTN,"CUR")=TotOutstandingInq^TotInqRetries^...
  ;                       TotInqCommFailure^TotInsBufVerified^...
- ;                       ManVerifedSubtotal^eIVProcessedSubtotal...
+ ;                       ManVerifedSubtotal^IIVProcessedSubtotal...
  ;                       TotInsBufUnverified^! InsBufSubtotal^...
  ;                       ? InsBufSubtotal^- InsBufSubtotal^...
  ;                       Other InsBufSubtotal^TQReadyToTransmit^...
@@ -113,14 +113,13 @@ PRINT(RTN,BDT,EDT,SCT,MM,PGC,PXT,MAX,CRT) ; Print data
  . ; Build lines of data to display
  . D DATA(.DISPDATA,.LINECT,RTN,"CUR",MM)
  . D DATA(.DISPDATA,.LINECT,RTN,"PYR",MM)
- . D DATA(.DISPDATA,.LINECT,RTN,"FLG",MM)
  ;
 PRINT2 S LINECT=LINECT+1
  S DISPDATA(LINECT)=EORMSG
  ;
  I MM="" D LINE(.DISPDATA,.PGC,.PXT,MAX,CRT,SITE,DTMRNG,MM)
  ; Generate MailMan message, if flag is set
- I MM'="" D MSG^IBCNEUT5(MM,"** eIV Statistical Rpt **","DISPDATA(")
+ I MM'="" D MSG^IBCNEUT5(MM,"** IIV Statistical Rpt **","DISPDATA(")
  ;
 PRINTX ; PRINT exit pt
  Q
@@ -142,7 +141,7 @@ LINEX ; LINE exit pt
  ;
 DATA(DISPDATA,LINECT,RTN,TYPE,MM) ; Format lines of data to be printed
  ; Init vars
- N DASHES,PEND,RPTDATA,CT,DEFINQ,INSCOS,PAYERS,QUEINQ,TXT
+ N DASHES,DASHES2,PEND,RPTDATA,CT,DEFINQ,INSCOS,PAYERS,QUEINQ,TXT
  ;
  S $P(DASHES,"=",15)=""
  I LINECT>0,MM="" S LINECT=LINECT+1,DISPDATA(LINECT)=""
@@ -156,8 +155,8 @@ DATA(DISPDATA,LINECT,RTN,TYPE,MM) ; Format lines of data to be printed
  I TYPE="OUT"!(TYPE="IN") D  G DATAX
  . S LINECT=LINECT+1
  . S DISPDATA(LINECT)=$$FO^IBCNEUT1($S(TYPE="OUT":"Inquiries Sent:",1:"Responses Received:"),36)_$$FO^IBCNEUT1(+$P(RPTDATA,U,1),9,"R")
- . F CT=1:1:3 D
- . . S TYPE="  "_$S(CT=1:"Insurance Buffer",CT=2:"Appointment",1:"Non-verified Insurance")
+ . F CT=1:1:4 D
+ . . S TYPE="  "_$S(CT=1:"Insurance Buffer",CT=2:"Appointment",CT=3:"Non-verified Insurance",1:"No Active Insurance")
  . . S LINECT=LINECT+1
  . . S DISPDATA(LINECT)=$$FO^IBCNEUT1(TYPE,46)_$$FO^IBCNEUT1(+$P(RPTDATA,U,CT+1),9,"R")
  ;
@@ -182,7 +181,7 @@ DATA(DISPDATA,LINECT,RTN,TYPE,MM) ; Format lines of data to be printed
  . ; Payers disabled locally
  . S PAYERS=+$P(RPTDATA,U,5)
  . S LINECT=LINECT+1
- . S DISPDATA(LINECT)=$$FO^IBCNEUT1("eIV Payers Disabled Locally:",36)_$$FO^IBCNEUT1(PAYERS,9,"R")
+ . S DISPDATA(LINECT)=$$FO^IBCNEUT1("eIIV Payers Disabled Locally:",36)_$$FO^IBCNEUT1(PAYERS,9,"R")
  . S LINECT=LINECT+1
  . S DISPDATA(LINECT)=""
  . ; Insurance Buffer statistics
@@ -198,16 +197,16 @@ DATA(DISPDATA,LINECT,RTN,TYPE,MM) ; Format lines of data to be printed
  . . I CT=7 S TXT="* entries (User Verified policy)"
  . . I CT=8 S TXT="+ entries (Payer indicated Active policy)"
  . . I CT=10 S TXT="# entries (Policy status undetermined)"
- . . I CT=11 S TXT="! entries (eIV needs user assistance for entry)"
+ . . I CT=11 S TXT="! entries (IIV needs user assistance for entry)"
  . . I CT=13 S TXT="- entries (Payer indicated Inactive policy)"
  . . S TYPE=TYPE_TXT
  . . S DISPDATA(LINECT)=$$FO^IBCNEUT1(TYPE,56)_$$FO^IBCNEUT1(+$P(RPTDATA,U,CT),9,"R")
  . ;
  . S LINECT=LINECT+1
  . S DISPDATA(LINECT)=$$FO^IBCNEUT1("  Entries Awaiting Processing: ",46)_$$FO^IBCNEUT1(+$P(RPTDATA,U,9),9,"R")
- . ; Subtotal of ? entries (eIV is waiting for a response)
+ . ; Subtotal of ? entries (IIV is waiting for a response)
  . S LINECT=LINECT+1
- . S DISPDATA(LINECT)=$$FO^IBCNEUT1("    # of ? entries (eIV is waiting for a response)",56)_$$FO^IBCNEUT1(+$P(RPTDATA,U,12),9,"R")
+ . S DISPDATA(LINECT)=$$FO^IBCNEUT1("    # of ? entries (IIV is waiting for a response)",56)_$$FO^IBCNEUT1(+$P(RPTDATA,U,12),9,"R")
  . ; Subtotal of blank entries (yet to be processed or accepted)
  . S LINECT=LINECT+1
  . S DISPDATA(LINECT)=$$FO^IBCNEUT1("    # of blank entries (yet to be processed or accepted)",56)_$$FO^IBCNEUT1(+$P(RPTDATA,U,14),9,"R")
@@ -217,42 +216,17 @@ DATA(DISPDATA,LINECT,RTN,TYPE,MM) ; Format lines of data to be printed
  . ; Payers added to file 365.12
  . D DATAX
  . S LINECT=LINECT+1
- . S DISPDATA(LINECT)="New eIV Payers received during report date range:"
+ . S DISPDATA(LINECT)="New eIIV Payers received during report date range:"
  . S LINECT=LINECT+1
  . I '$D(^TMP($J,RTN,TYPE)) S DISPDATA(LINECT)="    No new Payers added" Q
  . S DISPDATA(LINECT)="  Please link the associated active insurance companies to these payers at your"
  . S LINECT=LINECT+1,DISPDATA(LINECT)="  earliest convenience.  Locally activate the payers after you link insurance"
  . S LINECT=LINECT+1,DISPDATA(LINECT)="  companies to them.  For further details regarding this process, please refer"
- . S LINECT=LINECT+1,DISPDATA(LINECT)="  to the Integrated Billing eIV Interface User Guide."
+ . S LINECT=LINECT+1,DISPDATA(LINECT)="  to the Integrated Billing IIV Interface User Guide."
  . N PYR,PIEN
  . S PYR="",PIEN="" F  S PYR=$O(^TMP($J,RTN,TYPE,PYR)) Q:PYR=""  D
  . . F  S PIEN=$O(^TMP($J,RTN,TYPE,PYR,PIEN)) Q:'PIEN  S LINECT=LINECT+1,DISPDATA(LINECT)="    "_PYR
  ;
- ; Active/Trusted flag logs
- I TYPE="FLG" D  G DATAX
- .N DATA,PNAME,Z,FLG
- .F FLG="A","T" D
- ..S LINECT=LINECT+1,DISPDATA(LINECT)="",LINECT=LINECT+1
- ..I FLG="A" D
- ...S DISPDATA(LINECT)="National Payers - ACTIVE flag changes at FSC"
- ...S LINECT=LINECT+1
- ...S DISPDATA(LINECT)="============================================"
- ...Q
- ..I FLG="T" D
- ...S DISPDATA(LINECT)="Nationally Active Payers - TRUSTED flag changes at FSC"
- ...S LINECT=LINECT+1
- ...S DISPDATA(LINECT)="======================================================"
- ...Q
- ..I '$D(^TMP($J,RTN,"CUR","FLAGS",FLG)) S LINECT=LINECT+1,DISPDATA(LINECT)=" No information available" Q
- ..S PNAME="" F  S PNAME=$O(^TMP($J,RTN,"CUR","FLAGS",FLG,PNAME)) Q:PNAME=""  D
- ...S Z="" F  S Z=$O(^TMP($J,RTN,"CUR","FLAGS",FLG,PNAME,Z)) Q:Z=""  D
- ....S DATA=$G(^TMP($J,RTN,"CUR","FLAGS",FLG,PNAME,Z))
- ....S LINECT=LINECT+1
- ....S DISPDATA(LINECT)=$$FO^IBCNEUT1(" "_PNAME,47)_$$FO^IBCNEUT1($P(DATA,U),19)_" Set: "_$P(DATA,U,2)
- ....Q
- ...Q
- ..Q
- .Q
 DATAX ; DATA exit pt
  S LINECT=LINECT+1
  S DISPDATA(LINECT)=""

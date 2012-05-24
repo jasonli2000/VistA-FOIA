@@ -1,4 +1,4 @@
-LBRYPT1 ; GENERATED FROM 'LBRY PATRON TITLES' PRINT TEMPLATE (#618) ; 08/23/96 ; (FILE 680.5, MARGIN=80)
+LBRYPT1 ; GENERATED FROM 'LBRY PATRON TITLES' PRINT TEMPLATE (#618) ; 09/19/10 ; (FILE 680.5, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,8 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(618,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 M DXS=^DIPT(618,"DXS")
+ S I(0)="^LBRY(680.5,",J(0)=680.5
  D T Q:'DN  D N D N:$X>0 Q:'DN  W ?0 W "TITLE: "
  S X=$G(^LBRY(680.5,D0,0)) D N:$X>7 Q:'DN  W ?7,$E($P(X,U,1),1,160)
  S I(100)="^LBRY(680,",J(100)=680 X DXS(1,9.2) S DIP(101)=$S($D(^LBRY(680,D0,0)):^(0),1:"") S X=$S('$D(^LBRY(680.5,+$P(DIP(101),U,1),0)):"",1:$P(^(0),U,1)) S D0=I(0,0) S D0=D(0) I D0>0 D A1
@@ -23,14 +24,14 @@ A1 ;
 A1R ;
  K J(100),I(100) S:$D(I(0,0)) D0=I(0,0)
  D N:$X>0 Q:'DN  W ?0 W "FORMERLY: "
- S X=$G(^LBRY(680.5,D0,3)) D N:$X>10 Q:'DN  W ?10 S Y=$P(X,U,6) S Y=$S(Y="":Y,$D(^LBRY(680.5,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,160)
+ S X=$G(^LBRY(680.5,D0,3)) D N:$X>10 Q:'DN  W ?10 S Y=$P(X,U,6) S Y=$S(Y="":Y,$D(^LBRY(680.5,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,160)
  D N:$X>0 Q:'DN  W ?0 W "CONTINUED BY: "
- D N:$X>14 Q:'DN  W ?14 S Y=$P(X,U,7) S Y=$S(Y="":Y,$D(^LBRY(680.5,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,160)
+ D N:$X>14 Q:'DN  W ?14 S Y=$P(X,U,7) S Y=$S(Y="":Y,$D(^LBRY(680.5,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,160)
  S I(100)="^LBRY(680,",J(100)=680 X DXS(2,9.2) S DIP(101)=$S($D(^LBRY(680,D0,0)):^(0),1:"") S X=$S('$D(^LBRY(680.5,+$P(DIP(101),U,1),0)):"",1:$P(^(0),U,1)) S D0=I(0,0) S D0=D(0) I D0>0 D B1
  G B1R
 B1 ;
  D N:$X>0 Q:'DN  W ?0 W "PLACEMENT: "
- S X=$G(^LBRY(680,D0,1)) D N:$X>11 Q:'DN  W ?11 S Y=$P(X,U,3) S Y=$S(Y="":Y,$D(^LBRY(680.7,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,35)
+ S X=$G(^LBRY(680,D0,1)) D N:$X>11 Q:'DN  W ?11 S Y=$P(X,U,3) S Y=$S(Y="":Y,$D(^LBRY(680.7,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,35)
  D N:$X>0 Q:'DN  W ?0 W "MICROFILM HOLDINGS: "
  S X=$G(^LBRY(680,D0,2)) D N:$X>20 Q:'DN  W ?20,$E($P(X,U,2),1,75)
  D N:$X>0 Q:'DN  W ?0 W "DETAILED HOLDINGS: "
@@ -40,7 +41,8 @@ A2 ;
  S X=$G(^LBRY(680,D0,12,D1,0)) S DIWL=3,DIWR=78 D ^DIWP
  Q
 A2R ;
- D A^DIWW
+ D 0^DIWW
+ D ^DIWW
  D N:$X>0 Q:'DN  W ?0 W "SUMMARY HOLDINGS: "
  S X=$G(^LBRY(680,D0,9)) D N:$X>18 Q:'DN  W ?18,$E($P(X,U,1),1,50)
  D N:$X>0 Q:'DN  W ?0 W "GAPS: "
@@ -50,7 +52,8 @@ B2 ;
  S X=$G(^LBRY(680,D0,11,D1,0)) S DIWL=3,DIWR=78 D ^DIWP
  Q
 B2R ;
- D A^DIWW
+ D 0^DIWW
+ D ^DIWW
  D N:$X>0 Q:'DN  W ?0 W "RETENTION POLICY: "
  S X=$G(^LBRY(680,D0,9)) D N:$X>19 Q:'DN  W ?19,$E($P(X,U,4),1,20)
  Q

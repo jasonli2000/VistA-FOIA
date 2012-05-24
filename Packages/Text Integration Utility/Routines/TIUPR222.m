@@ -1,4 +1,4 @@
-TIUPR222 ; SLC/AJB - TIU Form Letter Update;06Mar07
+TIUPR222 ; SLC/AJB - TIU Form Letter Update;06Mar07 ;12/27/07  18:20
  ;;1.0;TEXT INTEGRATION UTILITIES;**222**;Jun 20, 1997
  Q
 EN ;
@@ -7,7 +7,7 @@ EN ;
  . F NAME="FORM LETTERS","FORM LETTER EXAMPLE" D
  . . I $$CHKTITLE(8925.1,NAME)>0 S TIUQUIT=1
  I +$G(TIUQUIT) W !!,"Titles have already been installed and will not be installed again." Q
- I '$D(ZTQUEUED) X ^%ZOSF("EON") W IOCUON,@IOF
+ I '$D(ZTQUEUED) X ^%ZOSF("EON") W $G(IOCUON),@IOF ;WVEHR/VOE IOCUON TO $G(IOCUON)
  I $$CHKTITLE(8925.1,"PROGRESS NOTES")<0 G EXIT
  W !!,"Creating the new DOCUMENT CLASS ""FORM LETTERS"" and"
  W !,"and the new TITLE ""FORM LETTER EXAMPLE"" in FILE #8925.1"

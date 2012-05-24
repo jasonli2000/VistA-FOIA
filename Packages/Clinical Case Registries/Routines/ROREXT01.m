@@ -1,11 +1,6 @@
-ROREXT01 ;HCIOFO/SG - EXTRACTION & TRANSMISSION PROCESS ;1/22/06 12:40pm
- ;;1.5;CLINICAL CASE REGISTRIES;**10**;Feb 17, 2006;Build 32
+ROREXT01 ;HCIOFO/SG - EXTRACTION & TRANSMISSION PROCESS ; 1/22/06 12:40pm
+ ;;1.5;CLINICAL CASE REGISTRIES;;Feb 17, 2006
  ;
- ; This routine uses the following IAs:
- ;
- ; #10063  $$S^%ZTLOAD (supported)
- ; #10103  $$FMDIFF^XLFDT (supported)
- ; #10103  $$NOW^XLFDT (supported)
  Q
  ;
  ;***** INTERNAL ENTRY POINT FOR DATA EXTRACTION
@@ -75,7 +70,7 @@ INTEXT(REGLST,RORTASK) ;
  ;
  ;***** RETURNS THE NEXT PATIENT FOR DATA EXTRACTION
  ;
- ; PTIEN         Patient IEN (DFN in file #2)
+ ; PTIEN         Patient IEN (DFN)
  ;
  ; .RGIENLST     Reference to a local array containing registry
  ;               IENs as subscripts. The IENs of the corresponding
@@ -95,10 +90,10 @@ NEXTPAT(PTIEN,RGIENLST) ;
  . . S RGIENLST(REGIEN)=0
  . . S IEN=+$O(^RORDATA(798,"KEY",PTIEN,REGIEN,""))
  . . Q:IEN'>0
- . . ;With patch 10, status is irrelevant
- . . ;I '$$ACTIVE^RORDD(IEN,,.STATUS)  Q:STATUS'=5
- . . ;--- Skip a record tagged as "DON'T SEND" or if test patient
- . . I (($P($G(^RORDATA(798,IEN,2)),U,4))!($$TESTPAT^RORUTL01(PTIEN))) Q
+ . . ;--- Skip all inactive records except marked for deletion
+ . . I '$$ACTIVE^RORDD(IEN,,.STATUS)  Q:STATUS'=5
+ . . ;--- Skip a record tagged as "DON'T SEND"
+ . . Q:$P($G(^RORDATA(798,IEN,2)),U,4)
  . . ;--- Consider the record
  . . S RGIENLST(REGIEN)=IEN,CNT=CNT+1
  Q $S(PTIEN>0:PTIEN,1:0)

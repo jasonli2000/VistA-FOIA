@@ -1,6 +1,6 @@
-PRCPCSOU ;WISC/RFJ-surgery order supplies utilities ; 06/23/2009  2:17 PM
- ;;5.1;IFCAP;**136**;Oct 20, 2000;Build 6
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCPCSOU ;WISC/RFJ-surgery order supplies utilities                 ;01 Sep 93
+ ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
  ;
@@ -17,12 +17,10 @@ SHOWORD(PATIENT,SURGERY) ;  show orders placed for patient da and surgery da
  I $G(PRCPFREL) W !,"** TO DELETE ORDERS WHICH HAVE BEEN RELEASED FOR PROCESSING, PLEASE PHONE SPD **"
  Q
  ;
- ;operate = ien of file #81
- ;orderda = ien of file #445.3
- ;prcdt = fileman date
-SHOWCC(OPERATE,ORDERDA,PRCDT) ;show case carts linked to operation da, order da
+ ;
+SHOWCC(OPERATE,ORDERDA)      ;  show case carts linked to operation da, order da
  N %,DA,DATA,PRCPFLAG,SCREEN
- W !!,"Case Carts to Order for Operation: ",$TR($$ICPT^PRCPCUT1(+OPERATE,$G(PRCDT)),"^"," ")
+ W !!,"Case Carts to Order for Operation: ",OPERATE,"  ",$P($$ICPT^PRCPCUT1(+OPERATE),"^",2)
  I '$D(^PRCP(445.7,"AOP",OPERATE)) W !?5,"<< NONE SPECIFIED >>" Q
  S (DA,SCREEN)=0 F  S DA=$O(^PRCP(445.7,"AOP",OPERATE,DA)) Q:'DA!($G(PRCPFLAG))  D
  .   I SCREEN>(IOSL-5) D P^PRCPUREP Q:$G(PRCPFLAG)  S SCREEN=0

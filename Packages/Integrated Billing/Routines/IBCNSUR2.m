@@ -1,6 +1,6 @@
 IBCNSUR2 ;ALB/CPM/CMS - MOVE SUBSCRIBERS TO DIFFERENT PLAN (CON'T) ; 09-SEP-96
- ;;2.0;INTEGRATED BILLING;**103,238,399**;21-MAR-94;Build 8
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**103,238**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
 PL ; Display old plan attributes; allow new plan to be edited
@@ -16,7 +16,7 @@ PL ; Display old plan attributes; allow new plan to be edited
  W !,?19,"TYPE OF PLAN:  ",$S($P(IBP0,"^",9):$P($G(^IBE(355.1,+$P(IBP0,"^",9),0)),"^"),1:"<Not Specified")
  W !,?11,"ELECTRONIC PLAN TYPE:  ",$$EXPAND^IBTRE(355.3,.15,$P(IBP0,U,15)) ; TJH *238
  I $P(IBP0,U,14)]"" W !,?18,"PLAN CATEGORY:  ",$$EXPAND^IBTRE(355.3,.14,$P(IBP0,U,14))
- W !,?9,"PLAN FILING TIME FRAME:  ",$P(IBP0,U,13) I +$P(IBP0,U,16) W "  (",$$FTFN^IBCNSU31(IBP1),")"
+ W !,?9,"PLAN FILING TIME FRAME:  ",$P(IBP0,U,13)
  W !," IS UTILIZATION REVIEW REQUIRED:  ",$$YN($P(IBP0,"^",5))
  W !,"  AMBULATORY CARE CERTIFICATION:  ",$$EXPAND^IBTRE(355.3,.12,$P(IBP0,U,12))
  W !,"  IS PRE-CERTIFICATION REQUIRED:  ",$$YN($P(IBP0,"^",6))
@@ -29,7 +29,7 @@ PL ; Display old plan attributes; allow new plan to be edited
  W !?9,"Plan Name: ",IBP2N,?43,"Plan Number: ",IBP2X,!
  ;
  S DIE="^IBA(355.3,",DA=IBP2
- S DR=".09;.15;I $P($G(^IBE(355.1,+$P($G(^IBA(355.3,DA,0)),U,9),0)),U,3)'=5 S Y=""@10"";.14;@10;.16;I '$$FTFV^IBCNSU31(X) S Y=""@13"";.17;@13;.13;.05;.12;.06:.08"
+ S DR=".09;.15;I $P($G(^IBE(355.1,+$P($G(^IBA(355.3,DA,0)),U,9),0)),U,3)'=5 S Y=""@10"";.14;@10;.13;.05;.12;.06:.08"
  D ^DIE K DA,DIE,DR
  ;
  Q

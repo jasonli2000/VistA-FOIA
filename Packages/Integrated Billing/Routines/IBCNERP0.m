@@ -1,8 +1,8 @@
-IBCNERP0 ;DAOU/BHS - IBCNE eIV STATISTICAL REPORT (cont'd) ;11-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERP0 ;DAOU/BHS - IBCNE IIV STATISTICAL REPORT (cont'd) ;11-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification Interface
+ ; IIV - Insurance Identification and Verification Interface
  ;
  ; PYR tag called by IBCNERP8
  ;
@@ -21,11 +21,11 @@ PYR(RTN,BDT,EDT,TOT) ; Determine Incoming Data
  . S CREATEDT=$P($G(^IBE(365.12,PIEN,0)),U,4)
  . I CREATEDT=""!(CREATEDT<BDT)!(CREATEDT>EDT) Q
  . S PYR=$P($G(^IBE(365.12,PIEN,0)),U)
- . Q:PYR="~NO PAYER"       ; used internally only - not a real eIV payer
+ . Q:PYR="~NO PAYER"       ; used internally only - not a real IIV payer
  . ;
  . ; Get Payer app multiple IEN
  . S APPIEN=$$PYRAPP^IBCNEUT5("IIV",PIEN)
- . ; Must have eIV application
+ . ; Must have eIIV application
  . I 'APPIEN Q
  . S APPDATA=$G(^IBE(365.12,PIEN,1,APPIEN,0))
  . ; Must be Nationally Active
@@ -50,7 +50,7 @@ HEADER(HDRDATA,PGC,PXT,MAX,CRT,SITE,DTMRNG,MM) ; Print header info for each pg
  ;
  ; Update header based on MailMan message flag
  S HDRCT=0
- S HDRCT=HDRCT+1,HDRDATA(HDRCT)="eIV Statistical Report"_$$FO^IBCNEUT1($$FMTE^XLFDT($$NOW^XLFDT,1)_"  Page: "_PGC,56,"R")
+ S HDRCT=HDRCT+1,HDRDATA(HDRCT)="IIV Statistical Report"_$$FO^IBCNEUT1($$FMTE^XLFDT($$NOW^XLFDT,1)_"  Page: "_PGC,56,"R")
  ;S HDRDATA(HDRCT)=$$FO^IBCNEUT1(SITE,(80-$L(SITE)\2)+$L(SITE),"R"),HDRCT=HDRCT+1
  S HDR="Report Timeframe:"
  S HDRCT=HDRCT+1,HDRDATA(HDRCT)=$$FO^IBCNEUT1(HDR,80-$L(HDR)\2+$L(HDR),"R")

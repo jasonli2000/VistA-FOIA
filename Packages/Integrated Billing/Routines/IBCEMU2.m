@@ -1,5 +1,5 @@
 IBCEMU2 ;ALB/DSM - IB MRA Utility ;01-MAY-2003
- ;;2.0;INTEGRATED BILLING;**155,320,349,436**;21-MAR-94;Build 31
+ ;;2.0;INTEGRATED BILLING;**155,320,349**;21-MAR-94;Build 46
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q
@@ -35,7 +35,7 @@ STOP() ;determine if user has requested the queued report to stop
 STAT(IBIFN,STATUS,MRAONLY) ; Update the review status in the EOB file
  ; This procedure updates field .16 in file 361.1 for all EOB's for
  ; the given bill#
- ; 
+ ;
  ;   IBIFN   - Internal Bill# (required)
  ;   STATUS  - Internal Value of the Review Status field (required)
  ;   MRAONLY - Optional Flag with a default of 0 if not passed in
@@ -162,7 +162,7 @@ CALCMCA(EOBADJ) ; FUNCTION - Calculate Medicare Contract Adjustment
  ; Sums up Amounts on ALL Reason Codes under ALL Group Codes = 'CO' and
  ; returns that value (which is Medicare Contract Adjustment).
  ;
- ; Input  EOBADJ = Array of Group Codes & Reason Codes from either the Claim 
+ ; Input  EOBADJ = Array of Group Codes & Reason Codes from either the Claim
  ;                 Level (10) or Service Line Level (15) of EOB file (#361.1)
  ; Output  returns Medicare Contract Adjustment
  ;
@@ -176,10 +176,10 @@ CALCMCA(EOBADJ) ; FUNCTION - Calculate Medicare Contract Adjustment
  . . S MCA=MCA+RSNAMT
  Q MCA  ;CALCMCA
  ;
-ALLOWED(IBEOB) ; Returns Total Allowed Amount by summing up all Allowed Amounts 
+ALLOWED(IBEOB) ; Returns Total Allowed Amount by summing up all Allowed Amounts
  ; from Line Level Adjustment
  ; Input: IBEOB = ien of EOB file (361.1)
- ; 
+ ;
  N LNLVL,LNLVLD,ALWD,TOTALWD
  S (LNLVL,TOTALWD)=0
  F  S LNLVL=$O(^IBM(361.1,IBEOB,15,LNLVL)) Q:'LNLVL  S LNLVLD=^(LNLVL,0) D
@@ -189,7 +189,7 @@ ALLOWED(IBEOB) ; Returns Total Allowed Amount by summing up all Allowed Amounts
 MRATYPE(BILL,ARDATE) ; Function - determines the MRA Receivable Type for a Third
  ; Party Receivable. This is accomplished by comparing DATE MRA FIRST ACTIVATED
  ; with AR Activation Date for the Bill.
- ; 
+ ;
  ; Input     BILL= ien of a given Bill Number (Required)
  ;         ARDATE= Date Account Receivable was Activated - date only  (Required)
  ;
@@ -206,7 +206,7 @@ MRATYPE(BILL,ARDATE) ; Function - determines the MRA Receivable Type for a Third
  ;
  ; MRA not Activated at site
  I MRADTACT="" Q 1 ;MRATYPE
- ; 
+ ;
  ; Bill from pre-MRA implementation era
  I ARDATE<MRADTACT Q 1 ;MRATYPE
  ;
@@ -227,39 +227,3 @@ MRATYPE(BILL,ARDATE) ; Function - determines the MRA Receivable Type for a Third
 MRADTACT() ; Function - returns DATE MRA FIRST ACTIVATED at site
  Q $P($G(^IBE(350.9,1,8)),U,13)
  ;
- ;** start IB*2.0*436 **
-MRACALC2(IBIFN) ; Function - This tag will add all EOB's for a given claim number. 
- ; Returns the sum of the Medicare Contractual Adj Amt
- ;
- ; Input:  IBIFN            - ien of Claim file 399
- ; Output: PRCASV("MEDCA")  - Medicare Contractual Adj Amt
- ;
- ; Variables IBEOB          = ien of EOB file 361.1
- ;           PRCASV("MEDCA")= Medicare Contractual Adj Amt
- ; Note:
- ;   For clarification, the following terms mean exactly the same thing.
- ;   "Medicare Contractual Adj Amt" = "Medicare Unpaid Amt" = "Medicare Unallowable Amt"
- N IBEOB,I,LNLVL,EOBADJ,IBCOBN,INPAT,FRMTYP,PRCASV
- ;
- S PRCASV("MEDCA")=0
- S FRMTYP=$$FT^IBCEF(IBIFN)       ;Form Type 2=1500; 3=UB
- S INPAT=$$INPAT^IBCEF(IBIFN)     ;Inpat/Outpat Flag
- ; Get EOB data
- S IBEOB=0
- F  S IBEOB=$O(^IBM(361.1,"B",IBIFN,IBEOB)) Q:'IBEOB  D
- . F I=0,1,2 S IBEOB(I)=$G(^IBM(361.1,IBEOB,I))
- . I $P(IBEOB(0),U,4)'=1 Q  ;make sure it's an MRA
- . S IBCOBN=$$COBN^IBCEF(IBIFN) ;get current bill sequence
- . ;
- . ; Handle CMS-1500 Form Type Next:
- . I FRMTYP=2 D MEDCARE(IBEOB,.PRCASV) Q
- . ;
- . ; Handle UB Form Type Next:
- . ; If Inpatient Calculate from Claim level data
- . I INPAT D  Q  ;
- . . K EOBADJ M EOBADJ=^IBM(361.1,IBEOB,10)
- . . S PRCASV("MEDCA")=$G(PRCASV("MEDCA"))+$$CALCMCA(.EOBADJ)
- . ; If Outpatient Calculate from Service Line level data
- . D MEDCARE(IBEOB,.PRCASV)
- Q PRCASV("MEDCA") ;MRACALC2
- ;** end IB*2.0*436 **

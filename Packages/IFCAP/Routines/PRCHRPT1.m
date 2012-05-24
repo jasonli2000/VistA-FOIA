@@ -1,5 +1,5 @@
 PRCHRPT1 ;ID/RSD,SF-ISC/TKW-PRINT OPTIONS ; [1/13/99 1:27pm]
-V ;;5.1;IFCAP;**15,70,106,132**;Oct 20, 2000;Build 3
+V ;;5.1;IFCAP;**15,70,106**;Oct 20, 2000
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
 EN ;DISPLAY ITEM HISTORY
@@ -18,7 +18,6 @@ EN10 Q:'$D(PRC("SITE"))  K PRCHD S M="FUND CONTROL POINT",DIS(0)="I PRC(""SITE""
 Q K FR,TO,FLDS,BY,DIC,I,J,K,L,PRC,PRCHFCP,D0,DA,M,DIS,ZTSK
  K %,ABORT,DIR,FCPNO,FCPTCNT,FCPTPGS,FR1,FR2,FR3,FR4,ITMNO,ITMY,LCNT,LLIM,NXD,PRCHQ,PRCRI,PRCI,RTX,^TEMP("FCPCNT"),^TEMP("FCPDT"),^TEMP("FCPNAME"),^TEMP("FCPPGS"),TO1,TO2,TO3,TO4,TXCNT,TXFCP,TXIEN,TXR,TXS,TXSTN,X,Y
  K AGN,C,DDH,SCTL,STN,ITMDESC,^TMP("PRCHRPT1",$J)
- K COUNT,DIRUT,FLG,LLCT,LNCT,NX,PRCF("X"),PRCHPDAT,ZTRTN
  QUIT
  ;
 FX I $D(^PRC(420,+PRC("SITE"),1,X,0)) S X=PRC("SITE")_$P($P(^(0),U,1)," ",1)
@@ -27,8 +26,7 @@ FX I $D(^PRC(420,+PRC("SITE"),1,X,0)) S X=PRC("SITE")_$P($P(^(0),U,1)," ",1)
 ITEM S TXR=$G(^TMP("PRCHITMH",0)) S:'TXR TXR=10
  S U="^" Q:'$D(^PRC(441,D0,0))  S W=$P(^(0),U,2),ASK=0,(W1,W(3),W(4))=0,W(2)="",PRC("SITE")=$S($D(PRC("SITE")):PRC("SITE"),1:0),W(1)=PRC("SITE")_0 K ^TMP("PRCHRPT1",$J)
  F W(1)=W(1):0 Q:'$O(^PRC(441,D0,4,"B",W(1)))  S W(1)=$O(^PRC(441,D0,4,"B",W(1))) S PRCHFCP=$S($D(^PRC(420,PRC("SITE"),1,+$E(W(1),4,9),0)):$P(^(0),U,1),1:$E(W(1),4,9)) K ^TMP("PRCHRPT1",$J) D ITEM0 Q:ASK
- K ASK,W,W1,DIC,COUNT,DIRUT,FLG,LLCT,LNCT,NX,PRCF("X"),PRCHPDAT
- D:$D(ZTSK) KILL^%ZTLOAD K ZTSK
+ K ASK,W,W1,DIC D:$D(ZTSK) KILL^%ZTLOAD K ZTSK
  Q
  ;
 ITEM0 I $D(^PRC(441,D0,4,W(1),1,"AC")) D
@@ -46,10 +44,9 @@ ITEM0 I $D(^PRC(441,D0,4,W(1),1,"AC")) D
  . . Q
  . Q
  I '$D(^PRC(441,D0,4,W(1),1,"AC")) D  Q
- . D HDR Q:ASK=1
+ . D HDR
  . I $D(PRCHFCP) W !!,"FCP: "_PRCHFCP_" has no history for this item."
  . Q
- G:ASK=1 Q
 NONE I $O(^TMP("PRCHRPT1",$J,0))="" W !,"A history for this item does not yet exist." D  Q
  . I $G(ZTSK)'>0 W !,"Press RETURN to continue." R X:DTIME Q
  I $G(LNCT)="" S LNCT=0
@@ -100,7 +97,7 @@ SDEV ; SELECT DEVICE FOR QUEUED PRINTING
  Q
 HDR ;
  ;
- I $G(LNCT)>0&($E(IOST)'="P") D ASK Q:ASK
+ I $G(LNCT)>0&($E(IOST)'="P") D ASK G:ASK Q
  W @IOF,!!,"Item Number: ",D0,?25,"Description: ",W,!?8,"FCP: ",PRCHFCP,!!,?26,"Quantity",!,?26,"Previously",?38,"Unit of",?71,"Quantity"
  W !,"Date Ordered",?15,"PO Number",?26,"Received",?38,"Purchase",?48,"Unit Cost",?59,"Total Cost",?71,"Ordered",! F I=1:1:80 W "_"
  Q

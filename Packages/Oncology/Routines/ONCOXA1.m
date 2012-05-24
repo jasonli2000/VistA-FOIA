@@ -1,4 +1,4 @@
-ONCOXA1 ; GENERATED FROM 'ONCOXA1' PRINT TEMPLATE (#827) ; 08/13/03 ; (FILE 165.5, MARGIN=80)
+ONCOXA1 ; GENERATED FROM 'ONCOXA1' PRINT TEMPLATE (#827) ; 09/19/10 ; (FILE 165.5, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -33,7 +33,7 @@ BEGIN ;
  D N:$X>2 Q:'DN  W ?2 W "Telephone:"
  D N:$X>28 Q:'DN  W ?28 X DXS(6,9.2) S X=DIP(101) S D0=I(0,0) K DIP K:DN Y W X
  D N:$X>2 Q:'DN  W ?2 W "Type of Reporting Source: "
- S X=$G(^ONCO(165.5,D0,0)) S Y=$P(X,U,10) W:Y]"" $S($D(DXS(9,Y)):DXS(9,Y),1:Y)
+ S X=$G(^ONCO(165.5,D0,0)) S Y=$P(X,U,10) S Y(0)=Y S:Y'="" Y=$P(^ONCO(168,Y,0),U,2) W $E(Y,1,30)
  D N:$X>2 Q:'DN  W ?2 W "Class of Case: "
  D N:$X>28 Q:'DN  W ?28 X DXS(7,9.2) X "F %=2:1:$L(X) I $E(X,%)?1U,$E(X,%-1)?1A S X=$E(X,0,%-1)_$C($A(X,%)+32)_$E(X,%+1,999)" K DIP K:DN Y W X
  D N:$X>2 Q:'DN  W ?2 W "Marital Status at Dx: "

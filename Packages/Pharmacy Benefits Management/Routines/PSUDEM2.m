@@ -1,5 +1,5 @@
-PSUDEM2 ;BIR/DAM - Outpatient Visits Extract ; 1/23/09 3:10pm
- ;;4.0;PHARMACY BENEFITS MANAGEMENT;**15**;MARCH, 2005;Build 2
+PSUDEM2 ;BIR/DAM - Outpatient Visits Extract ;20 DEC 2001
+ ;;4.0;PHARMACY BENEFITS MANAGEMENT;;MARCH, 2005
  ;
  ;DBIA's
  ; Reference to file 2            supported by DBIA 10035
@@ -44,20 +44,18 @@ DAT2 ;
  .S PSUSSN=$P(^DPT(PSUPT,0),U,9)
  .S PSUICN=$$GETICN^MPIF001(PSUPT)
  .I PSUICN[-1 S PSUICN=""
- .;PSU*4*15 Protect from empty 150 nodes
- .S PTSTAT=$P($G(^AUPNVSIT(PSUVIEN,150)),U,2),PTSTAT=$S(+PTSTAT:"I",1:"O")
+ .S PTSTAT=$P(^AUPNVSIT(PSUVIEN,150),U,2),PTSTAT=$S(+PTSTAT:"I",1:"O")
  . D SET
  Q
 POVS ;severl POVs can have same visit, work all when the first is found
  N PSUPOV
- ;PSU*4*15 move kills out of loop.
- K ALLICD9,ALLCPT
  S PSUPOV=0 F  S PSUPOV=$O(^AUPNVPOV("AD",PSUVIEN,PSUPOV)) Q:PSUPOV'>0  D
+ . K ALLICD9,ALLCPT
  .;LOOP CPTs linked by visit
  . S VCPTDA=0 F  S VCPTDA=$O(^AUPNVCPT("AD",PSUVIEN,VCPTDA)) Q:VCPTDA'>0  D
  .. ; get/gather cpts
  ..S CPTDA=$P($G(^AUPNVCPT(VCPTDA,0)),U),CPTNM=$P($G(^ICPT(CPTDA,0)),U) S:$L(CPTNM) ALLCPT(CPTNM)=""
- .. ;get/gather icd9s 
+ .. ;get/gather icd9s
  ..S ICD9DA=$P($G(^AUPNVCPT(VCPTDA,0)),U,5) I ICD9DA S ICD9NM=$P($G(^ICD9(ICD9DA,0)),U) S:$L(ICD9NM) ALLICD9(ICD9NM)=""
  . ;get orig ICD9
  .S ICD9DA=$P($G(^AUPNVPOV(PSUPOV,0)),U) I ICD9DA S ICD9NM=$P($G(^ICD9(ICD9DA,0)),U) S:$L(ICD9NM) ALLICD9(ICD9NM)=""

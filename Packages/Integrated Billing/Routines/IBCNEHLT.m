@@ -1,6 +1,6 @@
 IBCNEHLT ;DAOU/ALA - HL7 Process Incoming MFN Messages ; 09 Dec 2005  3:30 PM
- ;;2.0;INTEGRATED BILLING;**184,251,271,300,416,438**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**184,251,271,300**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;**Program Description**
  ;  This program will process incoming MFN messages and
@@ -8,19 +8,18 @@ IBCNEHLT ;DAOU/ALA - HL7 Process Incoming MFN Messages ; 09 Dec 2005  3:30 PM
  ;
 EN ;  Entry Point
  NEW AIEN,APIEN,APP,D0,D,DESC,DQ,DR,FILE,FLN,HEDI,ID,IEN
- NEW PEDI,SEG,STAT,HCT,NEWID,TSSN,REQSUB,NAFLG,NPFLG,TRUSTED
+ NEW PEDI,SEG,STAT,HCT,NEWID,TSSN,USSN,REQSUB,NAFLG,NPFLG
  NEW IBCNACT,IBCNADT,FSVDY,PSVDY
  NEW BPSIEN,CMIEN,DATA,DATAAP,DATABPS,DATACM,DATE,ERROR,FIELDNO,FILENO
  NEW IBSEG,MSG,BUFF
  NEW X12TABLE,BADFMT
  ;
- ; BADFMT is true if a site with patch 300 receives an eIV message in the previous HL7 interface structure (pre-300)
+ ; BADFMT is true if a site with patch 300 receives an IIV message in the previous HL7 interface structure (pre-300)
  ;
- ; Build local table of file numbers to determine if response is eIV or ePHARM
- F D=11:1:18 S X12TABLE("365.0"_D)=""
- F D=21:1:28 S X12TABLE("365.0"_D)=""
+ ; Build local table of file numbers to determine if response is IIV or ePHARM
+ F D=11:1:18,21 S X12TABLE("365.0"_D)=""
  ;
- ; Decide if message belongs to "E-Pharm" or "eIV"
+ ; Decide if message belongs to "E-Pharm" or "IIV"
  S APP=""
  S HCT=0,ERFLG=0
  F  S HCT=$O(^TMP($J,"IBCNEHLI",HCT)) Q:HCT=""  D SPAR^IBCNEHLU I $G(IBSEG(1))="MFI" S FILE=$G(IBSEG(2)),FLN=$P(FILE,$E(HLECH,1),1) Q
@@ -32,13 +31,13 @@ EN ;  Entry Point
  .. I $G(IBSEG(1))="MFE",$P($G(IBSEG(5)),$E(HLECH,1),3)'="" D  Q
  ... S BADFMT=1,APP=""
  ... S MSG(1)="Log a Remedy Ticket for this issue."
- ... S MSG(2)="Please include in the Remedy Ticket that the eIV payer tables may be out"
+ ... S MSG(2)="Please include in the Remedy Ticket that the IIV payer tables may be out"
  ... S MSG(3)="of sync with the master list and will need a new copy of the payer table"
  ... S MSG(4)="from Austin."
- ... D MSG^IBCNEUT5($$MGRP^IBCNEUT5(),"eIV payer tables may be out of synch with master list","MSG(")
+ ... D MSG^IBCNEUT5($$MGRP^IBCNEUT5(),"IIV payer tables may be out of synch with master list","MSG(")
  .. I $G(IBSEG(1))="ZPA" S APP="IIV"
  I $D(X12TABLE(FLN)) S APP="IIV"
- ; If neither eIV or ePHARM then quit
+ ; If neither IIV or ePHARM then quit
  I APP="" Q
  ;
  S HCT=1,NAFLG=0,NPFLG=0,D=""
@@ -103,17 +102,15 @@ EN ;  Entry Point
  ... S DESC=$$DECHL7^IBCNEHL2(IBSEG(5)),HEDI=$$DECHL7^IBCNEHL2(IBSEG(6)),PEDI=$$DECHL7^IBCNEHL2(IBSEG(7))
  .. ;
  .. I SEG="ZPA" D
- ... S STAT=$S(IBSEG(4)="Y":1,1:0)
- ... S TSSN=IBSEG(5),REQSUB=IBSEG(7)
+ ... S STAT=IBSEG(4),STAT=$S(STAT="Y":"Active",1:"Not Active")
+ ... S TSSN=IBSEG(5),USSN=IBSEG(6),REQSUB=IBSEG(7)
  ... S FSVDY=IBSEG(8),PSVDY=IBSEG(9)
- ... S TRUSTED=$S(IBSEG(10)="N":0,1:1)
  ... D PFIL
  Q
  ;
 PFIL ;  Payer Table Filer
  ;  Set the action:
  ;     MAD=Add, MUP=Update, MDC=Deactivate, MAC=Reactivate
- N OLDAF,OLDTF
  S IBCNADT=$$FMDATE^HLFNC(IBCNADT)
  I IBCNADT="" S IBCNADT=$$NOW^XLFDT()
  ;  If the action is MAD - Add the payer as new
@@ -143,7 +140,7 @@ PFIL ;  Payer Table Filer
  . S MSG(8)=""
  . S MSG(9)="Please include in the Remedy Ticket that VISTA did not receive the required"
  . S MSG(10)="information or the accurate information to add/update this Payer."
- . D MSG^IBCNEUT5($$MGRP^IBCNEUT5(),"eIV payer tables may be out of synch with master list","MSG(")
+ . D MSG^IBCNEUT5($$MGRP^IBCNEUT5(),"IIV payer tables may be out of synch with master list","MSG(")
  ;
  S DESC=$E(DESC,1,80)    ;restriction of the field in the DD
  S DIC=$$ROOT^DILFD(FLN)
@@ -172,38 +169,39 @@ PFIL ;  Payer Table Filer
  . D FILE^DICN
  . K DO
  . S APIEN=+Y,NAFLG=1
- ; get current values for Active and Trusted flags
- S OLDAF=$P(^IBE(365.12,IEN,1,APIEN,0),U,2),OLDTF=$P(^IBE(365.12,IEN,1,APIEN,0),U,7)
+ ;
+ I $G(STAT)="" S STAT=$P(^IBE(365.12,IEN,1,APIEN,0),U,2)
+ ;
  S DA(1)=IEN,DA=APIEN,DIC="^IBE(365.12,"_DA(1)_",1,",DR=""
  ;
  I IBCNACT="MDC" S DR=DR_".11///^S X=1;.12////^S X=IBCNADT;",STAT=0
  I IBCNACT="MAC" S DR=DR_".11///^S X=0;.12///@;"
- S DR=DR_".02///^S X=STAT;.06///^S X=$$NOW^XLFDT();.07///^S X=TRUSTED"
- I IBCNACT'="MDC" S DR=DR_";.08///^S X=REQSUB;.1///^S X=TSSN;.14///^S X=FSVDY;.15///^S X=PSVDY"
+ S DR=DR_".02///^S X=STAT;.06///^S X=$$NOW^XLFDT()"
+ I IBCNACT'="MDC" S DR=DR_";.08///^S X=REQSUB;.09///^S X=USSN;.1///^S X=TSSN;.14///^S X=FSVDY;.15///^S X=PSVDY"
  ;
  ;  If new application, add the Date/Time created
  I NAFLG S DR=DR_";.13///^S X=$$NOW^XLFDT()"
  ;
  S DIE=DIC D ^DIE
- ; Update flag logs
- I STAT'=OLDAF D UPDLOG("A",STAT,IEN,APIEN)
- I TRUSTED'=OLDTF D UPDLOG("T",TRUSTED,IEN,APIEN)
  I IBCNACT="MDC" D MDC Q
 PFILX ;
  Q
  ;
 TFIL ;  Non Payer Tables Filer
- NEW DIC,X,DLAYGO,Y,IEN,MAX
+ NEW DIC,DIE,X,DA,DLAYGO,Y,DR,IEN
  S DIC(0)="X",X=ID,DIC=$$ROOT^DILFD(FLN)
  D ^DIC S IEN=+Y
- ; don't update existing entries
- I IEN>0 Q
- D FIELD^DID(FLN,.02,,"FIELD LENGTH","MAX")
- I MAX("FIELD LENGTH")>0 S DESC=$E(DESC,1,MAX("FIELD LENGTH")) ; restriction of the field in the DD
- ; add new entry to the table
- ;S DLAYGO=FLN,DIC(0)="L",DIC("DR")=".02///"_DESC
- S DLAYGO=FLN,DIC(0)="L",DIC("DR")=".02///^S X=DESC"
- K DD,DO D FILE^DICN K DO
+ ;
+ S DESC=$E(DESC,1,80)    ;restriction of the field in the DD
+ ;
+ ;  If no matching entry found, add it to table
+ I IEN<1 D
+ . S DLAYGO=FLN,DIC(0)="L",DIC("P")=DLAYGO,DIE=DIC
+ . K DD,DO
+ . D FILE^DICN S IEN=+Y
+ . K DO
+ ;
+ S DR=".02///^S X=DESC",DA=IEN,DIE=DIC D ^DIE
  Q
  ;
 MAD(X) ;  Add an entry
@@ -249,20 +247,4 @@ MDC ;  Check for active transmissions and cancel
  ... ;  If the Response status is 'Response Received', don't change it
  ... I $P(^IBCN(365,RIEN,0),U,6)=3 Q
  ... D RSP^IBCNEUT2(RIEN,7)
- Q
- ;
-UPDLOG(FLAG,VALUE,PIEN,APIEN) ; Update active/trusted flag logs
- ; FLAG - "A" for Active flag, "T" for Trusted flag
- ; VALUE - new flag value (0 or 1)
- ; PIEN - ien in PAYER file (365.12)
- ; APIEN - ien in APPLICATION sub-file (365.121)
- ;
- N FILE,IENSTR,UPDT
- I $G(FLAG)=""!($G(VALUE)="") Q
- I +$G(PIEN)=0!(+$G(APIEN)=0) Q
- S FILE=$S(FLAG="A":"365.1212",FLAG="T":"365.1213",1:"") I FILE="" Q
- S IENSTR="+1,"_APIEN_","_PIEN_","
- S UPDT(FILE,IENSTR,.01)=$$NOW^XLFDT()
- S UPDT(FILE,IENSTR,.02)=VALUE
- D UPDATE^DIE("E","UPDT")
  Q

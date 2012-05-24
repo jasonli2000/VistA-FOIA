@@ -1,4 +1,4 @@
-PRCST43 ; ;10/27/00
+PRCST43 ; ;09/19/10
  D DE G BEGIN
 DE S DIE="^PRCS(410,D0,""IT"",D1,2,",DIC=DIE,DP=410.212,DL=3,DIEL=2,DU="" K DG,DE,DB Q:$O(^PRCS(410,D0,"IT",D1,2,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=% S %=$P(%Z,U,2) S:%]"" DE(3)=%
@@ -55,10 +55,10 @@ BEGIN S DNM="PRCST43",DQ=1+D G B
 C1 G C1S:$D(DE(1))[0 K DB
  S X=DE(1),DIC=DIE
  K ^PRCS(410,DA(2),"IT",DA(1),2,"B",$E(X,1,30),DA)
-C1S S X="" Q:DG(DQ)=X  K DB
+C1S S X="" G:DG(DQ)=X C1F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRCS(410,DA(2),"IT",DA(1),2,"B",$E(X,1,30),DA)=""
- Q
+C1F1 Q
 X1 K:+X'=X!(X>99)!(X<1)!(X?.E1"."1N.N) X
  Q
  ;

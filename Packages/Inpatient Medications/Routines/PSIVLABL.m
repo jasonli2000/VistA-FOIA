@@ -1,5 +1,5 @@
-PSIVLABL ;BIR/PR-PRINT OUT LABELS ; 8/19/09 3:00pm
- ;;5.0; INPATIENT MEDICATIONS ;**58,82,104,127,178,184**;16 DEC 97;Build 12
+PSIVLABL ;BIR/PR-PRINT OUT LABELS ;17 Aug 2001  9:33 AM
+ ;;5.0; INPATIENT MEDICATIONS ;**58,82,104,127,178**;16 DEC 97;Build 9
  ;
  ; Reference to ^%ZIS(2 is supported by DBIA 3435.
  ; Reference to ^PS(52.6 is supported by DBIA 1231.
@@ -45,7 +45,7 @@ START F PSIV1=1:1:PSIVNOL D
  . I PSJIO,$G(PSJIO("EL"))]"" X PSJIO("EL")
  I PSJIO,$G(PSJIO("FE"))]"" X PSJIO("FE")
  D:'$D(PSIVCT) ^PSIVSTAT
-Q K PSIV,PSIVDOSE,PSIVWD,P16,LINE,MESS,PSIVCT,PSIV2,PSIVFLAG,PSIVRM,PSIV1,PDOSE,PDATE,XX1,XX2,BAG,CX,PSIMESS Q
+Q K PSIV,PSIVDOSE,PSIVWD,P16,LINE,MESS,PSIVCT,PSIV2,PSIVFLAG,PSIVRM,PSIV1,PDOSE,PDATE,XX1,XX2,BAG,CX Q
 RE ;
  K DO
  I PSIV1,P(4)="A"!(P(5)=0) S P(16)=PSIV1 I $G(PSIVT)]"" D
@@ -76,18 +76,17 @@ SOL F PSIV=0:0 S PSIV=$O(^PS(55,DFN,"IV",+ON,"SOL",PSIV)) Q:'PSIV  S PSIV=PSIV_"
  S X=" " D P I PSIV1'>0!'$P(PSIVSITE,U,3)!($P(PSIVSITE,U,3)=1&(P(4)'="P"))!($P(PSIVSITE,U,3)=2&("AH"'[P(4))) G MEDRT
  S:'$D(PSIVDOSE) PSIVDOSE="" S X=$P(PSIVDOSE," ",PSIV1) D:$E(X)="." CONVER S X="Dose due at: "_$S(X="":"________",1:$E(X,4,5)_"/"_$E(X,6,7)_"/"_$E(X,2,3)_" "_$E(X#1_"000",2,5)) D P
  ;
-MEDRT ;Find Medication Route   
+MEDRT ;Find Medication Route
  S PSIVRP="",PSIVRT=""
  I $D(^PS(55,DFN,"IV",+ON,.2)) S PSIVRP=$P(^PS(55,DFN,"IV",+ON,.2),U,3) D
  .S PSIVRT=$P(^PS(51.2,PSIVRP,0),U,1)
  .S X="ROUTE: "_PSIVRT D:X]"" PMR
  ;
-INF S X=$P(P(8),"@") D:X]"" P
+INF      S X=$P(P(8),"@") D:X]"" P
  I $D(^PS(55,DFN,"IV",+ON,3)) S X=$P(^(3),"^") D:X]"" P
  S X=P(9) D:X]"" P
  S X=P(11) D:X]"" P
- ;PSJ*5*184 - Display all messages if more than one additive has a message.
- I $D(MESS) S PSIMESS="" F  S PSIMESS=$O(MESS(PSIMESS)) Q:PSIMESS=""  S X=PSIMESS D P
+ I $D(MESS) S X=MESS D P
  I $D(^PS(59.5,PSIVSN,4)) S Y=^(4) F PSIV=1:1 S X=$P(Y,U,PSIV) Q:X=""  D P
  S X=PSIV1_"["_$S(PSIV1:PSIVNOL,1:PSIV2)_"]"_"  "_$S('PSIV1:PSIVNOW,1:"") D P
  Q
@@ -106,7 +105,7 @@ P F LINE=LINE+1:1 D  Q:$L(X)<1
  . S X=$E(X,PSIVRM+1,999)
  Q
 PMR ; Print Med Route on label
- ;  
+ ;
  F LINE=LINE+1:1 D  Q:$L(X)<1
  . I LINE>PSIVSITE D
  .. S LINE=1
@@ -121,10 +120,9 @@ PMR ; Print Med Route on label
  . I 'PSJIO W !
  . S X=$E(X,PSIVRM+1,999)
  Q
- ;               
+ ;
 SOL1 S X=$S($D(^PS(52.7,$P(PSIV,U,2),0)):$P(^(0),"^")_" "_$P(^PS(55,DFN,"IV",+ON,"SOL",+PSIV,0),U,2),1:"**********") Q
-MESS ;PSJ*5*184 -make MESS a local array so all messages display for all additives.
- I $P(^PS(52.6,+Y,0),U,9)]"" S MESS($P(^PS(52.6,+Y,0),U,9))=""
+MESS I '$D(MESS) I $P(^PS(52.6,+Y,0),U,9)]"" S MESS=$P(^(0),U,9)
  Q
 CONVER ;Expand dose to date.dose and set in X
  I P(15)>1440 S X=$$CONVER1^PSIVORE2($P(PSIVDOSE," "),P(15),(PSIV1-1)) Q

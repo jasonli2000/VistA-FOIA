@@ -1,12 +1,12 @@
-PRCPCSO1 ;WISC/RFJ-surgery order supplies ; 06/23/2009  2:26 PM
- ;;5.1;IFCAP;**136**;Oct 20, 2000;Build 6
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCPCSO1 ;WISC/RFJ-surgery order supplies                           ;01 Sep 93
+ ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
  ;
 AUTOORD ;  automatically create order
  N ORDERNO
- D SHOWCC^PRCPCSOU(OPCODE,0,$G(OPDATEI))
+ D SHOWCC^PRCPCSOU(OPCODE,0)
  S XP="Do you want to automatically create and add items to a new order"
  S XH="Enter 'YES' to automatically create an order with the items on it,",XH(1)="enter 'NO'  to select the order and items, or",XH(2)="enter '^'   to select a new patient and operation."
  W ! S %=$$YN^PRCPUYN(1)

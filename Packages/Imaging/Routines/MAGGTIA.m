@@ -1,6 +1,5 @@
-MAGGTIA ;WOIFO/GEK/RMP/NST - Imaging RPC Broker calls. Add/Modify Image entry ; 20 Dec 2010 3:16 PM
- ;;3.0;IMAGING;**8,48,106,117,99**;Mar 19, 2002;Build 2057;Apr 19, 2011
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGGTIA ;WOIFO/GEK/RMP - Imaging RPC Broker calls. Add/Modify Image entry ; [ 11/08/2001 17:18 ]
+ ;;3.0;IMAGING;**8,48**;Jan 11, 2005
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGGTIA ;WOIFO/GEK/RMP/NST - Imaging RPC Broker calls. Add/Modify Image entry ; 
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -20,7 +20,7 @@ MAGGTIA ;WOIFO/GEK/RMP/NST - Imaging RPC Broker calls. Add/Modify Image entry ; 
  ;**** CALLING ROUTINE is responsible for RENAMING THE IMAGE FILE
  ;**** on DISK TO THE NEW FILE NAME RETURNED BY THIS CALL.
  ;
-ADD(MAGRY,MAGGZ) ; RPC [MAGGADDIMAGE] 
+ADD(MAGRY,MAGGZ) ; RPC [MAGGADDIMAGE]
  ; Call to UPDATE^DIE to Add an Image File entry
  ; MAGGZ is an array of fields and their entries
  ;  i.e. MAGGZ(1)=".5^38"  Image File,  field .5   data is 38
@@ -31,7 +31,7 @@ ADD(MAGRY,MAGGZ) ; RPC [MAGGADDIMAGE]
  ;   (the field 2005.04 is the OBJECT GROUP MULTIPLE)
  ;
  ; MAGRY - Ret variable (Single Variable)
- ;  
+ ;
  ;   Changed to include hierarchical directory hash  - PMK 04/23/98
  ;   If successful   MAGRY = IEN^FILE NAME (with full path)
  ;        IEN is Internal Entry Number of ^MAG(2005
@@ -117,16 +117,6 @@ ADD(MAGRY,MAGGZ) ; RPC [MAGGADDIMAGE]
  ;  some possible problems, we'll check for now.
  I '$D(MAGGFDA(2005,"+1,")) S MAGRY="0^No data to file  Operation CANCELED " Q
  ;
- ; Patch 106: For VI Capture and DICOM Gateway the value of #8.1 is set
- ; here if it is not send. For Imort API see PRE^MAGGSIA1 
- I '$D(MAGGFDA(2005,"+1,",8.1)) D
- . ; PACS UID (#60); RADIOLOGY REPORT (#61); PACS PROCEDURE (#62)
- . I $D(MAGGFDA(2005,"+1,",60))!$D(MAGGFDA(2005,"+1,",61))!$D(MAGGFDA(2005,"+1,",62)) S MAGGFDA(2005,"+1,",8.1)="D" Q
- . I $D(MAGGFDA(2005,"+1,",108)) S MAGGFDA(2005,"+1,",8.1)="I" Q  ; TRACKING ID (#108)
- . S MAGGFDA(2005,"+1,",8.1)="C"
- . Q
- ;
- S:$G(MAGGFDA(2005,"+1,",113))="" MAGGFDA(2005,"+1,",113)=1  ; Patch 117: Set STATUS field (#113) to Viewable (1)
  ;  We're making Object Type and either Patient, or short Desc Required.
  I '$D(MAGGFDA(2005,"+1,",3)) S MAGRY="0^Need an Object Type " Q
  ; Change to require patient. not patient or short desc.
@@ -165,10 +155,7 @@ ADD(MAGRY,MAGGZ) ; RPC [MAGGADDIMAGE]
  . ; if a big file is being made on workstation, put NetWork Location
  . ; pointer in the BIG NETWORK LOCATION field.
  . ; (BIG files default to same Network Location as FullRes (or PACS))
- . I ($P($G(MAGBIG),U,1))=1 D
- . . S MAGGFDA(2005,"+1,",102)=+Z
- . . S MAGGFDA(2005,"+1,",104)=$P(MAGBIG,U,2)
- . . Q
+ . I $G(MAGBIG)=1 S MAGGFDA(2005,"+1,",102)=+Z
  . S MAGREF=+Z ; save network location ien for $$DIRHASH in ^MAGGTIA1
  . I $G(MAGGABS)="STUFFONLY" S MAGGFDA(2005,"+1,",2.1)=+Z
  ;

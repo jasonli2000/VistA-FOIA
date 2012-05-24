@@ -1,9 +1,9 @@
-PSIVUTL ;BIR/MLM-IV UTILITIES ;07 SEP 97 / 2:17 PM 
- ;;5.0;INPATIENT MEDICATIONS ;**69,58,81,85,110,133,181,263**;16 DEC 97;Build 51
+PSIVUTL ;BIR/MLM-IV UTILITIES ;07 SEP 97 / 2:17 PM
+ ;;5.0; INPATIENT MEDICATIONS ;**69,58,81,85,110,133**;16 DEC 97
  ;
  ; Reference to ^DD("DD" is supported by DBIA 10017.
  ; Reference to ^PS(50.7 is supported by DBIA 2180.
- ; Reference to ^PS(52.6 is supported by DBIA 1231.
+ ; Reference to ^PS(52.6 is supported y DBIA 1231.
  ; Reference to ^PS(55 is supported by DBIA 2191.
  ; Reference to ^PS(52.7 is supported by DBIA 2173.
  ; Reference to ^DIC is supported by DBIA 10006.
@@ -25,7 +25,7 @@ ENU(Y) ;Get IV additive strength.
  N X S X=$P(^PS(52.6,+Y,0),U,3),Y=$$CODES^PSIVUTL(X,52.6,2)
  Q Y
  ;
-CODES(PSJCD,PSJF,PSJFLD) ; Get name from code. 
+CODES(PSJCD,PSJF,PSJFLD) ; Get name from code.
  ; PSJF = one of following files: ^PS(55, ^PS(53.1, ^PS(52.6
  D FIELD^DID(PSJF,PSJFLD,"","POINTER","PSJDD")
  S Y=$G(PSJDD("POINTER")) K PSJDD
@@ -58,7 +58,7 @@ GTOT(Y) ; Get order type & protocol
  ;
 PIV(ON) ; Display IV orders.
  N DRG,ON55,P,PSJORIFN,TYP,X,Y S TYP="?" I ON["V" D
- .S Y=$G(^PS(55,DFN,"IV",+ON,0)) F X=2,3,4,5,8,9,17,23,25 S P(X)=$P(Y,U,X)
+ .S Y=$G(^PS(55,DFN,"IV",+ON,0)) F X=2,3,4,5,8,9,17,23 S P(X)=$P(Y,U,X)
  .S TYP=$$ONE^PSJBCMA(DFN,ON,P(9),P(2),P(3)) I TYP'="O" S TYP="C"
  .S ON55=ON,P("OT")=$S(P(4)="A":"F",P(4)="H":"H",1:"I") D GTDRG^PSIVORFB,GTOT^PSIVUTL(P(4))
  .W $S($P($G(^PS(55,DFN,"IV",+ON,.2)),U,4)="D":" d",1:"  ")
@@ -84,8 +84,8 @@ PIVAD ; Print IV Additives.
  ;
 PIV1 ; Print Sched type, start/stop dates, and status.
  F X=2,3 S P(X)=$E($$ENDTC^PSGMI(P(X)),1,$S($D(PSJEXTP):8,1:5))
- I '$D(PSJEXTP) W ?50,TYP,?53,P(2),?60,P(3),?67,$S($G(P(25))]"":P(25),1:P(17)) Q
- W ?50,TYP,?53,P(2),?63,P(3),?73,$S($G(P(25))]"":P(25),1:P(17))
+ I '$D(PSJEXTP) W ?50,TYP,?53,P(2),?60,P(3),?67,P(17) Q
+ W ?50,TYP,?53,P(2),?63,P(3),?73,P(17)
  Q
 59 ; Validate the Infusion rate entered using IV Quick order code.
  N I F I=2,3,5,7,8,9,11,15,23 S P(I)=""
@@ -101,7 +101,7 @@ WRTDRG(X,L)       ; Format and print drug name, strength and bottle no.
 NAME(X,L,MARX,AD)        ; Format Additive display.
  ;INPUT : X=DRG("AD",DRG)  L=Display length   AD=for Additive(1/0)
  ;OUTPUT: AD(X)  if X=2 that means there is a second line to display
- N Y K MARX S Y=$P(X,U,3) S:(AD&($P(X,U,4)]"")) Y=Y_" ("_$P(X,U,4)_")"
+ N Y K MARX S Y=$P(X,U,3) S:(AD&$P(X,U,4)) Y=Y_" ("_$P(X,U,4)_")"
  ;* S:'AD Y=Y_" "_$S(P(4)="P"!($G(P(23))="P")!$G(P(5)):P(9),1:$P(P(8),"@"))
  I 'AD!('$O(DRG("SOL",0))) D
  .I $G(PSJL)["  in" S Y=Y_" "_$S(P(4)="P"!($G(P(23))="P")!$G(P(5)):P(9),1:$P(P(8),"@")) Q

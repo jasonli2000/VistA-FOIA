@@ -1,15 +1,15 @@
-IBCNEKI2 ;DAOU/BHS - PURGE eIV DATA FILES CONT'D ;11-JUL-2002
- ;;2.0;INTEGRATED BILLING;**271,316,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNEKI2 ;DAOU/BHS - PURGE IIV DATA FILES CONT'D ;11-JUL-2002
+ ;;2.0;INTEGRATED BILLING;**271,316**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; This routine holds additional procedures for purging the eIV data
+ ; This routine holds additional procedures for purging the IIV data
  ; from the Trans Queue file (365.1) and the Response file (365).
  ;
  ; ---------------------------------------------------
 MMPURGE ; This procedure is responsible for the creation and
  ; sending of the MailMan message on the first day of the month
  ; if the site has data eligible to be purged and if the mail group is
- ; defined appropriately in the eIV site parameters.
+ ; defined appropriately in the IIV site parameters.
  ;
  ; Identify records eligible to be purged
  NEW ENDDT,STATLIST,DATE,TQIEN,TOTTQ,PURTQ,TQS
@@ -44,22 +44,22 @@ MMPURGE ; This procedure is responsible for the creation and
  I 'PURTQ,'PURRP G MMPURGX
  ;
  ; Send a MailMan message with Eligible Purge counts
- S MSG(1)="ATTENTION IRM:  There are eIV TRANSMISSION QUEUE and"
- S MSG(2)="eIV RESPONSE records eligible to be purged."
+ S MSG(1)="ATTENTION IRM:  There are IIV TRANSMISSION QUEUE and"
+ S MSG(2)="IIV RESPONSE records eligible to be purged."
  S MSG(3)=""
  S MSG(4)="File                                  Eligible   Total  "
  S MSG(5)="                                       Count     Count  "
  S MSG(6)="------------------------------------  --------  --------"
- S MSG(7)="eIV RESPONSE FILE (#365)              "_$J(PURRP,8)_"  "_$J(TOTRP,8)
- S MSG(8)="eIV TRANSMISSION QUEUE FILE (#365.1)  "_$J(PURTQ,8)_"  "_$J(TOTTQ,8)
+ S MSG(7)="IIV RESPONSE FILE (#365)              "_$J(PURRP,8)_"  "_$J(TOTRP,8)
+ S MSG(8)="IIV TRANSMISSION QUEUE FILE (#365.1)  "_$J(PURTQ,8)_"  "_$J(TOTTQ,8)
  S MSG(9)="====================================  ========  ========"
  S MSG(10)="Total                                 "_$J(PURTQ+PURRP,8)_"  "_$J(TOTTQ+TOTRP,8)
  S MSG(11)=""
- S MSG(12)="Please run option IBCNE PURGE IIV DATA - Purge eIV Transactions,"
+ S MSG(12)="Please run option IBCNE PURGE IIV DATA - Purge IIV Transactions,"
  S MSG(13)="if you would like to purge the eligible records."
  ; Set to IB site parameter MAILGROUP
  S MGRP=$$MGRP^IBCNEUT5()
- D MSG^IBCNEUT5(MGRP,"eIV Data Eligible for Purge","MSG(")
+ D MSG^IBCNEUT5(MGRP,"IIV Data Eligible for Purge","MSG(")
  ;
 MMPURGX ;
  Q

@@ -1,18 +1,18 @@
-IBCNERPD ;DAOU/RO - eIV PAYER LINK REPORT PRINT;AUG-2003
- ;;2.0;INTEGRATED BILLING;**184,252,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERPD ;DAOU/RO - IIV PAYER LINK REPORT PRINT;AUG-2003
+ ;;2.0;INTEGRATED BILLING;**184,252**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification
+ ; IIV - Insurance Identification and Verification
  ;
  ; Called by IBCNERPB
  ; Input from IBCNERPB/C:
- ;  
- ;  ^TMP($J,IBCNERTN,S1,S2,CT,0)
- ;    IBCNERTN="IBCNERPB", 
- ;    CT=Seq ct
- ;  ^TMP($J,IBCNERTN,S1,S2,CT,1) 
  ;
-EN3(IBCNERTN,IBCNESPC) ; Entry pt.  
+ ;  ^TMP($J,IBCNERTN,S1,S2,CT,0)
+ ;    IBCNERTN="IBCNERPB",
+ ;    CT=Seq ct
+ ;  ^TMP($J,IBCNERTN,S1,S2,CT,1)
+ ;
+EN3(IBCNERTN,IBCNESPC) ; Entry pt.
  N IBTYP,IBSRT,CRT,MAXCNT,IBPXT
  N IBPGC,X,Y,DIR,DTOUT,DUOUT,LIN,IBTRC,IBMAT,IBREP,IBDET,IBPPYR,ZZ
  S IBREP=$G(IBCNESPC("REP"))
@@ -66,7 +66,7 @@ HEADER ; Print hdr info
  . I $D(DTOUT)!($D(DUOUT)) S PXT=1 Q
  I $D(ZTQUEUED),$$S^%ZTLOAD() S ZTSTOP=1 G HEADERX
  S PGC=PGC+1
- W @IOF,!,?1,"eIV Payer Link Report"
+ W @IOF,!,?1,"IIV Payer Link Report"
  S HDR=$$FMTE^XLFDT($$NOW^XLFDT,1)_"  Page: "_PGC,OFFSET=131-$L(HDR)
  W ?OFFSET,HDR
  W !,?1,"Report Option: "_$S(REP=1:"Payer List",1:"Insurance Company List")
@@ -106,7 +106,11 @@ LINEX Q
 DATA(DISPDATA) ;  Build disp lines
  N LCT,CT,CT2,RPTDATA,XX,YY,ZZ
  ; Merge into local array
- M RPTDATA=^TMP($J,RTN,SORT1,SORT2,CNT)
+ N %X,%Y
+ S %X="^TMP($J,RTN,SORT1,SORT2,CNT,"
+ S %Y="RPTDATA("
+ I $D(^TMP($J,RTN,SORT1,SORT2,CNT))#10=1 S RPTDATA=^TMP($J,RTN,SORT1,SORT2,CNT)
+ D %XY^%RCR K %X,%Y
  ; Build
  ;
  ; PAYER REPORT

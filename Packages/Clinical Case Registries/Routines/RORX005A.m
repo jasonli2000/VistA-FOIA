@@ -1,27 +1,13 @@
-RORX005A ;HOIFO/BH,SG - INPATIENT UTILIZATION (QUERY) ;4/21/09 2:20pm
- ;;1.5;CLINICAL CASE REGISTRIES;**1,8,10,13**;Feb 17, 2006;Build 27
+RORX005A ;HCIOFO/BH,SG - INPATIENT UTILIZATION (QUERY) ; 3/13/06 9:25am
+ ;;1.5;CLINICAL CASE REGISTRIES;**1**;Feb 17, 2006;Build 24
  ;
  ; This routine uses the following IAs:
  ;
- ; #92           ^DGPT(  #45.7 (controlled)
- ; #417          .01 field and "C" x-ref of file #40.8 (controlled)
- ; #2056         $$GET1^DIQ (supported)
- ; #3545         ^DGPT("AAD" (private)
- ; #10061        IN5^VADPT (supported) 
- ; #10103        FMADD^XLFDT, FMDIFF^XLFDT (supported)
+ ; #92           Read access to the file #45 (controlled)
+ ; #557          Read access to the file #40.7 (controlled)
+ ; #2438         .01 field and "C" x-ref of file #40.8 (controlled)
+ ; #10035        Read access to the file #2 (supported)
  ;
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*8    MAR  2010   V CARR       Modified to handle ICD9 filter for
- ;                                      'include' or 'exclude'.
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can select specific patients.
- ;                                      
- ;******************************************************************************
- ;******************************************************************************
  Q
  ;
  ;***** ADDS THE INPATIENT STAY
@@ -80,7 +66,7 @@ IPDATA(DFN) ;
  . . ;--- Check the movement date
  . . I DATE'<ROREDT1  S RC=1  Q
  . . S:DATE<RORSDT DATE=RORSDT
- . . ;--- Check the PTF record - Task removed April 2009
+ . . ;--- Check the PTF record
  . . S PTFIEN=+$G(VAIP(12))  Q:PTFIEN'>0
  . . I '$D(PTFIEN(PTFIEN))  D  Q:RC
  . . . S PTFIEN(PTFIEN)=0
@@ -92,7 +78,6 @@ IPDATA(DFN) ;
  . . . I 'TMP  D  Q:'$D(RORTSK("PARAMS","DIVISIONS","C",DIVIEN))
  . . . . S TMP=FACILITY_SUFFIX
  . . . . S DIVIEN=$S(TMP'="":+$O(^DG(40.8,"C",TMP,"")),1:0)
- . . . K DIVIEN ;kill statement added
  . . . S PTFIEN(PTFIEN)=1
  . . ;--- Skip the PTF record if necessary
  . . Q:'PTFIEN(PTFIEN)
@@ -105,13 +90,12 @@ IPDATA(DFN) ;
  . . S:(ENDT'>0)!(ENDT'<ROREDT1) ENDT=ROREDT,RC=2
  . . Q:ENDT<RORSDT
  . . S LOS=$$FMDIFF^XLFDT(ENDT,DATE\1,1)  S:LOS'>0 LOS=0
- . . ;--- Use the IEN in the SPECIALTY file (#42.4) as the Bedsection 
+ . . ;--- Use the IEN in the SPECIALTY file (#42.4) as the Bedsection
  . . ;    ID if it is available (it should be). Otherwise, use the
  . . ;--- IEN in the FACILITY TREATING SPECIALTY file (#45.7).
  . . I $G(VAIP(8))>0  D
- . . . K RORMSG S TMP=$$GET1^DIQ(45.7,+VAIP(8),1,"I",,"RORMSG")
- . . . ;D:$G(DIERR) DBS^RORERR("RORMSG",-9,,DFN,45.7,+VAIP(8))
- . . . D:$G(RORMSG("DIERR")) DBS^RORERR("RORMSG",-9,,DFN,45.7,+VAIP(8))
+ . . . S TMP=$$GET1^DIQ(45.7,+VAIP(8),1,"I",,"RORMSG")
+ . . . D:$G(DIERR) DBS^RORERR("RORMSG",-9,,DFN,45.7,+VAIP(8))
  . . . S BSID=$S(TMP>0:TMP_";42.4",1:+VAIP(8)_";45.7")
  . . E  S BSID=-1
  . . D ADDSTAY(DFN,PTFIEN,LOS,BSID,+VAIP(3))
@@ -143,31 +127,21 @@ QUERY(FLAGS) ;
  N RORPTN        ; Number of patients in the registry
  ;
  N CNT,ECNT,IEN,IENS,PATIEN,RC,TMP,VA,VADM,XREFNODE
- N RCC,FLAG
  S XREFNODE=$NA(^RORDATA(798,"AC",+RORREG))
  S RORPTN=$$REGSIZE^RORUTL02(+RORREG)  S:RORPTN<0 RORPTN=0
  S ROREDT1=$$FMADD^XLFDT(ROREDT,1)
  S (CNT,ECNT,RC)=0
  ;--- Browse through the registry records
  S IEN=0
- S FLAG=$G(RORTSK("PARAMS","ICD9FILT","A","FILTER"))
  F  S IEN=$O(@XREFNODE@(IEN))  Q:IEN'>0  D  Q:RC<0
  . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . S IENS=IEN_",",CNT=CNT+1
- . ;--- Get the patient DFN
- . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
- . ;check for patient list and quit if not on list
- . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",PATIEN)) Q
  . ;--- Check if the patient should be skipped
  . Q:$$SKIP^RORXU005(IEN,FLAGS,RORSDT,ROREDT)
- . ;--- Filter patient on ICD9 codes
- . S RCC=0
- . I FLAG'="ALL" D
- . . S RCC=$$ICD^RORXU010(PATIEN,RORREG)
- . I (FLAG="INCLUDE")&(RCC=0) Q
- . I (FLAG="EXCLUDE")&(RCC=1) Q
- . ;--- End of filter
+ . ;
+ . ;--- Get the patient IEN (DFN)
+ . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
  . ;
  . ;--- Get the patient's data
  . D VADEM^RORUTL05(PATIEN,1)

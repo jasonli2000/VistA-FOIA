@@ -1,5 +1,5 @@
-IBCEMRAB ;ALB/DSM - MEDICARE REMITTANCE ADVICE DETAIL-PART B ; 3/10/11 10:14am
- ;;2.0;INTEGRATED BILLING;**155,323,349,400,431**;21-MAR-94;Build 106
+IBCEMRAB ;ALB/DSM - MEDICARE REMITTANCE ADVICE DETAIL-PART B ; 12/29/05 9:58am
+ ;;2.0;INTEGRATED BILLING;**155,323,349**;21-MAR-94;Build 46
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q  ; this routine must be called at an entry point
@@ -41,17 +41,27 @@ HDR ; Print Header
  ; Row 7
  W !!!!,"DEPT OF VETERANS AFFAIRS"
  ;
- N PRVDR,LINE,PTNM,PTLEN,RMKS,HIC
+ N PRVDR,LVL,STATE,LINE,PTNM,PTLEN,RMKS,HIC
+ ; Retrieve the Provider data from IB Site Parameters file - ^IBE(350.9)
+ S PRVDR=$G(^IBE(350.9,1,2))
+ ; ProviderName^AgentCashierAddress^City^State^Zip
  ;
- ; gather the pay-to provider information - IB*2*400
- S PRVDR=$$PRVDATA^IBJPS3($P(IBEOB(0),U,1))
+ F LVL=1:1:5 S PRVDR(LVL)=$P(PRVDR,U,LVL)
+ ; PRVDR(1)  Provider Name (Agent Cashier Mail Symbol)
+ ; PRVDR(2)  Agent Cashier Street Address
+ ; PRVDR(3)  Agent Cashier City
+ ; PRVDR(4)  Agent Cashier State
+ ; PRVDR(5)  Agent Cashier Zip
+ ;
+ ; resolve the State File Pointer in PRVDR(4) & get State Abbreviation
+ S STATE=$S(PRVDR(4)'="":$P($G(^DIC(5,PRVDR(4),0)),U,2),1:"")
  ;
  ; Row 8
- W !,$P(PRVDR,U,5),?97,"PROVIDER #:",?111,"VA0"_$P($$SITE^VASITE,U,3)
+ W !,PRVDR(2),?97,"PROVIDER #:",?111,"VA0"_$P($$SITE^VASITE,U,3)
  ; Row 9
- W !,$P(PRVDR,U,6),?97,"PAGE #:",?111,$J(IBPGN,3)
+ W !,PRVDR(1),?97,"PAGE #:",?111,$J(IBPGN,3)
  ; Row 10
- W !,$P(PRVDR,U,7),", ",$P(PRVDR,U,8)," ",$P(PRVDR,U,9),?97,"DATE:",?111,$$FMTE^XLFDT($P(IBEOB(0),U,6),5)
+ W !,PRVDR(3),", ",STATE," ",PRVDR(5),?97,"DATE:",?111,$$FMTE^XLFDT($P(IBEOB(0),U,6),5)
  ; Row 14
  W !!!!,"PERF PROV",?12,"SERV DATE",?25,"POS",?29,"NOS",?34,"PROC",?40,"MODS",?53,"BILLED",?63,"ALLOWED",?75,"DEDUCT"
  W ?87,"COINS",?93,"GRP-RC",?107,"AMT",?114,"PROV PD"
@@ -67,11 +77,7 @@ HDR ; Print Header
  ; Row 17
  ; Patient Name, HIC, ACNT, ICN, ASG
  W !!,"NAME",?7,PTNM,?31,"HIC",?35,HIC
- W ?49,"ACNT",?54,$P($$SITE^VASITE,U,3),"-",$P(IBILL,U)
- ; HIPAA 5010 Changes
- N ICN
- S ICN=$P(IBEOB(0),U,14)
- W ?76,"ICN",?80,ICN W:$L(ICN)>17 !
+ W ?49,"ACNT",?54,$P($$SITE^VASITE,U,3),"-",$P(IBILL,U),?76,"ICN",?80,$P(IBEOB(0),U,14)
  W ?97,"ASG",?101,$S($P(IBILLU,U,6):"Y",1:"N")
  ;
  ; MOA: Medicare Outpatient Remarks Code

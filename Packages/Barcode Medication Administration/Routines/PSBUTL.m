@@ -1,5 +1,5 @@
-PSBUTL ;BIRMINGHAM/EFC-BCMA UTILITIES ; 6/24/08 9:54am
- ;;3.0;BAR CODE MED ADMIN;**3,9,13,38,45,46,63**;Mar 2004;Build 9
+PSBUTL ;BIRMINGHAM/EFC-BCMA UTILITIES ;Mar 2004
+ ;;3.0;BAR CODE MED ADMIN;**3,9,13,38**;Mar 2004;Build 8
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ; Reference/IA
@@ -8,7 +8,7 @@ PSBUTL ;BIRMINGHAM/EFC-BCMA UTILITIES ; 6/24/08 9:54am
  ; File 200/10060
  ;
  ;
-DIWP(X,Y,PSB,PSBARGN) ; 
+DIWP(X,Y,PSB,PSBARGN) ;
  K ^UTILITY($J,"W")
  S DIWL=0,DIWR=Y,DIWF="C"_Y D ^DIWP
  F X=0:0 S X=$O(^UTILITY($J,"W",0,X)) Q:'X  D
@@ -19,14 +19,14 @@ DIWP(X,Y,PSB,PSBARGN) ;
  K ^UTILITY($J,"W"),DIWL,DIWR,DIWF
  Q
  ;
-SATURDAY(X,PSBDISP) ; 
+SATURDAY(X,PSBDISP) ;
  S X=X\1 D H^%DTC ; Convert to $H
  S %H=%H+(6-%Y) ;   Set it forward to Saturday
  D YMD^%DTC ;       Back to FM Format
  I $G(PSBDISP) S PSBDISP=$E(X,4,5)_"/"_$E(X,6,7)_"/"_(1700+$E(X,1,3)) D EN^DDIOL("Actual date is Saturday "_PSBDISP)
  Q X
  ;
-SUNDAY(X,PSBDISP) ; 
+SUNDAY(X,PSBDISP) ;
  S X=X\1 D H^%DTC ; Convert to $H
  S %H=%H-%Y ;       Set it back to Sunday
  D YMD^%DTC ;       Back to FM Format
@@ -40,12 +40,9 @@ CLOCK(RESULTS,X) ; Verify Client/Server Date/Times are close enough
  ; Description:
  ; Returns variance from server to client in minutes
  ;
- N PSBCLNT,PSBSRVR,PSBDIFF,PSBMDNT
- S PSBMDNT=0
- I $P(X,"@",2)="0000" S $P(X,"@",2)="2400",PSBMDNT=1 ;Change Delphi time for midnight from 0000 to 2400 in PSB*3.0*63
+ N PSBCLNT,PSBSRVR,PSBDIFF
  S %DT="RS" D ^%DT S PSBCLNT=Y
  D NOW^%DTC S PSBSRVR=%
- S:$G(PSBMDNT) PSBCLNT=$$FMADD^XLFDT(PSBCLNT,-1,0,0,0) ;Change Delphi date for midnight from day following midnight to day previous to midnight in PSB*3.0*63
  S PSBDIFF=$$DIFF(PSBSRVR,PSBCLNT)
  S X=$$GET^XPAR("DIV","PSB SERVER CLOCK VARIANCE")
  I PSBDIFF>X!(PSBDIFF<(X*-1)) S RESULTS(0)="-1^"_PSBDIFF
@@ -133,7 +130,7 @@ TIMEIN ;
  S X=Y-DT
  Q
  ;
-TIMEOUT(X) ; 
+TIMEOUT(X) ;
  N HOUR,MIN,AMPM
  S X=$E($P(X,".",2)_"0000",1,4)
  I X="2400" Q "12:00m"
@@ -144,19 +141,19 @@ TIMEOUT(X) ;
  S:HOUR>12 HOUR=HOUR-12
  Q HOUR_":"_MIN_AMPM
  ;
-HFSOPEN(HANDLE) ; 
+HFSOPEN(HANDLE) ;
  N PSBDIR,PSBFILE
- S PSBDIR=$$DEFDIR^%ZISH()
+ S PSBDIR=$$GET^XPAR("DIV","PSB HFS SCRATCH")
  S PSBFILE="PSB"_DUZ_".DAT"
  D OPEN^%ZISH(HANDLE,PSBDIR,PSBFILE,"W") Q:POP
  S IOM=132,IOSL=99999,IOST="P-DUMMY",IOF=""""""
  Q
  ;
-HFSCLOSE(HANDLE) ; 
+HFSCLOSE(HANDLE) ;
  N PSBDIR,PSBFILE,PSBDEL
  D CLOSE^%ZISH(HANDLE)
  K ^TMP("PSBO",$J)
- S PSBDIR=$$DEFDIR^%ZISH()
+ S PSBDIR=$$GET^XPAR("DIV","PSB HFS SCRATCH")
  S PSBFILE="PSB"_DUZ_".DAT",PSBDEL(PSBFILE)=""
  S X=$$FTG^%ZISH(PSBDIR,PSBFILE,$NAME(^TMP("PSBO",$J,2)),3)
  S X=$$DEL^%ZISH(PSBDIR,$NA(PSBDEL))
@@ -184,15 +181,14 @@ AUDIT(PSBREC,PSBDD,PSBFLD,PSBDATA,PSBSK) ; Med Log Audit
  ...S PSBGOON=1,PSBOLDUZ=$P(^PSB(53.79,PSBREC,.9,XY,0),U,2),X=$P(^PSB(53.79,PSBREC,.9,XY,0),"'",2)
  .S:$L(X)'>2 X=PSBOLSTS,X=$S(X="G":"GIVEN",X="H":"HELD",X="R":"REFUSED",X="I":"INFUSING",X="C":"COMPLETED",X="S":"STOPPED",X="N":"NOT GIVEN",X="RM":"REMOVED",X="M":"MISSING DOSE",X="":PSBOLSTS)
  .I PSBSK["K" S ^PSB(53.79,PSBREC,.9,Y,0)=PSBDT_U_DUZ_U_"Field: "_PSBTMP("LABEL")_" '"_PSBDATA_"' by '"_$$GET1^DIQ(200,PSBOLDUZ,"INITIAL")_"' deleted."
- .;PSB*3*45 Store Action status and last given fields.
- .E  S ^PSB(53.79,PSBREC,.9,Y,0)=PSBDT_U_DUZ_U_"Field: "_PSBTMP("LABEL")_" Set to '"_PSBDATA_"' by '"_$$GET1^DIQ(200,DUZ,"INITIAL")_"'."_U_PSBDATA_U_$P(^PSB(53.79,PSBREC,0),"^",7)
+ .E  S ^PSB(53.79,PSBREC,.9,Y,0)=PSBDT_U_DUZ_U_"Field: "_PSBTMP("LABEL")_" Set to '"_PSBDATA_"' by '"_$$GET1^DIQ(200,DUZ,"INITIAL")_"'."_U_PSBDATA
  I PSBSK["K" S ^PSB(53.79,PSBREC,.9,Y,0)=PSBDT_U_DUZ_U_"Field: "_PSBTMP("LABEL")_" '"_PSBDATA_"' deleted."
  E  S ^PSB(53.79,PSBREC,.9,Y,0)=PSBDT_U_DUZ_U_"Field: "_PSBTMP("LABEL")_$S(PSBTMP("LABEL")["DISPENSE DRUG":" Added '",1:" Set to '")_PSBDATA_"'."
  K XY,PSBGOON
  Q
  ;
 CHECK(RESULTS,PSBWHAT,PSBDATA) ; Checks for KIDS Patch or Build
- ; Module added in Patch PSB*1.0*3 DP/TOPEKA 22-DEC-1999 11:51:22 
+ ; Module added in Patch PSB*1.0*3 DP/TOPEKA 22-DEC-1999 11:51:22
  ; PSBWHAT: B = Returns Build Version for packages by Namespace
  ;          P = Returns if Patch is installed
  ; PSBDATA: Build/Package namespace (i.e. PSB) or Patch Number
@@ -208,7 +204,7 @@ CHECK(RESULTS,PSBWHAT,PSBDATA) ; Checks for KIDS Patch or Build
  .S RESULTS(0)=$S(X:"1^Patch Is Installed",1:"-1^Patch Is Not Installed")
  Q
  ;
-VERSION() ; [Extrinsic] 
+VERSION() ; [Extrinsic]
  ; Returns V#.# for display purposes
  Q "V"_$J(2,0,1)
  ;

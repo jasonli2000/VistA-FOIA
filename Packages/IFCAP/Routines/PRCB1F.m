@@ -1,6 +1,6 @@
 PRCB1F ;WISC/PLT-IFCAP MONTHLY ACCRUAL ;9/13/96  16:21
-V ;;5.1;IFCAP;**64,72,142**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;**64,72**;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  QUIT  ;invalid entry
  ;
  ;ZTQPARAM=999 if from schedule option
@@ -43,20 +43,17 @@ Q40 S B="O^1:Compile/Print Monthly Accrual;2:Edit Monthly Accrual;3:Generate/Reb
  D:$P(A,"^",6) EN^DDIOL("Warning: Recompiling will overwrite all edited accrual amounts")
 Q41 D YN^PRC0A(.X,.Y,"Recompile Accrual Report:","O","NO")
  I X["^" G Q4
- L +^PRCH(440.7,PRCRI(440.7)):5 E  W !,"Another user has this Accrual File open, please try later" G Q40
  S $P(PRCA,"^",12)=Y G Q5
 Q45 ;eidt accrual amount
  I $P(PRCA,"^",9)'=$P(PRCTD,"^",6),$P(PRCA,"^",9)'=$P(PRCTD,"^",9) D EN^DDIOL("It is too late to edit accrual amounts") G Q4
  S PRCRI(440.7)=$O(^PRCH(440.7,"B",$P(PRCA,"^",11),0))
  I 'PRCRI(440.7) D EN^DDIOL("You need to select Compile/Print option first") G Q40
- L +^PRCH(440.7,PRCRI(440.7)):5 E  W !,"Another user has this Accrual File open, please try later" G Q40
  G Q5
  ;
 Q47 ;generate sv-document
  I $P(PRCA,"^",9)'=$P(PRCTD,"^",6),$P(PRCA,"^",9)'=$P(PRCTD,"^",9) D EN^DDIOL("It is too late to generate SV-documents") G Q4
  S PRCRI(440.7)=$O(^PRCH(440.7,"B",$P(PRCA,"^",11),0))
  I 'PRCRI(440.7) D EN^DDIOL("You need to select Compile/Print option first") G Q40
- L +^PRCH(440.7,PRCRI(440.7)):5 E  W !,"Another user has this Accrual File open, please try later" G Q40
  S A=^PRCH(440.7,PRCRI(440.7),0) D:$P(A,"^",7)]""
  . N GECSDATA
  . S A=$P($P(A,"^",7),"/",2),X="SV-"_A D DATA^GECSSGET(X,0)
@@ -70,8 +67,7 @@ Q47 ;generate sv-document
  G Q5
 Q5 D YN^PRC0A(.X,.Y,"Ready to "_$P("Compile/Print,Edit,Generate/Rebuild Document",",",PRCOPT),"O","NO")
  I X["^"!(X="")!'Y G Q4
- I PRCOPT=1 D ACCR G Q5X
- L +^PRCH(440.7,PRCRI(440.7)):3 E  W !,"Another user has this Accrual file open, please try later" G Q4
+ I PRCOPT=1 D ACCR
  I PRCOPT=2 D EDIT
  I PRCOPT=3 D
  . D EN^DDIOL("Generating the monthly accrual FMS SV-Document")
@@ -79,8 +75,7 @@ Q5 D YN^PRC0A(.X,.Y,"Ready to "_$P("Compile/Print,Edit,Generate/Rebuild Document
  . D SV^PRCB8B(.X,PRCRI(440.7)_"^"_PRCA,$TR(PRCB,"/","^"))
  . I X>0 D EDIT^PRC0B(.X,"440.7;^PRCH(440.7,;"_PRCRI(440.7),"2///^S X=""N"";6////"_X)
  . QUIT
- L -^PRCH(440.7,PRCRI(440.7))
-Q5X D EN^DDIOL(" "),EN^DDIOL(" ") G Q4
+ D EN^DDIOL(" "),EN^DDIOL(" ") G Q4
  ;
 EXIT QUIT
  ;

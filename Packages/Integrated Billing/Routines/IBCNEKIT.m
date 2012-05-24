@@ -1,9 +1,9 @@
-IBCNEKIT ;DAOU/ESG - PURGE eIV DATA FILES ;11-JUL-2002
- ;;2.0;INTEGRATED BILLING;**184,271,316,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNEKIT ;DAOU/ESG - PURGE IIV DATA FILES ;11-JUL-2002
+ ;;2.0;INTEGRATED BILLING;**184,271,316**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; This routine handles the purging of the eIV data stored in the
- ; eIV Transmission Queue file (#365.1) and in the eIV Response file (#365).
+ ; This routine handles the purging of the IIV data stored in the
+ ; IIV Transmission Queue file (#365.1) and in the IIV Response file (#365).
  ; User can pick a date range for the purge.  Data created within 6 months
  ; cannot be purged.  The actual global kills are done by a background
  ; task after hours (8:00pm).
@@ -25,7 +25,35 @@ PURGE ; This procedure is queued to run in the background and does the
  ;    BEGDT = beginning date for purging
  ;    ENDDT = ending date for purging
  ;
- ; First loop through the eIV Transmission Queue file and delete all
+ N NOW,CACHE
+ S NOW=$$NOW^XLFDT
+ ;
+ ; Check to see if O/C is Cache, if so then cache specific journal code can be used to
+ ; enable/disable/enable journaling
+ S CACHE=0
+ I $P(^%ZOSF("OS"),U)="OpenM-NT" S CACHE=1
+ ;
+ ; Retain ^XTMP for seven days
+ I '$D(^XTMP("IBCNEKIT")) S ^XTMP("IBCNEKIT",0)=U_NOW_U_"Journaling status"
+ S $P(^XTMP("IBCNEKIT",0),U)=$$FMADD^XLFDT(NOW,7)
+ ;
+ I 'CACHE D
+ . S ^XTMP("IBCNEKIT",NOW,"STEP 1: NO ACTION")="An O/S conflict prevents journaling from disabling."
+ E  D
+ . ; Set error trap and disable journaling for this one process
+ . NEW $ETRAP,$ESTACK,STATUS
+ . S $ETRAP="D TRAP^IBCNEKIT"
+ . S STATUS=$$CURRENT^%NOJRN
+ . S STATUS=$S(STATUS=1:"Enabled",1:"Disabled")
+ . S ^XTMP("IBCNEKIT",NOW,"STEP 1: START")="Journaling for this process is "_STATUS_U_$$NOW^XLFDT
+ . ;
+ . D DISABLE^%NOJRN
+ . S STATUS=$$CURRENT^%NOJRN
+ . S STATUS=$S(STATUS=1:"Enabled",1:"Disabled")
+ . S ^XTMP("IBCNEKIT",NOW,"STEP 2: DISABLE")="Journaling for this process is "_STATUS_U_$$NOW^XLFDT
+ ;
+ ;
+ ; First loop through the IIV Transmission Queue file and delete all
  ; records in the date range whose status is in the list
  ;
  NEW DATE,TQIEN,TQS,HLIEN,DIK,DA,CNT
@@ -50,7 +78,7 @@ PURGE ; This procedure is queued to run in the background and does the
  ; Check for a stop request
  I $G(ZTSTOP) G PURGEX
  ;
- ; Now we must loop through the eIV Response file itself to purge any
+ ; Now we must loop through the IIV Response file itself to purge any
  ; response records that do not have a corresponding transmission
  ; queue entry.  These are the unsolicited responses.  The status of
  ; these responses is always 'response received' so we don't need to
@@ -70,10 +98,27 @@ PURGE ; This procedure is queued to run in the background and does the
  . I $P($G(^IBCN(365,DA,0)),U,5) Q
  . D ^DIK
  . Q
- ;
 PURGEX ;
+ ; Turn journaling back on
+ I CACHE D
+ . D ENABLE^%NOJRN
+ . S STATUS=$$CURRENT^%NOJRN
+ . S STATUS=$S(STATUS=1:"Enabled",1:"Disabled")
+ . S ^XTMP("IBCNEKIT",NOW,"STEP 3: COMPLETED")="Journaling for this process is "_STATUS_U_$$NOW^XLFDT
  ; Tell TaskManager to delete the task's record
  I $D(ZTQUEUED) S ZTREQ="@"
+ Q
+ ;
+TRAP ;
+ ; Error trap code for Purge^IBCNEKIT that was called by TaskMan
+ ; Re-Enable journaling before quitting this routine
+ ;
+ D ENABLE^%NOJRN
+ S STATUS=$$CURRENT^%NOJRN
+ S STATUS=$S(STATUS=1:"Enabled",1:"Disabled")
+ S ^XTMP("IBCNEKIT",NOW,"STEP 3: ABORTED")="Journaling for this process is "_STATUS_U_$$NOW^XLFDT
+ D ^%ZTER
+ D UNWIND^%ZTER
  Q
  ;
 INIT ; This procedure calculates the default beginning and ending dates
@@ -90,7 +135,7 @@ INIT ; This procedure calculates the default beginning and ending dates
  ;   7=Cancelled
  S STATLIST=",3,5,7,"
  ;
- ; Try to find a beginning date in the eIV Transmission Queue file
+ ; Try to find a beginning date in the IIV Transmission Queue file
  S DATE="",FOUND=0,BEGDT=DT
  F  S DATE=$O(^IBCN(365.1,"AE",DATE)) Q:'DATE!FOUND  S TQIEN=0 F  S TQIEN=$O(^IBCN(365.1,"AE",DATE,TQIEN)) Q:'TQIEN  D  Q:FOUND
  . S TQS=$P($G(^IBCN(365.1,TQIEN,0)),U,4)    ; status
@@ -99,7 +144,7 @@ INIT ; This procedure calculates the default beginning and ending dates
  . S BEGDT=$P(DATE,".",1)
  . Q
  ;
- ; If not successful, try to find a beginning date in the eIV Response file.
+ ; If not successful, try to find a beginning date in the IIV Response file.
  I 'FOUND D
  . S DATE=""
  . F  S DATE=$O(^IBCN(365,"AE",DATE)) Q:'DATE!FOUND  S RPIEN=0 F  S RPIEN=$O(^IBCN(365,"AE",DATE,RPIEN)) Q:'RPIEN  D  Q:FOUND
@@ -114,7 +159,7 @@ INIT ; This procedure calculates the default beginning and ending dates
  S ENDDT=$$FMADD^XLFDT(DT,-182)
  ;
  I 'FOUND!(BEGDT>ENDDT) D  S STOP=1 G INITX
- . W !!?5,"Purging of eIV data is not possible at this time."
+ . W !!?5,"Purging of IIV data is not possible at this time."
  . I 'FOUND W !?5,"There are no entries in the file that are eligible to be",!?5,"purged or there is no data in the file."
  . E  W !?5,"The oldest date in the file is ",$$FMTE^XLFDT(BEGDT,"5Z"),".",!?5,"Data cannot be purged unless it is at least 6 months old."
  . W ! S DIR(0)="E" D ^DIR K DIR
@@ -123,9 +168,9 @@ INIT ; This procedure calculates the default beginning and ending dates
  ; At this point, we know that there are some entries eligible for
  ; purging.  Display a message to the user about this option.
  W @IOF
- W !?8,"Purge Electronic Insurance Verification (eIV) Data Files"
- W !!!," This option will allow you to purge data from the eIV Response File (#365)"
- W !," and the eIV Transmission Queue File (#365.1).  The data must be at least six"
+ W !?3,"Purge Electronic Insurance Identification and Verification (IIV) Data Files"
+ W !!!," This option will allow you to purge data from the IIV Response File (#365)"
+ W !," and the IIV Transmission Queue File (#365.1).  The data must be at least six"
  W !," months old before it can be purged.  Only insurance transactions that have a"
  W !," transmission status of ""Response Received"", ""Communication Failure"", or"
  W !," ""Cancelled"" may be purged.  You will be allowed to select a date range for"
@@ -165,7 +210,7 @@ ENDDTX ;
 CONFIRM ; This procedure displays a confirmation message to the user and
  ; asks if it is OK to proceed with the purge.
  NEW DIR,X,Y,DTOUT,DUOUT,DIRUT,DIROUT
- W !!!," You want to purge all eIV data created between "
+ W !!!," You want to purge all IIV data created between "
  W $$FMTE^XLFDT(BEGDT,"5Z")," and ",$$FMTE^XLFDT(ENDDT,"5Z"),"."
  W !
  S DIR(0)="YO",DIR("A")=" OK to continue"
@@ -183,14 +228,14 @@ QUEUE ; This procedure queues the purge process for later at night.
  NEW ZTRTN,ZTDESC,ZTDTH,ZTIO,ZTUCI,ZTCPU,ZTPRI,ZTSAVE,ZTKIL,ZTSYNC,ZTSK
  NEW DIR,X,Y,DTOUT,DUOUT,DIRUT,DIROUT
  S ZTRTN="PURGE^IBCNEKIT"     ; TaskMan task entry point
- S ZTDESC="Purge eIV Data"    ; Task description
+ S ZTDESC="Purge IIV Data"    ; Task description
  S ZTDTH=DT_".20"             ; start it at 8:00 PM tonight
  S ZTIO=""
  S ZTSAVE("BEGDT")=""
  S ZTSAVE("ENDDT")=""
  S ZTSAVE("STATLIST")=""
  D ^%ZTLOAD
- I $G(ZTSK) W !!," Task# ",ZTSK," has been scheduled to purge the eIV data tonight at 8:00 PM."
+ I $G(ZTSK) W !!," Task# ",ZTSK," has been scheduled to purge the IIV data tonight at 8:00 PM."
  E  W !!," TaskManager could not schedule this task.",!," Contact IRM for technical assistance."
  W ! S DIR(0)="E" D ^DIR K DIR
 QUEUEX ;

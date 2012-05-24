@@ -1,9 +1,9 @@
 VAFHLPR1 ;ALB/ESD - Create generic HL7 PR1 Segment ;4/4/00
- ;;5.3;Registration;**94,123,160,215,243,606**;Aug 13, 1993
+ ;;5.3;Registration;**94,123,160,215,243,606**;Aug 13, 1993;Build 1
  ;06/22/99 ACS - Added CPT modifier API calls and added CPT modifier to the
  ;PR1 segment (sequence 16)
  ;
- ;  This function will create VA-specific PR1 segment(s) for a 
+ ;  This function will create VA-specific PR1 segment(s) for a
  ;  given outpatient encounter. The PR1 segment is designed to transfer
  ;  information relative to various types of procedures performed during
  ;  a patient visit.
@@ -13,9 +13,9 @@ EN(VAFENC,VAFSTR,VAFHLQ,VAFHLFS,VAFHLECH,VAFARRY) ; Entry point for Ambulatory C
  ;
  ;  Input:   VAFENC - IEN of the Outpatient Encounter (#409.68) file
  ;           VAFSTR - String of fields requested separated by commas
- ;           VAFHLQ - Optional HL7 null variable. If not there, use 
+ ;           VAFHLQ - Optional HL7 null variable. If not there, use
  ;                    default HL7 variable
- ;          VAFHLFS - Optional HL7 field separator. If not there, use 
+ ;          VAFHLFS - Optional HL7 field separator. If not there, use
  ;                    default HL7 variable
  ;         VAFHLECH - HL7 variable containing encoding characters
  ;          VAFARRY - Optional user-supplied array name which will hold PR1 segments

@@ -1,19 +1,19 @@
 PRCADR1 ;SF-ISC/YJK-PRINT ADDRESS,APPROPR.CDS ;8/16/96  1:02 PM
-V ;;4.5;Accounts Receivable;**49,138,233**;Mar 20, 1995;Build 4
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;4.5;Accounts Receivable;**49,138**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;print debtor's /vendor address,multiple appropriations,list of other bills.
 EN1 ;print the appropriation,pat ref #. (multiple) and amount.
  W !,"ORIGINAL AMOUNT: ",$J($P(^PRCA(430,D0,0),U,3),0,2)
  I $P($G(^PRCA(430,D0,13)),"^") W !,"MEDICARE CONTRACTUAL ADJUSTMENT: ",$J($P($G(^PRCA(430,D0,13)),"^"),0,2)
  I $P($G(^PRCA(430,D0,13)),"^",2) W !,"UNREIMBURSED MEDICARE EXPENSE: ",$J($P($G(^PRCA(430,D0,13)),"^",2),0,2)
- W !!,"FISCAL YEAR",?15,"APPROP. CODE",?38,"PAT REFERENCE #",?66,"AMOUNT"
- W !,"-----------",?15,"------------",?38,"---------------",?66,"------"
+ W !!,"FISCAL YEAR",?15,"APPROP. CODE",?38,"PAT REFERENCE #",?63,"AMOUNT"
+ W !,"-----------",?15,"------------",?38,"---------------",?63,"------"
  S PRCAFN=0 F PRCAE1=0:0 S PRCAFN=$O(^PRCA(430,D0,2,PRCAFN)) Q:PRCAFN'>0  D WRPAT
 END1 K PRCAE1,PRCAFN Q  ;end of EN1
 WRPAT Q:'$D(^PRCA(430,D0,2,PRCAFN,0))  S PRCAFY=$P(^(0),U,1),PRCAMT=$P(^(0),U,2)
  S PRCAPAT="" I $P(^PRCA(430,D0,2,PRCAFN,0),U,3)'="" S PRCAPAT=$S($D(^PRC(442,$P(^(0),U,3),0)):$P(^(0),U,1),1:"")
  S PRCAPPR=$P($G(^PRCA(430,D0,11)),U,17)
- W !,?5,PRCAFY,?18,$E(PRCAPPR,1,10),?40,PRCAPAT,?60,$J(PRCAMT,12,2)
+ W !,?5,PRCAFY,?18,$E(PRCAPPR,1,10),?40,PRCAPAT,?60,$J(PRCAMT,9,2)
  K PRCAPAT,PRCAPPR,PRCAFY,PRCAMT Q
 EN2 ;PRINT DEBTOR'S ADDRESS - VENDOR
  Q:'$D(D0)  S PRCADBPT=$S($P(^PRCA(430,D0,0),U,9)'="":$P(^(0),U,9),1:"") G:PRCADBPT="" END2 S PRCADB=$P(^RCD(340,PRCADBPT,0),"^") N X S X=$$DADD^RCAMADD(PRCADB) S $P(PRCAGL,"^",1,6)=$P(X,"^",1,6),$P(PRCAGL,"^",9)=$P(X,"^",7) K PRCADB

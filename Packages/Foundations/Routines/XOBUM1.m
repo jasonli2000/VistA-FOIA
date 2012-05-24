@@ -1,6 +1,6 @@
 XOBUM1 ;; ld,mjk/alb - Foundations Manager ; 07/27/2002  13:00
- ;;1.6;Foundations;;May 08, 2009;Build 15
- ;Per VHA directive 2004-038, this routine should not be modified.
+ ;;1.5;Foundations;;Sep 09, 2005
+ ;;Foundations Toolbox Release v1.5 [Build: 1.5.0.026]
  ;
 START(XOBPORT) ;-- Entry point to start a single VistALink Listener
  ;
@@ -80,7 +80,7 @@ CHKOS() ;-- Check operating system
 VALID(XOBPORT) ;-- Validate port
  ;
  ;  This function will validate a port number passed in.
- ;  
+ ;
  ;   Input:
  ;     XOBPORT  - Port number for the Listener (Optional)
  ;
@@ -104,7 +104,7 @@ VALID(XOBPORT) ;-- Validate port
 GETPORT(XOBST) ;-- Prompt user for port number
  ;
  ;  This function will prompt the user for a valid port number.
- ;  
+ ;
  ;   Input:
  ;     XOBST - start = start Listener
  ;             stop  = stop Listener
@@ -140,7 +140,7 @@ BOX() ; -- start this BOX-VOl default configuration
  ;
  ;
 STOP(LOGDA) ; -- stop a listener
- NEW Y,X,LOG0,XOBBOX,XOBPORT,XONCFG,XOBSTAT,XOBOK,XOBCFG
+ NEW Y,X,LOG0,XOBBOX,XOBPORT,XONCFG,XOBSTAT,XOBOK
  SET XOBOK=0
  ;
  SET LOG0=$GET(^XOB(18.04,LOGDA,0))
@@ -148,8 +148,8 @@ STOP(LOGDA) ; -- stop a listener
  SET XOBPORT=$PIECE(LOG0,U,2)
  SET XOBSTAT=$PIECE(LOG0,U,3)
  SET XOBCFG=$PIECE(LOG0,U,6)
- ; 
- ; -- must be valid entry with a running status
+ ;
+ ; -- must be valid entyr with a running status
  IF XOBPORT,XOBSTAT=2 DO
  . DO UPDLOG^XOBVTCP(LOGDA,XOBPORT,3,XOBCFG)
  . SET XOBOK=1

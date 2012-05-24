@@ -1,6 +1,5 @@
 IBCESRV3 ;ALB/TMP - Server based Auto-update utilities - IB EDI ;03/05/96
- ;;2.0;INTEGRATED BILLING;**137,155,400**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**137,155**;21-MAR-94
  ; IA 4129 for call to DUZ^XUP
  Q
  ;
@@ -8,7 +7,7 @@ EOB835 ; Explanation of Benefits - auto update
  ; Input expected: IBTDA = the ien of the message entry in file 364.2
  ;
  ; This is the background task that is queued to run by TaskManager.
- ; This procedure is called via indirection in TRTN^IBCESRV1 which is
+ ; The call which queues this task is found in TRTN^IBCESRV1 which is
  ; called by ADD^IBCESRV.
  ;
  N IB0,IBBDA,IBBILL,IBMSG,IBFLAG,IBTYP,IBBST,DR,DA,DIE,Z,MRAUSER
@@ -53,7 +52,7 @@ UPDEOB(IBTDA) ; Explanation of Benefits or MRA
  ;
  ; If the EOB is not a Medicare MRA, then we can stop here
  I $P($G(^IBM(361.1,IBEOB,0)),U,4)'=1 G UPDEOBX
- ; 
+ ;
  ; *** Medicare MRA processing ***
  ;
  ; update the claim MRA status of the file 399 bill

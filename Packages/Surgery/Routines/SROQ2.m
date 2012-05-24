@@ -1,5 +1,5 @@
-SROQ2 ;BIR/ADM - SUMMARY REPORT ;05/11/10
- ;;3.0; Surgery ;**38,62,70,50,95,123,129,134,153,160,163,174**;24 Jun 93;Build 8
+SROQ2 ;BIR/ADM - SUMMARY REPORT ;07/18/07
+ ;;3.0; Surgery ;**38,62,70,50,95,123,129,134,153,160,163**;24 Jun 93;Build 2
  ;** NOTICE: This routine is part of an implementation of a nationally
  ;**         controlled procedure. Local modifications to this routine
  ;**         are prohibited.
@@ -58,7 +58,7 @@ ZERO ; set counters to 0
  S ^TMP("SRSS",$J,"ZZ")="0^0^0^0",SREXP("ZZ")=0
  K SRATT F I=9:1:14,99 S (SRATT(I),SRATT("J",I),SRATT("N",I))=0
  F SRPROC=1:1:12 S ^TMP("SRPROC",$J,SRPROC)="0^0",SRDEATH(SRPROC)=0
- S (SRINV("I"),SRINV("O"))=0 F I=1:1:39 S SRC(I)=0
+ S (SRINV("I"),SRINV("O"))=0 F I=1:1:38 S SRC(I)=0
  F I="C","D","N","P","S","U","O","ZZ" S SRHAIR(I)=0
  Q
 DEATH ; tabulate deaths

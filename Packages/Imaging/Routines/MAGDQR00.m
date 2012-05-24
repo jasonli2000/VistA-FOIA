@@ -1,6 +1,5 @@
-MAGDQR00 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 04/05/2006 08:43
- ;;3.0;IMAGING;**51,54**;03-July-2009;;Build 1424
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGDQR00 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 06/06/2005  09:27
+ ;;3.0;IMAGING;**51**;26-August-2005
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGDQR00 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 04/05/2006 08:43
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -118,8 +118,6 @@ MAGDQR00 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 04/05/2006 08:43
  ; 0010,0020  R  Patient ID
  ; 0020,0010  R  Study ID
  ; 0020,000D  U  Study Instance UID
- ; 0008,0018  U  Image Instance UID
- ; 0020,000E  U  Series Instance UID
  ;
  ; 0008,0061  O  Modalities in Study
  ; 0008,0090  O  Referring Physician's Name

@@ -1,8 +1,7 @@
 RMPRHL7A ;HINES CIOFO/HNC - Receive HL-7 CPRS Message, parse into components and store in File 668 ;3/13/00
- ;;3.0;PROSTHETICS;**45,78,83**;Feb 09, 1996;Build 20
+ ;;3.0;PROSTHETICS;**45,78**;Feb 09, 1996
  ;
  ;Patch #78 - 09/25/03 - TH - Add multiple DG1 and ZCL segments.
- ;Patch #83 - 03/02/09 - DDA - Add check in OBR to screen out IFCs generated locally.
  ;
  Q
 URG(X) ;Return Urgency give Z-code from HL-7 segment; see ORC+9
@@ -11,7 +10,6 @@ URG(X) ;Return Urgency give Z-code from HL-7 segment; see ORC+9
  Q X
  ;
 ORC(RMPRORC) ;Get fields from ORC segment and set into RMPR variables
- S ^TMP("SPS","HL7",2)=RMPRORC
  ;RMPRTRLC=ORC control code from HL7 Table 119
  ;RMPRURGI=priority/urgency     RMPRPLCR=who entered the order
  ;RMPRORNP=provider             RMPRNATO=nature of order
@@ -48,7 +46,6 @@ OBR(RMPROBR) ;Get fields from OBR segment and set into RMPR variables
  S RMPRSST=$P($P(RMPROBR,"|",5),"^",4)
  S RMPRSS=$P(^GMR(123.5,RMPRSST,0),U,1) D
  .;translate to set of codes
- .I RMPRSS["PROSTHETICS IFC" S RMPRSS="NO" Q
  .I RMPRSS["PROSTHETICS REQUEST" S RMPRSS=1 Q
  .I RMPRSS["CONTACT LENS REQUEST" S RMPRSS=3 Q
  .I RMPRSS["HOME OXYGEN REQUEST" S RMPRSS=4 Q
@@ -81,7 +78,7 @@ DG1(RMPRDG1) ;Get fields from DG1 and ZCL segments
  . S RMPRCI=$P(RMPRMSG,"|",3)
  . S RMPRVAL=$P(RMPRMSG,"|",4)
  . S RMPRMSG1(RMPRSID,RMPRCI+1)=RMPRVAL
- Q 
+ Q
  ;
 ZSV(RMPRZSV) ;Get service from ZSV segment
  S RMPRZSS=$P($P(RMPRZSV,"|",2),"^",4)
@@ -161,7 +158,7 @@ EN(MSG) ;Entry point from protocol RMPR RECEIVE
  D EXIT^RMPRHL7U
  Q
  ;
-RTN(RMPRORN,RMPRO) ;Put ^OR(100, ien for order into ^RMPR(668, 
+RTN(RMPRORN,RMPRO) ;Put ^OR(100, ien for order into ^RMPR(668,
  S DA=RMPRO
  S DIE="^RMPR(668,",DR="19////^S X=RMPRORN"
  L +^RMPR(668,RMPRO) D ^DIE L -^RMPR(668,RMPRO)

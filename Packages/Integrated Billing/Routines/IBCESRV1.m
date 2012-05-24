@@ -1,6 +1,5 @@
 IBCESRV1 ;ALB/TMP - Server interface to IB from Austin ;03/05/96
- ;;2.0;INTEGRATED BILLING;**137,181,191,400**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**137,181,191**;21-MAR-94
  Q
 PERROR(IBERR,IBTDA,IBEMG,IBXMZ) ; Process Errors - Send bulletin to mail group
  ; IBERR = Error text array
@@ -131,11 +130,15 @@ DKILL(IBXMZ) ; Delete server mail message from postmaster mailbox
  ;
  Q
  ;
-TRTN(IBTDA) ; Process incoming EDI message
+TRTN(IBTDA,ZTSK) ; Auto-update task message process
  ; IBTDA = internal entry # of message (file 364.2)
- ; This procedure is called from ADD^IBCESRV with variable IBRTN holding the TAG^ROUTINE to be invoked
- NEW IBA,IBB,IBGBL,IBERR        ; protect looping variables from ADD^IBCESRV
- D @IBRTN
+ ; ZTSK = if passed by reference, returns the task #
+ ;
+ N ZTDTH,ZTUCI,ZTSAVE,ZTIO,ZTDESC,ZTRTN,DIE,DR,DA
+ S (ZTSAVE("IBTDA"),ZTSAVE("DT"),ZTSAVE("U"),ZTSAVE("DUZ"))="",ZTSAVE("ZTREQ")="@",ZTRTN=IBRTN,ZTDTH=$H,ZTIO=""
+ I $P($G(^IBE(364.3,+$P($G(^IBA(364.2,IBTDA,0)),U,2),0)),U)="REPORT" S ZTSAVE("XMZ")=$G(^IBA(364.2,IBTDA,0))\1
+ D ^%ZTLOAD
+ I $G(ZTSK),$G(^IBA(364.2,IBTDA,0)) S DIE="^IBA(364.2,",DA=IBTDA,DR=".11////"_ZTSK_";.06////U" D ^DIE
  Q
  ;
 TRADEL(X) ; Process to delete message from temporary message holding file

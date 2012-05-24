@@ -1,7 +1,6 @@
-BPSOSU5 ;BHAM ISC/FCS/DRS/FLS - utilities ;03/07/08  10:39
- ;;1.0;E CLAIMS MGMT ENGINE;**1,7**;JUN 2004;Build 46
- ;;Per VHA Directive 2004-038, this routine should not be modified.
- ;
+BPSOSU5 ;BHAM ISC/FCS/DRS/FLS - utilities ;06/01/2004
+ ;;1.0;E CLAIMS MGMT ENGINE;**1**;JUN 2004
+ Q
  ;----------------------------------------------------------------------
 TOSCREEN()         ;EP; True or False, is output to screen?
  I $E(IOST)'="C" Q 0

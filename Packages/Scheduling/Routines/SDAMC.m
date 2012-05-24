@@ -1,5 +1,5 @@
-SDAMC ;ALB/MJK - Cancel Appt Action ; 8/31/05 3:02pm  ; 12/26/08 12:26pm  ; Compiled January 8, 2009 15:41:48
- ;;5.3;Scheduling;**20,28,32,46,263,414,444,478,538**;Aug 13, 1993;Build 5
+SDAMC ;ALB/MJK - Cancel Appt Action ; 8/31/05 3:02pm
+ ;;5.3;Scheduling;**20,28,32,46,263,414,444,478**;Aug 13, 1993
  ;
 EN ; -- protocol SDAM APPT CANCEL entry pt
  ; input:  VALMY := array entries
@@ -33,10 +33,8 @@ CANQ ;
  ;Wait List Message
  ;
  I $G(SCLHOLD)'="" S:'$D(SDCLN) SDCLN=SCLHOLD  ; SD*5.3*414
- N SDOMES S SDOMES="" I $G(SDCLN)'="",$D(^SDWL(409.3,"SC",SDCLN)) D
- .N SDWL S SDWL="" F  S SDWL=$O(^SDWL(409.3,"SC",SDCLN,SDWL)) Q:SDWL=""  D  Q:SDOMES
- ..I $P(^SDWL(409.3,SDWL,0),U,17)="O" I $P(^SDWL(409.3,SDWL,0),U)=$G(SDFN) D  S SDOMES=1
- ...W !,?1,"There are Wait List entries waiting for an Appointment for this patient in ",!?1,$P(^SC(SDCLN,0),U,1)," Clinic.",!
+ I $G(SDCLN)'="",$D(^SDWL(409.3,"SC",SDCLN)) D
+ .W !,?1,"There are Patients on the Wait List waiting for an Appointment in the",!?1,$P(^SC(SDCLN,0),U,1)," Clinic.",!
  S DIR(0)="E" D ^DIR W !
  K:SDAMTYP="P" SDCLN
  K SCLHOLD,SC,COV,APP

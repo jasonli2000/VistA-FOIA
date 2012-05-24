@@ -1,5 +1,5 @@
 PSJCOMR ;BIR/CML3-RENEW A COMPLEX ORDER SERIES ;07 MAR 96 / 1:23 PM
- ;;5.0; INPATIENT MEDICATIONS ;**110,127,136,157,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**110,127,136,157**;16 DEC 97
  ;
  ; Reference to ^PS(55 supported by DBIA 2191.
  ; Reference to ^PSSLOCK is supported by DBIA 2789.
@@ -7,7 +7,7 @@ PSJCOMR ;BIR/CML3-RENEW A COMPLEX ORDER SERIES ;07 MAR 96 / 1:23 PM
  ; Reference to ^DIR is supported by DBIA 10026.
  ;
  ; renew a complex order series
- Q:'PSJCOM  K COMQUIT,PSGORQF
+ Q:'PSJCOM  K COMQUIT
  W !!,"This order is part of a complex order. If you "_$S($P(PSJSYSP0,"^",3):"RENEW",1:"MARK")_" this order the",!,"following orders will be "_$S($P(PSJSYSP0,"^",3):"RENEWED",1:"MARKED")_" too." D CMPLX^PSJCOM1(PSGP,PSJCOM,PSGORD)
  W !! K DIR S DIR(0)="Y",DIR("A")=$S($P(PSJSYSP0,"^",3):"RENEW THIS COMPLEX ORDER SERIES",1:"MARK THIS COMPLEX ORDER SERIES FOR RENEWAL"),DIR("B")="YES"
  S DIR("?")="Answer 'YES' to "_$S($P(PSJSYSP0,"^",3):"renew this complex order series",1:"mark this complex order series for renewal")_".  Answer 'NO' (or '^') to stop now." D ^DIR K DIR
@@ -17,7 +17,7 @@ PSJCOMR ;BIR/CML3-RENEW A COMPLEX ORDER SERIES ;07 MAR 96 / 1:23 PM
  D DONE,ABORT^PSGOEE
  Q
  ;
-UNMARK ;  
+UNMARK ;
  W !!,"THIS COMPLEX ORDER SERIES HAS BEEN 'MARKED FOR RENEWAL'.",! K DIR S DIR(0)="Y",DIR("A")="DO YOU WANT TO 'UNMARK IT'",DIR("B")="NO"
  S DIR("?",1)="  Answer 'YES' to unmark this complex order series.  Answer 'NO' (or '^') to leave the complex",DIR("?")="order series marked.  (An answer is required.)" D ^DIR
  I 'Y N DIR D ABORT^PSGOEE G DONE
@@ -41,7 +41,7 @@ NEW ; get info, write record
  K ^TMP("PSJCOMR",$J),VSTRING
  Q
 NEWUD N PSJABT,PSGDRG,PSJREN,X,XX,PSGORDP,UDSTRING S PSGDRG=$P($G(^PS(55,PSGP,5,+PSGORD,1,1,0)),"^"),PSJREN=1
- ;D OC55
+ D OC55
  Q:$D(PSGORQF)  ; quit if not to continue
  D NOW^%DTC S PSGDT=%,PSGND4=$G(^PS(55,PSGP,5,+PSGORD,4)) I '$P(PSJSYSP0,"^",3) D MARK Q
  S PSGWLL=$S('$P(PSJSYSW0,"^",4):0,1:+$G(^PS(55,PSGP,5.1))),PSGOEE="R" K PSGOEOS
@@ -81,12 +81,11 @@ MOVE(X,Y) ; Move comments/dispense drugs from 55 to 53.45.
  S:Q ^PS(53.45,Y,0)="^53.450"_Y_"P^"_Q_U_Q
  Q
 OC55 ;* Order checks for Speed finish and regular finish
- N INTERVEN,PSJDDI,PSJIREQ,PSJRXREQ,PSJPDRG,PSJDD,PSJALLGY
+ N INTERVEN,PSJDDI,PSJIREQ,PSJRXREQ,PSJPDRG
  S Y=1,(PSJIREQ,PSJRXREQ,INTERVEN,X)=""
- F PSGDDI=0:0 S PSGDDI=$O(^PS(55,PSGP,5,+PSGORD,1,PSGDDI)) Q:'PSGDDI  D
- . S PSJDD=+$G(^PS(55,PSGP,5,+PSGORD,1,PSGDDI,0))
- . S PSJALLGY(PSJDD)=""
- K PSGORQF D ENDDC^PSGSICHK(PSGP,PSJDD)
+ K PSGORQF D ENDDC^PSGSICHK(PSGP,+$G(^PS(55,PSGP,5,+PSGORD,1,1,0)))
+ I '$D(PSGORQF) K PSGORQF,^TMP($J,"DI") D
+ . F PSGDDI=1:0 S PSGDDI=$O(^PS(55,PSGP,5,+PSGORD,1,PSGDDI)) Q:'PSGDDI  S PSJDD=+$G(^PS(55,PSGP,5,+PSGORD,1,PSGDDI,0)) K PSJPDRG D IVSOL^PSGSICHK
  Q
  ;
 RIV ; Renew order.
@@ -97,7 +96,7 @@ RIV ; Renew order.
 NEWIV ;Renew complex IV orders
  N X,XX
  I P(17)="D",P(12) N ERR D RI W:$G(ERR)=1 $C(7),"  Order unchanged." Q:$G(ERR)<2
- K PSGORQF S PSIVRNFG=1 D ORDCHK^PSJLIFN K PSIVRNFG Q:$G(PSGORQF)  W !
+ NEW PSGORQF S PSIVRNFG=1 D ORDCHK^PSJLIFN K PSIVRNFG Q:$G(PSGORQF)  W !
  I $G(PSGORD)["V" S ON55=PSGORD S P("OLDON")=$P(^PS(55,DFN,"IV",+PSGORD,2),"^",5) S:'P("OLDON") P("OLDON")=ON55
  ;
 R1 N PSIVND0,PSIVND2,PSIVREAS,PSIVOFD,IVSTRING,P2,PSJBKDR S PSJBKDR=1

@@ -1,6 +1,6 @@
 IBTUTL1 ;ALB/AAS - CLAIMS TRACKING UTILITY ROUTINE ;21-JUN-93
- ;;2.0;INTEGRATED BILLING;**13,223,249,292,384**;21-MAR-94;Build 74
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**13,223,249,292**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 OPT(DFN,IBETYP,IBTDT,ENCTR,IBRMARK,IBVSIT) ; -- add outpatient care entries
  ; -- input   dfn  := patient pointer to 2
@@ -12,7 +12,7 @@ OPT(DFN,IBETYP,IBTDT,ENCTR,IBRMARK,IBVSIT) ; -- add outpatient care entries
  ;
  N X,Y,DA,DR,DIE,DIC,IBSCRN
  S IBSCRN=0
- ;Allow user inter-actions if not queued and IBTALK=1 or not exist. 
+ ;Allow user inter-actions if not queued and IBTALK=1 or not exist.
  I '$D(ZTQUEUED) D  I IBSCRN G OPTSCRN
  . I $D(IBTALK),'$G(IBTALK) Q
  . I IBTDT<3060101 Q  ;Don't use new code for claims prior to 1/1/2006
@@ -31,7 +31,7 @@ OPT(DFN,IBETYP,IBTDT,ENCTR,IBRMARK,IBVSIT) ; -- add outpatient care entries
  L -^IBT(356,+IBTRN)
 OPTQ Q
  ;
-REFILL(DFN,IBETYP,IBTDT,IBRXN,IBRXN1,IBRMARK,IBEABD,IBSCROI) ; -- add refill
+REFILL(DFN,IBETYP,IBTDT,IBRXN,IBRXN1,IBRMARK,IBEABD) ; -- add refill
  ; -- input   dfn   := patient pointer to 2
  ;          ibetyp  := pointer to type entry in 356.6
  ;          ibtdt   := episode date (refill date)
@@ -39,7 +39,6 @@ REFILL(DFN,IBETYP,IBTDT,IBRXN,IBRXN1,IBRMARK,IBEABD,IBSCROI) ; -- add refill
  ;          ibrxn1  := refill multiple entry
  ;          ibrmark := non billable reason if unsure
  ;          ibeabd  := optional, can specify an earliest auto bill date
- ;          ibscroi := special consent roi
  ;
  N X,Y,DA,DR,DIE,DIC
  ;S X=$O(^IBT(356,"APTY",DFN,IBETYP,IBTDT,0)) I X S IBTRN=X G REFILLQ
@@ -50,7 +49,6 @@ REFILL(DFN,IBETYP,IBTDT,IBRXN,IBRXN1,IBRMARK,IBEABD,IBSCROI) ; -- add refill
  L +^IBT(356,+IBTRN):10 I '$T G REFILLQ
  S DR=".02////"_$G(DFN)_";.06////"_+IBTDT_";.08////"_IBRXN_";.1////"_IBRXN1_";.18////"_IBETYP_";.2////1;.24////"_$$INSURED^IBCNS1(DFN)_";1.01///NOW;1.02////"_$S($G(IBDUZ):IBDUZ,1:DUZ)_";.17////"_$S($G(IBEABD):IBEABD,1:$$EABD^IBTUTL(IBETYP))
  I $G(IBRMARK)'="" S DR=DR_";.19///"_IBRMARK
- I $G(IBSCROI)'="" S DR=DR_";.31////"_IBSCROI ;IB*2*384
  D ^DIE K DA,DR,DIE
  L -^IBT(356,+IBTRN)
 REFILLQ Q

@@ -1,6 +1,5 @@
-BPSOSO1 ;BHAM ISC/FCS/DRS - NCPDP Override Main menu ;03/07/08  10:33
- ;;1.0;E CLAIMS MGMT ENGINE;**1,7**;JUN 2004;Build 46
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+BPSOSO1 ;BHAM ISC/FCS/DRS - NCPDP Override Main menu ;09/03/2002 11:14 AM
+ ;;1.0;E CLAIMS MGMT ENGINE;**1**;JUN 2004
  ;---------------------------------------------------------------
  ; IHS/SD/lwj  9/3/02  NCPDP 5.1 changes
  ; In 3.2, prior authorization was updated and stored in field 416.

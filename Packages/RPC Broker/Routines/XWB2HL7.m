@@ -1,6 +1,5 @@
-XWB2HL7 ;ISF/RWF - Remote RPC via HL7 ;08/24/09  14:32
- ;;1.1;RPC BROKER;**12,18,20,22,27,32,39,54**;Mar 28, 1997;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+XWB2HL7 ;ISF/RWF - Remote RPC via HL7 ;04/30/2003  15:20
+ ;;1.1;RPC BROKER;**12,18,20,22,27,32,39**;Mar 28, 1997
  ;
  Q
  ;
@@ -13,8 +12,8 @@ XWB2HL7 ;ISF/RWF - Remote RPC via HL7 ;08/24/09  14:32
  ; it was renamed OLDEN1.
  ;
 EN1(RET,LOC,RPC,RPCVER,P1,P2,P3,P4,P5,P6,P7,P8,P9,P10) ; Call a remote RPC
- ; with 1-10 parameters.
- ; (This reworked EN1 emtry point replaces the original EN1 entry point,
+ ; with 1-10 parameters. (This tag is called from EN1^XWB2HL7.
+ ; This reworked EN1 call point replaces the original EN1 call point,
  ; which was renamed OLDEN1.)
  ;
  N I,INX,N,PMAX,RPCIEN,X,XWBDVER,XWBESSO,XWBHDL,XWBHL7,XWBMSG
@@ -108,7 +107,7 @@ REMOTE(XWBY,XWBQT,XWBSPN,XWBPAR) ;Entry point on Remote system
  ;See that leftover data in XUTL won't cause problems with %ZIS & HOME
  K ^XUTL("XQ",$J,"IO")
  ;Expand parameters into values
- F I=1:1 Q:'$D(XWBPAR(I))  D UD(XWBPAR(I)_$G(XWBPAR(I,1))) ;p54
+ F I=1:1 Q:'$D(XWBPAR(I))  D UD(XWBPAR(I))
  I '$D(RPC) S XWBY(0)="-1^Bad Message" G REX ;Bad msg
  S XWBRPC=0,XWBRPC=$$RPCGET(RPC,.XWBRPC) I XWBRPC'>0 S XWBY(0)="-1^RPC name not found" G REX
  I '$$RPCAVAIL^XWBLIB(XWBRPC,"R",RPCVER) S XWBY(0)="-1^RPC Access Blocked/Wrong Version at Remote Site" G REX
@@ -143,7 +142,7 @@ REX ;Exit from remote.
  ;
 CAPI(TAG,NAM,PAR) ;make API call
  ;DUZ was setup in Remote
- N HL,HLA,HLERR,HLL,HLMTIENS,IO,R,$ES,$ET ;p39
+ N HL,HLA,HLERR,HLL,HLMTIENS,IO,R,$ES,$ET
  S $ET="D CAPIER^XWB2HL7"
  S R=TAG_"^"_NAM_"(.XWBY"_$S(PAR="":")",1:","_PAR_")")
  ;Ready to call RPC?  Setup the Null device
@@ -196,7 +195,7 @@ REJECT ;Handle some kind of reject on remote system
  ;
 PLACE(HL,DATA) ;Called by HL7 to place each line of data.
  N IX
- S IX=+$G(^XTMP(HL,"CNT")),^XTMP(HL,"D",IX)=DATA,^XTMP(HL,"CNT")=IX+1 ;p32
+ S IX=+$G(^XTMP(HL,"CNT")),^XTMP(HL,"D",IX)=DATA,^XTMP(HL,"CNT")=IX+1
  Q
  ;
 RPCGET(N,R) ;Convert RPC name to IEN and parameters.

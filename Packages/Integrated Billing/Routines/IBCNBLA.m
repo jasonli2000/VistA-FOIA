@@ -1,6 +1,6 @@
 IBCNBLA ;ALB/ARH - Ins Buffer: LM action calls ;1 Jun 97
- ;;2.0;INTEGRATED BILLING;**82,149,153,184,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**82,149,153,184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 NEWSCRN(TEMPLAT,TMPARR,IBBUFDA) ; open a new screen for a specific buffer entry, pass in LM template and the array to select from
  ; if temp array is defined then user selects the buffer entry, otherwise use entry passed in
@@ -31,7 +31,7 @@ PNXTSCRN(TEMPLAT,IBBUFDA) ; open a new screen for a buffer entry, rebuild the pr
  D CLEAN^VALM10,INIT^IBCNBLP,HDR^IBCNBLP S VALMBCK="R"
  Q
  ;
-LNXTSCRN(TEMPLAT,TMPARR,AVIEW) ; select entries from list to process/expand
+LNXTSCRN(TEMPLAT,TMPARR) ; select entries from list to process/expand
  ;
  ; This procedure is called from the ListMan action protocols for
  ; processing and expanding buffer entries.
@@ -139,7 +139,7 @@ SELSORT ;  select the way to sort the list screen
  ;
  D FULL^VALM1 W !
  W !,"Select the item to sort the buffer records on the buffer list screen."
- S DIR(0)="SO^1:Patient Name;2:Insurance Company;3:Source of Information;4:Date Entered;5:Inpatients;6:Means Test;7:On Hold;8:Verified;9:eIV Status;10:Positive Response"
+ S DIR(0)="SO^1:Patient Name;2:Insurance Company;3:Source of Information;4:Date Entered;5:Inpatients;6:Means Test;7:On Hold;8:Verified;9:IIV Status"
  S DIR("A")="Sort the list by",DIR("B")=$P($G(IBCNSORT),"^",2)
  D ^DIR K DIR
  I 'Y G SELSORTX
@@ -167,14 +167,14 @@ SELSORT ;  select the way to sort the list screen
  .. I ST="5: '" S STDES="No Problems Identified, Awaiting Electronic Processing" ; removed blanks
  .. E  S STDES=$$GET1^DIQ(365.15,$$FIND1^DIC(365.15,"","X",$P(ST,"'",2)),.01,"E")
  .. S DIR(0)=DIR(0)_$P(ST,"'")_"  "_STDES_$S(ST="6:?'Q1":"",1:";")
- . S DIR("A")="Which eIV Status do you want to appear first?"
+ . S DIR("A")="Which IIV Status do you want to appear first?"
  . S DIR("B")=1
- . S DIR("?",1)=" Please identify the eIV status that you want to appear first in the Insurance"
+ . S DIR("?",1)=" Please identify the IIV status that you want to appear first in the Insurance"
  . S DIR("?",2)=" Buffer listing.  The symbol appears immediately to the left of the patient"
  . S DIR("?",3)=" name in the list.  The default sort order for statuses is the same as"
  . S DIR("?",4)=" they are presented in this list below.  You may choose which status will appear"
  . S DIR("?",5)=" first in the list.  The remaining statuses will be sorted according to this"
- . S DIR("?",6)=" default sort order.  When sorting by eIV status, the secondary sort"
+ . S DIR("?",6)=" default sort order.  When sorting by IIV status, the secondary sort"
  . S DIR("?",7)=" is the entered date and the final sort is by patient name."
  . S DIR("?")=" "
  . D ^DIR K DIR
@@ -204,7 +204,7 @@ TGLSCRN(IBBUFDA) ; toggle process screen from policy to insurance info, glbal va
  ;
 AMCHK ; This procedure is called from the main buffer screen as an action
  ; to check the insurance company names in the buffer file.  This will
- ; invoke another ListMan screen that shows a list of all insurance 
+ ; invoke another ListMan screen that shows a list of all insurance
  ; company names that do not exist in File 36 either as names or as
  ; synonyms and also they do not exist in the Auto Match file.  These
  ; are bad insurance company names that need to be corrected before

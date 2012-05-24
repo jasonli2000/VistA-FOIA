@@ -1,6 +1,5 @@
-XDRDQUE ;SF-IRMFO/IHS/OHPRD/JCM - START AND STOP DUPLICATE CHECKER SEARCH ;8/28/08  18:23
- ;;7.3;TOOLKIT;**23,47,113**;Apr 25, 1995;Build 5
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+XDRDQUE ;SF-IRMFO/IHS/OHPRD/JCM - START AND STOP DUPLICATE CHECKER SEARCH ;08/03/2000  07:29
+ ;;7.3;TOOLKIT;**23,47**;Apr 25, 1995
  ;;
 START ;
  S XDRQFLG=0
@@ -8,8 +7,6 @@ START ;
  ;S XDRDQUE("TASKMAN STATUS")=$P(@$Q(^%ZTSCH("STATUS","")),U,2) I XDRDQUE("TASKMAN STATUS")'="RUN" W !!,"Taskman does not seem to be running properly, Please notify your site manager.",!! G END
  S XDRDQUE("TASKMAN STATUS")=$$TM^%ZTLOAD
  I 'XDRDQUE("TASKMAN STATUS") W !!,"Taskman does not seem to be running properly, Please notify your site manager.",!! G END
- ; XT*7.3*113, variable XDRNOPT=1 makes option unavailable for the PATIENT file
- N XDRNOPT S XDRNOPT=1
  D FILE G:XDRQFLG END ; Asks user which file to check for dups
  D CHECK^XDRU1 G:XDRQFLG END ; Checks the Duplicate Resolution file
  D ASK G:XDRQFLG END ; Asks user what action and type of search
@@ -23,11 +20,6 @@ FILE ; EP - Called by XDRDCOMP,XDRDLIST,XDRDSCOR,XDRMADD,XDRCNT
  K X S:$D(XDRFL) X=XDRFL
  S DIC(0)=$S($D(X):"Z",1:"QEAZ")
  S:'$D(DIC("A")) DIC("A")="Select file to be checked for duplicates: "
- ; If XDRNOPT=1, don't allow selection of PATIENT file.(new with XT*7.3*113)
- I $G(XDRNOPT)=1 D
- . S DIC("S")="I Y'=2"
- . W:'$D(ZTQUEUED) !,"* This option is not available for PATIENTS"
- . Q
  S DIC="^VA(15.1," D ^DIC K DIC,X
  I Y=-1 S XDRQFLG=1 G FILEX
  S XDRD(0)=Y(0),XDRD(0,0)=Y(0,0),XDRFL=$P(Y(0),U),PRIFILE=XDRFL K Y

@@ -1,6 +1,6 @@
-DIR ;SFISC/XAK-READER, HELP ;17NOV2009
- ;;22.0;VA FileMan;**30,163**;Mar 30, 1999;Build 28
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DIR ;SFISC/XAK-READER, HELP ;11:03 AM  24 Feb 2000
+ ;;22.0;VA FileMan;**30**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  N %,%A,%B,%B1,%B2,%B3,%BA,%C,%E,%G,%H,%I,%J,%N,%P,%S,%T,%W,%X,%Y,A0,C,D,DD,DDH,DDQ,DDSV,DG,DH,DIC,DIFLD,DIRO,DO,DP,DQ,DU,DZ,X1,XQH,DIX,DIY,DISYS,%BU,%J1,%A0,%W0,%D1,%D2,%DT,%K,%M
  S:$D(DDH)[0 DDH=0 Q:'$D(DIR(0))  D ^DIR2 G Q:%T=""
  I $D(DIR("V"))#2 D ^DIR1 S DDER=%E G Q
@@ -23,11 +23,11 @@ A I $D(DDM) K:DDM DDQ S:'DDM DDQ=IOSL-7
  ;
 W ; write the prompt and read the user's response
  S %W=%W0,%N=$E(%W)=U
-SCREEN K DTOUT,DUOUT,DIRUT,DIROUT S %E=0 I $D(DDS),$D(DIR0) D ^DIR0 Q  ;READ in DIR01 via DIR0
+ K DTOUT,DUOUT,DIRUT,DIROUT S %E=0 I $D(DDS),$D(DIR0) D ^DIR0 Q
  I %T="S",%A'["A",%A'["B" D S
  I $D(DIR("A"))=11 F %=0:0 S %=$O(DIR("A",%)) Q:%'>0  W !,DIR("A",%)
  W ! W:$L(%P) %P
- I $L($G(DIR("B")))>19,%A'["r",%T'="D",%T'="S",(%B'["D"&%T)!'%T,%B'["P"!'$P(%A,",",2) W DIR("B") S Y=DIR("B") D RW^DIR2 S:X="" X=DIR("B") Q
+ I $L($G(DIR("B")))>19,%A'["r",%T'="D",$D(DIR("B")),$L(DIR("B"))>19,%T'="S",(%B'["D"&%T)!'%T W DIR("B") S Y=DIR("B") D RW^DIR2 S:X="" X=DIR("B") Q
  W:$D(DIR("B")) DIR("B")_"// "
  R X:$S($D(DIR("T")):DIR("T"),'$D(DTIME):300,1:DTIME) I '$T S DTOUT=1
  I $D(DIR("PRE")) X DIR("PRE") I '$D(X) S %E=1,X="" Q

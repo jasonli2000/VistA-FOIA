@@ -1,5 +1,5 @@
 RMPRPAT3 ;HINES-CIOFO/HNC,RVD - Detail Display Patient 10-2319 Transaction ;11/03/04
- ;;3.0;PROSTHETICS;**3,12,25,28,32,41,69,92,99,90,162**;Feb 09, 1996;Build 5
+ ;;3.0;PROSTHETICS;**3,12,25,28,32,41,69,92,99,90**;Feb 09, 1996
  ;
  ; RVD 4/30/02 patch #69 - add ICD-9 CODE and description in the display.
  ;                         add HCPCS and Short Description.
@@ -16,7 +16,7 @@ RMPRPAT3 ;HINES-CIOFO/HNC,RVD - Detail Display Patient 10-2319 Transaction ;11/0
 PRINT ;called from RMPRPAT2
  ;get 2319 transaction
  ;
- N DIC,DIQ,DR,DA,RMPRV,RMPRDA,RV,DESCRPT
+ N DIC,DIQ,DR,DA,RMPRV,RMPRDA,RV
  S DIC=660,DIQ="R19",DR=".01:96",DIQ(0)="EN"
  S (RMPRDA,DA)=+IT(ANS)
  D EN^DIQ1
@@ -132,9 +132,7 @@ PRINT ;called from RMPRPAT2
  ; End of Patch 92
  ;
  W !,"CPT MODIFIER: ",$G(R19(660,RMPRDA,4.7,"E"))
- ;set description and modify for SHIPPING CHARGE; patch RMPR*3.0*162
- S DESCRPT=$G(R19(660,RMPRDA,24,"E")) S:$P(^RMPR(660,RMPRDA,0),U,17) DESCRPT="SHIPPING CHARGE"
- W !,"DESCRIPTION: ",DESCRPT
+ W !,"DESCRIPTION: ",$G(R19(660,RMPRDA,24,"E"))
  W !,"EXTENDED DESCRIPTION: ",!
  I $D(R19(660,RMPRDA,28)) D  G:$D(DUOUT)!$D(DTOUT) EX1
  .N R28

@@ -1,6 +1,5 @@
-XTPMKPTC ;OAK/BP - PATCH MONITOR FUNCTIONS ;09/10/2008
- ;;7.3;TOOLKIT;**98,100,114**; Apr 25, 1995;Build 1
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+XTPMKPTC ;OAK/BP - PATCH MONITOR FUNCTIONS ; 2/7/06
+ ;;7.3;TOOLKIT;**98,100**; Apr 25, 1995;Build 4
  ;
 SRVR N XMB X XMREC
  S XTBMLN1=$G(^XMB(3.9,XMZ,0))
@@ -24,7 +23,6 @@ EXTINFO S (XTBDESG,XTBPKG,XTBPRIO,XTBVER,XTBSEQ,XTBSUB)=""
  .K NOFILE
  .Q:XMRG["====="
  .I XMRG["Designation" S (XTBDESG,XTBINST)=$P(XMRG,"Designation: ",2) Q:$D(NOFILE)  DO
- ..Q:XTBINST'["*"  ;*p114*-REM
  ..S XTBY=$P(XTBDESG,"*",2) I XTBY'?1.2N1".".N S XTBY=XTBY_".0",$P(XTBINST,"*",2)=XTBY
  .I XTBDESG="" S NOFILE=1 Q
  .I $D(^XPD(9.9,"B",XTBDESG)) S NOFILE=1 Q  ; already done
@@ -61,7 +59,7 @@ NIGHT S XTBPURGI=$P($G(^XPD(9.95,1,0)),U,3) ;purge y/n
  .I $P($G(^XPD(9.7,+XTBXX,0)),U,9)=3!(XTBPTYPE=1&($P(XTBDTA,U,11)]"")),XTBPURGI=1 DO  Q:$D(XTBKILLD)  ; installed, check purge flag
  ..S DA=XTBDA,DIK="^XPD(9.9," D ^DIK S XTBKILLD=1 K DA,DIK Q
  .I XTBXX]"",XTBPTYPE=1 S XTBPTYPE="",$P(^XPD(9.9,XTBDA,0),U,10)="" ;found In INSTALL
- .Q:XTBPTYPE=1&($P(XTBDTA,U,11)]"")  ;non-kids, has install date  
+ .Q:XTBPTYPE=1&($P(XTBDTA,U,11)]"")  ;non-kids, has install date
  .Q:$P($G(^XPD(9.7,+XTBXX,0)),U,9)=3
  .I (DT>$P(XTBDTA,U,9)) D SET
  I '$D(^TMP($J,9,0)) K ^TMP($J) S ^TMP($J,3,0)="",^TMP($J,4,0)="    No Delinquent Patches were found."

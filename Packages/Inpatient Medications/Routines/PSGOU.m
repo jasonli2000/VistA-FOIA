@@ -1,5 +1,5 @@
 PSGOU ;BIR/CML3,MV-PROFILE UTILITIES ;19 SEP 96 / 3:59 PM
- ;;5.0; INPATIENT MEDICATIONS ;**34,110,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**34,110**;16 DEC 97
  ;
  ; Reference to ^PS(51.1 is supported by DBIA# 2177
  ; Reference to ^PS(55 is supported by DBIA# 2191.
@@ -9,7 +9,6 @@ ECHK ;
  S C="A",ON=O_"U" G:SD>PSGDT DS S ND=$G(^PS(55,PSGP,5,O,0)) G:$S($P(ND,"^",9)="":1,1:"DE"'[$P(ND,"^",9)) DS S ND4=$G(^(4))
  I ST'="O",SD'<PSGODT,$P(ND,"^",9)="E",$P(ND4,"^",16) G DS
  I ST="O",$P(ND,"^",9)'["D",$S('$P(ND4,"^",UDU):1,SD<PSGODT:0,1:$P(ND4,"^",16)) G DS
- I PSGOL="S",(SD>$P($G(PSJDCEXP),U,2)) S C="DF" G DS
  Q:PSGOL="S"  S C="O"
  ;
 DS ;
@@ -47,11 +46,10 @@ LCHK ;
 LM W !!?3,"Enter 'SHORT' (or 'S', or press the RETURN key) to exclude this patient's",!,"discontinued and expired orders in the following profile.  Enter 'LONG' (or 'L') to include those orders."
  W "  Enter 'NO' (or 'N') to bypass the profile com-",!,"pletely.  Enter '^' if you wish to go no further with this patient." Q
  ;
-ENU ; update status field to reflect expired orders, if necessary
+ENU ; update staus field to reflect expired orders, if necessary
  W !!,"...a few moments, I have some updating to do..."
 ENUNM ;
  D NOW^%DTC S PSGDT=%
- S PSJDCEXP=$$RECDCEXP^PSJP()
  F PSGO2=+PSJPAD:0 S PSGO2=$O(^PS(55,PSGP,5,"AUS",PSGO2)) Q:'PSGO2  Q:PSGO2>PSGDT  F PSGO3=0:0 S PSGO3=$O(^PS(55,PSGP,5,"AUS",PSGO2,PSGO3)) Q:'PSGO3  S PSGO4=$G(^PS(55,PSGP,5,PSGO3,0)) D
  .I PSGO4]"",$S($E($G(PSGALO),1,2)="10":"AHR"[$E($P(PSGO4,"^",9)),1:"AR"[$E($P(PSGO4,"^",9))) D ENUH
  K PSGO1,PSGO2,PSGO3,PSGO4,UD Q

@@ -1,6 +1,6 @@
-DIKZ ;SFISC/XAK-XREF COMPILER ;19JAN2010
- ;;22.0;VA FileMan;**140,163**;Mar 30, 1999;Build 28
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DIKZ ;SFISC/XAK-XREF COMPILER ;7JUN2004
+ ;;22.0;VA FileMan;**140**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  I $G(DUZ(0))'="@" W $C(7),$$EZBLD^DIALOG(101) Q
 EN1 N DIKJ,%X D:'$D(DISYS) OS^DII
  I '$D(^DD("OS",DISYS,"ZS")) W $C(7),$$EZBLD^DIALOG(820) Q
@@ -15,7 +15,7 @@ EN ;
  K ^UTILITY($J),^UTILITY("DIK",$J) N DIK,DIFILENO
  S DNM=X,(DH,DIFILENO)=+Y I $D(^DIC(+Y,0,"GL")) S DIK2=^("GL")
  I '$D(DIK2)!(DMAX<2400) G Q
- S X=DH D DELETROU^DIEZ(DNM),A^DIU21,WAIT^DICD:'$G(DIKZS),DT^DICRW ;DELETE OLD ROUTINES, DELETE "DIK" NODES
+ S X=DH D A^DIU21,WAIT^DICD:'$G(DIKZS),DT^DICRW
  S (DRN,DIKZQ,T)=0,DMAX=DMAX-100
  ;
  ;Load indexes defined in Index file

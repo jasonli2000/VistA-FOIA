@@ -1,6 +1,6 @@
-IBNCPNB ;OAK/ELZ - UTILITIES FOR NCPCP ;5/22/08  15:23
- ;;2.0;INTEGRATED BILLING;**276,342,384**;21-MAR-94;Build 74
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBNCPNB ;OAK/ELZ - UTILITIES FOR NCPCP ;24-JUN-2003
+ ;;2.0;INTEGRATED BILLING;**276,342**;21-MAR-94;Build 18
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;NCPDP PHASE III
  Q
@@ -161,36 +161,4 @@ MOREINS(DFN,IBADT) ;
  ;
  Q (IBRES>1)
  ;
- ;Relocated from IBNCPDPU
-NDC(X) ; Massage the NDC as it is stored in Pharmacy
- ;  Input:  X  --  The NDC as it is stored in Pharmacy
- ; Output:  X  --  The NDC in the format 5N 1"-" 4N 1"-" 2N
- ;
- I $G(X)="" S X="" G NDCQ
- ;
- N LEN,PCE,Y,Z
- ;
- S Z(1)=5,Z(2)=4,Z(3)=2
- S PCE=0 F  S PCE=$O(Z(PCE)) Q:'PCE  S LEN=Z(PCE) D
- .S Y=$P(X,"-",PCE)
- .I $L(Y)>LEN S Y=$E(Y,2,LEN+1)
- .I $L(+Y)<LEN S Y=$$FILL^IBNCPDPU(Y,LEN)
- .S $P(X,"-",PCE)=Y
- ;
-NDCQ Q X
- ;
-ERMSG(IBSTL) ; Inactive status reason
- N IBSTA,IBI,IBARR,IBTXT
- D STATAR^IBCNRU1(.IBARR)
- F IBI=1:1:$L(IBSTL,",")+1 S IBSTA=+$P(IBSTL,",",IBI) Q:"^100^200^300^400^"'[(U_IBSTA_U)
- S IBTXT=$G(IBARR(+IBSTA),"Plan is not active.")
- Q IBTXT
- ;
-PAPERBIL(IBTRKRN) ; 'paper' bill in CT?
- N IBZ,IBIFN
- S IBZ=$G(^IBT(356,IBTRKRN,0)) I IBZ="" Q 0
- S IBIFN=+$P(IBZ,U,11) I 'IBIFN Q 0
- I $P($G(^DGCR(399,IBIFN,0)),U,13)=7 Q 0  ; cancelled
- I $P($G(^DGCR(399,IBIFN,"M1")),U,8)'="" Q 0  ; ecme bill
- Q 1
  ;IBNCPNB

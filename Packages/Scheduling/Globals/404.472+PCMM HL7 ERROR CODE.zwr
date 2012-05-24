@@ -190,7 +190,7 @@ ZWR
 ^SCPT(404.472,69,"DESC",1,0)="If PCP or AP, then Team Purpose must be '2'"
 ^SCPT(404.472,69,"DESC",2,0)="If PM, CCM, or TPA, then Team Purpose must be '10'"
 ^SCPT(404.472,70,0)="850^PV1^4^Admit type is invalid (table SD009)"
-^SCPT(404.472,70,"DESC",0)="^^2^2^3090422"
+^SCPT(404.472,70,"DESC",0)="^^2^2^3090825"
 ^SCPT(404.472,70,"DESC",1,0)="Error code indicates that the Admission Type does not match values from"
 ^SCPT(404.472,70,"DESC",2,0)="the Table SD009 - Purpose of Visit & appointment Type."
 ^SCPT(404.472,"B",100,52)=""

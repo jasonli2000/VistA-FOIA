@@ -1,9 +1,7 @@
 IBNCPBB ;DALOI/AAT - ECME BACKBILLING ;24-JUN-2003
- ;;2.0;INTEGRATED BILLING;**276,347,384,435**;21-MAR-94;Build 27
+ ;;2.0;INTEGRATED BILLING;**276,347**;21-MAR-94;Build 24
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
- ; Reference to file #9002313.29 supported by IA# 4222
- ; Reference to DIC^PSODI supported by IA# 4858
  ;
  Q
 EN ;[IB GENERATE ECME RX BILLS] entry
@@ -17,36 +15,31 @@ EN ;[IB GENERATE ECME RX BILLS] entry
  . I IBMOD1="P" D SELECT I IBEXIT Q
  . I IBMOD1="R" D SELECT2 I IBEXIT Q
  . D CONFIRM I IBEXIT Q
- . D PROCESS^IBNCPBB1 I IBEXIT Q
+ . D PROCESS I IBEXIT Q
  I IBPAUSE W ! D PAUSE()
  K @IBREF
  Q
  ;
 CT(IBTRN) ;CT ENTRY
- N IBDELAY,IBZ,IBRX,IBRXN,IBFIL,IBEXIT,IBPAT,IBRDT,IBFDT,IBRES,IBBIL,IBBN,IBQ,IBSCRES,IBERR
+ N IBZ,IBRX,IBRXN,IBFL,IBEXIT,IBPAT,IBRDT,IBFDT,IBRES,IBBIL,IBBN,IBQ,IBSCRES
  S IBQ=0
  D FULL^VALM1
  W !!,"This option sends electronic Pharmacy Claims to the Payer"
  S VALMBCK="R"
  S IBZ=$G(^IBT(356,IBTRN,0)) Q:IBZ=""
- S IBRX=$P(IBZ,U,8),IBFIL=$P(IBZ,U,10)
+ S IBRX=$P(IBZ,U,8),IBFL=$P(IBZ,U,10)
  I 'IBRX D  Q
  . W !!,"This is not a Pharmacy Claims Tracking record",*7,!
  . D PAUSE("Cannot submit to ECME")
  ;
  ;Release date:
- I IBFIL=0 S IBRDT=$$FILE^IBRXUTL(IBRX,31)
- E  S IBRDT=$$SUBFILE^IBRXUTL(IBRX,IBFIL,52,17)
+ I IBFL=0 S IBRDT=$$FILE^IBRXUTL(IBRX,31)
+ E  S IBRDT=$$SUBFILE^IBRXUTL(IBRX,IBFL,52,17)
  I 'IBRDT D  Q
  . W !!,"The Prescription is not released.",!
  . D PAUSE("Cannot submit to ECME")
- ; -- Drug DEA ROI check.
- S IBPAT=$P(IBZ,U,2)
- S IBDRUG=$$FILE^IBRXUTL(IBRX,6)
- ; Fill/Refill Date:
- S IBFDT=$S('IBFIL:$$FILE^IBRXUTL(IBRX,22),1:$$SUBFILE^IBRXUTL(IBRX,IBFIL,52,.01))
- I $$INSUR^IBBAPI(IBPAT,IBFDT,"P",.IBANY,1) S IBINS=+$G(IBANY("IBBAPI","INSUR",1,1)) S IBQ=$$ROICHK^IBNCPDR4(IBPAT,IBDRUG,IBINS,IBFDT) D:IBQ=1 ROICLN^IBNCPDR4(IBTRN) I 'IBQ D PAUSE() Q  ;Requires ROI
  ;
+ S IBPAT=$P(IBZ,U,2)
  I $$SC($P(IBZ,U,19)) D  Q:IBQ
  . N DIR,DIE,DA,DR,Y
  . W !!,"The Rx is marked 'non-billable' in CT: ",$P($G(^IBE(356.8,+$P(IBZ,U,19),0)),U)
@@ -57,17 +50,19 @@ CT(IBTRN) ;CT ENTRY
  . W ! D ^DIR K DIR
  . I 'Y S IBQ=1 Q
  . S DIE="^IBT(356,",DA=IBTRN,DR=".19///@" D ^DIE ;clean NB reason
- . S IBSCRES(IBRX,IBFIL)=1 ; sc resolved flag
+ . S IBSCRES(IBRX,IBFL)=1 ; sc resolved flag
  ;
  S IBZ=$G(^IBT(356,IBTRN,0)) ; refresh
  I $P(IBZ,U,19) D  Q
  . W !!,"The Prescription is marked 'non-billable' in Claims Tracking",*7
  . W !,"Reason non-billable: ",$P($G(^IBE(356.8,+$P(IBZ,U,19),0),"Unknown"),U),!
  . D PAUSE("Cannot submit to ECME")
+ ; Fill/Refill Date:
+ S IBFDT=$S('IBFL:$$FILE^IBRXUTL(IBRX,22),1:$$SUBFILE^IBRXUTL(IBRX,IBFL,52,.01))
  ; Is the patient billable at the released date?
  S IBRES=$$ECMEBIL^IBNCPDPU(IBPAT,IBFDT)
  I 'IBRES D  Q
- . W !!,"The patient is not ECME Billable at the ",$S(IBFIL:"re",1:""),"fill date."
+ . W !!,"The patient is not ECME Billable at the ",$S(IBFL:"re",1:""),"fill date."
  . W !,"Reason: ",$P(IBRES,U,2,255),!
  . D PAUSE("Cannot submit to ECME")
  ;
@@ -79,12 +74,10 @@ CT(IBTRN) ;CT ENTRY
  . D PAUSE("Cannot submit to ECME")
  I IBBIL W !,"The bill# ",$P($G(^DGCR(399,IBBIL,0)),U)," has been cancelled.",!
  ;
- S IBDELAY=$$DLYRC() ; get delay reason code with optional parameter, IB*2.0*435
- ;
  D CONFRX(IBRXN) Q:$G(IBEXIT)
  ;
- W !!,"Submitting Rx# ",IBRXN W:IBFIL ", Refill# ",IBFIL W " ..."
- S IBRES=$$SUBMIT^IBNCPDPU(IBRX,IBFIL,IBDELAY) W !,"  ",$S(+IBRES=0:"S",1:"Not s")_"ent through ECME."
+ W !!,"Submitting Rx# ",IBRXN W:IBFL ", Refill# ",IBFL W " ..."
+ S IBRES=$$SUBMIT^IBNCPDPU(IBRX,IBFL) W !,"  ",$S(+IBRES=0:"S",1:"Not s")_"ent through ECME."
  I +IBRES'=0 W !,"  *** ECME returned status: ",$$STAT(IBRES),!
  I +IBRES=0 W !!,"The Rx have been submitted to ECME for electronic billing",!
  D PAUSE()
@@ -220,6 +213,21 @@ STAT(X) ;
  I +X<6 Q $P(X,"^",2)
  Q "Unknown Status"
  ;
+PROCESS ;
+ N RES,IBY,IBD,IBRX,IBFIL,IBERR,IBBIL
+ S IBERR=0
+ S IBY=0 F  S IBY=$O(IBSEL(IBY)) Q:'IBY  D
+ . S IBD=$G(@IBREF@(IBY)) Q:IBD=""
+ . S IBRX=$P(IBD,U),IBFIL=+$P(IBD,U,3),IBBIL=$P(IBD,U,6)
+ . W !,"Submitting Rx# ",$P(IBD,U,2) W:IBFIL "Refill# ",IBFIL W:'IBFIL " (original fill)" W " ..."
+ . I IBBIL,'$P($G(^DGCR(399,IBBIL,"S")),U,16) D  S IBERR=IBERR+1 Q
+ .. W !," *** Rx# ",$P(IBD,U,2)," was previously billed."
+ .. W !," Please cancel the Bill No ",$P($G(^DGCR(399,IBBIL,0)),U)," before submitting the claim"
+ . S RES=$$SUBMIT^IBNCPDPU(IBRX,IBFIL) W "  ",$S(+RES=0:"Sent through ECME",1:"Not sent")
+ . I +RES'=0 W !?5,"*** ECME returned status: ",$$STAT(RES) S IBERR=IBERR+1
+ I 'IBERR W !!,"The selected Rx(s) have been submitted to ECME",!,"for electronic billing"
+ Q
+ ;
 BILL(IBRXN,IBDT) ;Bill IEN (if any) or null
  N RES,X,IBZ
  S IBDT=$P(IBDT,".")
@@ -267,9 +275,9 @@ PARSE(X) ;
  Q
  ;
 PAUSE(MESSAGE) ;
- D EN^DDIOL("","","!")
- I $G(MESSAGE)'="" D EN^DDIOL(MESSAGE) D EN^DDIOL(". ","","?0")
- D EN^DDIOL("Press RETURN to continue: ")
+ W !
+ I $G(MESSAGE)'="" W MESSAGE,". "
+ W "Press RETURN to continue: "
  R %:DTIME
  Q
  ;
@@ -279,18 +287,5 @@ SC(IEN) ;Service connected
  S IBT=$P($G(^IBE(356.8,IEN,0)),U)
  I IBT="NEEDS SC DETERMINATION" Q 1
  I IBT="OTHER" Q 1
+ ;
  Q 0
- ;
- ;
-DLYRC(DFLT) ; function, ask for NCPDP field 357-NV Delay Reason Code
- ; DFLT = optional default value (integer from 1-14)
- ; returns code or "^" on time-out, etc.
- N IBDELAY,C,DIC,DIR,DIRUT,DIROUT,DUOUT,DTOUT,X,Y
- S IBDELAY=""
- I $G(DFLT)?1.2N,DFLT>0,DFLT<15 S DIR("B")=DFLT
- S DIR(0)="PO^9002313.29:EMZ" D ^DIR K DIR ; IA# TBD
- S IBDELAY=$S($D(DTOUT)!$D(DUOUT)!$D(DIROUT)!$D(DIRUT):"^",1:Y)
- S IBDELAY=+$P((IBDELAY),"^",1)
- Q IBDELAY
- ;
- ;IBNCPBB

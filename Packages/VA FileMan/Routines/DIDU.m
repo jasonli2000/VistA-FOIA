@@ -1,6 +1,7 @@
-DIDU ;SEA/TOAD-VA FileMan: DD Tools, External Format ;24AUG2009
- ;;22.0;VA FileMan;**31,48,162**;Mar 30, 1999;Build 19
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DIDU ;SEA/TOAD-VA FileMan: DD Tools, External Format ;6/15/00  13:29
+ ;;22.0;VA FileMan;**31,48**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
+ ;11960;7754722;5858;
  ;
 EXTERNAL(DIFILE,DIFIELD,DIFLAGS,DINTERNL,DIMSGA) ;
  ;
@@ -23,7 +24,7 @@ E2 ; handle bad input variables
  I $G(DINTERNL)="" Q ""
  S DIMSGA=$G(DIMSGA)
  S DIFLAGS=$G(DIFLAGS)
- I DIFLAGS'?.1(1"F",1"L",1"U",1"i",1"h",1"A") D ERR(DIMSGA,301,"","","",DIFLAGS) Q ""
+ I DIFLAGS'?.1(1"F",1"L",1"U",1"i",1"h") D ERR(DIMSGA,301,"","","",DIFLAGS) Q ""
  I $G(DIFIELD)'>0 D ERR(DIMSGA,202,"","","","FIELD") Q ""
  ;
 E3 ; get field definition and type, handle bad file or field
@@ -164,7 +165,6 @@ ERR(DIMSGA,DIERN,DIFILE,DIIENS,DIFIELD,DI1,DI2,DI3) ;
  ; error logging procedure
  ; EXTERNAL
  ;
- I $G(DIFLAGS)["A",$$ALLOW(DIERN) S DIDONE=1 Q
  N DIPE,DI F DI="FILE","IENS","FIELD",1:1:3 S DIPE(DI)=$G(@("DI"_DI))
  D BLD^DIALOG(DIERN,.DIPE,.DIPE,DIMSGA,"F")
  S DIERR=$G(DIERR)+DICLERR_U_($P($G(DIERR),U,2)+$P(DICLERR,U,2))
@@ -179,12 +179,9 @@ ERRPTR(DITYPE) ;
  D ERR(DIMSGA,520,DIFILE,"",DIFIELD,DITYPE)
  Q
  ;
-ALLOW(X) ;If ALLOW appears, do not call erroneous data an error
- N I,T F I=3:1 S T=$T(ALLOW+I) Q:T?.P  I T[X Q:T'["ALLOW"  K T Q
- Q '$D(T)
  ; 202    The input parameter that identifies the |1
  ; 301    The passed flag(s) '|1|' are unknown or in
- ; 330    The value '|1|' is not a valid |2|.           ALLOW
+ ; 330    The value '|1|' is not a valid |2|.
  ; 348    The passed value '|1|' points to a file th
  ; 401    File #|FILE| does not exist.
  ; 403    File #|FILE| lacks a Header Node.
@@ -194,7 +191,7 @@ ALLOW(X) ;If ALLOW appears, do not call erroneous data an error
  ; 520    A |1| field cannot be processed by this ut
  ; 537    Field #|FIELD| in File #|FILE| has a corru
  ; 603    Entry #|1| in File #|FILE| lacks the requi
- ; 630    In Entry #|1| of File #|FILE|, the value '    ALLOW
+ ; 630    In Entry #|1| of File #|FILE|, the value '
  ; 648    In Entry #|1| of File #|FILE|, the value '
- ; 730    The value '|1|' is not a valid |2| accordi    ALLOW
+ ; 730    The value '|1|' is not a valid |2| accordi
  ;

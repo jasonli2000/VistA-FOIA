@@ -1,19 +1,12 @@
-IBCNEDE6 ;DAOU/DAC - eIV DATA EXTRACTS ;15-OCT-2002
- ;;2.0;INTEGRATED BILLING;**184,271,345,416**;21-MAR-94;Build 58
+IBCNEDE6 ;DAOU/DAC - IIV DATA EXTRACTS ;15-OCT-2002
+ ;;2.0;INTEGRATED BILLING;**184,271,345**;21-MAR-94;Build 28
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q    ; no direct calls allowed
  ;
- ; IB*2*416 removed the ability to perform Identification inquiries.
- ; However, this code is being left as is for future changes.
- ;
 INAC(IBCNCNT,MAXNUM,IBDDI,SRVICEDT,FDAYS,APPTFLG) ;Get Inactive Insurances
  ; DAOU/BHS - 10/15/2002 - Replaced VRFDT w/ FDAYS (fresh days value)
  ; APPTFLG - Appt extract flag ONLY set from IBCNEDE2 - optional 0/1
- ;
- ; IB patch 416 discontinued the practice of using eIV for fishing for insurance
- ; using the "No Insurance" extract or by doing Identification inquiries.
- Q 0
  ;
  NEW IDATA,INCP,IEN,TQIEN,INS,INACT,DATA1,DATA2,FRESHDT
  NEW PAYER,PAYERID,RESULT,FOUND,SIDARRAY,SIDACT,SIDCNT,SID,INREC
@@ -35,7 +28,7 @@ INAC(IBCNCNT,MAXNUM,IBDDI,SRVICEDT,FDAYS,APPTFLG) ;Get Inactive Insurances
  . S IEN="" F  S IEN=$O(^DPT(DFN,.312,"B",INCP,IEN)) Q:IEN=""  D
  .. S INS=$P(^DPT(DFN,.312,IEN,0),U)
  .. ;
- .. ;Check for Medicaid
+ .. ;Check for Medicare/Medicaid
  .. I $$EXCLUDE^IBCNEUT4($P($G(^DIC(36,INS,0)),U)) Q
  .. ;
  .. ;  Check for insurance company payer, etc.
@@ -65,7 +58,7 @@ INAC(IBCNCNT,MAXNUM,IBDDI,SRVICEDT,FDAYS,APPTFLG) ;Get Inactive Insurances
  .. S SID="" F  S SID=$O(SIDARRAY(SID)) Q:SID=""  D
  ... S INREC=$P(SID,"_",2)   ; which patient ins rec ID is from
  ... D INACSET($P(SID,"_"),INREC)
- ... ; 
+ ... ;
  .. ;  Create TQ entry w/ blank Sub ID
  .. I (SIDACT=5)!(SIDACT=6)!(SIDACT=7)!(SIDACT=8) S SID="" D INACSET("","")
  K SIDARRAY
@@ -75,10 +68,6 @@ INACX ;
 INACSET(SID,INREC) ; INAC. SET
  ; The hard coded '1' in the 3rd piece of DATA1 sets the Transmission
  ; status of file 365.1 to "Ready to Transmit"
- ;
- ; IB*2*416 removed the ability to perform identification inquiries
- Q
- ;
  N FRESH
  S FRESH=$$FMADD^XLFDT(SRVICEDT,-FDAYS)
  S DATA1=DFN_U_PAYER_U_1_U_""_U_SID_U_FRESH
@@ -99,7 +88,7 @@ UPDDTS(PIEN,SVDT,FRDT) ;  Update service date and freshness date per payer
  ; DAYS (365.121,.15)
  ; Output:
  ;  SVDT - passed by reference - updates service date
- ;  FRDT - passed by reference - updates freshness date - except for 
+ ;  FRDT - passed by reference - updates freshness date - except for
  ;         INAC where it is optional
  N FDAYS,PDAYS,DIFF,AIEN,DATA,OSVDT,EDTFLG
  ;
@@ -138,8 +127,8 @@ UPDDTS(PIEN,SVDT,FRDT) ;  Update service date and freshness date per payer
  ;
  Q
  ;
-BLANKTQ(SRVICEDT,FRESHDT,YDAYS,IBCNCNT) ; 
- ; This tag is only called from PROCESS^IBCNEDE4 
+BLANKTQ(SRVICEDT,FRESHDT,YDAYS,IBCNCNT) ;
+ ; This tag is only called from PROCESS^IBCNEDE4
  ; No new records were created in file 365.1 for this DFN.
  ; Need to check if an inquiry for any payer exists for this DFN within
  ; the freshness period.  If it doesn't exist create a new blank inquiry
@@ -147,12 +136,8 @@ BLANKTQ(SRVICEDT,FRESHDT,YDAYS,IBCNCNT) ;
  ; Input
  ;    SRVICEDT - Service Date
  ;    FRESHDT - Freshness Date
- ;    YDAYS - 
+ ;    YDAYS -
  ;    IBCNCNT - updated - Counter for the extract
- ;
- ; IB*2*416 removed the ability to perform identification inquiries
- ;          - blank or otherwise
- Q
  ;
  I $$TFL^IBCNEDE6(DFN)=0 Q
  ;

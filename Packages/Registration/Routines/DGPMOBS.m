@@ -1,8 +1,8 @@
 DGPMOBS ;ALB/MM - Observation API;11/25/98
- ;;5.3;Registration;**212,831**;Aug 13 1993;Build 10
+ ;;5.3;Registration;**212**;Aug 13 1993
  ;
  ;This routine provides 3 entry points to obtain observation statuses.
- ;Line labels MVT, PT, and SPEC document required input variables and 
+ ;Line labels MVT, PT, and SPEC document required input variables and
  ;output values.
  ;
 MVT(IFN) ;This entry point returns the observation status based on
@@ -12,7 +12,7 @@ MVT(IFN) ;This entry point returns the observation status based on
  ;   Patient Movement (#405) file IFN (Required)
  ;
  ;Output:
- ;   If an observation treating specialty return:
+ ;   If an obseration treating specialty return:
  ;       1^Facility Treating Specialty (#45.7)file IFN^Facility
  ;       Treating Specialty (#45.7) file name^Specialty (#42.4)
  ;       file IFN^Specialty (#42.4) file name
@@ -22,7 +22,7 @@ MVT(IFN) ;This entry point returns the observation status based on
  ;       Treating Specialty (#45.7) file name^Specialty (#42.4)
  ;       file IFN^Specialty (#42.4) file name
  ;
- ;   If Patient (#2) file DFN, Patient Movement (#405) IFN, or 
+ ;   If Patient (#2) file DFN, Patient Movement (#405) IFN, or
  ;   Specialty (#42.4) file IFN not defined or invalid return:
  ;       -1^Error condition
  ;
@@ -38,7 +38,7 @@ MVT(IFN) ;This entry point returns the observation status based on
  Q OBS
 PT(DFN,MVTDT) ;This entry point returns observation status for a patient
  ;based on the treating specialty associated for a designated date/time.
- ;If not defined, defaults to status for the current date/time. 
+ ;If not defined, defaults to status for the current date/time.
  ;
  ;Input:
  ;   DFN from Patient (#2) file
@@ -60,8 +60,8 @@ PT(DFN,MVTDT) ;This entry point returns observation status for a patient
  Q OBS
 INP ;Get inpatient data based on criteria from MVT and PT entry points
  D IN5^VADPT
- ;VAIP(8) returned by IN5^VADPT call is the treating specialty from 
- ;the Facility Treating Specialty (#45.7) file in internal^external 
+ ;VAIP(8) returned by IN5^VADPT call is the treating specialty from
+ ;the Facility Treating Specialty (#45.7) file in internal^external
  ;format
  ;SPIFN is a pointer to the SPECIALTY (#42.4) file from the SPECIALTY
  ;(#1) field
@@ -69,10 +69,10 @@ INP ;Get inpatient data based on criteria from MVT and PT entry points
  S OBS=$$SPEC(SPIFN)
  I +OBS'=-1 S OBS=OBS_U_VAIP(8)_U_SPIFN_U_$P($G(^DIC(42.4,+SPIFN,0)),U)
  Q
-SPEC(SPIFN) ;This entry point determines if the Specialty file (#42.4) 
+SPEC(SPIFN) ;This entry point determines if the Specialty file (#42.4)
  ;is an observation specialty.
- ; 
- ;Observation specialties from the Specialty (#42.4) file are: 
+ ;
+ ;Observation specialties from the Specialty (#42.4) file are:
  ;
  ;     18 - Neurology Observation
  ;     23 - Spinal Cord Injury Observation
@@ -81,7 +81,6 @@ SPEC(SPIFN) ;This entry point determines if the Specialty file (#42.4)
  ;     41 - Rehab Medicine Observation
  ;     65 - Surgical Observation
  ;     94 - Psychiatric Observation
- ;     108 - ED Observation
  ;
  ;Input:
  ;   SPIFN - Specialty (#42.4) IFN
@@ -97,5 +96,5 @@ SPEC(SPIFN) ;This entry point determines if the Specialty file (#42.4)
  I '$D(SPIFN) S TX="-1^Specialty (#42.4) IFN not defined" Q TX
  I '$D(^DIC(42.4,+SPIFN,0)) S TX="-1^No Specialty (#42.4) file entry" Q TX
  ;SPEC=observation treating specialty IFNs
- F SPEC=18,23,24,36,41,65,94,108 I SPEC=SPIFN S TX=1 Q
+ F SPEC=18,23,24,36,41,65,94 I SPEC=SPIFN S TX=1 Q
  Q TX

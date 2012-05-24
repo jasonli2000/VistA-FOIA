@@ -1,6 +1,6 @@
-IBCNERP2 ;DAOU/BHS - IBCNE eIV RESPONSE REPORT COMPILE ;03-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERP2 ;DAOU/BHS - IBCNE IIV RESPONSE REPORT COMPILE ;03-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ; Input vars from IBCNERP1:
  ;  IBCNERTN="IBCNERP1"
@@ -18,7 +18,7 @@ IBCNERP2 ;DAOU/BHS - IBCNE eIV RESPONSE REPORT COMPILE ;03-JUN-2002
  ;  IBCNESPC("DTEXP")=Expiration date used in the inactive policy report
  ;
  ; Output vars used by IBCNERP3:
- ;  Structure of ^TMP based on eIV Response File (#365)
+ ;  Structure of ^TMP based on IIV Response File (#365)
  ;   IBCNERTN="IBCNERP1"
  ;   SORT1=PyrNm (SORT=1) or PtNm(SORT=2)
  ;   SORT2=PtNm (SORT=1) or PyrNm (SORT=2)
@@ -66,9 +66,9 @@ EN(IBCNERTN,IBCNESPC) ; Entry
  S IBEXP=$G(IBCNESPC("DTEXP"))
  S IPRF=$G(IBCNESPC("RFLAG"))
  ;
- ; Loop thru the eIV Response File (#365) by Date/Time Response Rec X-Ref
+ ; Loop thru the IIV Response File (#365) by Date/Time Response Rec X-Ref
  ; S IBDT=$O(^IBCN(365,"AD",IBCNESPC("ENDDT")))
- ; Initialize IBDT to end date 
+ ; Initialize IBDT to end date
  S IBDT=IBCNESPC("ENDDT")_".999999"
  F  S IBDT=$O(^IBCN(365,"AD",IBDT),-1) Q:IBDT=""!($P(IBDT,".",1)<IBBDT)  D  Q:$G(ZTSTOP)
  . S PYRIEN=$S(IBPY="":0,1:$O(^IBCN(365,"AD",IBDT,IBPY),-1))
@@ -85,11 +85,11 @@ EN(IBCNERTN,IBCNESPC) ; Entry
  ... S IBPTR=0
  ... F  S IBPTR=$O(^IBCN(365,"AD",IBDT,PYRIEN,PATIEN,IBPTR)) Q:'IBPTR  D  Q:$G(ZTSTOP)
  .... S IBTOT=IBTOT+1
- .... ; Since non-positive identifications are no longer placed in the 
+ .... ; Since non-positive identifications are no longer placed in the
  .... ; insurance buffer, two new reports were added to allow users to
  .... ; view the responses.  One report (IPFR=1) shows only responses
  .... ; of inactive policies.  The other (IPFR=2) shows ambiguous responses.
- .... ; Any response that is not active nor inactive is considered 
+ .... ; Any response that is not active nor inactive is considered
  .... ; ambiguous for the purposes of this report.
  .... I IPRF D  Q:DONTINC
  ..... N EBIC,NODE1,PCD
@@ -101,7 +101,7 @@ EN(IBCNERTN,IBCNESPC) ; Entry
  ..... S FRST=$O(^IBCN(365,IBPTR,2,0))
  ..... I FRST="" Q
  ..... S PCD=$P($G(^IBCN(365,IBPTR,2,FRST,0)),U,6)
- ..... I PCD]"",PCD'="eIV Eligibility Determination" Q
+ ..... I PCD]"",PCD'="IIV Eligibility Determination" Q
  ..... S EBIC=$$GET1^DIQ(365.02,FRST_","_IBPTR_",","ELIGIBILITY/BENEFIT INFO:CODE")
  ..... I PCD]"",IPRF=1,EBIC'=6 Q
  ..... I PCD]"",IPRF=2,EBIC=6!(EBIC=1) Q
@@ -124,7 +124,12 @@ EN(IBCNERTN,IBCNESPC) ; Entry
  .... K RPTDATA
  .... D GETDATA^IBCNERPE(IBPTR,.RPTDATA)
  .... ; Merge data from RPTDATA to ^TMP
- .... M ^TMP($J,IBCNERTN,SORT1,SORT2,IBCT)=RPTDATA
+ .... ;M ^TMP($J,IBCNERTN,SORT1,SORT2,IBCT)=RPTDATA
+ .... N %X,%Y
+ .... S %X="RPTDATA("
+ .... S %Y="^TMP($J,IBCNERTN,SORT1,SORT2,IBCT,"
+ .... I $D(RPTDATA)#10=1 S ^TMP($J,IBCNERTN,SORT1,SORT2,IBCT)=RPTDATA
+ .... D %XY^%RCR K %X,%Y
  ;
  ; Purge index of duplicate Pyr/Pt combos
  K ^TMP($J,IBCNERTN_"X")
@@ -149,7 +154,12 @@ TRCN ; Trace # proc.
  S SORT2=$P($G(^DPT(PATIEN,0)),U,1)
  I SORT2="" G EXIT
  ; Merge data- RPTDATA to ^TMP
- M ^TMP($J,IBCNERTN,SORT1,SORT2,1)=RPTDATA
+ ;M ^TMP($J,IBCNERTN,SORT1,SORT2,1)=RPTDATA
+ N %X,%Y
+ S %X="RPTDATA("
+ S %Y="^TMP($J,IBCNERTN,SORT1,SORT2,1,"
+ I $D(RPTDATA)#10=1 S ^TMP($J,IBCNERTN,SORT1,SORT2,1)=RPTDATA
+ D %XY^%RCR K %X,%Y
  ;
 EXIT ;
  Q

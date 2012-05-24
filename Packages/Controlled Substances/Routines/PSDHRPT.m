@@ -1,9 +1,8 @@
 PSDHRPT ;BIR/BJW-Destructions Holding file Report ; 3 Mar 98
- ;;3.0; CONTROLLED SUBSTANCES ;**8,71**;13 Feb 97;Build 29
+ ;;3.0; CONTROLLED SUBSTANCES ;**8**;13 Feb 97
  ;**Y2K compliance** display 4 digit year on va forms
  I '$D(PSDSITE) D ^PSDSET Q:'$D(PSDSITE)
- I '$D(^XUSEC("PSJ RPHARM",DUZ))&('$D(^XUSEC("PSD TECH ADV",DUZ))) D  G END
- .W !!,"Please contact your Pharmacy Coordinator for access to",!,"the pending Controlled Substances destruction data.",!!,"PSJ RPHARM or PSD TECH ADV security key required.",!
+ I '$D(^XUSEC("PSJ RPHARM",DUZ)) W !!,"Please contact your Pharmacy Coordinator for access to",!,"the pending Controlled Substances destruction data.",!!,"PSJ RPHARM security key required.",! G END
 ASKD ;ask disp location
  S PSDS=$P(PSDSITE,U,3),PSDSN=$P(PSDSITE,U,4)
 ASKV ;ask vault(s)
@@ -49,7 +48,7 @@ PRINT ;print data
  S PSDT=$P(NODE,"^",6) I PSDT S Y=PSDT X ^DD("DD") S PSDYR=$P(Y,",",2),PSDYR=$E(PSDYR,1,4) S PSDT=$E(PSDT,4,5)_"/"_$E(PSDT,6,7)_"/"_PSDYR
  S PSDCD=$P($G(^PSD(58.86,PSD,3)),"^") I PSDCD S Y=PSDCD X ^DD("DD") S PSDCYR=$P(Y,",",2),PSDCYR=$E(PSDCYR,1,4) S PSDCD=$E(PSDCD,4,5)_"/"_$E(PSDCD,6,7)_"/"_PSDCYR
  S PSDCONT=$P(NODE,"^",8)
- ;The next 2 lines added for E3R# 3771 to print comments 
+ ;The next 2 lines added for E3R# 3771 to print comments
  S:$D(^PSD(58.86,PSD,2)) PSDCOMS=$P(^(2),"^",1)
  S:'$D(^PSD(58.86,PSD,2)) PSDCOMS=""
  S:$D(^PSD(58.86,PSD,3)) PSDCNL=$P(^(3),"^",3)

@@ -1,5 +1,5 @@
 GMRCSLM1 ;SLC/DCM - Gather data and format ^TMP global for consult tracking Silent call for use by List Manager and GUI ;10/9/01 23:12
- ;;3.0;CONSULT/REQUEST TRACKING;**1,4,10,12,15,17,22,32,63**;DEC 27, 1997;Build 10
+ ;;3.0;CONSULT/REQUEST TRACKING;**1,4,10,12,15,17,22,32**;DEC 27, 1997
  ;
  ; This routine invokes IA #2638,#2740
  ;
@@ -30,7 +30,6 @@ SET ;;Format entries into a word processing 'TMP("GMRCR",$J,"CS",' global that L
  ;;GMRCOER=1 : Data is OE/RR GUI formatted.
  S:'$D(TAB) TAB="",$P(TAB," ",30)=""
  S GMRCIFN=$G(GMRCDA) I '$L(GMRCIFN),$D(XQADATA) S (GMRCDA,GMRCIFN)=+XQADATA
- I $G(XQADATA)["@" S (GMRCDA,GMRCIFN)=+$P($P(XQADATA,"@",2),"|",2)
  S GMRCSEX=$S($P(^DPT(DFN,0),"^",2)="M":"MALE",1:"FEMALE")
  I '$D(^GMR(123,+GMRCIFN,0)) S GMRCQUT=1 Q
  S PROC="",GMRC(0)=^GMR(123,GMRCIFN,0)

@@ -1,6 +1,7 @@
 XOBSCAV2 ;; kec/oak - VistaLink Access/Verify Security ; 12/09/2002  17:00
- ;;1.6;VistALink Security;;May 08, 2009;Build 15
- ;Per VHA directive 2004-038, this routine should not be modified.
+ ;;1.5;VistALink Security;;Sep 09, 2005
+ ;;Foundations Toolbox Release v1.5 [Build: 1.5.0.026]
+ ;;
  QUIT
  ;
  ; --------------------------------------------------------------------
@@ -50,7 +51,7 @@ SENDDEM0(XOBTEXT) ; failure
  QUIT
  ;
  ; ==== SAX Parser Callbacks ====
- ; 
+ ;
 ELEST(ELE,ATR) ; -- element start event handler
  ;
  IF ELE="VistaLink" DO  QUIT
@@ -62,9 +63,6 @@ ELEST(ELE,ATR) ; -- element start event handler
  ;
  IF ELE="Request" DO  QUIT
  . SET XOBDATA("XOB SECAV","SECURITYACTION")=$GET(ATR("type"),"unknown")
- . ; get ip from msg if provided
- . IF "AV.SetupAndIntroText"=XOBDATA("XOB SECAV","SECURITYACTION") DO
- . . SET XOBDATA("CLIENTIP")=$GET(ATR("clientIp"))
  ;
  IF XOBDATA("XOB SECAV","SECURITYTYPE")'=$$MSGTYP^XOBSCAV("request") DO  QUIT
  .;if not a security request, shouldn't be here
@@ -79,7 +77,7 @@ ELEST(ELE,ATR) ; -- element start event handler
  ;
  IF XOBDATA("XOB SECAV","SECURITYACTION")="AV.GetUserDemographics" DO  QUIT
  .; nothing needed
- .; 
+ .;
  IF XOBDATA("XOB SECAV","SECURITYACTION")="AV.Logon" DO  QUIT
  .IF ELE="avCodes" SET XOBAVCOD=""
  .SET XOBDATA("XOB SECAV","REQUESTCVC")=$GET(ATR("requestCvc"))
@@ -125,7 +123,6 @@ SENDNVC ; respond to "change verify code" request. Use of CVC^XUSRB per DBIA #40
  NEW XOBRET,XOBRETDV,XOBSDUZ
  SET XOBSDUZ=DUZ ; save DUZ in case of failure - we need to restore
  DO CVC^XUSRB(.XOBRET,XOBDATA("XOB SECAV","OLDVC")_U_XOBDATA("XOB SECAV","NEWVC")_U_XOBDATA("XOB SECAV","NEWVCCHECK"))
- KILL XOBDATA("XOB SECAV","OLDVC"),XOBDATA("XOB SECAV","NEWVC"),XOBDATA("XOB SECAV","NEWVCCHECK")
  IF +$GET(DUZ) DO  QUIT  ; success changing verify code
  .; check the divisions now
  .DO DIVGET^XUSRB2(.XOBRETDV,DUZ) ; use of DIVGET^XUSRB2: DBIA #4055
@@ -161,7 +158,7 @@ GETINTRO(XOBSREF,XOBSCNTR) ;
  ; XOBSCNT: integer subscript counter value at which to start storing text
  ; returns: XOBSREF containing <IntroText> element text with intro text lines in CDATA section
  ;          XOBSCNT incremented to last subscript at which text was stored (if passed as dot-arg)
- ; 
+ ;
  NEW XOBCCMSK,XOBI,XOBITINF,XOBTMP1
  ; get intro text
  DO INTRO^XUSRB(.XOBITINF) ; use of INTRO^XUSRB: DBIA #4054

@@ -1,5 +1,5 @@
 PSOHLSG ;BIR/LC,PWC-HL7 EXTERNAL INTERFACE ;03/01/96 09:45
- ;;7.0;OUTPATIENT PHARMACY;**26,70,139,156,312**;DEC 1997;Build 5
+ ;;7.0;OUTPATIENT PHARMACY;**26,70,139,156**;DEC 1997
  ;External reference to GETAPP^HLCS2 supported by DBIA 2887
  ;External reference to INIT^HLFNC2 supported by DBIA 2161
  ;External reference to GENERATE^HLMA supported by DBIA 2164
@@ -34,8 +34,7 @@ INIT ;initialize variables and build outgoing message
  .K DIC,DA,DD,DO
  .S DIC="^PS(52.51,",X=IRXN,DIC(0)=""
  .S DIC("DR")="2////"_DFN_";3////"_DTME_";4////"_PRSN_";5////"_RPRT_";6////"_STPMTR_";8////"_FP_";9////"_FPN_";15////"_DIV_";13////"_"BUILDING MESSAGE"_";14////1"
- .D FILE^DICN K DD,DO,DIC
- .S $P(^TMP("PSOMID",$J,II),"^",4)=$P(Y,"^") K Y
+ .D FILE^DICN K DD,DO,Y,DIC
  .D START^PSOHLSG1
  K ^TMP("HLS",$J)
  M ^TMP("HLS",$J)=^TMP("PSO",$J)
@@ -47,11 +46,10 @@ INIT ;initialize variables and build outgoing message
  I $G(HLMID),$P($G(HLERR),"^")'="" S XQAMSG="Error transmitting batch "_HLMID_" to the external interface",MESS="TRANSMISSION FAILED",STA=3 D UFILE,ALERT G EXIT
  I $G(HLMID),$P($G(HLERR),"^")="" S MESS="MESSAGE TRANSMITTED",STA=1 D UFILE G EXIT
 UFILE S II="" F  S II=$O(^TMP("PSOMID",$J,II)) Q:II=""  S III=$G(^(II)) D
- .S PRX=$P(III,"^",4),PFP=$P(III,"^",2),PFPN=$P(III,"^",3)
- .Q:'$D(^PS(52.51,PRX))
- .;S JJ="" F  S JJ=$O(^PS(52.51,"B",PRX,JJ)) Q:JJ=""  D
- .I $P($G(^PS(52.51,PRX,0)),"^",8)=PFP,$P($G(^PS(52.51,PRX,0)),"^",9)=PFPN D
- ..S DA=PRX,DIE="^PS(52.51,",DR="10////"_HLMID_";13////"_MESS_";14////"_STA_"" D ^DIE
+ .S PRX=$P(III,"^"),PFP=$P(III,"^",2),PFPN=$P(III,"^",3)
+ .Q:'$D(^PS(52.51,"B",PRX))
+ .S JJ="" F  S JJ=$O(^PS(52.51,"B",PRX,JJ)) Q:JJ=""  D
+ ..I $P(^PS(52.51,JJ,0),"^")=PRX,$P(^(0),"^",8)=PFP,$P(^(0),"^",9)=PFPN S DA=JJ,DIE="^PS(52.51,",DR="10////"_HLMID_";13////"_MESS_";14////"_STA_"" D ^DIE
  Q
  ;
 EXIT S:$D(ZTQUEUED) ZTREQ="@"

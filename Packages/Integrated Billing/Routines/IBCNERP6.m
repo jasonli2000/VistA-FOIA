@@ -1,8 +1,8 @@
-IBCNERP6 ;DAOU/BHS - eIV PAYER REPORT PRINT ;05-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERP6 ;DAOU/BHS - IIV PAYER REPORT PRINT ;05-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification Interface
+ ; IIV - Insurance Identification and Verification Interface
  ;
  ; Called by IBCNERPA
  ;
@@ -23,7 +23,7 @@ IBCNERP6 ;DAOU/BHS - eIV PAYER REPORT PRINT ;05-JUN-2002
  ;        SORT1 = PayerName (SORT=1) or -InquiryCount(SORT=2)
  ;        SORT2 = PayerIEN (SORT=1) or PayerName (SORT=2)
  ;        SORT3 = "*" (SORT=1) or PayerIEN (SORT=2)
- ;                                       
+ ;
  ;   ^TMP($J,IBCNERTN,SORT1,SORT2,SORT3,ERRCD)=InquiryCount
  ;        (see above)
  ;        ERRCD = Error Condition code (ptr to 365.018)
@@ -93,7 +93,7 @@ HEADER ; Print header info for each page
  . I $D(DTOUT)!$D(DUOUT) S PXT=1 Q
  I $D(ZTQUEUED),$$S^%ZTLOAD() S (ZTSTOP,PXT)=1 G HEADERX
  S PGC=PGC+1
- W @IOF,!,?1,"eIV Payer Report"
+ W @IOF,!,?1,"IIV Payer Report"
  S HDR=$$FMTE^XLFDT($$NOW^XLFDT,1)_"  Page: "_PGC
  S OFFSET=131-$L(HDR)
  W ?OFFSET,HDR
@@ -144,7 +144,12 @@ DATA(DISPDATA) ; Gather and format lines of data to be printed
  S $P(DASHES2,"-",89)=""
  S $P(REJDASHS,"-",8)=""
  S LINECT=1
- M RPTDATA=^TMP($J,RTN,SORT1,SORT2,SORT3)
+ ;M RPTDATA=^TMP($J,RTN,SORT1,SORT2,SORT3)
+ N %X,%Y
+ S %X="^TMP($J,RTN,SORT1,SORT2,SORT3,"
+ S %Y="RPTDATA("
+ I $D(^TMP($J,RTN,SORT1,SORT2,SORT3))#10=1 S RPTDATA=^TMP($J,RTN,SORT1,SORT2,SORT3)
+ D %XY^%RCR K %X,%Y
  S INQS=+$P(RPTDATA,U,1)
  S CANC=+$P(RPTDATA,U,2)
  S QUED=+$P(RPTDATA,U,3)

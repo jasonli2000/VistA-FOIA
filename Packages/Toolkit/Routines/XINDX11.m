@@ -1,15 +1,12 @@
 XINDX11 ;ISC/GRK - Create phantom routines for functions, options, etc. ;07/08/98  15:06
- ;;7.3;TOOLKIT;**20,27,121**;Apr 25, 1995;Build 7
- ; Per VHA Directive 2004-038, this routine should not be modified.
+ ;;7.3;TOOLKIT;**20,27**;Apr 25, 1995
  W !,"The option and function files are being processed.",!
  I INP(10)=9.4 G PKG
  N KRN,TYPE ;Build file
  S INDFN="^DD(""FUNC"",",INDRN="|func",INDD="Function",INDSB="FUNC",INDXN="Build file" D HDR
  F KRN=0:0 S KRN=$O(^XPD(9.6,INDDA,"KRN",.5,"NM",KRN)) Q:KRN'>0  S INDXN=$P(^(KRN,0),U) D ENTRY
- I INDLC=2 K ^UTILITY($J,INDRN),^UTILITY($J,1,INDRN) ;patch 121
  S INDFN="^DIC(19,",INDRN="|opt",INDD="Option",INDSB="OPT",INDXN="Build file" D HDR
  F KRN=0:0 S KRN=$O(^XPD(9.6,INDDA,"KRN",19,"NM",KRN)) Q:KRN'>0  S INDXN=$P(^(KRN,0),U) D ENTRY
- I INDLC=2 K ^UTILITY($J,INDRN),^UTILITY($J,1,INDRN)
  ;Routines
  ;F KRN=0:0 S KRN=$O(^XPD(9.6,INDDA,"KRN",9.8,"NM",KRN)) Q:KRN'>0  S X=^(KRN,0) I '$P(X,U,3) S ^UTILITY($J,$P(X,U))=""
  I $T(RTN^XTRUTL1)]"" D RTN^XTRUTL1(INDDA)
@@ -31,7 +28,7 @@ NAMSP S INDXN=$P(^DIC(9.4,DA,0),"^",2),C9=0,INDXN(C9)="," F A=0:0 S A=$O(^DIC(9.
 HDR S INDLC=0,INDC=INDRN_" ; '"_INDXN_"' "_INDD_"s.",INDX=";" D ADD S ^UTILITY($J,INDRN)="",^UTILITY($J,1,INDRN,0,0)=0
  Q
 ENTRY F B=0:0 S B=$O(@(INDFN_"""B"",INDXN,B)")) Q:B=""  D @INDSB
- ;I INDLC=2 K ^UTILITY($J,INDRN),^UTILITY($J,1,INDRN) Q ;patch 121 moved to top of routine
+ I INDLC=2 K ^UTILITY($J,INDRN),^UTILITY($J,1,INDRN) Q
  S ^UTILITY($J,1,INDRN,0,0)=INDLC
  Q
 FUNC ;Process Function file entry

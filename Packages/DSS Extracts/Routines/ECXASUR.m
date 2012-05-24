@@ -1,5 +1,5 @@
 ECXASUR ;ALB/JAP - SUR Extract Audit Report ; 4/26/02 11:16am
- ;;3.0;DSS EXTRACTS;**8,33,44,123**;Dec 22, 1997;Build 8
+ ;;3.0;DSS EXTRACTS;**8,33,44**;Dec 22, 1997
  ;
 EN ;entry point for SUR extract audit report
  ;select extract
@@ -69,8 +69,8 @@ PROCESS ;process data in file #727.811
  .Q:(PROC="")&(PSI="I")
  .S (CPT,PROCN)="" I PROC]"" D
  ..;from cpt code get procedure name; variable cpt should be same as variable proc
- ..S Y=$$CPT^ICPTCOD(PROC,DATE)
- ..S CPT=$P($G(Y),U,2),PROCN=$P($G(Y),U,3)
+ ..K Y S DIC="^ICPT(",DIC(0)="XZ",X=PROC D ^DIC
+ ..S CPT=$P($G(Y(0)),U,1),PROCN=$P($G(Y(0)),U,2)
  .S:CPT="" CPT="Unknown" S:PROCN="" PROCN="Unknown" S CPT="A"_CPT
  .S LOC=$S(OR="":2,1:1)
  .I CAN'="" S LOC=3

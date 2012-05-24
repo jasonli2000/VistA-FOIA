@@ -1,11 +1,13 @@
-PRCST2 ; GENERATED FROM 'PRCSENR&NRS' INPUT TEMPLATE(#616), FILE 410;10/27/00
+PRCST2 ; GENERATED FROM 'PRCSENR&NRS' INPUT TEMPLATE(#616), FILE 410;09/19/10
  D DE G BEGIN
 DE S DIE="^PRCS(410,",DIC=DIE,DP=410,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRCS(410,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(2)=%
  I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,1) S:%]"" DE(6)=% S %=$P(%Z,U,3) S:%]"" DE(10)=% S %=$P(%Z,U,4) S:%]"" DE(9)=% S %=$P(%Z,U,5) S:%]"" DE(3)=%
  I $D(^(2)) S %Z=^(2) S %=$P(%Z,U,1) S:%]"" DE(15)=%,DE(17)=% S %=$P(%Z,U,2) S:%]"" DE(18)=% S %=$P(%Z,U,3) S:%]"" DE(20)=% S %=$P(%Z,U,4) S:%]"" DE(22)=% S %=$P(%Z,U,5) S:%]"" DE(24)=% S %=$P(%Z,U,6) S:%]"" DE(25)=%
+ I  S %=$P(%Z,U,7) S:%]"" DE(26)=% S %=$P(%Z,U,8) S:%]"" DE(27)=% S %=$P(%Z,U,9) S:%]"" DE(28)=% S %=$P(%Z,U,10) S:%]"" DE(29)=%
  I $D(^(3)) S %Z=^(3) S %=$P(%Z,U,3) S:%]"" DE(13)=% S %=$P(%Z,U,5) S:%]"" DE(8)=%
  I $D(^(7)) S %Z=^(7) S %=$P(%Z,U,1) S:%]"" DE(7)=%
+ I $D(^(9)) S %Z=^(9) S %=$P(%Z,U,1) S:%]"" DE(35)=%
  I $D(^(11)) S %Z=^(11) S %=$P(%Z,U,1) S:%]"" DE(4)=%
  K %Z Q
  ;
@@ -80,12 +82,12 @@ C4 G C4S:$D(DE(4))[0 K DB
  K ^PRCS(410,"J",$E(X,1,30),DA)
  S X=DE(4),DIC=DIE
  ;
-C4S S X="" Q:DG(DQ)=X  K DB
+C4S S X="" G:DG(DQ)=X C4F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRCS(410,"J",$E(X,1,30),DA)=""
  S X=DG(DQ),DIC=DIE
  I '$D(DIU(0)),$E($P(X,";",2),1,9)="ENG(6920," D ACCX^ENLIB2
- Q
+C4F1 Q
 X4 Q
 5 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=5 G A
 6 D:$D(DG)>9 F^DIE17,DE S DQ=6,DW="1;1",DV="DR",DU="",DLB="DATE OF REQUEST",DIFLD=5
@@ -101,10 +103,10 @@ X6 S %DT="EX" D ^%DT S X=Y K:Y<1 X
 C7 G C7S:$D(DE(7))[0 K DB
  S X=DE(7),DIC=DIE
  S $P(^PRCS(410,DA,7),"^",2)=""
-C7S S X="" Q:DG(DQ)=X  K DB
+C7S S X="" G:DG(DQ)=X C7F1 K DB
  S X=DG(DQ),DIC=DIE
  I $D(^VA(200,X,20)),$P(^(20),"^",3)'="" S $P(^PRCS(410,DA,7),"^",2)=$P(^VA(200,X,20),"^",3)
- Q
+C7F1 Q
 X7 I $D(^PRC(411,PRC("SITE"),8,X)) K X Q
  Q
  ;
@@ -134,10 +136,10 @@ X12 S X=$$GETCCCNT^PRCSECP(PRC("SITE"),PRC("CP")) I (+X=1) S $P(^PRCS(410,DA,3),
 C13 G C13S:$D(DE(13))[0 K DB
  S X=DE(13),DIC=DIE
  K ^PRCS(410,"AC",$E(X,1,30),DA)
-C13S S X="" Q:DG(DQ)=X  K DB
+C13S S X="" G:DG(DQ)=X C13F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRCS(410,"AC",$E(X,1,30),DA)=""
- Q
+C13F1 Q
 X13 D CC^PRCSES
  I $D(X),X'?.ANP K X
  Q
@@ -149,10 +151,10 @@ X13 D CC^PRCSES
 C15 G C15S:$D(DE(15))[0 K DB
  S X=DE(15),DIC=DIE
  K ^PRCS(410,"E",$E(X,1,30),DA)
-C15S S X="" Q:DG(DQ)=X  K DB
+C15S S X="" G:DG(DQ)=X C15F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRCS(410,"E",$E(X,1,30),DA)=""
- Q
+C15F1 Q
 X15 D VENDOR^PRCSES
  I $D(X),X'?.ANP K X
  Q
@@ -166,10 +168,10 @@ X16 I $D(Z(1))!('$D(Z("Z"))) S Y="@1"
 C17 G C17S:$D(DE(17))[0 K DB
  S X=DE(17),DIC=DIE
  K ^PRCS(410,"E",$E(X,1,30),DA)
-C17S S X="" Q:DG(DQ)=X  K DB
+C17S S X="" G:DG(DQ)=X C17F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRCS(410,"E",$E(X,1,30),DA)=""
- Q
+C17F1 Q
 X17 D VENDOR^PRCSES
  I $D(X),X'?.ANP K X
  Q
@@ -213,4 +215,58 @@ X25 K:$L(X)>20!($L(X)<3)!'(X?.ANP) X
  I $D(X),X'?.ANP K X
  Q
  ;
-26 D:$D(DG)>9 F^DIE17 G ^PRCST21
+26 S DW="2;7",DV="P5'",DU="",DLB="VENDOR STATE",DIFLD=11.6
+ S DU="DIC(5,"
+ G RE
+X26 Q
+27 S DW="2;8",DV="FX",DU="",DLB="VENDOR ZIP CODE",DIFLD=11.7
+ G RE
+X27 K:$L(X)<5!(X'?5N.ANP)!($L(X)>5&(X'?5N1"-"4N)) X
+ I $D(X),X'?.ANP K X
+ Q
+ ;
+28 S DW="2;9",DV="F",DU="",DLB="VENDOR CONTACT",DIFLD=11.8
+ G RE
+X28 K:$L(X)>30!($L(X)<3)!'(X?.ANP) X
+ I $D(X),X'?.ANP K X
+ Q
+ ;
+29 S DW="2;10",DV="F",DU="",DLB="VENDOR PHONE NO.",DIFLD=11.9
+ G RE
+X29 K:$L(X)>18!($L(X)<3)!'(X?.ANP) X
+ I $D(X),X'?.ANP K X
+ Q
+ ;
+30 S DQ=31 ;@1
+31 S D=0 K DE(1) ;10
+ S DIFLD=10,DGO="^PRCST21",DC="24^410.02AI^IT^",DV="410.02MRNJ3,0",DW="0;1",DOW="LINE ITEM NUMBER",DLB=$P($$EZBLD^DIALOG(8042,DOW),": ") S:D DC=DC_D
+ G RE:D I $D(DSC(410.02))#2,$P(DSC(410.02),"I $D(^UTILITY(",1)="" X DSC(410.02) S D=$O(^(0)) S:D="" D=-1 G M31
+ S D=$S($D(^PRCS(410,DA,"IT",0)):$P(^(0),U,3,4),$O(^(0))'="":$O(^(0)),1:-1)
+M31 I D>0 S DC=DC_D I $D(^PRCS(410,DA,"IT",+D,0)) S DE(31)=$P(^(0),U,1)
+ G RE
+R31 D DE
+ S D=$S($D(^PRCS(410,DA,"IT",0)):$P(^(0),U,3,4),1:1) G 31+1
+ ;
+32 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=32 G A
+33 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=33 D X33 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X33 D ^PRCSCK
+ Q
+34 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=34 D X34 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X34 I $D(PRCSERR),PRCSERR S Y="@1"
+ Q
+35 S DW="9;1",DV="FX",DU="",DLB="DELIVER TO/LOCATION",DIFLD=46
+ G RE
+X35 K:$L(X)>30!($L(X)<3)!(X'?.ANP) X
+ I $D(X),X'?.ANP K X
+ Q
+ ;
+36 S D=0 K DE(1) ;45
+ S Y="JUSTIFICATION^W^^0;1^Q",DG="8",DC="^410.06" D DIEN^DIWE K DE(1) G A
+ ;
+37 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=37 D X37 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X37 W !,"ORIGINATOR: ",$P(^VA(200,$P(^PRCS(410,DA,14),"^"),0),"^")
+ Q
+38 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=38 D X38 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X38 K PRCSSUB
+ Q
+39 D:$D(DG)>9 F^DIE17 G ^PRCST22

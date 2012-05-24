@@ -1,7 +1,9 @@
-BPSREOP1 ;BHAM ISC/SS - REOPEN CLOSED CLAIMS ;03/07/08  14:54
- ;;1.0;E CLAIMS MGMT ENGINE;**3,7,10**;JUN 2004;Build 27
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+BPSREOP1 ;BHAM ISC/SS - REOPEN CLOSED CLAIMS ;05-APR-05
+ ;;1.0;E CLAIMS MGMT ENGINE;**3**;JUN 2004;Build 20
+ ;; Per VHA Directive 10-93-142, this routine should not be modified.
  ;Reopen closed claims
+ Q
+ ;
  ;
  ;create an ^TMP for the list manager
  ;
@@ -14,8 +16,6 @@ COLLECT(BPDFN,BPSTRT,BPEND) ;
  F  S BPIEN59=$O(^BPST("AC",BPDFN,BPIEN59)) Q:+BPIEN59=0  D
  . I $P($G(^BPST(BPIEN59,12)),U,2)<BPSTRT Q
  . I $P($G(^BPST(BPIEN59,12)),U,2)>BPEND Q
- . ; Don't display deleted prescriptions
- . I $$RXAPI1^BPSUTIL1($P(^BPST(BPIEN59,1),U,11),100,"I")=13 Q
  . S BPIEN02=+$P($G(^BPST(BPIEN59,0)),U,4)
  . ;if the is no BPS CLAIMS - error
  . Q:BPIEN02=0
@@ -29,10 +29,10 @@ COLLECT(BPDFN,BPSTRT,BPEND) ;
 CLAIMINF(BP59) ;*/
  N BPX,BPX1
  S BPX1=$$RXREF^BPSSCRU2(BP59)
- S BPX=$$LJ^BPSSCR02($$DRGNAME^BPSSCRU2(BP59),17)_" "_$$LJ^BPSSCR02($$NDC^BPSSCRU2(+BPX1,+$P(BPX1,U,2)),11)_" "
+ S BPX=$$LJ^BPSSCR02($$DRGNAME^BPSSCRU2(BP59),17)_"  "_$$LJ^BPSSCR02($$NDC^BPSSCRU2(+BPX1,+$P(BPX1,U,2)),13)_" "
  S BPX=BPX_$$LJ^BPSSCR02($$FILLDATE^BPSSCRRS(+BPX1,+$P(BPX1,U,2)),5)_" "
  S BPX=BPX_$$LJ^BPSSCR02($$RXNUM^BPSSCRU2(+BPX1),11)_" "_+$P(BPX1,U,2)_"/"
- S BPX=BPX_$$LJ^BPSSCR02($$ECMENUM^BPSSCRU2(BP59),12)_" "_$$MWCNAME^BPSSCRU2($$GETMWC^BPSSCRU2(BP59))_" "
+ S BPX=BPX_$$LJ^BPSSCR02($$ECMENUM^BPSSCRU2(BP59),7)_" "_$$MWCNAME^BPSSCRU2($$GETMWC^BPSSCRU2(BP59))_"   "
  S BPX=BPX_$$RTBB^BPSSCRU2(BP59)_" "_$$RXST^BPSSCRU2(BP59)_"/"_$$RL^BPSSCRU2(BP59)
  Q BPX
  ;
@@ -45,71 +45,6 @@ PATINF(BPDFN) ;*/
  ;------------ patient's name
 PATNAME(BPDFN) ;
  Q $E($P($G(^DPT(BPDFN,0)),U),1,30)
- ;
- ;/**
- ;ECME User Screen Reopen Closed Claim Hidden Action (ROC)
- ;**/
-EUSCREOP ;
- N BPREOP,BP59,BPDFN,BPDISP,BPCNT,BPI,BPJ,BPCOMM,BPRETV,BPIEN02,BPSRXNUM
- ; Check for BPS MANAGER security key
- I '$D(^XUSEC("BPS MANAGER",DUZ)) D  Q
- . W !,"You must hold the BPS MANAGER Security Key to access the",!,"Reopen Closed Claims option."
- . S VALMBCK="R"
- . D PAUSE^VALM1
- S (BP59,BPCNT,BPI,BPJ)=0
- I '$D(@(VALMAR)) G REOP
- D FULL^VALM1
- ; Select the claim(s) to reopen
- W !,"Enter the line number for the claim you want to reopen."
- I $$ASKLINES^BPSSCRU4("","C",.BPREOP,VALMAR) D
- . ; Build array to display to user
- . F  S BP59=$O(BPREOP(BP59)) Q:BP59=""  D
- . . S BPDFN=+$P($G(^BPST(BP59,0)),U,6)
- . . S BPCNT=BPCNT+1
- . . I '$D(BPDISP(BPDFN)) S BPDISP(BPDFN,BPCNT)=$$LJ^BPSSCR02($$PATNAME(BPDFN)_" :",50),BPCNT=BPCNT+1
- . . S BPDISP(BPDFN,BPCNT)=@VALMAR@($P(BPREOP(BP59),U,1),0)
- . . ; Make sure this claim is closed
- . . I '$$CLOSED02^BPSSCR03($P($G(^BPST(BP59,0)),U,4)) D
- . . . S BPCNT=BPCNT+1
- . . . S BPDISP(BPDFN,BPCNT)="Claim NOT closed and cannot be reopened."
- . . . K BPREOP(BP59)
- . . ; Make sure the Prescription isn't deleted
- . . I $$RXAPI1^BPSUTIL1($P(^BPST(BP59,1),U,11),100,"I")=13 D
- . . . S BPCNT=BPCNT+1
- . . . S BPDISP(BPDFN,BPCNT)="The prescription has been marked DELETED and cannot be reopened."
- . . . K BPREOP(BP59)
- . ; Display the selected claims from the display array
- . W !!,"You've chosen to reopen the following prescriptions(s) for"
- . F  S BPI=$O(BPDISP(BPI)) Q:BPI=""  D
- . . F  S BPJ=$O(BPDISP(BPI,BPJ)) Q:BPJ=""  D
- . . . W !,BPDISP(BPI,BPJ)
- . . Q
- . Q
- ; If there are any closed claims selected, verify if the users still wants to reopen
- I $D(BPREOP) D
- . W !!,"All Selected Rxs will be reopened using the same information gathered in the",!,"following prompts.",!!
- . I $$YESNO^BPSSCRRS("Are you sure?(Y/N)") D
- . . ; Get the Reopen Comments to be stored in the BPS CLAIMS file
- . . S BPCOMM=$$PROMPT("REOPEN COMMENTS","","F",1,40)
- . . Q:BPCOMM["^"
- . . ; Do we REALLY want to reopen the claims?
- . . I $$YESNO^BPSSCRRS("ARE YOU SURE YOU WANT TO RE-OPEN THIS CLAIM? (Y/N)","No") D
- . . . S (BPCNT,BP59)=0
- . . . ; Loop through all selected claims and reopen them one at a time
- . . . ; using the same comments
- . . . F  S BP59=$O(BPREOP(BP59)) Q:BP59=""  D
- . . . . S BPIEN02=+$P($G(^BPST(BP59,0)),U,4)
- . . . . S BPRETV=$$REOPEN^BPSBUTL(BP59,BPIEN02,$$NOW^XLFDT,+DUZ,BPCOMM)
- . . . . W !,$P(BPRETV,U,2)
- . . . . I +BPRETV S BPCNT=BPCNT+1
- . . . . Q
- . . . I BPCNT>1 W !!,BPCNT_" claims have been reopened.",! Q
- . . . I BPCNT=1 W !!,"1 claim has been reopened.",! Q
- . . . I BPCNT=0 W !!,"Unable to reopen claim" Q
- I '$D(BPREOP) S VALMBCK="R" D PAUSE^VALM1 Q
- D PAUSE^VALM1
- D REDRAW^BPSSCRUD("Updating screen for reopened claims...")
- Q
  ;
 SELECT ;
  I VALMCNT<1 D  Q
@@ -138,7 +73,7 @@ GET59(BPLINE) ;
 SELCLAIM(BP59) ;
  D FULL^VALM1
  W @IOF
- N BPX,BPX1,BPDFN,BPIEN02,BPCLDATA,BPCOMM,BPRETV,BPQ
+ N BPX,BPX1,BPDFN,BPIEN02,BPCLDATA,BPCOMM,BPRETV,BPREOPDT,BPQ
  S BPDFN=+$P($G(^BPST(BP59,0)),U,6)
  S BPX1=$$RXREF^BPSSCRU2(BP59)
  W !,?1,$$LJ^BPSSCR02("PATIENT NAME: "_$$PATNAME(BPDFN),30)
@@ -151,7 +86,7 @@ SELCLAIM(BP59) ;
  S BPCLDATA=$G(^BPSC(BPIEN02,900))
  ;if the is no BPS CLAIMS - error
  W !,?3,"CLOSED  ",$$FORMDATE^BPSSCRU6(+$P($G(^BPSC(BPIEN02,900)),U,2),2)
- W !,?4,"ECME#: "_$$ECMENUM^BPSSCRU2(BP59)_", FILL DATE: "_$$FORMDATE^BPSSCRU6($$DOSDATE^BPSSCRRS(+BPX1,+$P(BPX1,U,2)),2)
+ W !,?4,"ECME#: "_+BPX1_", FILL DATE: "_$$FORMDATE^BPSSCRU6($$DOSDATE^BPSSCRRS(+BPX1,+$P(BPX1,U,2)),2)
  W ", RELEASE DATE: "_$$FORMDATE^BPSSCRU6($$RELDATE^BPSSCRU6(+BPX1,+$P(BPX1,U,2)),2)
  W !,?4,"PLAN: ",$$PLANNAME^BPSSCRU6(BP59)," INSURANCE: ",$$INSNAME^BPSSCRU6(BP59)
  W !,?4,"CLOSE REASON: ",$$CLREASON^BPSSCRU6(+$P(BPCLDATA,U,4))
@@ -162,7 +97,11 @@ SELCLAIM(BP59) ;
  Q:BPCOMM["^" 0
  S BPQ=$$YESNO^BPSSCRRS("ARE YOU SURE YOU WANT TO RE-OPEN THIS CLAIM? (Y/N)","No")
  Q:BPQ<1 0
- S BPRETV=$$REOPEN^BPSBUTL(BP59,BPIEN02,$$NOW^XLFDT,+DUZ,BPCOMM)
+ D
+ . N %,%H,%I,X
+ . D NOW^%DTC
+ . S BPREOPDT=%
+ S BPRETV=$$REOPEN^BPSBUTL(BP59,BPIEN02,BPREOPDT,+DUZ,BPCOMM)
  W !,$P(BPRETV,U,2),!
  W !,"1 claim has been reopened.",!
  D PAUSE^VALM1
@@ -218,6 +157,3 @@ UPDREOP(BP02,BPCLOSED,BPREOPDT,BPDUZ,BPCOMM) ;
  I $D(ERRARR) Q "0^"_ERRARR("DIERR",1,"TEXT",1)
  Q 1
  ;
- ; Reopen Closed Claim displayed in ECME User Screen
-REOP ;
- Q

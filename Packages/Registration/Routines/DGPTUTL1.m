@@ -1,5 +1,5 @@
 DGPTUTL1 ;ALB/MJK - PTF Utility ;2/1/05 2:20pm
- ;;5.3;Registration;**33,45,54,517,635,817**;Aug 13, 1993;Build 4
+ ;;5.3;Registration;**33,45,54,517,635**;Aug 13, 1993
  ;
 FLAG ; -- select PTF rec to update xmit flags
  S DGMAX=25
@@ -9,8 +9,7 @@ FLAG ; -- select PTF rec to update xmit flags
 FLAGQ K DGMAX,DGT,DGADM,DGX,DGA1,DGA,DGMTY,C,DGOUT Q
  ;
 UP ; -- select mvt and update xmit flag
- ;I DGMTY=501 S DIC="^DGPT("_PTF_",""M"",",DIC("S")="I Y'=1,'$D(^(""P""))"
- I DGMTY=501 S DIC="^DGPT("_PTF_",""M"",",DIC("S")="I Y'=1"
+ I DGMTY=501 S DIC="^DGPT("_PTF_",""M"",",DIC("S")="I Y'=1,'$D(^(""P""))"
  I DGMTY=535 S DIC="^DGPT("_PTF_",535,",DIC("S")="I Y'=1"
  W ! S DIC(0)="AEMQ" D ^DIC S DIE=DIC K DIC
  K DGOUT I X["^" S DGOUT=""

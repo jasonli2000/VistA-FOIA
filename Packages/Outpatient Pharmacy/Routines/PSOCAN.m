@@ -1,18 +1,15 @@
-PSOCAN ;BIR/JMB-Rx discontinue and reinstate ;8/3/06 12:38pm
- ;;7.0;OUTPATIENT PHARMACY;**11,21,24,27,32,37,88,117,131,185,253,251,375**;DEC 1997;Build 17
+PSOCAN ;BIR/JMB-Rx discontinue and reinstate ; 8/3/06 12:38pm
+ ;;7.0;OUTPATIENT PHARMACY;**11,21,24,27,32,37,88,117,131,185,253**;DEC 1997
  ;External reference to File #55 supported by DBIA 2228
  ;External references L, UL, PSOL, and PSOUL^PSSLOCK supported by DBIA 2789
 START S WARN=0,(DAYS360,SPCANC)=1 D KCAN1^PSOCAN3 W !! S DIR("A")="Discontinue/Reinstate by Rx# or patient name",DIR(0)="SBO^R:RX NUMBER;P:PATIENT NAME"
- S DIR("?")="Enter 'R' to discontinue/reinstate by Rx#.  Enter 'P' to discontinue/reinstate by patient name." D ^DIR K DIR
- G:$G(DIRUT) KILL^PSOCAN1 K RP S RP=Y G:RP="P" PAT^PSOCAN1
+ S DIR("?")="Enter 'R' to discontinue/reinstate by Rx#.  Enter 'P' to discontinue/reinstate by patient name." D ^DIR K DIR G:$G(DIRUT) KILL^PSOCAN1 K RP S RP=Y G:RP="P" PAT^PSOCAN1
 NUM D DCORD^PSONEW2
- K PSOTECCK,RXSP,PSINV,PSOWUN,PSOULRX D KCAN1^PSOCAN3 S:'$D(PSOCLC) PSOCLC=DUZ S PS="Discontinue" W ! S DIR("A")="Discontinue/Reinstate Prescription(s)#"
+ K RXSP,PSINV,PSOWUN,PSOULRX D KCAN1^PSOCAN3 S:'$D(PSOCLC) PSOCLC=DUZ S PS="Discontinue" W ! S DIR("A")="Discontinue/Reinstate Prescription(s)#"
  S DIR(0)="FO^1:245",DIR("?")="Wand/enter barcode or enter Rx number(s) to discontinued/reinstated. If more than one, separate with commas. Do not exceed 245 characters including commas"
  D ^DIR K DIR G:$G(DIRUT) START S OUT=0 I Y["-" D PSOINST^PSOSUPAT G:OUT NUM S (IN,X)=$P(^PSRX($P(Y,"-",2),0),"^") G NO
  S IN=Y G RX:Y[","
-NO I '$O(^PSRX("B",Y,0)) W " Rx Not Found!",! G NUM
- S PSPOP=0,DIC=52,DIC(0)="QEMZ" D ^DIC K DIC Q:$G(POERR)&(Y<0)
- G:Y<0 NUM S (DA,IFN,PSOULRX)=+Y,RXNUM=Y(0,0),PSODFN=+$P(^PSRX(DA,0),"^",2)
+NO S PSPOP=0,DIC=52,DIC(0)="QEMZ" D ^DIC K DIC Q:$G(POERR)&(Y<0)  G:Y<0 NUM  S (DA,IFN,PSOULRX)=+Y,RXNUM=Y(0,0),PSODFN=+$P(^PSRX(DA,0),"^",2)
  S PSOWUN=1 S PSOPLCK=$$L^PSSLOCK(PSODFN,0) I '$G(PSOPLCK) D LOCK^PSOORCPY K PSOPLCK G NUM
  K PSOPLCK D PSOL^PSSLOCK(IFN) I '$G(PSOMSG) W !!,$S($P($G(PSOMSG),"^",2)'="":$P($G(PSOMSG),"^",2),1:"Another person is editing this order.") K PSOMSG D ULP G NUM
  I $P($G(^PSRX(+$G(IFN),"STA")),"^")=12,$P($G(^("PKI")),"^") W !!,"Cannot be Reinstated - Digitally Signed" D ULP G NUM
@@ -27,22 +24,12 @@ LMNO D CHK S:'$G(DA)&($G(IFN)) DA=IFN
  I '$G(POERR) N PKIR D
  .I $P(^PSRX(DA,"STA"),"^")=1,$P($G(^("PKI")),"^") S PKIR=""
  .D ^PSORXPR
- D YN S:PS="Reinstate" PS="Discontinue" Q:$G(POERR)&('%)
- I '% D ULP,ULRX G NUM
- D REA D:'$D(REA)&($G(PSOWUN)) ULP,ULRX Q:'$D(REA)
- D COM^PSOCAN1 Q:$G(POERR)&('$D(INCOM))!($D(DIRUT))  I '$D(INCOM)!($D(DIRUT)) D ULP,ULRX G NUM
+ D YN S:PS="Reinstate" PS="Discontinue" Q:$G(POERR)&('%)  I '% D ULP,ULRX G NUM
+ D REA D:'$D(REA)&($G(PSOWUN)) ULP,ULRX Q:'$D(REA)  D COM^PSOCAN1 Q:$G(POERR)&('$D(INCOM))!($D(DIRUT))  I '$D(INCOM)!($D(DIRUT)) D ULP,ULRX G NUM
  S RX=$P(^PSRX(DA,0),"^"),PSCAN(RX)=DA_"^"_REA
- D:REA="R" REINS^PSOCAN2
- I REA="R",'$G(PSORX("DFLG")) D DCORD^PSONEW2
- K PSOTECCK
- D:$G(PSORX("DFLG")) ULP,ULRX
- Q:$G(POERR)&($G(PSORX("DFLG")))
- G NUM:$G(PSORX("DFLG"))
- D:REA="C" CAN
- Q:$G(POERR)
- D ULP,ULRX G NUM
+ D:REA="R" REINS^PSOCAN2 D:REA="R"&('$G(PSORX("DFLG"))) DCORD^PSONEW2 D:$G(PSORX("DFLG")) ULP,ULRX Q:$G(POERR)&($G(PSORX("DFLG")))  G NUM:$G(PSORX("DFLG")) D:REA="C" CAN Q:$G(POERR)  D ULP,ULRX G NUM
 YN D EN^PSOCMOPA I $G(XFLAG)]"" S %=0 K XFLAG Q
- W ! S DIR("A")="Are you sure you want to "_PS,DIR(0)="Y",DIR("B")="NO" D ^DIR S %=Y K DIR,DUOUT,DTOUT I 'Y!$D(DIRUT) S VALMBCK="R"
+ S DIR("A")="Are you sure you want to "_PS,DIR(0)="Y",DIR("B")="NO" D ^DIR S %=Y K DIR,DUOUT,DTOUT I 'Y!$D(DIRUT) S VALMBCK="R"
  K DIRUT Q
 REA S REA=+$P(^PSRX(DA,"STA"),"^") I REA=12 S REA="R" Q
  I REA,REA'=11 W !?5,$C(7) D
@@ -79,7 +66,7 @@ ASK Q:'$D(PSCAN)  W ! S DIR("A")="OK to "_$S($G(RXCNT)>1:"Change Status",REA="C"
  K PSOPLCKZ W:$G(PSOCNRXV) !,$S($G(RXCNT)>1:"Statuses Changed",REA="C":"Prescription Discontinued",1:"Prescription Reinstated") D INVALD^PSOCAN1 G NUM
 ACT S DA=+PSCAN(RX),REA=$P(PSCAN(RX),"^",2),II=RX,PSODFN=$P(^PSRX(DA,0),"^",2) I REA="R" D REINS^PSOCAN2 Q
  D CAN Q
-EXP ;S PSINV($P(^PSRX(DA,0),"^"))="" 
+EXP ;S PSINV($P(^PSRX(DA,0),"^"))=""
  Q:$P(^PSRX(DA,"STA"),"^")=12
  S $P(^PSRX(DA,"STA"),"^")=11 D ECAN^PSOUTL(DA)
  S STAT="SC",PHARMST="ZE",COMM="Medication Expired on "_$E($P(^PSRX(DA,2),"^",6),4,5)_"/"_$E($P(^(2),"^",6),6,7)_"/"_$E($P(^(2),"^",6),2,3) D EN^PSOHLSN1(DA,STAT,PHARMST,COMM) K COMM,STAT,PHARMST

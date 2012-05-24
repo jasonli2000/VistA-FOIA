@@ -1,12 +1,12 @@
-LEXTOLKN ;ISL Parse term into words ;01/03/2011
- ;;2.0;LEXICON UTILITY;**4,55,73**;Sep 23, 1996;Build 10
+LEXTOLKN ;ISL Parse term into words ;11/30/2008
+ ;;2.0;LEXICON UTILITY;**4,55**;Sep 23, 1996;Build 11
  ;
  ; Returns ^TMP("LEXTKN",$J,#,WORD) containing words
  ;
- ; If LEXIDX is set, then the Excluded Words file is used to 
+ ; If LEXIDX is set, then the Excluded Words file is used to
  ; selectively exclude words from the indexing process.  If
- ; LEXLOOK is set, then the Excluded Words file is used to 
- ; selectively exclude words from the look-up process.  If 
+ ; LEXLOOK is set, then the Excluded Words file is used to
+ ; selectively exclude words from the look-up process.  If
  ; LEXIDX and LEXLOOK do not exist then all words are parsed
  ; parsed.
  ;
@@ -55,17 +55,11 @@ PTX ; Entry point to parse string (X must exist)
  . F LEXOKP=$L(LEXTOKW):-1:1 Q:$E(LEXTOKW,LEXOKP)'[" "
  . S LEXTOKW=$E(LEXTOKW,1,LEXOKP)
  . ; Apostrophy "S"
- . S (LEXTOKAA,LEXTOKAB,LEXTOKAC)=""
- . I LEXTOKW["'" D
- . . ; Standard Apostrophy "S"
- . . I $E(LEXTOKW,($L(LEXTOKW)-1),$L(LEXTOKW))["'S" D
- . . . S LEXTOKAA=$TR(LEXTOKW,"'",""),LEXTOKAB=$P(LEXTOKW,"'",1),LEXTOKAC=$P(LEXTOKW,"'",1)_$P(LEXTOKW,"'",2)
- . ; Pluralized/Apostrophy "S"
+ . S (LEXTOKAA,LEXTOKAB,LEXTOKAC)="" I $E(LEXTOKW,($L(LEXTOKW)-1),$L(LEXTOKW))["'S" D
+ . . S LEXTOKAA=$TR(LEXTOKW,"'",""),LEXTOKAB=$P(LEXTOKW,"'",1),LEXTOKAC=$P(LEXTOKW,"'",1)_$P(LEXTOKW,"'",2)
+ . ; Pluralized Apostrophy "S"
  . I '$L((LEXTOKAA_LEXTOKAB_LEXTOKAC)) I $E(LEXTOKW,$L(LEXTOKW))["S",$E(LEXTOKW,($L(LEXTOKW)-1))'["'" D
  . . N LEXTMP S LEXTMP=$E(LEXTOKW,1,($L(LEXTOKW)-1)) Q:'$L(LEXTMP)  S:$D(^LEX(757.01,"AWRD",LEXTMP)) LEXTOKAA=LEXTMP
- . I $L((LEXTOKAA_LEXTOKAB_LEXTOKAC)) D
- . . N LEXTMP S LEXTMP=$G(LEXTOKAA) S:'$L(LEXTMP) LEXTMP=$G(LEXTOKAB) S:$L($G(LEXTOKAB))>0&($L($G(LEXTOKAB))<$L(LEXTMP)) LEXTMP=LEXTOKAB
- . . S:'$L(LEXTMP) LEXTMP=$G(LEXTOKAC) I $L(LEXTMP),(LEXTOKAA_LEXTOKAB_LEXTOKAC)[LEXTMP S LEXTOKW=LEXTMP,(LEXTOKAA,LEXTOKAB,LEXTOKAC)=""
  . ; Apostrophies and spaces
  . S LEXTOKW=$TR(LEXTOKW,"'",""),LEXTOKW=$TR(LEXTOKW," ","")
  . ; Numeric only

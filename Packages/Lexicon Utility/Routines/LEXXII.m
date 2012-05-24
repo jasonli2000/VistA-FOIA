@@ -1,20 +1,20 @@
-LEXXII ;ISL/KER - Lexicon Status (Install Info) ;01/03/2011
- ;;2.0;LEXICON UTILITY;**32,46,49,50,41,59,73**;Sep 23, 1996;Build 10
- ;              
+LEXXII ;ISL/KER - Lexicon Status (Install Info) ;07/16/2008
+ ;;2.0;LEXICON UTILITY;**32,46,49,50,41,59**;Sep 23, 1996;Build 6
+ ;
  ; Variables NEWed or KILLed Elsewhere
  ;   LEXACCT  NEWed by LEXXFI sending message
  ;   LEXID    NEWed by LEXXFI sending message
  ;   LEXCRE   NEWed by LEXXGI loading data
  ;   LEXIGHF  NEWed by Post Install routine LEX20nnP
  ;   XPDA     NEWed by KIDS during Install
- ;              
+ ;
  ; Global Variables
  ;   DBIA 10096  ^%ZOSF("PROD"
  ;   DBIA 10096  ^%ZOSF("UCI"
  ;   DBIA 10060  ^VA(200
  ;   ^LEXM(0
  ;   ^TMP("LEX*",$J    SACC 2.3.2.5.1
- ;              
+ ;
  ; External References
  ;   DBIA 10103  $$FMTE^XLFDT
  ;   DBIA 10103  $$NOW^XLFDT
@@ -22,11 +22,11 @@ LEXXII ;ISL/KER - Lexicon Status (Install Info) ;01/03/2011
  ;   DBIA  2056  $$GET1^DIQ (file #200)
  ;   DBIA  2051  FIND^DIC
  ;   DBIA  2056  GETS^DIQ
- ;              
+ ;
 EN ; Main Entry
  N LEXSUB S LEXSUB=$G(LEXID) S:LEXSUB="" LEXSUB="LEXXII" K ^TMP(LEXSUB,$J) D II
  Q
- ;                               
+ ;
 II ; Install Information
  N LEXT,LEXA,LEXACT,LEXB,LEXD,LEXE,LEXL,LEXU,LEXN,LEXP,LEXPROF,LEXDA H 2
  S LEXA="",LEXACT=$G(LEXACCT),LEXPRO=$G(LEXPRO),LEXPRON=$G(LEXPRON)
@@ -51,14 +51,10 @@ II ; Install Information
  S:$L(LEXT)&($L($G(LEXCRE)))&($P($G(LEXCRE),".",1)?7N) LEXT=LEXT_" (Created "_$$ED($G(LEXCRE))_")"
  S:'$L(LEXT)&($L($G(LEXCRE)))&($P($G(LEXCRE),".",1)?7N) LEXT="  Created:     "_$$ED($G(LEXCRE))
  D:$L(LEXT) TL(LEXT)
- S LEXT="" I $O(LEXPROC(" "),-1)'>1,$L($G(LEXPRO))&($L($G(LEXPRON))),$O(LEXPROC(" "),-1)'>1 D
+ S LEXT="" I $L($G(LEXPRO))&($L($G(LEXPRON))) D
  . S LEXT="  Protocol:    "_LEXPRON D BL,TL(LEXT)
  . S LEXT="  Invoked:     "_LEXPRO D TL(LEXT)
  . K LEXPRO,LEXPRON,^LEXM(0,"PRO")
- I $O(LEXPROC(" "),-1)>1 D
- . N LEXT,LEXI,LEXC,LEXT S LEXT=$$TRIM($G(LEXPROC(1))) Q:'$L(LEXT)  D BL,TL(("  "_LEXT))
- . S LEXC=0,LEXI=1 F  S LEXI=$O(LEXPROC(LEXI)) Q:+LEXI'>0  D
- . . N LEXT S LEXT=$$TRIM($TR($G(LEXPROC(LEXI)),"'","")) Q:'$L(LEXT)  S LEXC=LEXC+1 D TL(("     "_LEXT))
  S LEXB=$$SS($G(LEXBUILD)),LEXE=$P(LEXB,"^",2),LEXL=$P(LEXB,"^",3),LEXB=$P(LEXB,"^",1)
  I $P(LEXB,".",1)?7N!($P(LEXB,".",2)?7N)!($P(LEXB,".",3)[":") D
  . D BL
@@ -72,7 +68,7 @@ II ; Install Information
  . S LEXT="" S LEXT="  Data:        "_$G(LEXRES) D BL,TL(LEXT)
  D BL
  Q
- ;                             
+ ;
  ; Miscellaneous
 UCI(X) ;   UCI where Lexicon is installed
  N LEXU,LEXP,LEXT,Y X ^%ZOSF("UCI") S LEXU=Y,LEXP="" S:LEXU=^%ZOSF("PROD")!($P(LEXU,",",1)=^%ZOSF("PROD")) LEXP=" (Production)"
@@ -91,13 +87,13 @@ SS(LEX) ;   Start/Stop Times
  I +LEXDA>0 D
  . S LEXIENS=LEXDA_"," D GETS^DIQ(9.7,LEXIENS,"11;17","I","LEXOUT")
  . S LEXL=0,LEXB=$G(LEXOUT(9.7,LEXIENS,11,"I"))
- . S:$L($G(LEXSTART))&($P($G(LEXSTART),".",1)?7N) LEXB=$G(LEXSTART)
+ . S:'$L(LEXB)&($L($G(LEXSTART))&($E($G(LEXSTART),1,7)?7N)) LEXB=$G(LEXSTART)
  . S LEXE=$$NOW^XLFDT S:+LEXB>0&(+LEXE>0) LEXL=$$EP(LEXB,LEXE)
  . S LEX=LEXB_"^"_LEXE S:$L(LEXL) $P(LEX,"^",3)=LEXL
  I +LEXDA=0 D
  . S LEX="" S LEXDA=+($G(LEXD)) S LEXL="",LEXB=$P($G(LEXD),"^",2)
- . S:$L($G(LEXSTART))&($P($G(LEXSTART),".",1)?7N) LEXB=$G(LEXSTART)
- . S LEXE=$$NOW^XLFDT S:+LEXB>0&(+LEXE>0) LEXL=$$EP(LEXB,LEXE)
+ . S:'$L(LEXB)&($L($G(LEXSTART))&($E($G(LEXSTART),1,7)?7N)) LEXB=$G(LEXSTART)
+ . Q:$P(LEXB,".",1)'?7N  S LEXE=$$NOW^XLFDT S:+LEXB>0&(+LEXE>0) LEXL=$$EP(LEXB,LEXE)
  . S LEX=LEXB_"^"_LEXE S:$L(LEXL) $P(LEX,"^",3)=LEXL
  Q LEX
 DDA(LEX) ;   Get Default DA of Build LEX
@@ -146,7 +142,3 @@ ST ;   Show Temp Array
  F  S LEXN=$Q(@LEXN) Q:LEXN=""!(LEXN'[LEXC)  D
  . Q:LEXN[",0)"  W !,@LEXN
  Q
-TRIM(X) ;   Trim Spaces
- S X=$G(X) Q:X="" X F  Q:$E(X,1)'=" "  S X=$E(X,2,$L(X))
- F  Q:$E(X,$L(X))'=" "  S X=$E(X,1,($L(X)-1))
- Q X

@@ -1,12 +1,10 @@
 FBAAV2 ;AISC/GRR-ELECTRONICALLY TRANSMIT PHARMACY PAYMENTS ;11 Apr 2006  2:52 PM
- ;;3.5;FEE BASIS;**3,89,98,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**3,89,98**;JAN 30, 1995;Build 54
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 DETP ; ENTRY FROM FBAAV0
  S FBTXT=0
  D CKB5V^FBAAV01 I $G(FBERR) K FBERR Q
- ; HIPAA 5010 - line items that have 0.00 amount paid are now required to go to Central Fee
- ;F K=0:0 S K=$O(^FBAA(162.1,"AE",J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAA(162.1,"AE",J,K,L)) Q:L'>0  S Y(0)=$G(^FBAA(162.1,K,"RX",L,0)),Y(2)=$G(^(2)),Y=$G(^FBAA(162.1,K,0)) I Y(0)]"",Y]"",+$P(Y(0),U,16) D
- F K=0:0 S K=$O(^FBAA(162.1,"AE",J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAA(162.1,"AE",J,K,L)) Q:L'>0  S Y(0)=$G(^FBAA(162.1,K,"RX",L,0)),Y(2)=$G(^(2)),Y=$G(^FBAA(162.1,K,0)) I Y(0)]"",Y]"" D
+ F K=0:0 S K=$O(^FBAA(162.1,"AE",J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAA(162.1,"AE",J,K,L)) Q:L'>0  S Y(0)=$G(^FBAA(162.1,K,"RX",L,0)),Y(2)=$G(^(2)),Y=$G(^FBAA(162.1,K,0)) I Y(0)]"",Y]"",+$P(Y(0),U,16) D
  .N FBPICN,FBY
  .S FBPICN=K_U_L
  .S FBY=$S($P(Y,U,12):$P(Y,U,12),1:$P(Y,U,2))_U_+$P(Y(2),U,9)

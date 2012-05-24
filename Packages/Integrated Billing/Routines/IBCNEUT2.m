@@ -1,6 +1,6 @@
-IBCNEUT2 ;DAOU/DAC - eIV MISC. UTILITIES ;06-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,416,435**;21-MAR-94;Build 27
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNEUT2 ;DAOU/DAC - IIV MISC. UTILITIES ;06-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ; Can't be called from the top
  Q
@@ -41,7 +41,6 @@ BUFF(BUFF,BNG) ;  Set error symbol into Buffer File
  ;    BUFF = Buffer internal entry number
  ;    BNG = Buffer Symbol IEN
  I 'BUFF!'BNG Q
- I +$P($G(^IBA(355.33,BUFF,0)),U,17) Q    ; .12 field not for ePharmacy IB*2*435
  NEW DIE,DA,DR,D,D0,DI,DIC,DQ,X,DISYS
  S DIE="^IBA(355.33,",DA=BUFF,DR=".12////^S X=BNG"
  D ^DIE
@@ -53,6 +52,16 @@ PAYR ;  Set up the '~NO PAYER' payer.  This procedure is called by both
  S X="~NO PAYER" D ^DIC
  S DA=+Y
  S DR=".02////^S X=""00000""",DIE=DIC D ^DIE
+ ;
+ ;  Set up Payer Application with active flags (if needed)
+ ;S IDUZ=$$FIND1^DIC(200,"","X","INTERFACE,IB IIV")
+ ;I '$D(^IBE(365.12,DA,1,0)) S ^IBE(365.12,DA,1,0)="^365.121P^^"
+ ;S DLAYGO=365.121,DIC(0)="L",DIC("P")=DLAYGO,DA(1)=DA
+ ;S DIC="^IBE(365.12,"_DA(1)_",1,"
+ ;S X="IIV" D ^DIC
+ ;S DA=+Y
+ ;S DIE=DIC,DR=".02////1;.03////1;.05////^S X=$$NOW^XLFDT();.06////^S X=$$NOW^XLFDT()"
+ ;S DR=DR_";.04////^S X=IDUZ" D ^DIE
  ;
  K DA,DIC,DLAYGO,X,Y,D1,DILN,DISYS,IDUZ,DIE,DR,D0,D,DI,DIERR,DQ
  Q

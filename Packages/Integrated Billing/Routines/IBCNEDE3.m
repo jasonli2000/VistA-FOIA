@@ -1,9 +1,6 @@
 IBCNEDE3 ;DAOU/DJW - NONVERINS DATA EXTRACT ;18-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,416,438**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
- ;
- ; IB*2*438 removed the ability to perform non-verified extract.
- ; However, this code is being left as is for future changes.
+ ;;2.0;INTEGRATED BILLING;**184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;**Program Description**
  ;  This program finds veterans who have been seen within a
@@ -13,15 +10,15 @@ IBCNEDE3 ;DAOU/DJW - NONVERINS DATA EXTRACT ;18-JUN-2002
  ;
  Q   ; program can not be called directly
  ;
-EN ; Loop through designated cross-references for updates 
+EN ; Loop through designated cross-references for updates
  ; (Non verified insurance)
  ;
- ; Initialize 
+ ; Initialize
  NEW DIC,DA,X,Y,DLAYGO,DINUM,DTOUT,DFN,FRESHDT,IBD,IBPM,IBPMD
  NEW IEN,MAXCNT,IBCNECNT,EACTIVE,XDAYS,YDAYS,TDT,VI,IBBDT,IBEDT
  NEW VINCON,VNOK,SRVICEDT,RESULT,PAYER,PAYERID,ARRAY,ERROR,SUPPBUFF
- NEW TRANSNO,IBQUERY,PTN,INSNAME,IBCNETOT,SID,SIDACT,SIDDATA
- NEW SIDARRAY,SIDCNT,DISYS,DGPMDT,AUPNDT,II,PATID
+ NEW TRANSNO,IBQUERY,PTN,INSNAME,IBCNETOT,SID,SIDACT,SIDDATA,SCNT5
+ NEW SIDARRAY,SIDCNT,DISYS,DGPMDT,AUPNDT,II
  ;
  S IEN="",IBCNECNT=0
  ; Initialize count for periodic TaskMan check
@@ -78,7 +75,7 @@ INP(DATE) ;  Find inpatients for that date (we want most recent encounter)
  .. S IBPMD=$G(^DGPM(IBPM,0)) Q:'IBPMD
  .. S DFN=+$P(IBPMD,U,3) Q:'DFN
  .. I $P($G(^DPT(DFN,0)),U,21) Q         ; Exclude if test patient
- .. Q:$D(^TMP("IBCNEDE3",$J,"PTS",DFN,"INP"))      ; already processed 
+ .. Q:$D(^TMP("IBCNEDE3",$J,"PTS",DFN,"INP"))      ; already processed
  .. S ^TMP("IBCNEDE3",$J,"PTS",DFN,"INP",IBD)=""
  .. D PROC^IBJDI5(DFN,"*",IBD)
  Q
@@ -131,9 +128,7 @@ REST(STARTDT,ENDDT) ; Check to see if there was a more recent inpatient
  Q
  ;
 PROCESS ;  Get insurance for each patient
- N MCAREFLG
  S DFN=0 F  S DFN=$O(^TMP("IBJDI51",$J,DFN)) Q:'DFN  D  Q:IBCNECNT'<MAXCNT!$G(ZTSTOP)
- . S MCAREFLG=0
  . ; Update count for periodic check
  . S IBCNETOT=IBCNETOT+1
  . ; Check for request to stop background job, periodically
@@ -149,10 +144,8 @@ PROCESS ;  Get insurance for each patient
  . S VI=0 F  S VI=$O(VINS(VI)) Q:VI=""!(IBCNECNT'<MAXCNT)  D
  .. S VINCON=$P(VINS(VI,0),U)
  .. ;
+ .. ;Check for ins. companies to exclude (i.e. Medicare/Medicaid)
  .. S INSNAME=$P($G(^DIC(36,VINCON,0)),U)
- .. ; allow only one MEDICARE transmission per patient
- .. I INSNAME["MEDICARE",MCAREFLG Q
- .. ;Check for ins. companies to exclude (i.e. Medicaid)
  .. I $$EXCLUDE^IBCNEUT4(INSNAME) Q
  .. ;
  .. ;Check for Ins. Company/Payer problems
@@ -162,10 +155,6 @@ PROCESS ;  Get insurance for each patient
  .. ;
  .. S PAYER=$P(RESULT,U,2),PAYERID=$P(RESULT,U,3) ; Payer IEN & Payer ID
  .. I 'PAYER!(PAYERID="") Q
- .. I '$$PYRACTV^IBCNEDE7(PAYER) Q        ; Payer is not nationally active
- .. ;
- .. ; set patient id field   IB*2*416
- .. S PATID=$P($G(VINS(VI,5)),U,1)    ; 5.01 field in pt. ins.
  .. ;
  .. ; Update service date and freshness date based on payer allowed
  .. ;  date range
@@ -173,26 +162,28 @@ PROCESS ;  Get insurance for each patient
  .. ;
  .. ; Update service dates for inquiries to be transmitted
  .. D TQUPDSV^IBCNEUT5(DFN,PAYER,SRVICEDT)
+ .. ;
+ .. ; Check for outstanding/current entries in File 365.1
+ .. I '$$ADDTQ^IBCNEUT5(DFN,PAYER,SRVICEDT,YDAYS) Q
  .. K SIDARRAY
  .. S SIDDATA=$$SIDCHK^IBCNEDE5(PAYER,DFN,,.SIDARRAY,FRESHDT)
  .. S SIDACT=$P(SIDDATA,U),SIDCNT=$P(SIDDATA,U,2)
+ .. S SCNT5=$S(SIDACT=5:1,1:"")
  .. ;
  .. I SIDACT=3 D  Q
  ... I 'SUPPBUFF,'$$BFEXIST^IBCNEUT5(DFN,INSNAME) D PT^IBCNEBF(DFN,VI,18,"",1)
- .. ;
- .. I IBCNECNT+SIDCNT>MAXCNT S IBCNECNT=MAXCNT Q  ;quit if TQ entries>MAXCNT
+ .. I IBCNECNT+SCNT5+SIDCNT>MAXCNT S IBCNECNT=MAXCNT Q  ;quit if TQ entries>MAXCNT
  .. S SID=""
- .. F  S SID=$O(SIDARRAY(SID)) Q:SID=""  D:$P(SID,"_")'="" SET($P(SID,"_"),$P(SID,"_",2),PATID) S:INSNAME["MEDICARE" MCAREFLG=1
- .. I SIDACT=4 D SET("","",PATID) S:INSNAME["MEDICARE" MCAREFLG=1
+ .. F  S SID=$O(SIDARRAY(SID)) Q:SID=""  D SET($P(SID,"_"),$P(SID,"_",2))
+ .. I SIDACT=4!(SIDACT=5) D SET("","")
  Q
  ;
-SET(SID,INR,PATID) ; Call function to set IIV TRANSMISSION QUEUE file #365.1
+SET(SID,INR) ; Call function to set IIV TRANSMISSION QUEUE file #365.1
  NEW DATA1,DATA2,TQIEN
  ;
  ; The hard coded '1' in the 3rd piece of DATA1 sets the Transmission
  ; status of file 365.1 to "Ready to Transmit"
  S DATA1=DFN_U_PAYER_U_1_U_""_U_SID_U_FRESHDT
- S $P(DATA1,U,8)=PATID     ; IB*2*416
  ;
  ; The hardcoded '3' in the 1st piece of DATA2 is the value to tell
  ; the file 365.1 that it is the non-verified extract.
@@ -202,7 +193,7 @@ SET(SID,INR,PATID) ; Call function to set IIV TRANSMISSION QUEUE file #365.1
  I TQIEN'="" S IBCNECNT=IBCNECNT+1
  ;
  Q
-BUFF ; Create new buffer entry, if one doesn't already exist, with a 
+BUFF ; Create new buffer entry, if one doesn't already exist, with a
  ; bang symbol
  I SUPPBUFF Q   ; determine if we suppress buffer entries
  I '$$BFEXIST^IBCNEUT5(DFN,INSNAME) D PT^IBCNEBF(DFN,VI,$P(RESULT,U),"",1)

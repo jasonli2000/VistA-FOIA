@@ -1,6 +1,6 @@
-RCXFMSUF ;WISC/RFJ-calculate fms fund code for a bill ; 10/20/10 10:37am
- ;;4.5;Accounts Receivable;**90,101,135,157,160,165,170,203,207,173,211,192,220,235,273**;Mar 20, 1995;Build 3
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+RCXFMSUF ;WISC/RFJ-calculate fms fund code for a bill ;1 Oct 97
+ ;;4.5;Accounts Receivable;**90,101,135,157,160,165,170,203,207,173,211,192,220,235**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
  ;
@@ -23,7 +23,7 @@ GETFUNDB(BILLDA,DONTSTOR,RCEFT) ;  return a bills fms fund code
  ;  until all references to the fund are eliminated.
  ;  rceft = 1 if processing an EFT deposit
  ;
- N ACTDATE,CATEGDA,FUND,NEWFUND
+ N ACTDATE,CATEGDA,FUND
  ;
  ;  calculate a bills fund
  I $G(RCEFT)=1 S FUND="5287"_$S(DT<3030926:"",DT'<3030926&(DT<$$ADDPTEDT^PRCAACC()):".4",1:"04") Q FUND
@@ -32,10 +32,6 @@ GETFUNDB(BILLDA,DONTSTOR,RCEFT) ;  return a bills fms fund code
  ;
  ;  piece 5 is new fund, remove spaces
  S FUND=$P($TR($T(@CATEGDA)," "),";",5)
- ;
- ;  set fund 528711 for 3rd party RX bills after 4/27/2011
- I $$TYP^IBRFN(BILLDA)="PH" D
- . I (CATEGDA=6)!(CATEGDA=7)!(CATEGDA=9)!(CATEGDA=10),$$CHECKRXS(BILLDA) S FUND=528711
  ;
  ;  if category is vendor(17), ex-employee(15), current employee(16)
  ;  federal agency refund(13), federal agency reimb(14), military(12)
@@ -50,7 +46,7 @@ GETFUNDB(BILLDA,DONTSTOR,RCEFT) ;  return a bills fms fund code
  .   I $P($G(^PRCA(430,BILLDA,11)),"^",17)'="" S FUND=$P(^(11),"^",17),DONTSTOR=1
  ;
  ;  public law states that bills in the category ineligible (1),
- ;  emerg/human (2), torts (10), or medicare (21) which are older 
+ ;  emerg/human (2), torts (10), or medicare (21) which are older
  ;  than oct 1, 1992 should be reported under fund 3220.
  I CATEGDA=1!(CATEGDA=2)!(CATEGDA=10)!(CATEGDA=21) D
  .   S ACTDATE=$P($G(^PRCA(430,BILLDA,6)),"^",21)
@@ -64,9 +60,8 @@ GETFUNDB(BILLDA,DONTSTOR,RCEFT) ;  return a bills fms fund code
  ;
  ;  set the fund for the bill
  I $G(DONTSTOR)'=1 D STORE^RCXFMSUR(BILLDA,"",FUND)
- ; 
- I FUND>528704,FUND<528709!(FUND=528710)!(FUND=528711) Q FUND
  ;
+ I FUND>528704,FUND<528709!(FUND=528710) Q FUND
  I $G(REPRODT),REPRODT<3030926,$E(FUND,1,4)=5287 Q 5287
  I $G(REPRODT),REPRODT<3031001,$E(FUND,1,4)=5287,$G(REFMS) Q 5287
  I DT<3030926,$E(FUND,1,4)=5287 Q 5287 ; Effective date
@@ -88,21 +83,12 @@ GETFUNDB(BILLDA,DONTSTOR,RCEFT) ;  return a bills fms fund code
  I DT<$$ADDPTEDT^PRCAACC(),FUND=528704 Q 5287.4
  Q FUND
  ;
-CHECKRXS(BILLDA) ; returns true (1) if bill has any scripts on or after 4/27/11
- N RXNUM,NEWFUND,FILLDT,ARRXS
- S NEWFUND=0
- D SET^IBCSC5A(BILLDA,.ARRXS,)
- S RXNUM=0,FILLDT=""
- F  S RXNUM=$O(ARRXS(RXNUM)) Q:RXNUM'>0!(NEWFUND)  D
- .  S FILLDT=$O(ARRXS(RXNUM,0))
- .  I FILLDT'<3110427 S NEWFUND=1
- Q NEWFUND
  ;
  ;  this is a listing of all categories and associated funds
  ;  the label is from the internal entry number in the category
  ;  file 430.2.  piece 3 is a description, piece 4 is the old fund,
  ;  piece 5 is the new fund
-0 ;;no fund                       ;       ;    
+0 ;;no fund                       ;       ;
 1 ;;INELIGIBLE HOSP.              ;3220   ;0160A1
 2 ;;EMERGENCY/HUMANITARIAN        ;0160A1 ;528703
 3 ;;NURSING HOME CARE(NSC)        ;2431   ;528703
@@ -147,5 +133,3 @@ CHECKRXS(BILLDA) ; returns true (1) if bill has any scripts on or after 4/27/11
 42 ;;CWT PROCEEDS                  ;       ;528707
 43 ;;COMP & PEN PROCEEDS           ;       ;528708
 44 ;;ENHANCED USE LEASE PROCEEDS   ;5358.3 ;528710
- ;
- ;    

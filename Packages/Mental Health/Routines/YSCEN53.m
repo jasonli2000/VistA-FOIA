@@ -1,8 +1,6 @@
-YSCEN53 ;ALB/ASF-TEAM HX REPORT ;4/3/90  10:49 ; 4/10/09 2:31pm
- ;;5.01;MENTAL HEALTH;**96**;Dec 30, 1994;Build 46
- ;Reference to ^ICD( supported by DBIA #370
- ;Reference to ICDCODE APIs supported by DBIA #3990
- ;Reference to ^ICD9( supported by DBIA #5388
+YSCEN53 ;ALB/ASF-TEAM HX REPORT ;4/3/90  10:49 ;
+ ;;5.01;MENTAL HEALTH;;Dec 30, 1994
+ ;
  ;  Called from routine YSCEN52
 A ;
  S (YSFLGP,YST1)=0 F  S YST1=$O(^UTILITY($J,"YS",YST1)) Q:'YST1!Q3  F YS="DRG","DXLS","LOS" I $D(^UTILITY($J,"YS",YST1,YS)) D:YS?1"D".E HD^YSCEN56,HD1,L1,L5:YS="DRG" D:YS="LOS" L4 D:YS'="DXLS" WAIT^YSCEN1
@@ -13,7 +11,7 @@ L1 ;
 L2 ;
  S G=^UTILITY($J,"YS",YST1,YS,YSI)
  I YS="DRG" W ! I $D(^ICD(YSI,1,1,0)) W YSI,?5,$E(^ICD(YSI,1,1,0),1,25)
- I YS="DXLS" N YSDXX,YSDXG,YSDXG1 S YSDXX=$P($$ICDDX^ICDCODE(YSI),U,2),YSDXG=$$ICDD^ICDCODE(YSDXX,"YSDXG1") W !,YSDXX,?8,$E(YSDXG1(1),1,20) ;asf 4/10/09
+ I YS="DXLS" W !,$P(^ICD9(YSI,0),U),?8,$E($P(^ICD9(YSI,0),U,3),1,20)
 L3 ;
  S N=+$P(G,U,2),YSBAR=+G/N,YSSX=+$P(G,U,3)
  W ?32,$J(N,3),?38,$J(YSBAR,6,1)
@@ -25,11 +23,9 @@ L3 ;
 HD1 ;
  W !?32,"# of",?40,"mean",?47,"standard" W:YS="DRG" ?67,"days to" W !,$S(YS="DRG":"DRG",1:"DXLS"),?32,"pts",?40,"LOS",?47,"deviation",?59,"range" W:YS="DRG" ?67,"break even" W ! F ZZ=1:1:11 W "-------"
  Q
-SP ;asf 4/10/09
- N YSDD1,YSDD2 S YSDD1=$$ICDDX^ICDCODE($P(^ICD9(YSI,0),U))
- S YSDD1=$P(YSDD1,U,2),YSDD2=$$ICDD^ICDCODE(YSDD1,"YSDD2")
- S G1=$E(YSDD2(1),I1,$L(^(1))) F I1=I1+45:1 S X=$E(G1,I1) Q:X=" "!(X="")
- W $S($L(G1):$E(G1,1,I1),1:"") I $L(G1)>I1 W !?14 G SP
+SP ;
+ S G1=$E(^ICD9(YSI,1),I1,$L(^(1))) F I1=I1+45:1 S X=$E(G1,I1) Q:X=" "!(X="")
+ W $S($L(G1):$E(G1,1,I1),1:$P(^ICD9(YSI,0),U,3)) I $L(G1)>I1 W !?14 G SP
  Q
 L4 ;
  D:'$D(^UTILITY($J,"YS",YST1,"DXLS")) HD^YSCEN56 D HD1 W !,"Team total: " S G=^UTILITY($J,"YS",YST1,YS) D L3

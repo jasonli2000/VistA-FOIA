@@ -1,5 +1,5 @@
-ONCOEDC1 ;Hines OIFO/GWB - "Required" data item check ;06/23/10
- ;;2.11;ONCOLOGY;**27,28,29,34,36,39,41,42,47,51**;Mar 07,1995;Build 65
+ONCOEDC1 ;Hines OIFO/GWB - "Required" data item check ;10/30/00
+ ;;2.11;ONCOLOGY;**27,28,29,34,36,39,41,42,47**;Mar 07,1995;Build 19
  ;
 F1655 ;If data item blank, S CMPLT=0 and add field to list
  I $$GET1^DIQ(165.5,PRM,361,"I")="" S FDNUM=361 D CMPLT
@@ -43,11 +43,10 @@ F1655 ;If data item blank, S CMPLT=0 and add field to list
  I $$GET1^DIQ(165.5,PRM,32,"I")="" S FDNUM=32 D CMPLT
  I $$GET1^DIQ(165.5,PRM,37.1,"I")="" S FDNUM=37.1  D CMPLT
  I $$GET1^DIQ(165.5,PRM,85,"I")="" S FDNUM=85 D CMPLT
- I '$$GTT^ONCOU55(PRM),$$GET1^DIQ(165.5,PRM,37.2,"I")="" S FDNUM=37.2 D CMPLT
- I '$$GTT^ONCOU55(PRM),$$GET1^DIQ(165.5,PRM,86,"I")="" S FDNUM=86 D CMPLT
+ I $$GET1^DIQ(165.5,PRM,37.2,"I")="" S FDNUM=37.2 D CMPLT
+ I $$GET1^DIQ(165.5,PRM,86,"I")="" S FDNUM=86 D CMPLT
  I $$GET1^DIQ(165.5,PRM,37.3,"I")="" S FDNUM=37.3 D CMPLT
- I DTDX<3100000 D
- .I $$GET1^DIQ(165.5,PRM,87,"I")="" S FDNUM=87 D CMPLT
+ I $$GET1^DIQ(165.5,PRM,87,"I")="" S FDNUM=87 D CMPLT
  I DTDX<3030000 D
  .I $$GET1^DIQ(165.5,PRM,25.1,"I")="" S FDNUM=25.1 D CMPLT
  .I $$GET1^DIQ(165.5,PRM,25.2,"I")="" S FDNUM=25.2 D CMPLT
@@ -137,8 +136,4 @@ F1655 ;If data item blank, S CMPLT=0 and add field to list
 CMPLT ;Set CMPLT = 0 and add FLD to LIST of fields needed to be filled in.
  S FLDNAME=$P($G(^DD(ONCFILE,FDNUM,0)),U,1) S FDNUM=""
  S CMPLT=0,LIST(FLDNAME)=""
- Q
- ;
-CLEANUP ;Cleanup
- K CMPLT,DTDX,FDNUM,FLDNAME,LIST,ONCFILE,PRM
  Q

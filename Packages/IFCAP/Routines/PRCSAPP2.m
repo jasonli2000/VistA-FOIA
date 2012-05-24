@@ -1,6 +1,6 @@
-PRCSAPP2 ;WISC/KMB/BGJ/SC/ASU - CONTINUATION OF PRCSAPP ; 3/31/05 3:07pm
-V ;;5.1;IFCAP;**14,81,148**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCSAPP2 ;WISC/KMB/BGJ/SC-CONTINUATION OF PRCSAPP ; 3/31/05 3:07pm
+V ;;5.1;IFCAP;**14,81**;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;PRC*5.1*81-if a 2237 trx is being approved & it originated from
  ;DynaMed RIL then update DM re. approval thru a call to rtn PRCVTAP
@@ -16,13 +16,6 @@ FINAL ;   ask if request was reviewed. print request if needed.
  N PRCOKCB S PRCOKCB=$$OKCCBOC^PRCSCK($P(PRCSN,"^"))
  I PRCOKCB S %=1 W !,"Is this request ready for approval" D YN^DICN W:%=0 !,"Enter yes or no.",! G:%=0 FINAL Q:%=-1  S REPLY=%
  I 'PRCOKCB S REPLY=2
- ; PRC*5.1*148 start
- ; if Approver is a requestor, violation to segregation of duties
- I REPLY=1,PRCHQ=1,$P($G(^PRCS(410,DA,7)),"^",1)=DUZ D  G FINAL2
- . W !!,"You are the CP Clerk (Requestor) on this 1358 transaction."
- . W " Per Segregation",!,"of Duties, the CP Clerk (Requestor)"
- . W " is not permitted to Approve the 1358." H 2
- ; PRC*5.1*148 end
  ;
 FINAL1 ;*******************************************************************
  ;PRCVDM -flag helps in determining if ans is Y to transmit to Fiscal
@@ -31,7 +24,6 @@ FINAL1 ;*******************************************************************
  N PRCVDM
  I REPLY=1 W !,"Is this request ready for transmission to A&MM/Fiscal" S %=2 D YN^DICN Q:%=-1  S REPLY1=% S:%=1 PRCVDM=1 I %=0 W !,"Enter yes or no.",! H 1 G FINAL1
  ;  if ready for approval (or reviewed), store on cross-ref F,F1
-FINAL2 ;
  D:REPLY=2 W5^PRCSEB D:REPLY=1 W51^PRCSEB Q:REPLY1=2
  I $D(SKIPRNT) S MESSAGE="" D ESIG^PRCUESIG(DUZ,.MESSAGE) Q:MESSAGE'=1
  ;********************************************************************
@@ -40,7 +32,7 @@ FINAL2 ;
  ;********************************************************************
  I $D(PRCVDM),PRCVDM=1 D EN^PRCVTAP(DA)
  ;
- ;  set record in 443, clean up 410, change cp uncommitted balance 
+ ;  set record in 443, clean up 410, change cp uncommitted balance
  ;  using TRANS^PRCSES, in 420
  D NOW^%DTC S PRCS=%
  S PRCSCP=$S($D(^PRC(420,PRC("SITE"),1,+PRC("CP"),0)):$P(^(0),U,12),1:"")

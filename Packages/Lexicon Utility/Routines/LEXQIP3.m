@@ -1,31 +1,31 @@
-LEXQIP3 ;ISL/KER - Query - ICD Procedure - Save ;01/03/2011
- ;;2.0;LEXICON UTILITY;**62,73**;Sep 23, 1996;Build 10
- ;               
+LEXQIP3 ;ISL/KER - Query - ICD Procedure - Save ;10/30/2008
+ ;;2.0;LEXICON UTILITY;**62**;Sep 23, 1996;Build 16
+ ;
  ; Global Variables
- ;    ^ICD0(              ICR   4485
+ ;    ^ICD9(              ICR   4485
  ;    ^TMP("LEXQIDO")     SACC 2.3.2.5.1
- ;               
+ ;
  ; External References
  ;    $$UP^XLFSTR         ICR  10104
- ;               
+ ;
  ; Local Variables NEWed or KILLed Elsewhere
- ;     LEXIEN             Internal Entry Number
+ ;     LEXIEN             CPT Internal Entry Number
  ;     LEXLEN             Offset Length
  ;     LEXGET             Array of Non-Versioned Data
- ;     LEXST              Status and Effective Dates
+ ;     LEXST              CPT Status and Effective Dates
  ;     LEXSD              Versioned Short Description
  ;     LEXLD              Versioned Long Description
  ;     LEXWN              Warning
  ;     LEXMOR             Major O.R. Procedure
  ;     LEXDG              MDC/DRG
  ;     LEXELDT            External Last Date
- ;              
+ ;
 EN ; Main Entry Point
  K ^TMP("LEXQIDO",$J) Q:'$L($G(LEXELDT))  I +($G(LEXST))<0 D FUT D:$D(^TMP("LEXQIDO",$J)) DSP^LEXQO("LEXQIDO") Q
  D FUL D:$D(^TMP("LEXQIDO",$J)) DSP^LEXQO("LEXQIDO")
  Q
 FUT ; Future Activation
- N LEX1,LEX2,LEX3,LEXEFF,LEXI,LEXL,LEXNAM,LEXSO,LEXSTA S LEXI=+($G(LEXIEN)) Q:+LEXI'>0  Q:'$D(^ICD0(+LEXI,0))  S LEXL=+($G(LEXLEN)) Q:+LEXL'>0
+ N LEX1,LEX2,LEX3,LEXEFF,LEXI,LEXL,LEXNAM,LEXSO,LEXSTA S LEXI=+($G(LEXIEN)) Q:+LEXI'>0  Q:'$D(^ICD9(+LEXI,0))  S LEXL=+($G(LEXLEN)) Q:+LEXL'>0
  S:LEXL>62 LEXL=62 S LEXSO=$G(LEXGET(80.1,(+LEXI_","),.01,"E")) Q:'$L(LEXSO)  S LEXNAM=$G(LEXGET(80.1,(+LEXI_","),"B")) Q:'$L(LEXNAM)
  S LEXSTA=$G(LEXST),LEXEFF=$P(LEXSTA,"^",5),LEXSTA=$P(LEXSTA,"^",4) Q:'$L(LEXSTA)  Q:'$L(LEXEFF)  S (LEX1,LEX2,LEX3)=""
  D BOD(LEXELDT),COD(LEXSO,LEXNAM,+($G(LEXL))),STA(.LEXST,+($G(LEXL)))

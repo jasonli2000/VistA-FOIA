@@ -1,5 +1,5 @@
-PRCHLO4A ;WOIFO/RLL/DAP-EXTRACT ROUTINE CLO REPORT SERVER ;12/30/10  14:58
- ;;5.1;IFCAP;**83,104,98,130,154**;Oct 20, 2000;Build 5
+PRCHLO4A ;WOIFO/RLL/DAP-EXTRACT ROUTINE CLO REPORT SERVER ; 9/26/06 11:33am
+V ;;5.1;IFCAP;**83,104,98**; Oct 20, 2000;Build 37
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ; Continuation of PRCHLO4
  ;
@@ -16,9 +16,6 @@ GETDIR ; Get directory from PRCPLO EXTRACT DIRECTORY system parameter for CLRS
 CRTWIN ; Create CLRSxxxWFTP.TXT  file to transfer file(s)
  ;*98 Modified to work with PRC CLRS ADDRESS parameter
  N FILEDIR,POP,STID,OUTFLL1,ADDR
- ; PRC*5.1*130 begin
- N PRCHUSN,PRCHPSW
- ; PRC*5.1*130 end
  S STID=$$GET1^DIQ(4,$$KSP^XUPARAM("INST")_",",99)
  S POP=""  ; POP is returned by OPEN^%ZISH
  S FILEDIR=$$GET^XPAR("SYS","PRCPLO EXTRACT DIRECTORY",1,"Q")
@@ -26,19 +23,11 @@ CRTWIN ; Create CLRSxxxWFTP.TXT  file to transfer file(s)
  ; transfer files (1 for each file for Windows/Cache)
  S ADDR=$$GET^XPAR("SYS","PRC CLRS ADDRESS",1,"Q")
  I ADDR="" S PRCPMSG(1)="There is no address identified in the CLRS Adress Parameter.",PRCPMSG(2)="Please correct and retry." D MAILFTP S CLRSERR=1 Q
- ; PRC*5.1*130 begin
- S PRCHUSN=$$GET^XPAR("SYS","PRCPLO USER NAME",1,"Q")
- I PRCHUSN="" S PRCPMSG(1)="There is no user name identified in the CLRS USER NAME Parameter.",PRCPMSG(2)="Please correct and retry." D MAILFTP S CLRSERR=1 Q
- S PRCHUSN=$$DECRYP^XUSRB1(PRCHUSN)
- S PRCHPSW=$$GET^XPAR("SYS","PRCPLO PASSWORD",1,"Q")
- I PRCHPSW="" S PRCPMSG(1)="There is no password identified in the CLRS PASSWORD Parameter.",PRCPMSG(2)="Please correct and retry." D MAILFTP S CLRSERR=1 Q
- S PRCHPSW=$$DECRYP^XUSRB1(PRCHPSW)
- ; PRC*5.1*130 end
  ;
  I CLRSERR'=3  D
  . N PONN  ; File number for File type
  . S PONN=1
- . F PONN=1:1:27  D
+ . F PONN=1:1:19  D
  . . N FTY  ; File type F=Po Activity , G=GIP
  . . ;
  . . S FTY="F"
@@ -76,12 +65,8 @@ BLDF1 ; RLL/PRC*5.1*104 added logic to create separate FTP
  ; transfers (1 for each file)
  ;
  W "open "_ADDR,!  ;Connect to the Report Server
- ; PRC*5.1*130 begin
- ; Enter user name for Report Server Login
- W PRCHUSN,!
- ; Enter P/W for Report Server Login
- W PRCHPSW,!
- ; PRC*5.1*130 end
+ W "clrsadmin",!  ; Enter user name for Report Server Login
+ W "1025clrs",!  ;pw=1025clrs Enter P/W for Report Server Login
  W "PUT "_FILEDIR_"IFCP"_STID_FTY_PONN_".TXT",!
  W "bye",!  ; Exit FTP
  ;
@@ -126,18 +111,18 @@ VMSPING ; need to PING report server to make sure it is available
  ; 3. Read Logfile into working global
  N FNAME,XLOG
  S FNAME="CLRS"_STID_"PING.LOG"
- S XLOG=$$FTG^%ZISH(FILEDIR,FNAME,$NAME(^TMP("PRCLRSLOG",$J,1)),3)
+ S XLOG=$$FTG^%ZISH(FILEDIR,FNAME,$NAME(^TMP("CLRSLOG",$J,1)),3)
  ; Check global for %SYSTEM or 0 packets received
  N PNG,PNG1,PNG2,PNG3
  S PNG=0,PNG1=0,PNG2=0
- F  S PNG=$O(^TMP("PRCLRSLOG",$J,PNG)) Q:PNG=""  D
- . S PNG1=$G(^TMP("PRCLRSLOG",$J,PNG))
+ F  S PNG=$O(^TMP("CLRSLOG",$J,PNG)) Q:PNG=""  D
+ . S PNG1=$G(^TMP("CLRSLOG",$J,PNG))
  . I PNG1["0 packets received" S CLRSERR=3
  . I PNG1["%SYSTEM" S CLRSERR=3
  . Q
  Q
 WINPING ; PING report server to make sure it is available
- ;*98 Modified to work with PRC CLRS ADDRESS parameter 
+ ;*98 Modified to work with PRC CLRS ADDRESS parameter
  N PV,XPV1,FILEDIR,STID,XLOG,ADDR
  S FILEDIR=$$GET^XPAR("SYS","PRCPLO EXTRACT DIRECTORY",1,"Q")
  S ADDR=$$GET^XPAR("SYS","PRC CLRS ADDRESS",1,"Q")
@@ -147,11 +132,11 @@ WINPING ; PING report server to make sure it is available
  S XPV1="S PV=$ZF(-1,""PING "_ADDR_">"_FILEDIR_"CLRS"_STID_"PING.LOG"")"
  X XPV1
  S FNAME="CLRS"_STID_"PING.LOG"
- S XLOG=$$FTG^%ZISH(FILEDIR,FNAME,$NAME(^TMP("PRCLRSLOG",$J,1)),3)
+ S XLOG=$$FTG^%ZISH(FILEDIR,FNAME,$NAME(^TMP("CLRSLOG",$J,1)),3)
  N PNG,PNG1,PNG2,PNG3
  S PNG=0,PNG1=0,PNG2=0
- F  S PNG=$O(^TMP("PRCLRSLOG",$J,PNG)) Q:PNG=""  D
- . S PNG1=$G(^TMP("PRCLRSLOG",$J,PNG))
+ F  S PNG=$O(^TMP("CLRSLOG",$J,PNG)) Q:PNG=""  D
+ . S PNG1=$G(^TMP("CLRSLOG",$J,PNG))
  . I PNG1["Received = 0" S CLRSERR=3
  . Q
  Q
@@ -187,7 +172,7 @@ FTPCOM ; Issue the FTP command after CLRSxxxWFTP.TXT file is built
  ;
  N LPP1,LPP2
  S LPP1=0,LPP2="F"
- F LPP1=1:1:27  D  ; run the FTP command for the 27 PO files
+ F LPP1=1:1:19  D  ; run the FTP command for the 19 PO files
  . D RUNFTPT
  . Q
  S LPP1=0,LPP2="G"
@@ -217,7 +202,7 @@ DELWIN ; Delete windows files
  I CKOS["NT"  D
  . N LPP1,LPP2
  . S LPP1=0,LPP2="F"
- . F LPP1=1:1:27  D  ; run the FTP command for the 27 PO files
+ . F LPP1=1:1:19  D  ; run the FTP command for the 19 PO files
  . . D DELFTPF
  . . Q
  . Q

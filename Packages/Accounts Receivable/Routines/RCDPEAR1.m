@@ -1,5 +1,5 @@
-RCDPEAR1 ;ALB/TMK/PJH - ELECTRONIC ERA AGING REPORT - FILE 344.4 ; 8/2/10 7:26pm
- ;;4.5;Accounts Receivable;**173,269**;Mar 20, 1995;Build 113
+RCDPEAR1 ;ALB/TMK - ELECTRONIC ERA AGING REPORT - FILE 344.4 ;31-OCT-02
+ ;;4.5;Accounts Receivable;**173**;Mar 20, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
@@ -46,9 +46,8 @@ RPTOUT(RCMIN,RCDETAIL,RCPRT) ; Entrypoint for queued job, nightly job
  . I 'RCPG!(($Y+5)>IOSL) D HDR(.RCCT,.RCPG,.RCSTOP,RCPRT,RCDETAIL,RCMIN) Q:RCSTOP
  . S RC0=$G(^RCY(344.4,RCZ0,0)),RCTOT=RCTOT+$P(RC0,U,5)
  . S Z=$$SETSTR^VALM1($J(-RCZ,4),"",1,4)
- . S Z=$$SETSTR^VALM1("  "_$P(RC0,U,2),Z,5,50)
- . D SETLINE(Z,.RCCT,RCPRT)
- . S Z=$$SETSTR^VALM1($P(RC0,U,6)_"/"_$P(RC0,U,3),"",11,69)
+ . S Z=$$SETSTR^VALM1("  "_$P(RC0,U,2),Z,5,22)
+ . S Z=$$SETSTR^VALM1("  "_$E($P(RC0,U,6),1,30)_"/"_$P(RC0,U,3),Z,27,43)
  . S Z=$$SETSTR^VALM1("  "_$$FMTE^XLFDT($P(RC0,U,4),2),Z,70,10)
  . D SETLINE(Z,.RCCT,RCPRT)
  . S Z=$$SETSTR^VALM1($J("",16)_$S($P(RC0,U,7):$$FMTE^XLFDT($P(RC0,U,7)\1,2),1:""),"",1,25)
@@ -97,7 +96,7 @@ PRTQ I '$D(ZTQUEUED),'RCSTOP,RCPG,RCPRT="" D ASK()
  ;
 HDR(RCCT,RCPG,RCSTOP,RCPRT,RCDETAIL,RCMIN) ;Prints report heading
  ; Function returns RCPG = current page # and RCCT = running line count
- ;   and RCSTOP = 1 if user aborted print 
+ ;   and RCSTOP = 1 if user aborted print
  ; Parameters must be passed by reference
  ; RCDETAIL = 1 if detail is needed, otherwise only summary is reported
  ; RCPRT = name of the subscript for ^TMP to use to return all lines
@@ -123,10 +122,9 @@ HDR(RCCT,RCPG,RCSTOP,RCPRT,RCDETAIL,RCMIN) ;Prints report heading
  D SETLINE(Z,.RCCT,RCPRT)
  D SETLINE(" ",.RCCT,RCPRT)
  D SETLINE("AGED",.RCCT,RCPRT)
- S Z=$$SETSTR^VALM1("DAYS"_$J("",2)_"TRACE #","",1,79)
+ S Z=$$SETSTR^VALM1("DAYS"_$J("",2)_"TRACE #"_$J("",15)_"PAYMENT FROM/ID"_$J("",28)_"ERA DATE","",1,79)
  D SETLINE(Z,.RCCT,RCPRT)
- S Z=$$SETSTR^VALM1($J("",10)_"PAYMENT FROM/ID"_$J("",46)_"ERA DATE","",1,79)
- D SETLINE(Z,.RCCT,RCPRT)
+ D SETLINE(" ",.RCCT,RCPRT)
  S Z=$$SETSTR^VALM1($J("",16)_"FILE DATE"_$J("",6)_"AMOUNT PAID"_$J("",2)_"EEOB CNT "_$J("",2)_"ERA #",Z,1,79)
  D SETLINE(Z,.RCCT,RCPRT)
  D SETLINE($TR($J("",IOM-1)," ","="),.RCCT,RCPRT)
@@ -135,7 +133,7 @@ HDR(RCCT,RCPG,RCSTOP,RCPRT,RCDETAIL,RCMIN) ;Prints report heading
 SETLINE(Z,RCCT,RCPRT) ; Sets line into print global or writes line
  ; Z = txt to output
  ; RCCT = line counter
- ; RCPRT = flag if 1, indicates output to global, no writes 
+ ; RCPRT = flag if 1, indicates output to global, no writes
  S RCCT=RCCT+1
  I RCPRT="" W !,Z Q
  S ^TMP($J,RCPRT,RCCT)=Z

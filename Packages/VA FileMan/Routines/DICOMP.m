@@ -1,6 +1,6 @@
-DICOMP ;SFISC/GFT-EVALUATE COMPUTED FLD EXPR ;27FEB2008
- ;;22.0;VA FileMan;**6,76,114,118,157**;;Build 7
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DICOMP ;SFISC/GFT-EVALUATE COMPUTED FLD EXPR ;29APR2003
+ ;;22.0;VA FileMan;**6,76,114,118**
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  S DICOMP=$G(DICOMP) N DLV,K S K=0 F DLV=0:1 G A:'$D(J(DLV+1))
 EN1 ;
  S K=0 F  S DLV=K,K=$O(I(K)) G A:K="",A:$D(J(K))[0!($D(I(K\100*100))[0)
@@ -35,33 +35,30 @@ I I $A(I,M+1)=34 S M=$F(I,"""",M+2)-1 G I:M>0 S W=0,M=999,X=U Q
 MR F M=M+1:1 S W=$E(I,M) Q:DPUNC[W
  S X=$E(I,1,M-1) Q
  ;
-C I $D(DPS($$NEST,"SETDATA")) G 0
+C I $D(DPS($$NEST,"SETDATA")) D  G Q^DICOMP1:'$D(X)
+ .N DIFILE,DIAC S DIAC="WR",DIFILE=J(DLV0) D ^DIAC
+ .I $P($G(^DD(J(DLV0),0,"DI")),U,2)["Y"!(J(DLV0)=200&($P($G(^DIC(200,0)),U)="NEW PERSON"))!'DIAC W:DICOMP["?" "   "_$$EZBLD^DIALOG(405,J(DLV0)) K X Q
+ .S %Y=+$P(DICOMPX,U,2),%=$P($G(^DD(+DICOMPX,%Y,0)),U,2),DIAC=$G(^(9)) I %["C"!%!(%="")!(DIAC]""&(DUZ(0)'="@")&($TR(DIAC,DUZ(0))=DIAC)) N XD S XD("FILE")=J(DLV0),XD("FIELD")=%Y W:DICOMP["?" "  "_$$EZBLD^DIALOG(710,.XD) K X Q
+ .S DICF="" F %=DLV0:1:DLV S DICF="_D"_(%#100)_"_"","""_DICF
+ .S DPS($$NEST)=" N DIFDA S DIFDA("_J(DLV0)_","_$E(DICF,2,999)_","_%Y_")=X D FILE^DIE("""",""DIFDA"") S X="""""
  S DICF=X D DG S K(K+1,2)=0
  I $O(DPS($$NEST,"$"))["$" S DPS($$NEST)=DPS($$NEST)_Y_DICF G N
  G 0:'$D(W($$NEST)) S (W,W($$NEST))=W($$NEST)-1 K:W<2 W($$NEST) S DPS($$NEST)=" S X"_W_"="_Y_DPS($$NEST) G N
  ;
-DPS G 0:'DPS I $D(DPS(DPS,"ST")) D DPS^DICOMPW S:X]"" K=K+1,K(K)=X G DPS
- I $D(DPS(DPS,"BETWEEN")) S DPS(DPS,"BOOL")=1
-DUP I $D(DPS(DPS,"DUPLICATED")) D  G 0:'DPS
- .I $G(Y(0))'[U S DPS=0 Q
- .S Y=$O(^DD(J(DLV),"B",$P(Y(0),U),0)) I 'Y S DPS=0 Q
- .F T=0:0 S T=$O(^DD(J(DLV),Y,1,T)) Q:'T  I +$G(^(T,0))=J(0),$P(^(0),U,3,99)="" S Y=$P(^(0),U,2) I Y?1U.AN Q  ;find a regular cross_refs
- .I 'T F T=0:0 S T=$O(^DD("IX","F",J(DLV),Y,T)) Q:'T  I $P($G(^DD("IX",T,0)),U,4)="R",$P(^(0),U,6)="F",$P(^(0),U,9)=J(0) S Y=$P(^(0),U,2) Q  ;or find a regular INDEX
- .I 'T S DPS=0 Q
- .D DIMP^DICOMPZ("N Z S Z=X,X="""" I $L(Z) S Z=$O("_I(0)_""""_Y_""",Z,0)) I Z,Z-D0!$O(^(D0)) S X=1") S DPS(DPS)=X_" S X=X",DPS(DPS,"BOOL")=1
- D DPS^DICOMPW G N:'$D(W(DPS+1)),0
+DPS I $D(DPS(DPS,"ST")) D DPS^DICOMPW S:X]"" K=K+1,K(K)=X G DPS
+ I DPS D DPS^DICOMPW G N:'$D(W(DPS+1))
+ G 0
  ;
-FUNC S Y=+$O(^DD("FUNC","B",X,0)) I '$D(^DD("FUNC",Y,0)),X'?1N.N2A,X'?1"$"1U G V
+FUNC S Y=$O(^DD("FUNC","B",X,0)) S:Y="" Y=-1 I '$D(^DD("FUNC",Y,0)),X'?1N.N2A,X'?1"$"1U G V
  I Y=90!(Y=91)!(Y=92) D PRIOR^DICOMPZ G N:$D(Y),0
- S DICF=X,DBOOL=$G(DBOOL,0) D ST I $G(^DD("FUNC",Y,0))="DUPLICATED" S DPS(1,"INTERNAL")="" D 1 K Y G B
- I "Q"'[$G(^DD("FUNC",Y,1)) D 1 G B
+ S DICF=X,DBOOL=$G(DBOOL,0) D ST I $D(^DD("FUNC",Y,1)) D 1 G B
  I DICF'?1"$"1U.U D ^DICOMPY S W="" G DPS:DPS,0
  S DPS(DPS,DICF)=DPS(DPS),DPS(DPS)=" S X="_DICF_W
 B S M=M+1,W="" G 0:$E(I,M)=")",N
  ;
 2 ;
  D ST
-1 S DPS(DPS,DICF)="",DPS(DPS)=" "_$G(^(1))_DPS(DPS)_" S X=X" I $D(^(2)) S %=$P(^(2),U) I %]"" S DPS(DPS,%)=""
+1 S DPS(DPS,DICF)="",DPS(DPS)=" "_^(1)_DPS(DPS)_" S X=X" I $D(^(2)) S %=$P(^(2),U) I %]"" S DPS(DPS,%)=""
  I DPS=1,$G(^(10))]"" S DPS(^(10))=""
  S %=$G(^(3),0) D:%'?.N
  .S %=1 F %Y=M+1:1 S Y=$E(I,%Y) Q:")"[Y  S:Y="," %=%+1
@@ -87,8 +84,8 @@ DG S Y=$$DGI,X=" S "_Y_"=$G(X)"
 DGI() S DG(DLV0)=$G(DG(DLV0))+1 Q DQI_DG(DLV0)_")"
  ;
 EXPR(FILE,DICOMP,I,SUBS) ;I=input expression; DICOMP=flags
- S X=$G(DUZ),X(2)=$G(DUZ(2)),DICOMP=$G(DICOMP)
- N DUZ,J,DICOMPX,DICOMPW,DQI,DA,DICMX S DUZ=X,DUZ(0)="@",DUZ(2)=X(2) ;pretend he's programmer
+ S X=$G(DUZ),DICOMP=$G(DICOMP)
+ N DUZ,J,DICOMPX,DICOMPW,DQI,DA,DICMX S DUZ=X,DUZ(0)="@" ;pretend he's programmer
  K X S X=I
  I DICOMP["m" S DICMX="X DICMX" ;Flag 'm' = allow returning multiple values
  S DICOMPW="",DA="X("

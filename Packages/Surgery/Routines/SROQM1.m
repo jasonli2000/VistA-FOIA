@@ -1,5 +1,5 @@
-SROQM1 ;BIR/ADM - QUARTERLY REPORT (CONTINUED) ;05/11/10
- ;;3.0; Surgery ;**38,62,70,129,153,160,174**;24 Jun 93;Build 8
+SROQM1 ;BIR/ADM - QUARTERLY REPORT (CONTINUED) ;01/30/07
+ ;;3.0; Surgery ;**38,62,70,129,153,160**;24 Jun 93;Build 7
  ;** NOTICE: This routine is part of an implementation of a nationally
  ;**         controlled procedure. Local modifications to this routine
  ;**         are prohibited.
@@ -19,26 +19,26 @@ WC D BLANK S SRLINE=" Wound Occurrences            Total      Urinary Occurrence
  S SRLINE=" A. Superficial Incisional SSI"_$J(SRC(1),5)_"      A. Renal Insufficiency       "_$J(SRC(8),5) D LINE
  S SRLINE=" B. Deep Incisional SSI       "_$J(SRC(2),5)_"      B. Acute Renal Failure       "_$J(SRC(9),5) D LINE
  S SRLINE=" C. Wound Disruption          "_$J(SRC(22),5)_"      C. Urinary Tract Infection   "_$J(SRC(10),5) D LINE
- S SRLINE=" D. Organ/Space SSI           "_$J(SRC(35),5)_"      D. Other                     "_$J(SRC(31),5) D LINE
- S SRLINE=" E. Other                     "_$J(SRC(36),5) D LINE
-RC S SRLINE="                                         Respiratory Occurrences      Total" D LINE
-   S SRLINE=" CNS Occurrences              Total      A. Pneumonia                 "_$J(SRC(4),5) D LINE
- S SRLINE=" A. CVA/Stroke                "_$J((SRC(12)+SRC(28)),5)_"      B. Unplanned Intubation      "_$J((SRC(7)+SRC(11)),5) D LINE
- S SRLINE=" B. Coma >24 Hours            "_$J(SRC(13),5)_"      C. Pulmonary Embolism        "_$J(SRC(5),5) D LINE
- S SRLINE=" C. Peripheral Nerve Injury   "_$J(SRC(14),5)_"      D. On Ventilator >48 Hours   "_$J(SRC(6),5) D LINE
- S SRLINE=" D. Other                     "_$J(SRC(30),5)_"      E. Tracheostomy              "_$J(SRC(33),5) D LINE
+ S SRLINE=" D. Other                     "_$J(SRC(36),5)_"      D. Other                     "_$J(SRC(31),5) D LINE,BLANK
+RC S SRLINE=" Respiratory Occurrences      Total      CNS Occurrences              Total" D LINE
+ S SRLINE=" A. Pneumonia                 "_$J(SRC(4),5)_"      A. CVA/Stroke                "_$J((SRC(12)+SRC(28)),5) D LINE
+ S SRLINE=" B. Unplanned Intubation      "_$J((SRC(7)+SRC(11)),5)_"      B. Coma >24 Hours            "_$J(SRC(13),5) D LINE
+ S SRLINE=" C. Pulmonary Embolism        "_$J(SRC(5),5)_"      C. Peripheral Nerve Injury   "_$J(SRC(14),5) D LINE
+ S SRLINE=" D. On Ventilator >48 Hours   "_$J(SRC(6),5)_"      D. Other                     "_$J(SRC(30),5) D LINE
+ S SRLINE=" E. Tracheostomy              "_$J(SRC(33),5) D LINE
+ S SRLINE=" F. Repeat Vent w/in 30 Days  "_$J(SRC(37),5) D LINE
+ S SRLINE=" G. Other                     "_$J(SRC(29),5) D LINE
  S SRBLANK="" F I=1:1:41 S SRBLANK=SRBLANK_" "
- S SRLINE=SRBLANK_"F. Other                     "_$J(SRC(29),5) D LINE
-CARD S SRLINE=" Cardiac Occurrences          Total" D LINE
- S SRLINE=" A. Cardiac Arrest Req. CPR   "_$J(SRC(16),5)_"      Other Occurrences            Total" D LINE
- S SRLINE=" B. Myocardial Infarction     "_$J(SRC(17),5)_"      A. Bleeding/Transfusions     "_$J(SRC(15),5) D LINE
- S SRLINE=" C. Endocarditis              "_$J(SRC(23),5)_"      B. Graft/Prosthesis/Flap" D LINE
- S SRLINE=" D. Low Cardiac Output >6 Hrs."_$J(SRC(24),5)_"                          Failure  "_$J(SRC(19),5) D LINE
- S SRLINE=" E. Mediastinitis             "_$J(SRC(25),5)_"      C. DVT/Thrombophlebitis      "_$J(SRC(20),5) D LINE
- S SRLINE=" F. Repeat Card Surg Proc     "_$J(SRC(27),5)_"      D. Systemic Sepsis           "_$J(SRC(3),5) D LINE
- S SRLINE=" G. New Mech Circulatory Sup  "_$J(SRC(34),5)_"      E. Reoperation for Bleeding  "_$J(SRC(26),5) D LINE
- S SRLINE=" H. Postop Atrial Fibrillation"_$J(SRC(39),5)_"      F. C. difficile Colitis      "_$J(SRC(38),5) D LINE
- S SRLINE=" I. Other                     "_$J(SRC(32),5)_"      G. Other                     "_$J(SRC(21),5) D LINE,BLANK
+ S SRLINE=SRBLANK_"Other Occurrences            Total" D LINE
+CARD S SRLINE=" Cardiac Occurrences          Total      A. Organ/Space SSI           "_$J(SRC(35),5) D LINE
+ S SRLINE=" A. Cardiac Arrest Req. CPR   "_$J(SRC(16),5)_"      B. Bleeding/Transfusions     "_$J(SRC(15),5) D LINE
+ S SRLINE=" B. Myocardial Infarction     "_$J(SRC(17),5)_"      C. Graft/Prosthesis/Flap" D LINE
+ S SRLINE=" C. Endocarditis              "_$J(SRC(23),5)_"                          Failure  "_$J(SRC(19),5) D LINE
+ S SRLINE=" D. Low Cardiac Output >6 Hrs."_$J(SRC(24),5)_"      D. DVT/Thrombophlebitis      "_$J(SRC(20),5) D LINE
+ S SRLINE=" E. Mediastinitis             "_$J(SRC(25),5)_"      E. Systemic Sepsis           "_$J(SRC(3),5) D LINE
+ S SRLINE=" F. Repeat Card Surg Proc     "_$J(SRC(27),5)_"      F. Reoperation for Bleeding  "_$J(SRC(26),5) D LINE
+ S SRLINE=" G. New Mech Circulatory Sup  "_$J(SRC(34),5)_"      G. C. difficile Colitis      "_$J(SRC(38),5) D LINE
+ S SRLINE=" H. Other                     "_$J(SRC(32),5)_"      H. Other                     "_$J(SRC(21),5) D LINE,BLANK
  S:'SRWC SRWC=1 S SRLINE=" Clean Wound Infection Rate: "_$J((SRIN/SRWC*100),5,1)_"%" D LINE
  Q
 IXUT ; get index procedure data from ^TMP

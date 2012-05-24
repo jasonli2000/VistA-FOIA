@@ -1,5 +1,5 @@
 PSJO ;BIR/CML3,PR-GET AND PRINT INPATIENT ORDERS ;28 Jun 99 / 10:20 AM
- ;;5.0; INPATIENT MEDICATIONS ;**31,58,110,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**31,58,110**;16 DEC 97
  ;
  ; Reference to ^PSD(58.8 supported by DBIA #2283.
  ; Reference to ^PSI(58.1 supported by DBIA #2284.
@@ -28,19 +28,18 @@ PUD ; print unit dose
  ; Naked reference below refers to full reference ^PS(53.1,+PSJO,0) or ^PS(55,DFN,5,+PSJO,0) using indirection.
  S ND=$S($D(@(PSJF_+PSJO_",0)")):^(0),1:""),SCH=$G(^(2)),ND4=$G(^(4)),ND6=$P($G(^(6)),"^"),DO=$S($P(DN,"^",2)=.2:$P($G(@(PSJF_+PSJO_",.2)")),"^",2),1:$G(@(PSJF_+PSJO_",.3)")))
  ;I PSJC["A" S V='$P(ND4,"^",UDU) W $S(ND4="":" ",$P(ND4,"^",12):"D",$P(ND4,"^",18)&($P(ND4,"^",19)!V):"H",$P(ND4,"^",22)&($P(ND4,"^",23)!V):"H",$P(ND4,"^",15)&($P(ND4,"^",16)!V):"R",1:" ") W:V&(PSJSYSU) "->"
- I ("AO"[PSJC)!(PSJC="DF") D
+ I "AO"[PSJC D
  .S V='$P(ND4,"^",UDU),V=$S(+PSJSYSU=1&V:1,+PSJSYSU=3&V:1,1:0)
  .W $S(ND4="":" ",$P(ND4,"^",12):"D",$P(ND4,"^",18)&($P(ND4,"^",19)!V):"H",$P(ND4,"^",22)&($P(ND4,"^",23)!V):"H",$P(ND4,"^",15)&($P(ND4,"^",16)!V):"R",1:" ")
  .W $S($P($G(@(PSJF_+PSJO_",.2)")),"^",4)="D":"d",1:" ")_$S(V:"->",1:"  ")
  ;I $S(PSJC["NZ":0,1:PSJC["N") W $S($P(ND4,"^",12):"D",1:" "),$S(PSJSYSU:"->",1:"")
  I $S(PSJC["NZ":0,1:PSJC["N") W $S($P(ND4,"^",12):"D",1:" ")
- S RTE=$P(ND,"^",3),SM=$S('$P(ND,"^",5):0,$P(ND,"^",6):1,1:2),STAT=$S($P(ND,"^",28)]"":$P(ND,"^",28),$P(ND,"^",9)]"":$P(ND,"^",9),1:"NF")
- S PF=$E("*",$P(ND,"^",20)>0),PSGID=$P(SCH,"^",2),SD=$P(SCH,"^",4),SCH=$P(SCH,"^")
+ S RTE=$P(ND,"^",3),SM=$S('$P(ND,"^",5):0,$P(ND,"^",6):1,1:2),STAT=$S($P(ND,"^",9)]"":$P(ND,"^",9),1:"NF"),PF=$E("*",$P(ND,"^",20)>0),PSGID=$P(SCH,"^",2),SD=$P(SCH,"^",4),SCH=$P(SCH,"^")
  I STAT="A",$P(ND,U,27)="R" S STAT="R"
  S NF=$P(DN,"^",2),WS=$S(PSJPWD:$$WS(PSJPWD,PSGP,PSJF,PSJO),1:0)
  NEW MARX,PSJRNDT
  S PSJRNDT=$$LASTREN^PSJLMPRI(DFN,PSJO) S:PSJRNDT PSJRNDT=$E($$ENDTC^PSGMI(+PSJRNDT),1,5)
- D DRGDISP^PSJLMUT1(PSGP,+PSJO_$S(PSJC["A":"U",PSJC["O":"U",PSJC="DF":"U",1:"P"),40,54,.MARX,0)
+ D DRGDISP^PSJLMUT1(PSGP,+PSJO_$S(PSJC["A":"U",PSJC["O":"U",1:"P"),40,54,.MARX,0)
  F X=0:0 S X=$O(MARX(X)) Q:'X  W @($S(X=1:"?9",1:"!?11")),$S($E(PSJS)="*":$P(PSJS,"^"),1:MARX(X)) D:X=1
  . W ?50,$S(PSJC["NZ":"?",PSJSCHT'="z":PSJSCHT,1:"?")
  . W:'$D(PSJEXTP) ?53,$S(PSJC["NZ":"*****",1:$E($$ENDTC^PSGMI(PSGID),1,5)),?60,$S(PSJC["NZ":"*****",1:$E($$ENDTC^PSGMI(SD),1,5)),?67,STAT
@@ -51,24 +50,11 @@ PUD ; print unit dose
  ;
 TF ;
  NEW SLS,C S SLS="",C=PSJC,$P(SLS," -",40)=""
- S LN2=$S(C="A":$$TXT(C),C["CC":$$TXT("PR"),C["CD":$$TXT("PC"),C["BD":$$TXT("NC"),C["C":$$TXT("P"),C["B":$$TXT("N"),C["NX":$$TXT("N"),C["DF":$$TXT("DF"),C["NZ":$$TXT("P"),1:$$TXT("NA"))
+ S LN2=$S(C="A":"A C T I V E",C["CC":"P E N D I N G   R E N E W A L S",C["CD":"P E N D I N G   C O M P L E X",C["BD":"N O N - V E R I F I E D  C O M P L E X",C["C":"P E N D I N G ",C["B":"N O N - V E R I F I E D",1:"N O N - A C T I V E")
  W:$D(^TMP("PSJ",$J,PSJC)) !,$E($E(SLS,1,(80-$L(LN2))/2)_" "_LN2_$E(SLS,1,(80-$L(LN2))/2),1,80)
  S PSJF="^PS("_$S(PSJC'["C":"55,"_PSGP_",5,",1:"53.1,") S TF=$S(PSJC["C":0,1:TF)
  Q
  ;
- ;
-TXT(X) ;
- I $G(X)="" Q ""
- I X="A" Q "A C T I V E"
- S PSJDCEXP=$$RECDCEXP^PSJP()
- I X="DF" Q "RECENTLY DISCONTINUED/EXPIRED (LAST "_+$G(PSJDCEXP)_" HOURS)"
- I X="N" Q "N O N - V E R I F I E D"
- I X="NA" Q "N O N - A C T I V E"
- I X="NC" Q "N O N - V E R I F I E D  C O M P L E X"
- I X="P" Q "P E N D I N G"
- I X="PC" Q "P E N D I N G  C O M P L E X"
- I X="PR" Q "P E N D I N G   R E N E W A L S"
- Q ""
  ;
 BOT ; print name, ssn, and dob on bottom of page
  F Q=$Y:1:IOSL-4 W !

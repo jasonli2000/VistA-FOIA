@@ -1,16 +1,7 @@
-RORHIVUT ;HCIOFO/SG - HIV UTILITIES ;9/14/05 8:15am
- ;;1.5;CLINICAL CASE REGISTRIES;**14**;Feb 17, 2006;Build 24
+RORHIVUT ;HCIOFO/SG - HIV UTILITIES ; 9/14/05 8:15am
+ ;;1.5;CLINICAL CASE REGISTRIES;;Feb 17, 2006
  ;
  Q
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*14   APR  2011   A SAUNDERS   CLINAIDS: also quit if 'unknown'
- ;******************************************************************************
- ;******************************************************************************
  ;
  ;***** RETURNS THE CATEGORY SUBSCRIPT AND HEADER
 CAT(I) ;
@@ -35,8 +26,7 @@ CAT(I) ;
  ;
 CLINAIDS(IEN,DATE) ;
  N X  S X=$P($G(^RORDATA(799.4,+IEN,0)),U,2,3)
- Q:'X 0 ;quit if 'no' or null in first piece (clinical aids indicator)
- I +$G(X)=9 Q 0  ;quit if 'unknown'
+ Q:'X 0
  I $G(DATE)>0  Q:$P(X,U,2)\1>DATE 0
  Q "1"_U_$P(X,U,2)
  ;

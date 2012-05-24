@@ -1,5 +1,5 @@
 IVMPREC1 ;ALB/SEK/BRM - PROCESS INCOMING HL7 (ACK) MESSAGES ; 07/28/2003
- ;;2.0;INCOME VERIFICATION MATCH;**9,17,26,52,34,72,82,129**; 21-OCT-94;Build 4
+ ;;2.0;INCOME VERIFICATION MATCH;**9,17,26,52,34,72,82**; 21-OCT-94
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ; This routine will process ACK HL7 messages received from the
@@ -11,10 +11,10 @@ ACK ; - Receive ACK Message from IVM Center stored in ^TMP("HLR".
  ;   If 1st segment is MSH than MSA (AA) indicating batch or individual
  ;   query was received ok.  MSA (AE) indicates error in transmission of
  ;   individual query.
- ; 
+ ;
  ; - When acknowledgment code = "AA" (application accept)
  ;   Stuff 1 into STATUS field (.03) of ^IVM(301.6 indicating IVM Center
- ;   has received transmission.  
+ ;   has received transmission.
  ;
  K HLNODE,IVMRTN,SEGCNT,CNT
  S IVMRTN="IVMPREC1"
@@ -80,7 +80,7 @@ AE ; - When acknowledgment code = "AE" (application error)
  Q
  ;
 OTH ; Generate message for errors other than Full/Initial Transmissions.
- N IVMRMM,IVMNAM,IVMPID,IVMMCID,IVMTMP,HLDA,HLDAT,HLSEG,DIC,DR,DA,DIQ
+ N IVMRMM,IVMNAM,IVMPID,IVMTMP,HLDA,HLDAT,HLSEG,DIC,DR,DA,DIQ
  S (IVMNAM,IVMPID,HLDA,IVMTMP)=""
  S HLDA=$O(^HL(772,"C",$P($G(IVMMCI),"-"),0))
  Q:+$G(HLDA)'>0
@@ -89,12 +89,7 @@ OTH ; Generate message for errors other than Full/Initial Transmissions.
  D EN^DIQ1
  F  S IVMTMP=$O(HLDAT(772,HLDA,200,IVMTMP)) Q:((IVMTMP="")!($G(HLSEG)="PID"))  D
  .S HLSEG=$P($G(HLDAT(772,HLDA,200,IVMTMP)),"^")
- .I HLSEG="MSH" S IVMMCID=$P($G(HLDAT(772,HLDA,200,IVMTMP)),"^",10)
  .D:HLSEG="PID"
- ..;Find PID segment for the same message control ID only
- ..I IVMMCID'=IVMMCI S HLSEG="NOT CORRECT PID" Q
- ..; If PID segment was split, reconnect records
- ..I $L($G(HLDAT(772,HLDA,200,IVMTMP)))=245,$L($G(HLDAT(772,HLDA,200,IVMTMP)),U)<20 S HLDAT(772,HLDA,200,IVMTMP)=$$REBLDPID("HLDAT(772,"_HLDA_",200)",IVMTMP)
  ..S IVMNAM=$P($G(HLDAT(772,HLDA,200,IVMTMP)),"^",6)  ;PATIENT NAME
  ..S IVMNAM=$P(IVMNAM,"~")_", "_$P(IVMNAM,"~",2)
  ..S IVMPID=$P($G(HLDAT(772,HLDA,200,IVMTMP)),"^",20)  ;SSN
@@ -140,16 +135,3 @@ Z07CHK(CURSEQ,CURMCI,CUREM) ; Function ;
  . . I $P(LOG,"^",3)=3&($P(LOG,"^",4)=CUREM) S RET="0^ACK TO THIS SEQUENCE HAS ALREADY BEEN PROCESSED" Q
  . . S ^IVM(301.6,"ADS",CURMCI,IEN)="" S RET="1^ADS X-REF MISSING.  X-REF HAS BEEN RESET."
  Q RET
- ;
-REBLDPID(ARRAY,SEQ) ; Reconnect the pieces of the PID segment
- ; ARRAY contains the HL7 message reference to be accessed indirectly
- ;  It should look similar in structure to the HL7 message text in
- ;  file 772
- ; @ARRAY@(SEQ) should = the first 'PID' segment record text and should
- ; be 245 characters long
- N PID,SEQX
- S PID=$G(@ARRAY@(SEQ)),SEQX=SEQ
- G:$L(PID)'=245 PIDQ
- F  S SEQX=$O(@ARRAY@(SEQX)) Q:SEQX=""  I $G(@ARRAY@(SEQX))'="" S PID=PID_$G(@ARRAY@(SEQX)) Q
-PIDQ Q PID
- ;

@@ -1,6 +1,5 @@
 XUMF1H ;ISS/RAM - MFS Handler ;6/27/06  07:50
- ;;8.0;KERNEL;**407,474**;Jul 10, 1995;Build 12
- ;Per VHA Directive 10-92-142, this routine should not be modified
+ ;;8.0;KERNEL;**407**;Jul 10, 1995;Build 8
  ;
  ; This routine handles Master File HL7 messages.
  ;
@@ -9,7 +8,7 @@ MAIN ; -- entry point
  N CNT,ERR,I,X,HLFS,HLCS,ERROR,HLRESLTA,IFN,IEN,MTPE,TYPE,ARRAY
  N HDT,KEY,MID,REASON,VALUE,XREF,ALL,GROUP,PARAM,ROOT,SEG,QRD,XUMF
  N QID,WHAT,WHO,HLSCS,CDSYS,EXIT,HLREP,NUMBER,Y,XXX,YYY,XIEN
- N XUMFSDS,FDA,LIST,ERRCNT,PKV,MKEY,MKEY1,TYP,MFI,IMPLY,RECORD,OUT
+ N XUMFSDS,FDA,LIST,ERRCNT,PKV,MKEY,MKEY1,TYP,MFI,IMPLY
  ;
  D INIT,PROCESS,REPLY,EXIT
  ;
@@ -20,7 +19,6 @@ INIT ; -- initialize
  K ^TMP("DILIST",$J),^TMP("DIERR",$J)
  K ^TMP("HLS",$J),^TMP("HLA",$J)
  K ^TMP("XUMF MFS",$J),^TMP("XUMF ERROR",$J)
- K ^TMP("XUMF EVENT",$J)
  ;
  S XUMF=1,DUZ(0)="@"
  ;
@@ -38,8 +36,7 @@ PROCESS ; -- pull message text
  .D @($P(HLNODE,HLFS))
  I $D(LIST) D LIST
  I $D(FDA) D UPDATE
- I $D(RECORD) D RECORD
- I $D(IFN) D EVT^XUMF0,POST
+ I $D(IFN) D POST
  ;
  Q
  ;
@@ -75,10 +72,9 @@ MFE ; -- MFE SEGMENT
  ;
  I $D(LIST) D LIST K LIST,LISTVUID
  I $D(FDA) D UPDATE K FDA
- I $D(RECORD) D RECORD
  I $D(IFN),(IFN'=$O(^DIC(4.001,"MFID",MFI,0))) D POST
  ;
- K IFN,IEN,PRE,POST,VUID,IMPLY,RECORD
+ K IFN,IEN,PRE,POST,VUID,IMPLY
  K ^TMP("XUMF IMPLIED LOGIC",$J)
  ;
  I MFI="" S ERROR="1^MFI not resolved HLNODE: "_HLNODE Q
@@ -89,12 +85,9 @@ MFE ; -- MFE SEGMENT
  ;
  Q:ARRAY
  ;
- ;MFE processing
- D MFE0 Q:ERROR
+ D MFE^XUMF0(IFN,VUID,.IEN,.ERROR) Q:ERROR
  ;
- D:'$G(IEN) MFE^XUMF0(IFN,VUID,.IEN,.ERROR) Q:ERROR
- ;
- ;D MFE0
+ D MFE0
  ;
  ;Implied logic flag - must be set by MFE-Processing Logic field (#4)
  S IMPLY=+$G(^TMP("XUMF IMPLIED LOGIC",$J))
@@ -105,14 +98,6 @@ MFE ; -- MFE SEGMENT
  .; clean multiple flag
  .K:'$D(XIEN(IFN,IEN)) XIEN
  .S XIEN(IFN,IEN)=$G(XIEN(IFN,IEN))+1
- .;
- .N ROOT
- .S ROOT=$$ROOT^DILFD(IFN,,1)
- .M RECORD("BEFORE")=@ROOT@(IEN)
- .S RECORD("STATUS")=$$GETSTAT^XTID(IFN,,IEN_",")
- .;
- .S ^TMP("XUMF EVENT",$J,IFN,"BEFORE",IEN,"REPLACED BY")=$P($G(@ROOT@(IEN,"VUID")),U,3)
- .S ^TMP("XUMF EVENT",$J,IFN,"BEFORE",IEN,"INHERITS FROM")=$$RPLCMNT^XTIDTRM(IFN,IEN)
  ;
  Q
  ;
@@ -128,12 +113,10 @@ ZRT ; -- data segments
  ;
  S NAME=$P(HLNODE,HLFS,2)
  ;
- D ZRT0 Q:ERROR  I $G(OUT) K OUT Q
- ;
  I 'IEN,NAME="Term" D STUB^XUMF0 Q
  I 'IEN S ERROR="1^IEN not defined IFN: "_IFN_" VUID: "_VUID Q
  ;
- ;D ZRT0 Q:ERROR
+ D ZRT0 Q:ERROR
  ;
  S IENS=IEN_","
  ;
@@ -176,7 +159,7 @@ ZRT ; -- data segments
  ;
  I MKEY=NAME Q:VALUE=""  D
  .N FDA,IEN
- .;
+ .
  .S VALUE=$$VAL^XUMF0(SUBFILE,FIELD,VUID1,VALUE,"?+1,"_IENS) Q:VALUE="^"
  .S FDA(SUBFILE,"?+1,"_IENS,.01)=VALUE
  .D UPDATE^DIE(,"FDA","IEN","ERR")
@@ -292,7 +275,6 @@ ADD ; -- ADD-processing logic
  Q
  ;
 MFE0 ; -- MFE-processing logic
- ;if creating a new entry you must set IEN and other tasks performed in STUB^XUMF0 (if appropriate)
  ;
  N X
  ;
@@ -320,7 +302,7 @@ EXIT ; -- cleanup, and quit
  ;
  K ^TMP("DILIST",$J),^TMP("DIERR",$J),^TMP("HLS",$J),^TMP("HLA",$J)
  ;
- K ^TMP("XUMF MFS",$J),^TMP("XUMF ERROR",$J),^TMP("XUMF EVENT",$J)
+ K ^TMP("XUMF MFS",$J),^TMP("XUMF ERROR",$J)
  ;
  Q
  ;
@@ -346,6 +328,13 @@ REPLY ; -- MFK
  D:ERROR EM^XUMF0
  ;
  D GENACK^HLMA1($G(HL("EID")),$G(HLMTIENS),$G(HL("EIDS")),"GM",1,.HLRESLT)
+ ;
+ ; check for error
+ ;I ($P($G(HLRESLT),U,3)'="") D  Q
+ ;.S ERROR=1_U_$P(HLRESLT,HLFS,3)_U_$P(HLRESLT,HLFS,2)_U_$P(HLRESLT,U)
+ ;
+ ; successful call, message ID returned
+ ;S ERROR="0^"_$P($G(HLRESLT),U,1)
  ;
  Q
  ;
@@ -413,40 +402,6 @@ WP ;
  I $D(ERR) D
  .S ERROR="1^wp field error"
  .D EM(ERROR,.ERR) K ERR
- ;
- Q
- ;
-RECORD ;MFS event protocol data
- ;
- N ROOT,NODE,NODE1,CHANGE,STATUS
- ;
- I $G(ERROR) D  Q
- .S ^TMP("XUMF EVENT",$J,"ERROR")=ERROR
- .S ^TMP("XUMF EVENT",$J,"ERROR",1)=$G(IFN)_U_$G(IEN)
- ;
- S ROOT=$$ROOT^DILFD(IFN,,1)
- M RECORD("AFTER")=@ROOT@(IEN)
- ;
- I $G(RECORD("NEW")) M ^TMP("XUMF EVENT",$J,IFN,"NEW",IEN)=RECORD("AFTER") Q
- ;
- S ^TMP("XUMF EVENT",$J,IFN,"AFTER",IEN,"REPLACED BY")=$P($G(@ROOT@(IEN,"VUID")),U,3)
- S ^TMP("XUMF EVENT",$J,IFN,"AFTER",IEN,"INHERITS FROM")=$$RPLCMNT^XTIDTRM(IFN,IEN)
- ;
- S STATUS=$$GETSTAT^XTID(IFN,,IEN_",")
- I RECORD("STATUS")'=STATUS D
- .S ^TMP("XUMF EVENT",$J,IFN,"STATUS",IEN)=$P(RECORD("STATUS"),U,1,2)_U_$P(STATUS,U,1,2)
- ;
- S NODE=$Q(RECORD("AFTER","")),NODE1=$Q(RECORD("BEFORE","")),CHANGE=0
- I $P(NODE,"RECORD(""AFTER")'=$P(NODE1,"RECORD(""BEFORE") S CHANGE=1
- I @NODE'=@NODE1 S CHANGE=1
- I 'CHANGE FOR  SET NODE=$Q(@NODE) Q:NODE=""!(NODE["(""BEFORE")  D  Q:CHANGE
- .S NODE1=$Q(@NODE1) I NODE1="" S CHANGE=1 Q
- .I $P(NODE,"RECORD(""AFTER")'=$P(NODE1,"RECORD(""BEFORE") S CHANGE=1 Q
- .I @NODE'=@NODE1 S CHANGE=1 Q
- ;
- I CHANGE D
- .M ^TMP("XUMF EVENT",$J,IFN,"AFTER",IEN)=RECORD("AFTER")
- .M ^TMP("XUMF EVENT",$J,IFN,"BEFORE",IEN)=RECORD("BEFORE")
  ;
  Q
  ;

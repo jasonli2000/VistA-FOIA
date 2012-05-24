@@ -1,5 +1,5 @@
-ZTMON ;SEA/RDS-TaskMan: Option, ZTMON, Part 1 (Main Loop) ;3/21/07  14:36
- ;;8.0;KERNEL;**118,127,136,355,446**;Jul 10, 1995;Build 35
+ZTMON ;SEA/RDS-TaskMan: Option, ZTMON, Part 1 (Main Loop) ;05/12/2005  13:21
+ ;;8.0;KERNEL;**118,127,136,355**;Jul 10, 1995;Build 9
  ;
 ENV ;Main Entry Point For Taskman Status Monitor
  D EN(1) ;Long mode
@@ -28,14 +28,13 @@ RUN ;Evaluate RUN-Node
  ;
 STATUS ;Evaluate Status List
  K X,ZTC S ZT="",ZTH=$$H3^%ZTM($H),ZT2=""
- ;Tell sub-managers by setting ^%ZTSCH("LOADA",%ZTPAIR)=run^value^time^$J
  M ZTC("S")=^%ZTSCH("STATUS"),ZTC("L")=^%ZTSCH("LOADA")
  F  S ZT=$O(ZTC("S",ZT)) Q:ZT=""  S X=ZTC("S",ZT) I $L($P(X,U,3)) S ZTC("D",$P(X,U,3),ZT)=ZT
- W !,"Checking the Status List:",!,"  Node",?14,"weight  status",?34,"time",?44," $J"
+ W !,"Checking the Status List:",!,"  Node      weight  status",?32,"time",?42," $J"
  S ZT=""
  F  S ZT=$O(ZTC("D",ZT)),ZT1="" Q:ZT=""  F  S ZT1=$O(ZTC("D",ZT,ZT1)) Q:ZT1=""  D
  . S %=ZTC("S",ZT1),ZT2=1
- . W !?1,ZT W ?15,$S($D(ZTC("L",ZT)):$J($P(ZTC("L",ZT),U,2),3),1:""),?22,$P(%,U,2),?31,$$STIME($P(%,U)) W ?44,ZT1,?54,$P(%,U,4)
+ . W !?1,ZT W ?13,$S($D(ZTC("L",ZT)):$J($P(ZTC("L",ZT),U,2),3),1:""),?20,$P(%,U,2),?29,$$STIME($P(%,U)) W ?42,ZT1,?52,$P(%,U,4)
  . Q
  I 'ZT2 W !?5,"The Status List is ",$S(ZTY:"temporarily ",1:""),"empty."
  Q

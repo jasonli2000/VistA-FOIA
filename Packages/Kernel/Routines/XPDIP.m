@@ -1,6 +1,5 @@
 XPDIP ;SFISC/RSD - Install Package & Routine file ;03/08/2006
- ;;8.0;KERNEL;**15,21,28,30,41,44,51,58,83,92,100,108,137,229,350,393,517**;Jul 10, 1995;Build 6
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;8.0;KERNEL;**15,21,28,30,41,44,51,58,83,92,100,108,137,229,350,393**;Jul 10, 1995;Build 12
  Q
 PKG ;
  N %,OLDA,DA,DIK,XPD,XPDFIL,XPDPKG,XPDBLDA,Y
@@ -102,19 +101,16 @@ PKGVER(XPDPDA,XPDI) ;update version in package file, XPDPDA=Package file ien, re
  ;
 PKGPAT(XPDPDA,XPDV,XPDI) ;update patch history
  ;INPUT: XPDPDA=Package file ien, XPDV=version
- ;XPDI=patch^date installed^install by
- ;RETURNS: version ien^patch ien^[CURRENT VERSION, if it was set]
- N I,X,XPD,XPDP,XPDIEN,CURVER
+ ;XPDI=patch^date installed^install by,   returns version ien^patch ien
+ N I,X,XPD,XPDP,XPDIEN
  ;quit if we can't find the version multiple, resets XPDV=ien of version
  S XPDIEN=","_XPDPDA_",",XPDV=$$MDIC(9.49,XPDIEN,XPDV) Q:'XPDV 0
  S XPDIEN=","_XPDV_XPDIEN,XPDP=$$MDIC(9.4901,XPDIEN,$P(XPDI,U)) Q:'XPDP 0
  S X="XPD(9.4901,"""_XPDP_XPDIEN_""")"
  F I=.02,.03 S:$P(XPDI,U,I*100)]"" @X@(I)=$P(XPDI,U,I*100)
  S:$D(XPDI(1)) @X@(1)=XPDI(1)
- ;if no CURRENT VERSION, set it
- I $G(^DIC(9.4,XPDPDA,"VERSION"))="" S XPD(9.4,XPDPDA_",",13)=XPDV,CURVER=XPDV
  D FILE^DIE("","XPD")
- Q XPDV_U_XPDP_U_$G(CURVER)
+ Q XPDV_U_XPDP
  ;
  ;XPDF=subfile #,XPDIEN=ien string, X=input
 MDIC(XPDF,XPDIEN,XPDX) ;

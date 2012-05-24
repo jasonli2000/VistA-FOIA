@@ -1,5 +1,5 @@
 IBJDB22 ;ALB/RB - REASONS NOT BILLABLE REPORT (PRINT) ;19-JUN-00
- ;;2.0;INTEGRATED BILLING;**123,159,399**;21-MAR-94;Build 8
+ ;;2.0;INTEGRATED BILLING;**123,159**;21-MAR-94
  ;
 EN ; - Entry point from IBJDB21.
  ;
@@ -40,13 +40,8 @@ DET ; - Print detailed report.
  . . . E  W ?65,$$DTE($P(IBN,U,2)) W ?76,"POSTMASTER"
  . . . S IBU=5 S:12[IBEP IBU=$S(IBSORT="R":6,1:IBU)
  . . . I 12[IBEP W ?97,$E($P(IBN,U,IBU),1,25),?124,$J($P(IBN,U,8),8,2),!
- . . . I 34[IBEP,+$P(IBN,U,11)>0 W ?99,$J($P(IBN,U,8),8,2) F X=2:1:$P($P(IBN,U,11),";",1)+1 W ?114,$P($P(IBN,U,11),";",X)_" "
- . . . I 34[IBEP,+$P(IBN,U,11)<0 W ?99,$J($P(IBN,U,8),8,2),!
- . . . I 34[IBEP,+$P(IBN,U,11)>0 W !
+ . . . I 34[IBEP W ?99,$J($P(IBN,U,8),8,2),!
  . . . I $P(IBN,U,9)]"" W ?15,"Comments: ",$P(IBN,U,9) W:12'[IBEP !
- . . . I 12[IBEP,+$P(IBN,U,11)>0,$P(IBN,U,9)="" W ?27,"Related Bills: " F X=2:1:$P($P(IBN,U,11),";",1)+1 W ?41,$P($P(IBN,U,11),";",X)_" "
- . . . I 2[IBEP,$P(IBN,U,10)'="" W ?76,"Nx Adm:",?85,$P(IBN,U,10)
- . . . I 12[IBEP,+$P(IBN,U,11)>0,$P(IBN,U,9)'="" W !,?27,"Related Bills: " F X=2:1:$P($P(IBN,U,11),";",1)+1 W ?41,$P($P(IBN,U,11),";",X)_" "
  . . . I 12[IBEP W ?97,$E($P(IBN,U,$S("PR"[IBSORT:7,1:6)),1,25),!
  . . . S SCNT=SCNT+1,ECNT=ECNT+1
  . . . S STOT=STOT+$P(IBN,U,8),ETOT=ETOT+$P(IBN,U,8)
@@ -139,7 +134,7 @@ HDR ; - Write the detailed report header.
  W ?45,"Date      Entered   Edited     Last Edited By"
  I 12[IBEP W ?97,$S("PR"[IBSORT:"Specialty",1:"Provider")
  ;
- I 34[IBEP W ?101,"Amount",?114,"Related Bills",!,$$DASH(IOM),!
+ I 34[IBEP W ?101,"Amount",!,$$DASH(IOM-25),!
  E  W ?126,"Amount",!,$$DASH(IOM),!
  S IBQ=$$STOP^IBOUTL("Reasons Not Billable Report")
  Q
@@ -179,7 +174,7 @@ PAUSE ; - Page break.
 DTE(X) ; - Format the date.
  Q $S(X:$E(X,4,5)_"/"_$E(X,6,7)_"/"_$E(X,2,3),1:"")
  ;
-RNB ; - Reasons Not Billable 
+RNB ; - Reasons Not Billable
  ;;NOT INSURED
  ;;SC TREATMENT
  ;;AGENT ORANGE

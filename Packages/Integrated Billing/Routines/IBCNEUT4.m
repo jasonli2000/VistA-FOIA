@@ -1,5 +1,5 @@
 IBCNEUT4 ;DAOU/ESG - eIV MISC. UTILITIES ;17-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,345,416**;21-MAR-94;Build 58
+ ;;2.0;INTEGRATED BILLING;**184,271,345**;21-MAR-94;Build 28
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ; Can't be called from the top
@@ -33,8 +33,8 @@ EXCLUDE(NAME) ; This function determines if we should exclude the insurance
  ; Screen out bad data
  I $G(NAME)="" S EXCL=1 G EXCLUDX
  ;
- ; Screen out MEDICAID ins co
- I NAME["MEDICAID" S EXCL=1
+ ; Screen out MEDICAID or MEDICARE ins co names
+ I NAME["MEDICAID"!(NAME["MEDICARE") S EXCL=1 G EXCLUDX
 EXCLUDX ;
  Q EXCL
  ;
@@ -50,7 +50,7 @@ CLEAR(DA,EDITED,FORCE) ; This procedure will clear the eIV status field from an
  ;             buffer symbol was cleared
  ;     FORCE - optional input parameter; if this is set to 1 then the
  ;             eIV status field will be cleared regardless of the
- ;             current status 
+ ;             current status
  NEW DIE,DR,D,D0,DI,DIC,DISYS,DQ,X,%
  I '$G(DA) G CLEARX
  I '$D(FORCE) S FORCE=0
@@ -126,8 +126,8 @@ VALID(INSIEN,PAYIEN,PAYID,SYMIEN) ; Validate an Ins Co IEN
  ; Retrieve the Ins Co name
  S INSNAME=$P($G(^DIC(36,INSIEN,0)),U,1)
  I INSNAME="" S SYMIEN=$$ERROR^IBCNEUT8("B9","Insurance company IEN "_INSIEN_" doesn't have a name on file.") G VALIDX
- ; Screen out MEDICAID ins co
- I $$EXCLUDE(INSNAME) S SYMIEN=$$ERROR^IBCNEUT8("B11","Insurance company "_INSNAME_" contains MEDICAID in the name.  Electronic inquiries cannot be made to this insurance company.") G VALIDX
+ ; Screen out MEDICAID or MEDICARE ins co names
+ I $$EXCLUDE(INSNAME) S SYMIEN=$$ERROR^IBCNEUT8("B11","Insurance company "_INSNAME_" contains MEDICAID or MEDICARE in the name.  Electronic inquiries cannot be made to this insurance company.") G VALIDX
  ; Retrieve the Payer IEN associated with this ins co
  S PAYIEN=$P($G(^DIC(36,INSIEN,3)),U,10)
  I PAYIEN="" S SYMIEN=$$ERROR^IBCNEUT8("B4","Insurance company "_INSNAME_" is not linked to a Payer.") G VALIDX

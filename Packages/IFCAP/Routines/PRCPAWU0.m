@@ -1,5 +1,5 @@
 PRCPAWU0 ;WISC/RFJ-adjustment utilities                             ;11 Mar 94
- ;;5.1;IFCAP;**124**;Oct 20, 2000;Build 2
+ ;;5.1;IFCAP;;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
@@ -44,12 +44,11 @@ VALUE(LOW,HIGH,PROMPT,DEFAULT) ;  adjust value from low to high
  Q Y
  ;
  ;
-REASON(DEFAULT,NODISV) ;  enter reason text
- ;NODISV=1 will stop default reason from ^DISV
+REASON(DEFAULT) ;  enter reason text
  N DIR,REASON,X,Y
- I DEFAULT="",'$G(NODISV) S REASON=$G(^DISV(+$G(DUZ),"PRCPAWU0","REASON"))
- S DIR(0)="F^1:80",DIR("A")="  REASON TEXT",DIR("B")=$S(DEFAULT=""&'$G(NODISV):$G(REASON),1:DEFAULT)
+ I DEFAULT="" S REASON=$G(^DISV(+$G(DUZ),"PRCPAWU0","REASON"))
+ S DIR(0)="F^1:80",DIR("A")="  REASON TEXT",DIR("B")=$S(DEFAULT="":$G(REASON),1:DEFAULT)
  S DIR("A",1)="  >> Enter the reason text which will appear on the transaction register. <<"
  D ^DIR
- I (DEFAULT=""&'$G(NODISV)),Y'["^" S ^DISV(DUZ,"PRCPAWU0","REASON")=Y
+ I DEFAULT="",Y'["^" S ^DISV(DUZ,"PRCPAWU0","REASON")=Y
  Q Y

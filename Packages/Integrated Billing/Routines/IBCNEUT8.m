@@ -1,6 +1,6 @@
-IBCNEUT8 ;DAOU/AM - eIV MISC. UTILITIES ;12-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNEUT8 ;DAOU/AM - IIV MISC. UTILITIES ;12-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ; This routine includes subroutines originally included in IBCNEUT3
  ; and referenced by IBCNEUT3 and IBCNEUT4.
@@ -13,7 +13,7 @@ IBCNEUT8 ;DAOU/AM - eIV MISC. UTILITIES ;12-JUN-2002
  ;
  ; ERROR returns the IEN of the symbol mnemonice passed to it and updates
  ; an array of items to display, if passed.
- ; 
+ ;
  ; Can't be called from the top
  Q
  ;
@@ -30,16 +30,26 @@ INSIEN(INSNAME,INSIEN) ; Subroutine to find all ins co IENs
  ; Loop through the ins co names starting with a space (" ")
  ; looking for matching names
  S NAME=" " F  S NAME=$O(^DIC(36,"B",NAME)) Q:$E(NAME,1)'=" "  D
- . I $$TRIM^XLFSTR(NAME)=INSNAME M INSIEN=^DIC(36,"B",NAME)
- . Q
+ . ;I $$TRIM^XLFSTR(NAME)=INSNAME M INSIEN=^DIC(36,"B",NAME)
+ . I $$TRIM^XLFSTR(NAME)=INSNAME D
+ . . N %X,%Y
+ . . S %X="^DIC(36,""B"",NAME,"
+ . . S %Y="INSIEN("
+ . . I $D(^DIC(36,"B",NAME))#10=1 S INSIEN=^DIC(36,"B",NAME)
+ . . D %XY^%RCR K %X,%Y
  ;
  ; Retrieve the ins co names from the Ins Buffer
  ; starting with the entry prior to the ins co name in
  ; the Buffer and look for ins co name matches
  S NAME=$O(^DIC(36,"B",INSNAME),-1)
  F  S NAME=$O(^DIC(36,"B",NAME)) Q:$E(NAME,1,$L(INSNAME))'=INSNAME  D
- . I $$TRIM^XLFSTR(NAME)=INSNAME M INSIEN=^DIC(36,"B",NAME)
- . Q
+ . ;I $$TRIM^XLFSTR(NAME)=INSNAME M INSIEN=^DIC(36,"B",NAME)
+ . I $$TRIM^XLFSTR(NAME)=INSNAME D
+ . . N %X,%Y
+ . . S %X="^DIC(36,""B"",NAME,"
+ . . S %Y="INSIEN("
+ . . I $D(^DIC(36,"B",NAME))#10=1 S INSIEN=^DIC(36,"B",NAME)
+ . . D %XY^%RCR K %X,%Y
  ;
  Q
  ;

@@ -1,6 +1,6 @@
-FBAARR ;AISC/GRR-RE-INITIATE REJECTED LINE ITEMS ; 8/31/10 2:43pm
- ;;3.5;FEE BASIS;**61,114**;JAN 30, 1995;Build 7
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+FBAARR ;AISC/GRR-RE-INITIATE REJECTED LINE ITEMS ;9/9/2003
+ ;;3.5;FEE BASIS;**61**;JAN 30, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  N FBILM
  S IOP=$S($D(ION):ION,1:"HOME") D ^%ZIS K IOP
  S Q="",$P(Q,"=",80)="=",UL="",$P(UL,"-",80)="-",(FBAAOUT,CNT,FBINTOT)=0
@@ -19,11 +19,7 @@ RD0 S DIR(0)="Y",DIR("A")="Want to re-initiate all rejected items in the Batch",
  D ^DIR K DIR G:Y ^FBAARR1
 RD1 S DIR(0)="Y",DIR("A")="Want to re-initiate any line items",DIR("B")="NO" D ^DIR K DIR Q:$D(DIRUT)!'Y  D DELT^FBAARR2:FBTYPE="B2",DELM:FBTYPE="B3",DELP^FBAARR2:FBTYPE="B5",DELC^FBAARR0:FBTYPE="B9"
 RDD ;
-FIN N FBFDART
- S FBFDART(161.7,FBN_",",13)=$G(DT)
- S FBFDART(161.7,FBN_",",14)=$G(DUZ)
- S FBFDART(161.7,FBN_",",11)="V"
- D FILE^DIE(,"FBFDART")
+FIN S $P(FZ,"^",12)=DT,$P(FZ,"^",16)=DUZ,^FBAA(161.7,FBN,0)=FZ,^FBAA(161.7,FBN,"ST")="V",^FBAA(161.7,"AC","V",FBN)="",^FBAA(161.7,"AF",DT,FBN)="" K ^FBAA(161.7,"AC","T",FBN)
  S DIC="^FBAA(161.7,",DA=FBN,DR="0;ST" W !! D EN^DIQ G BT
 Q D KILL^FBAARR1
  Q

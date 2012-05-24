@@ -1,10 +1,11 @@
 PSOSDP ;BHAM ISC/SAB - poly pharmacy report attached to action/info profile ;12/13/93 8:24
- ;;7.0;OUTPATIENT PHARMACY;**2,17,19,107,110,155,176,233,258,326**;DEC 1997;Build 11
+ ;;7.0;OUTPATIENT PHARMACY;**2,17,19,107,110,155,176,233,258**;DEC 1997;Build 4
  ;called from PSOSD
  Q:+$G(^TMP($J,DFN))<PSONUM!($G(DOD(DFN))]"")  S DRG="",P=0,PSOPOLP=0 D HD K SGY
  F  S DRG=$O(^TMP($J,DFN,DRG)) Q:DRG=""  F  S P=$O(^TMP($J,DFN,DRG,P)) Q:'P  I $G(^PSRX(P,0))]"" S RX0=^PSRX(P,0),RX2=$G(^(2)),RX3=$G(^(3)) D  K SGY
  .I $Y+6>IOSL D FT,HD
  .S SIG=$P($G(^PSRX(P,"SIG")),"^") W !?10,"* "_$E(DRG,1,40),?52 D SIG W $G(BSIG(1)),?79,"*"
+ .;F PSOGY=2:1 Q:$G(SGY(PSOGY))=""  W !?10,"*",?52,SGY(PSOGY),?79,"*" I $Y+4>IOSL,$O(SGY(PSOGY)) D FT,HD
  .I $O(BSIG(1)) F PSREV=1:0 S PSREV=$O(BSIG(PSREV)) Q:'PSREV  W !?10,"*",?52,$G(BSIG(PSREV)),?79,"*" I $Y+4>IOSL,$O(BSIG(PSREV)) D FT,HD
  .K BSIG,PSREV
  D FT K PSOGY
@@ -18,7 +19,7 @@ HD S FN=DFN
  W @IOF,!,"Polypharmacy Rx Profile Review",?47,"Run Date: " S Y=DT D DT^DIO2 W ?71,"Page: "_PAGE S PAGE=PAGE+1,X=$$SITE^VASITE
  W !,"Sorted by drug name for Rx's currently active",@$S(PSORM:"?70",1:"!"),"Site: VAMC "_$P(X,"^",2)_"( "_$P(X,"^",3)_")",!,$E(LINE,1,$S('PSORM:80,1:IOM)-1)
  I $D(CLINICX) W !?1,"Clinic: ",$E(CLINICX,1,28),?45,"Date/Time: " S Y=CLDT D DT^DIO2
- W !?1,"Name  : ",PSNAME,?30 W ?58,"Review Date: ________" W !?1,"DOB   : "_PSDOB
+ W !?1,"Name  : ",PSNAME,?30,"ID#: "_VA("BID") W ?58,"Review Date: ________" W !?1,"DOB   : "_PSDOB
  W:ADDRFL]"" ?30,ADDRFL,! W ?30,"Address  :"
  I ADDRFL="" D CHECKBAI^PSOSD1
  W ?41,VAPA(1) W:VAPA(2)]"" !?41,VAPA(2) W:VAPA(3)]"" !?41,VAPA(3) W !?41,VAPA(4)_", "_$P(VAPA(5),"^",2)_"  "_VAPA(6),!?30,"Phone    : "_VAPA(8)
@@ -56,6 +57,7 @@ CLSG ;clinic group sort and print
  D ^%ZIS I POP S IOP=PSOION K PSOION G EXIT
  S APRT=ION ;D ^%ZISC
  K DTOUT,DIR,DIRUT
+ ;S DIR(0)="Y",DIR("B")="NO",DIR("A")="DO YOU WANT YOUR OUTPUT QUEUED" D ^DIR G:$D(DIRUT) EXIT S APQUE=Y K X,Y,DIR,DIRUT,DTOUT
  W ! I $G(IO("Q")) D  W:$D(ZTSK) !,"Report Queued to Print !!",!! G EXIT
  .S %DT="ERXAFS",%DT("A")="Request Start Time: ",%DT("B")="NOW",%DT(0)="NOW" D ^%DT W ! Q:$D(DIRUT)!(X["^")  S APTM=Y
  .F G="LINE","CLDT","CLSG","PSOPOL","PSOSYS","PSOINST","PSOBAR3","PSOBAR4","PSOBAR2","PSOPAR","PSOPAR7","PRF","PSDAYS","PSDATE","PSTYPE","PSOSITE","PSDATE","PSDAY","PSONUM","PSORM" S:$D(@G) ZTSAVE(G)=""

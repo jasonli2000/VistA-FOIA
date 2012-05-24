@@ -1,9 +1,6 @@
 RAPM ;HOIFO/TH-Radiology Performance Monitors/Indicator; ;5/12/04  10:03
- ;;5.0;Radiology/Nuclear Medicine;**37,44,48,67,99,47**;Mar 16, 1998;Build 21
- ;RVD - 3/19/09 p99.
- ;Supported IA #2056 reference to ^DIQ
- ;Supported IA #10000 reference to C^%DTC
- ;Supported IA #10090 reference to ^DIC(4
+ ;;5.0;Radiology/Nuclear Medicine;**37,44,48,67**;Mar 16, 1998
+ ;
  ; *** Application variables: ***
  ;
  ; Exam Date - RADTE (Regular Fileman format)
@@ -19,10 +16,10 @@ INIT ; Check for the existence of RACESS. Pass in user's DUZ!
  I $D(DUZ),($O(RACCESS(DUZ,""))']"") D CHECK^RADLQ3(DUZ)
  ;
  N DIR,DIRUT,RABDATE,RAEDATE,RARPT,DTDIFF,RABEGDT,RAENDDT,RA1
- N RAM,RARAD,RAR,RAMSG,X,Y K RAP99
- S (RABDATE,RAEDATE,RAANS,RAANS2,RANODIV,RASINCE,RARAD)="",RAN=0
+ N RAM,RARAD,RAR,RAMSG,X,Y
+ S (RABDATE,RAEDATE,RAANS,RAANS2,RANODIV,RASINCE,RARAD)=""
  ; RANODIV=1 if one or more exams are missing DIVISION
-PROMPT ; 
+PROMPT ;
  W @IOF
  W !!,"Radiology Verification Timeliness Report",!!
  ; Prompt for Report Type. Quit if no report type selected
@@ -51,15 +48,10 @@ PROMPT ;
  . I RAANS!(RAANS2) W !?5,"** No mail will be sent **",$C(7)
  . Q
 START ; Get data and print the report
- S:$D(ZTQUEUED) ZTREQ="@" S RAIO=$S(IO="":0,1:1),RAN=0
- ;added by patch #99
+ S:$D(ZTQUEUED) ZTREQ="@" S RAIO=$S(IO="":0,1:1)
  D GETDATA
- I $G(RAP99) S RAS99=1 D PWT^RAPMW(RABDATE,RAEDATE)  ;process partial Wait and Time report
- ;
- ;D GETDATA
  I RARPT="S"!(RARPT="B") S RAPG=0 D ^RAPM1
  I RARPT="D"!(RARPT="B") S RAPG=0 D ^RAPM2
- I $G(RAP99) K RAS99 S RAL99=1 D PWT^RAPMW(RABDATE,RAEDATE)    ;process all wait and time reports
  ; see if need send email
  D SEND^RAPM2
  D EXIT
@@ -71,15 +63,15 @@ GETRPT ; Prompt for Summary or Detail or Both reports; Default = Summary Report
  S DIR("A")="Select Report Type",DIR("B")="S"
  S DIR("?")="Enter Summary report OR Detail report OR Both reports"
  D ^DIR
- Q:$D(DIRUT) 
+ Q:$D(DIRUT)
  S RARPT=Y
  Q
 GETDATE ; Prompt for start and end dates
- S DIR(0)="D^:"_DT_":AEX"
+ S DIR(0)="D^:"_DT_":AE"
  I RARPT'="D" D
  . W !!?4,"The begin date for Summary and Both must be at least 10 days before today.",!
  . S X1=DT,X2=-10 D C^%DTC S RA1=X
- . S DIR(0)="D^:"_RA1_":AEX"
+ . S DIR(0)="D^:"_RA1_":AE"
  . Q
  S DIR("A")="Enter starting date"
  S DIR("?")="Enter date to begin searching from"
@@ -87,7 +79,7 @@ GETDATE ; Prompt for start and end dates
  Q:$D(DIRUT)
  S RABDATE=Y
  ;
- S RADD=91,X1=RABDATE,X2=RADD D C^%DTC S RAMAXDT=X
+ S RADD=$S(RARPT="S":91,1:31),X1=RABDATE,X2=RADD D C^%DTC S RAMAXDT=X
  ; put 10 day block for summary report or Both
  I RARPT'="D" D
  . W !!?4,"The ending date for Summary and Both must be at least 10 days before today.",!
@@ -95,7 +87,7 @@ GETDATE ; Prompt for start and end dates
  S:RAMAXDT>DT RAMAXDT=DT
  S DIR(0)="D^"_RABDATE_":"_RAMAXDT_":AE"
  S DIR("A")="Enter ending date"
- S DIR("?",1)="     +91 days max. for Summary and Detail."
+ S DIR("?",1)="     +91 days max. for Summary, +31 days max. for Detail."
  S DIR("?",2)="     And the ending date for the Summary and Both"
  S DIR("?")="     must be at least 10 days before today."
  D ^DIR
@@ -103,7 +95,7 @@ GETDATE ; Prompt for start and end dates
  ;
  ; Set end date to end of day
  ; RABDATE and RAEDATE are original values
- ; RABEGDT and RAENDDT are used in GETDATA 
+ ; RABEGDT and RAENDDT are used in GETDATA
  S RAEDATE=Y,RAENDDT=RAEDATE_.9999
  ; Set start date back to include current day
  S RABEGDT=(RABDATE-1)_.9999
@@ -130,11 +122,9 @@ DEV ; Device
 TASK ; set vars for taskman
  S ZTRTN="START^RAPM"
  S ZTSAVE("RA*")=""
- S ZTSAVE("^TMP($J,")=""
- ;S ZTSAVE("^TMP($J,""RA D-TYPE"",")=""
- ;S ZTSAVE("^TMP($J,""RA I-TYPE"",")=""
- S:$G(RAP99) ZTDESC="Radiology Timeliness Performance Reports"
- S:'$G(RAP99) ZTDESC="Radiology Verification Timeliness Report"
+ S ZTSAVE("^TMP($J,""RA D-TYPE"",")=""
+ S ZTSAVE("^TMP($J,""RA I-TYPE"",")=""
+ S ZTDESC="Radiology Verification Timeliness Report"
  Q
  ;
 GETDATA ; Get all the data
@@ -159,7 +149,7 @@ CHECK ; Check type of image
  ; Check division - Quit if no division selected
  S RASELDIV=$P($G(^RADPT(RADFN,"DT",RADTI,0)),U,3)
  S RACHKDIV=$P($G(^DIC(4,+RASELDIV,0)),U,1)
- ; quit if div is known AND does not match selection 
+ ; quit if div is known AND does not match selection
  I RACHKDIV'="",'$D(^TMP($J,"RA D-TYPE",RACHKDIV)) Q
  S:RACHKDIV="" RANODIV=1
  ;
@@ -172,8 +162,6 @@ CHECK ; Check type of image
  . Q:RACN0=""  ; no exam data
  . ; Get Case number: Exam Date - Case Number
  . S RACN=$E(RADTE,4,7)_$E(RADTE,2,3)_"-"_$P(RACN0,U,1)
- . N RASSAN,RACNDSP S RASSAN=$$SSANVAL^RAHLRU1(RADFN,RADTI,RACNI)
- . S RACNDSP=$S((RASSAN'=""):RASSAN,1:RACN)
  . ; Get exam status
  . S RAEXST=$P(RACN0,U,3)
  . Q:RAEXST=""  ; no exam status
@@ -185,7 +173,7 @@ CHECK ; Check type of image
  . S RANUM=$P(RACN0,U,25)
  . ; if member of set > 1 then set RACNI to 99999 to skip remaining cases
  . I RANUM>1 S RACNI=99999
- . ; Get Radiologist (Primary Interpreting Staff) internal # and name. 
+ . ; Get Radiologist (Primary Interpreting Staff) internal # and name.
  . S RAPRIM=$P(RACN0,U,15)
  . ; if specific radiologist requested, quit if not his/her case
  . I RARAD,RAPRIM'=RARAD Q
@@ -214,11 +202,11 @@ EXIT ; Exit
  D CLOSE^RAUTL
  K RACN0,RAEXST,RANUM,RACN,RAPRIM,RAPRIMNM,RACAT,RARPTTXT,RAANS,RATXT
  K DIR,DIRUT,RABDATE,RAEDATE,RARPT,DTDIFF,RABEGDT,RAENDDT,RAITYP,RAIMGTYP,RATYP
- K ZTRTN,ZTSAVE,ZTDESC,RAPG,RASELDIV,RACHKDIV,RACNO,RAVHRS,RACNDSP,RASSAN
+ K ZTRTN,ZTSAVE,ZTDESC,RAPG,RASELDIV,RACHKDIV,RACNO,RAVHRS
  K RADIV,RAN,RAIMG,RAREC1,RATOTCNT,RACNI,RADFN,RADTE,RADTI,RAHD,RAPATNM
  K RAPOP,RAPSTX,RAQUIT,RAREC,RARPTDT,RARPTST,RASORT,RASRT,RATDFHR,RAHASR
  K RATDFSEC,RATHRS,RAVDFHR,RAVDFSEC,RAVERDT,RAMES,RALINE,RAMAXDT,RADD
  K RAANS2,RAIOM,RAHDR,RANODIV,RASINCE,RADHT,RADHV,RAVAL,RAPRCN
- K RAXIT,RAIO,RALDENT,RALMAX,RALUSED,RATAIL,RAS99,RAL99,RAP99,RAN
+ K RAXIT,RAIO,RALDENT,RALMAX,RALUSED,RATAIL
  K ^TMP($J)
  Q

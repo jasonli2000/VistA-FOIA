@@ -1,6 +1,6 @@
-PRCPCUT1 ;WISC/RFJ-case cart & instrument kit utilities ; 06/23/2009  2:09 PM
- ;;5.1;IFCAP;**136**;Oct 20, 2000;Build 6
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCPCUT1 ;WISC/RFJ-case cart & instrument kit utilities             ;01 Sep 93
+ ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
  ;
@@ -50,7 +50,8 @@ QUANTITY(HIGHNUM,TYPE) ;  enter quantity to assemble or disassemble
  D ^DIR K DIR
  Q $S(Y<1:0,1:+Y)
  ;
- ;da - ien of file #81
- ;prcdt - fileman date (or date.time)
-ICPT(DA,PRCDT) ;  ef - return icpt code and name
- QUIT $P($$CPT^ICPTCOD(DA,$G(PRCDT),"",""),U,2,3)
+ ;
+ICPT(DA) ;  return icpt code and name
+ N D0,DIC,DIQ,DR,PRCPX
+ S DIC="^ICPT(",DR=".01;2",DIQ="PRCPX",DIQ(0)="IEN" D EN^DIQ1
+ Q $G(PRCPX(81,DA,.01,"E"))_"^"_$G(PRCPX(81,DA,2,"E"))

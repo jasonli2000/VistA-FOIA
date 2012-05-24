@@ -1,6 +1,6 @@
-IBCNEDEQ ;DAOU/ALA - Process eIV Transactions continued ;21-AUG-2002
- ;;2.0;INTEGRATED BILLING;**184,271,300,416,438**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNEDEQ ;DAOU/ALA - Process Transactions continued ;21-AUG-2002
+ ;;2.0;INTEGRATED BILLING;**184,271,300**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;**Program Description**
  ;  This program contains some subroutines for processing a transmission
@@ -21,9 +21,9 @@ HLER ;  HL7 Creation error message
  S MSG(1)=HLRESLT
  S MSG(2)="occurred when trying to create the outgoing HL7 message for"
  S MSG(3)="Patient: "_$P($G(^DPT(DFN,0)),U,1)_$$SSN(DFN)_" and Payer: "_$P($G(^IBE(365.12,PAYR,0)),U,1)_"."
- S MSG(4)="Please contact the Help Desk and report this problem."
+ S MSG(4)="Please log a NOIS for this problem."
  D TXT^IBCNEUT7("MSG")
- S XMSUB="eIV HL7 Creation Error"
+ S XMSUB="IIV HL7 Creation Error"
  D MSG^IBCNEUT5(MGRP,XMSUB,"MSG(")
  K XMSUB,MSG,HLRESLT
  Q
@@ -41,7 +41,7 @@ CERR ;  Communication Error Mail Message - No Retries defined
  ;    MSG = Message array
  ;
  I 'FMSG G CERRQ
- S XMSUB="eIV Communication Error"
+ S XMSUB="IIV Communication Error"
  S MSG(1)="VistA was unable to electronically confirm insurance for"
  S MSG(2)="Patient: "_$P($G(^DPT(DFN,0)),U)_$$SSN(DFN)_" and Payer: "_$P($G(^IBE(365.12,PAYR,0)),U)_"."
  S MSG(3)="A single attempt was made to electronically confirm the insurance"
@@ -66,7 +66,7 @@ CERE ;  Communication Error Mail Message - Exceeds Retries
  ;    MSG = Message array
  ;
  I 'FMSG G CEREQ
- S XMSUB="eIV Communication Error"
+ S XMSUB="IIV Communication Error"
  S MSG(1)="VistA was unable to electronically confirm insurance for"
  S MSG(2)="Patient: "_$P($G(^DPT(DFN,0)),U)_$$SSN(DFN)_" and Payer: "_$P($G(^IBE(365.12,PAYR,0)),U)_"."
  ;
@@ -113,7 +113,7 @@ RESP ;  Create Response Record
  ;    IEN = Transmission IEN (optional)
  ;    RSTYPE = Response Type (O=Original, U=Unsolicited)
  ;
- NEW DIC,DIE,X,DA,DLAYGO,Y,RARRAY,ERR
+ NEW DIC,DIE,X,DA,DLAYGO,Y,RARRAY
  S DIC="^IBCN(365,",X=MSGID,DLAYGO=365,DIC(0)="L",DIC("P")=DLAYGO
  K DD,DO
  D FILE^DICN
@@ -129,12 +129,12 @@ RESP ;  Create Response Record
  S RARRAY(365,RSIEN_",",.1)=RSTYPE
  ;
  D FILE^DIE("I","RARRAY","ERR")
- I $D(ERR("DIERR",1,"TEXT",1)) D
+ I $D(ERR) D
  . S ERFLG=1,MCT=0,VEN=0
  . F  S VEN=$O(ERR("DIERR",VEN)) Q:'VEN  D
- .. S MCT=MCT+1,MSG(MCT)=$G(ERR("DIERR",VEN,"TEXT",1))
+ .. S MCT=MCT+1,MSG(MCT)=ERR("DIERR",VEN,"TEXT",1)
  . ;
- . S MCT=MCT+1,MSG(MCT)="Please contact the Help Desk and report this problem."
+ . S MCT=MCT+1,MSG(MCT)="Please log a NOIS for this problem."
  . S XMSUB="Error creating Response"
  . D MSG^IBCNEUT5(MGRP,XMSUB,"MSG(")
  . K ERR,VEN,MCT
@@ -142,7 +142,7 @@ RESP ;  Create Response Record
  ;
 TMRR ;  Communication Timeout message
  I 'TMSG Q
- S XMSUB="eIV Communication Timeout"
+ S XMSUB="IIV Communication Timeout"
  S MSG(1)="No Response has been received within the defined failure days of "_FAIL_" for "
  S MSG(3)="Patient: "_$P($G(^DPT(DFN,0)),U,1)_$$SSN(DFN)_" and Payer: "_$P($G(^IBE(365.12,PAYR,0)),U,1)
  ;

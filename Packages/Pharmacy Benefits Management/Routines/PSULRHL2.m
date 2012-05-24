@@ -1,5 +1,5 @@
-PSULRHL2 ;HCIOFO/BH - File real time HL7 messages ; 3/30/11 10:14am
- ;;4.0;PHARMACY BENEFITS MANAGEMENT;**3,17,18**;MARCH, 2005;Build 7
+PSULRHL2 ;HCIOFO/BH - File real time HL7 messages ; 24 Aug 2005  5:23 PM
+ ;;4.0;PHARMACY BENEFITS MANAGEMENT;**3**;MARCH, 2005
  ;
 FILE Q  ;  quit for HLO - ALA
  ;
@@ -13,12 +13,12 @@ FILE Q  ;  quit for HLO - ALA
  ;
  ;***** The following are present upon entry to this label
  ;
- ; HLNEXT   M Code you can use to execute a $O through the segments of 
+ ; HLNEXT   M Code you can use to execute a $O through the segments of
  ;          a message
- ; 
+ ;
  ; HLNODE   The current segment in the message (initally set to null)
  ;
- ; HLQUIT   If not greater than zero, indicates there are no more 
+ ; HLQUIT   If not greater than zero, indicates there are no more
  ;          segments to $O through
  ;
  ;*****
@@ -61,7 +61,7 @@ WRITE(IEN) ;--- Find the OBR/OBX segments
  . . . S STR1=@HLFILE@(I)
  . . . S J1=""
  . . . F  S J1=$O(@HLFILE@(I,J1))  Q:J1=""  S STR1=STR1_@HLFILE@(I,J1)
- . . . I $E(STR1,1,3)'="OBX" S QUIT=1 Q 
+ . . . I $E(STR1,1,3)'="OBX" S QUIT=1 Q
  . . . D OBX(STR1,IEN,IEN1)
  . . S I=PREV
  Q
@@ -69,7 +69,7 @@ WRITE(IEN) ;--- Find the OBR/OBX segments
  ;
 ERROR(CODE,FAC,MESSAGE) ; Files any errors found within the processing
  ;
- ;  Input:        
+ ;  Input:
  ;
  ;  CODE     Error Code
  ;  FAC      Facility number
@@ -91,7 +91,7 @@ ERROR(CODE,FAC,MESSAGE) ; Files any errors found within the processing
  Q
  ;
  ;
-OBX(STR1,IEN,IEN1) ; Extracts required OBX fields and files into 
+OBX(STR1,IEN,IEN1) ; Extracts required OBX fields and files into
  ;                 the global
  ;
  N FDA2,IENS,INDEX,LABS,LOCAL,LOINCC,LOINCNME,MSG2,NLTCODE,NLTNAME,OUT2,RANGE,RESULT,UNITS,VALUE
@@ -165,12 +165,12 @@ PARAMS() ; Get HL7 Parameters and facility # from the MSH segment
  I $G(FAC)="" Q 0
  Q 1
  ;
-DEMO() ; Get the demographic data and file a zero node entry in the 
+DEMO() ; Get the demographic data and file a zero node entry in the
  ; message global
  ;
- N CNT,DFN,END,FDA,I,ICN,IDSTR,J3,MSG,OUT,QPID,QORC,QUIT,REC,SUB,SSN,STA5A
- S (ICN,SSN,DFN,STA5A)=""
- S (QPID,QORC,QUIT,CNT)=0
+ N CNT,DFN,END,FDA,I,ICN,IDSTR,J3,MSG,OUT,QUIT,REC,SUB,SSN
+ S (ICN,SSN,DFN)=""
+ S (QUIT,CNT)=0
  F  S CNT=$O(@HLFILE@(CNT)) Q:'CNT!(QUIT)  D
  . S REC=@HLFILE@(CNT)
  . S J3=""
@@ -184,18 +184,13 @@ DEMO() ; Get the demographic data and file a zero node entry in the
  . . . I $P(SUB,HLCS,5)="NI" D
  . . . . I $P(SUB,HLCS,8)'="" Q
  . . . . S ICN=$P(SUB,HLCS,1),ICN=$P(ICN,"V",1)
- . . . . ; 
- . . . . ;PSU*4*17 Don't overwrite SSN with ""
+ . . . . ;
  . . . I $P(SUB,HLCS,5)="SS" D
- . . . . S SSN=$S($G(SSN):SSN,1:$P(SUB,HLCS,1))
+ . . . . S SSN=$P(SUB,HLCS,1)
  . . . . ;
  . . . I $P(SUB,HLCS,5)="PI" D
  . . . . S DFN=$P(SUB,HLCS,1)
- . . S QPID=1
- . ;*18 Get Station#
- . I $E(REC,1,3)="ORC" D
- . . S STA5A=$P(REC,HLFS,11),STA5A=$P(STA5A,HLCS,14),QORC=1
- . I QPID,QORC S QUIT=1
+ . . S QUIT=1
  ;
  I DFN="" D ERROR(1,FAC,ID) Q 0
  ;
@@ -204,7 +199,6 @@ DEMO() ; Get the demographic data and file a zero node entry in the
  S FDA(99999,"+1,",.02)=DFN
  S FDA(99999,"+1,",.04)=ICN
  S FDA(99999,"+1,",.05)=SSN
- S FDA(99999,"+1,",.06)=STA5A
  S FDA(99999,"+1,",.01)=FAC
  D UPDATE^DIE("","FDA","OUT","MSG")
  ;

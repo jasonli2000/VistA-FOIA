@@ -1,5 +1,5 @@
-ACKQASU4 ;HCIOFO/AG - New/Edit Visit Utilities  ; 12/31/07 7:28am
- ;;3.0;QUASAR;**17**;Feb 11, 2000;Build 28
+ACKQASU4 ;HCIOFO/AG - New/Edit Visit Utilities  ;  04/01/99
+ ;;3.0;QUASAR;;Feb 11, 2000
  ;Per VHA Directive 10-93-142, this routine SHOULD NOT be modified.
  ;
  ;
@@ -133,7 +133,7 @@ COPYSCND ; copy a secondary provider to QUASAR
  S ACKQPRV=$$PROVCHK(ACKPRV)
  S ACKTYPQ=$$GET1^DIQ(509850.3,$S(ACKQPRV="":" ",1:ACKQPRV)_",",.02,"I")
  ;
- ; if they are a student and we haven't one already, 
+ ; if they are a student and we haven't one already,
  ;  then attempt to file as student
  I ACKTYPQ="S",ACKSTUD="" D  Q   ; student
  . S ACKE=$$SETSTUD^ACKQASU6(ACKVIEN,ACKQPRV)
@@ -183,9 +183,9 @@ DIAGHIST ; ensure diagnosis is on Patient history
  ; look for the diagnosis on the current history
  D FIND^DIC(509850.22,","_ACKPAT_",","","Q",ACKICD,1,"B","","","ACKTGT")
  ;
- ; if found then exit 
+ ; if found then exit
  I +$P($G(ACKTGT("DILIST",0)),U,1)=1 Q  ; exactly one found
- ; 
+ ;
  ; create a new entry
  S ACKUPD(509850.22,"+1,"_ACKPAT_",",.01)=ACKICD
  S ACKUPD(509850.22,"+1,"_ACKPAT_",",1)=ACKVD
@@ -197,10 +197,13 @@ DIAGHIST ; ensure diagnosis is on Patient history
 PROVCHK(ACKPRV) ;  Check to see if Provider is on Quasar Staff file - if so
  ;          function passes back Quasars Provider IEN No else null
  ;
- N ACKA,ACKB,NPNAME S ACKB=""
+ N ACKA,ACKB S ACKB=""
  I ACKPRV="" Q ACKB
- ;ACKQ*3*17 
- S NPNAME=$$GET1^DIQ(200,ACKPRV,.01,"")
- I '$D(^ACK(509850.3,"B",NPNAME)) Q ACKB
- Q $O(^ACK(509850.3,"B",NPNAME,ACKB))
+ ;  If not on USR file then definitely wont be on Quasar
+ I '$D(^USR(8930.3,"B",ACKPRV)) Q ACKB
+ S ACKA=""
+ F  S ACKA=$O(^USR(8930.3,"B",ACKPRV,ACKA)) Q:'+ACKA!(ACKB'="")  D
+ . I '$D(^ACK(509850.3,"B",ACKA)) Q
+ . S ACKB=$O(^ACK(509850.3,"B",ACKA,ACKB))
+ Q ACKB
  ;

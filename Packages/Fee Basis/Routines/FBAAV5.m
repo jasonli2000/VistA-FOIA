@@ -1,12 +1,10 @@
 FBAAV5 ;AISC/GRR-CREATE TRANSACTIONS FOR CH/CNH PAYMENTS ;11 Apr 2006  2:54 PM
- ;;3.5;FEE BASIS;**3,55,89,98,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**3,55,89,98**;JAN 30, 1995;Build 54
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  D CKB9V^FBAAV01 I $G(FBERR) K FBERR Q
  G:FBSTAT="S"&(FBCHB="Y")&($P(Y(0),"^",18)'="Y") ^FBAAV6
 DETCH S FBTXT=0
- ; HIPAA 5010 - line items that have 0.00 amount paid are now required to go to Central Fee
- ;F K=0:0 S K=$O(^FBAAI("AC",J,K)) Q:K'>0  S Y(0)=$G(^FBAAI(K,0)),Y(2)=$G(^(2)) I Y(0)]"",+$P(Y(0),U,9) D
- F K=0:0 S K=$O(^FBAAI("AC",J,K)) Q:K'>0  S Y(0)=$G(^FBAAI(K,0)),Y(2)=$G(^(2)) I Y(0)]"" D
+ F K=0:0 S K=$O(^FBAAI("AC",J,K)) Q:K'>0  S Y(0)=$G(^FBAAI(K,0)),Y(2)=$G(^(2)) I Y(0)]"",+$P(Y(0),U,9) D
  .N FBPICN,FBY
  .S FBPICN=K
  .S FBY=$S($P(Y(2),U,2):$P(Y(2),U,2),1:$P(Y(0),U,2))_U_+$P(Y(2),U,3)
@@ -49,7 +47,7 @@ GOT ; process an inpatient invoice
  ;       After the line Y(0) will equal the 0 node of file #2
  S VAPA("P")="",Y(0)=$S($D(^DPT(DFN,0)):^(0),1:"")
  D PAT^FBAAUTL2
- ; obtain date of birth, must follow call to PAT^FBAAUTL2 to overwrite 
+ ; obtain date of birth, must follow call to PAT^FBAAUTL2 to overwrite
  ; the value returned from it
  S FBDOB=$$AUSDT^FBAAV3($P(Y(0),"^",3))
  D ADD^VADPT
@@ -160,7 +158,7 @@ B9DISCHG(FBIENS) ; Determine Discharge Date and Type for a B9 payment
  . . S FBADMIT=$P($P(FBY,U,4),".") ; CNH admission date
  . . S FBAUTHP=+$O(^FBAAA("AG",FB7078,DFN,0)) ; authorization 'pointer'
  . . ;
- . . ; find the admission entry in CNH ACTIVITY file          
+ . . ; find the admission entry in CNH ACTIVITY file
  . . S FBACTA=0 ; init the admission activity ien
  . . S FBADMITR=9999999-FBADMIT ; reverse admission date
  . . S FBDTR=9999999-$$FMADD^XLFDT(FBADMIT,1) ; start loop

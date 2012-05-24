@@ -1,6 +1,6 @@
 DDGF0 ;SFISC/MKO-SETUP, CLEANUP ;09:58 AM  9 Sep 1994
- ;;22.0;VA FileMan;**160**;Mar 30, 1999;Build 21
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;22.0;VA FileMan;;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  D INIT^DDGLIB0() Q:$G(DIERR)
  D SET,GETKEY
@@ -140,7 +140,7 @@ SMAP ;Keys for moving selected gadgets
  ;;DESELECT;" ";    deselect an element
  ;;DESELECT;$C(13); deselect an element
  ;;EDIT;F4;         edit properties
- ;;REORDER;F1_"O";  reorder fields in block
+ ;;REORDER;F1_"O" ; reorder fields in block
  ;;
 DMAP ;Keys for changing data length
  ;;CHR;AR;          char right

@@ -1,11 +1,13 @@
-DGPTX15 ; ;07/14/09
+DGPTX15 ; ;09/19/10
  S X=DG(DQ),DIC=DIE
- K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(0)=X S Y(1)=$C(59)_$P($G(^DD(2,.32102,0)),U,3) S X=$P($P(Y(1),$C(59)_Y(0)_":",2),$C(59))="NO" I X S X=DIV S Y(1)=$S($D(^DPT(D0,.321)):^(.321),1:"") S X=$P(Y(1),U,7),X=X S DIU=X K Y S X="" X ^DD(2,.32102,1,1,1.4)
+ X ^DD(2,.525,1,1,1.3) I X S X=DIV S Y(1)=$S($D(^DPT(D0,.52)):^(.52),1:"") S X=$S('$D(^DIC(22,+$P(Y(1),U,6),0)):"",1:$P(^(0),U,1)) S DIU=X K Y S X=DIV S X="" X ^DD(2,.525,1,1,1.4)
  S X=DG(DQ),DIC=DIE
- X ^DD(2,.32102,1,2,1.3) I X S X=DIV S Y(1)=$S($D(^DPT(D0,.321)):^(.321),1:"") S X=$P(Y(1),U,10),X=X S DIU=X K Y S X="" S DIH=$G(^DPT(DIV(0),.321)),DIV=X S $P(^(.321),U,10)=DIV,DIH=2,DIG=.3211 D ^DICR
+ X ^DD(2,.525,1,2,1.3) I X S X=DIV S Y(1)=$S($D(^DPT(D0,.52)):^(.52),1:"") S X=$P(Y(1),U,7) S DIU=X K Y S X=DIV S X="" X ^DD(2,.525,1,2,1.4)
  S X=DG(DQ),DIC=DIE
- K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(0)=X S Y(1)=$C(59)_$P($G(^DD(2,.32102,0)),U,3) S X=$P($P(Y(1),$C(59)_Y(0)_":",2),$C(59))="NO" I X S X=DIV S Y(1)=$S($D(^DPT(D0,.321)):^(.321),1:"") S X=$P(Y(1),U,9),X=X S DIU=X K Y S X="" X ^DD(2,.32102,1,3,1.4)
+ X ^DD(2,.525,1,3,1.3) I X S X=DIV S Y(1)=$S($D(^DPT(D0,.52)):^(.52),1:"") S X=$P(Y(1),U,8) S DIU=X K Y S X=DIV S X="" X ^DD(2,.525,1,3,1.4)
  S X=DG(DQ),DIC=DIE
  D AUTOUPD^DGENA2(DA)
  S X=DG(DQ),DIC=DIE
- X ^DD(2,.32102,1,5,1.3) I X S X=DIV S Y(1)=$S($D(^DPT(D0,.321)):^(.321),1:"") S X=$P(Y(1),U,13),X=X S DIU=X K Y S X="" S DIH=$G(^DPT(DIV(0),.321)),DIV=X S $P(^(.321),U,13)=DIV,DIH=2,DIG=.3213 D ^DICR
+ X "S DFN=DA D EN^DGMTR K DGREQF"
+ S X=DG(DQ),DIC=DIE
+ D EVENT^IVMPLOG(DA)

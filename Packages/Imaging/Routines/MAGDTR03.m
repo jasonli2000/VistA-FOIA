@@ -1,5 +1,5 @@
-MAGDTR03 ;WOIFO/PMK - Read a DICOM image file ; 30 Oct 2008 3:21 PM
- ;;3.0;IMAGING;**46,54**;03-July-2009;;Build 1424
+MAGDTR03 ;WOIFO/PMK - Read a DICOM image file ; 20 Nov 2006  2:46 PM
+ ;;3.0;IMAGING;**46**;16-February-2007;;Build 1023
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -120,7 +120,8 @@ FINISH ; finalize resulted or cancelled consult
  . S LOCKNAME=$P(^MAG(2006.5849,UNREAD,0),"^",12)
  . I LOCKNAME'=FULLNAME,FULLNAME'="" D  ; not the same person, update
  . . ; look up resulter in file 200 - check for >1 people with same name
- . . S DUZACQ=$$FIND1^DIC(200,"","BX",FULLNAME) ; IA # 10060
+ . . S DUZACQ=$O(^VA(200,"B",FULLNAME,""))
+ . . I DUZACQ,$O(^VA(200,"B",FULLNAME,DUZACQ)) S DUZACQ="" ; same name
  . . S INITIALS=$$GET1^DIQ(200,DUZACQ,1) ; initial
  . . ; DUZread (piece 4) is not known - set to null
  . . S X=FULLNAME_"^"_INITIALS_"^"_DUZACQ_"^^"_LOCATION
@@ -153,7 +154,7 @@ REPAIR ; code to repair a defective unread list entry
  N ACTIVITY,DUZACQ,FULLNAME,HIT,I,IFCSITE,INITIALS,LOCATION,SUBFILE,TIMESTMP
  S IFCSITE=$$GET1^DIQ(123,GMRCIEN,.07,"I") ; routing facility
  ;
- ; first find the consult request tracking "completion" activity in cprs 
+ ; first find the consult request tracking "completion" activity in cprs
  S HIT=0 F I=1:1 D  Q:HIT  Q:ACTIVITY=""
  . S SUBFILE=I_","_GMRCIEN ; format: <subfile ien>,<gmrc ien>
  . S ACTIVITY=$$GET1^DIQ(123.02,SUBFILE,1) ; activity - from ^GMR(123.1)
@@ -175,14 +176,15 @@ REPAIR ; code to repair a defective unread list entry
  E  I IFCSITE D  ; remotely completed IFC
  . S FULLNAME=$$GET1^DIQ(123.02,SUBFILE,.22) ; remote responsible person
  . ; look up resulter in file 200 - check for >1 people with same name
- . S DUZACQ=$$FIND1^DIC(200,"","BX",FULLNAME) ; IA # 10060
+ . S DUZACQ=$O(^VA(200,"B",FULLNAME,""))
+ . I DUZACQ,$O(^VA(200,"B",FULLNAME,DUZACQ)) S DUZACQ="" ; same name
  . S INITIALS=$$GET1^DIQ(200,DUZACQ,1) ; initials
  . ; DUZread (piece 4) is not known - set to null
  . S X=FULLNAME_"^"_INITIALS_"^"_DUZACQ_"^^"_IFCSITE
  . Q
  E  S X="^^^^" ; problem with cprs consult
  S $P(^MAG(2006.5849,UNREAD,0),"^",12,16)=X ; reader identification
- S $P(^MAG(2006.5849,UNREAD,0),"^",19)=$$NOW^XLFDT() ; Record Repair TimeStamp in piece 19 Field #18
+ N % D NOW^%DTC S $P(^MAG(2006.5849,UNREAD,0),"^",19)=% ; Record Repair TimeStamp in piece 19 Field #18
  D EXREF(UNREAD,TIMESTMP) ; set "E" cross-reference
  Q
  ;

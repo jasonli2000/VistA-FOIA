@@ -1,5 +1,5 @@
 PSJLMHED ;BIR/MLM-BUILD LM HEADERS ;28 Jan 98 / 2:18 PM
- ;;5.0; INPATIENT MEDICATIONS ;**4,58,85,110,148,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**4,58,85,110,148**;16 DEC 97;Build 2
  ;
  ; Reference to ^PS(55 is supported by DBIA 2191.
  ; Reference to CWAD^ORQPT2 is supported by DBIA 2831.
@@ -40,19 +40,16 @@ INIT(PSJPROT) ; -- init bld vars
  D KILL^VALM10(),EN^PSJO1(PSJPROT)
  I '$D(^TMP("PSJ",$J)) W !!,?22,"NO ORDERS FOUND FOR "_$S(PSJOL="S":"SHORT",1:"LONG")_" PROFILE." S VALMQUIT=1 D PAUSE^PSJLMUTL Q
  S PSJTF=0,PSJLN=1,PSJEN=1,PSJC="" F  S PSJC=$O(^TMP("PSJ",$J,PSJC)) Q:PSJC=""  D
- .S PSJF="^PS("_$S("AO"[PSJC:"55,"_PSGP_",5,",PSJC="DF":"55,"_PSGP_",5,",1:"53.1,")
- .I PSJTF'=$E(PSJC,1)!(PSJC="CC")!(PSJC="CD")!(PSJC="BD") Q:PSJC="CB"  Q:PSJC="O"  Q:PSJC="DF"  D TF S PSJTF=$E(PSJC,1)    ;DAM 8-29-07 Added Q:PSJC="CB"  Q:PSJC="O"
+ .S PSJF="^PS("_$S("AO"[PSJC:"55,"_PSGP_",5,",1:"53.1,")
+ .I PSJTF'=$E(PSJC,1)!(PSJC="CC")!(PSJC="CD")!(PSJC="BD") Q:PSJC="CB"  Q:PSJC="O"  D TF S PSJTF=$E(PSJC,1)    ;DAM 8-29-07 Added Q:PSJC="CB"  Q:PSJC="O"
  .S PSJST="" F  S PSJST=$O(^TMP("PSJ",$J,PSJC,PSJST)) Q:PSJST=""  D
- .. S PSJS="" F  S PSJS=$O(^TMP("PSJ",$J,PSJC,PSJST,PSJS)) Q:PSJS=""  Q:PSJC="CB"  Q:PSJC="O"  Q:PSJC="DF"  D ON      ;DAM 8-29-07  Added Q:PSJC="CB"  Q:PSJC="O"
+ .. S PSJS="" F  S PSJS=$O(^TMP("PSJ",$J,PSJC,PSJST,PSJS)) Q:PSJS=""  Q:PSJC="CB"  Q:PSJC="O"  D ON      ;DAM 8-29-07  Added Q:PSJC="CB"  Q:PSJC="O"
  .;
  .;DAM 8-29-07   New code to place Pending Orders after Pending Renewal Orders on the roll and scroll display.  Non-Active Orders appear last.
  S PSJTF=0,PSJC="" F  S PSJC=$O(^TMP("PSJ",$J,PSJC)) Q:PSJC=""  D
- . S PSJF="^PS("_$S("AO"[PSJC:"55,"_PSGP_",5,",PSJC="DF":"55,"_PSGP_",5,",1:"53.1,")
+ . S PSJF="^PS("_$S("AO"[PSJC:"55,"_PSGP_",5,",1:"53.1,")
  . I PSJC="CB" D TF S PSJTF=$E(PSJC,1)                            ;These are Pending Orders
  . I PSJC="CB" S PSJST="" F  S PSJST=$O(^TMP("PSJ",$J,PSJC,PSJST)) Q:PSJST=""  D
- . . S PSJS="" F  S PSJS=$O(^TMP("PSJ",$J,PSJC,PSJST,PSJS)) Q:PSJS=""   D ON
- . I PSJC="DF" D TF S PSJTF=$E(PSJC,1)                              ;These are recently DC Orders (mv)
- . I PSJC="DF" S PSJST="" F  S PSJST=$O(^TMP("PSJ",$J,PSJC,PSJST)) Q:PSJST=""  D
  . . S PSJS="" F  S PSJS=$O(^TMP("PSJ",$J,PSJC,PSJST,PSJS)) Q:PSJS=""   D ON
  . I PSJC="O" D TF S PSJTF=$E(PSJC,1)                              ;These are Non-Active Orders
  . I PSJC="O" S PSJST="" F  S PSJST=$O(^TMP("PSJ",$J,PSJC,PSJST)) Q:PSJST=""  D
@@ -72,12 +69,9 @@ ON ;
  Q
  ;
 TF ; Set up order type header
- NEW PSJDFHDR
  I $D(^TMP("PSJ",$J,PSJC)) D
- .S PSJDCEXP=$$RECDCEXP^PSJP()
- .S PSJDFHDR="RECENTLY DISCONTINUED/EXPIRED (LAST "_+$G(PSJDCEXP)_" HOURS)"
  .N C,X,Y S C=PSJC,Y="",$P(Y," -",40)=""
- .S X=$S(C="A":$$TXT^PSJO("A"),C["CC":$$TXT^PSJO("PR"),C["CD":$$TXT^PSJO("PC"),C["C":$$TXT^PSJO("P"),C["BD":$$TXT^PSJO("NC"),C["B":$$TXT^PSJO("N"),C["DF":PSJDFHDR,1:$$TXT^PSJO("NA"))
+ .S X=$S(C="A":"A C T I V E",C["CC":"P E N D I N G   R E N E W A L S",C["CD":"P E N D I N G  C O M P L E X",C["C":"P E N D I N G ",C["BD":"N O N - V E R I F I E D  C O M P L E X",C["B":"N O N - V E R I F I E D",1:"N O N - A C T I V E")
  .S ^TMP("PSJPRO",$J,PSJLN,0)=$E($E(Y,1,(80-$L(X))/2)_" "_X_$E(Y,1,(80-$L(X))/2),1,80),PSJLN=PSJLN+1
  Q
 TEST ;

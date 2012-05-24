@@ -1,5 +1,5 @@
 SROAPCA4 ;BIR/SJA - CARDIAC COMPLIANCE DATA ;07/05/06
- ;;3.0; Surgery ;**95,125,153,174**;24 Jun 93;Build 8
+ ;;3.0; Surgery ;**95,125,153**;24 Jun 93;Build 11
  ;
  ; Reference to ^DGPM("APTT1" supported by DBIA #565
  ; Reference to File #405 supported by DBIA #3029
@@ -18,16 +18,15 @@ LAB ;D PAGE^SROAPCA I SRSOUT Q
  W !!,"III. DETAILED LABORATORY INFO - PREOPERATIVE VALUES"
  N SROUN S SROUN=" mg/dl"
  W !,"Creatinine:",?14,$J($P(SRA(201),U,4),4),SROUN S Y=$P(SRA(202),"^",4) D DT W ?25,"("_$E(X,1,8)_")"
- W ?41,"T. Cholesterol:",?57,$J($P(SRA(201),U,26),4),SROUN S Y=$P(SRA(202),"^",26) D DT W ?68,"("_$E(X,1,8)_")"
+ W ?41,"T. Bilirubin:",?57,$J($P(SRA(201),U,24),4),SROUN S Y=$P(SRA(202),"^",24) D DT W ?68,"("_$E(X,1,8)_")"
  W !,"Hemoglobin:",?14,$J($P(SRA(201),U,20),4),SROUN S Y=$P(SRA(202),"^",20) D DT W ?25,"("_$E(X,1,8)_")"
- W ?41,"HDL:",?57,$J($P(SRA(201),U,21),4),SROUN S Y=$P(SRA(202),"^",22) D DT W ?68,"("_$E(X,1,8)_")"
+ W ?41,"T. Cholesterol:",?57,$J($P(SRA(201),U,26),4),SROUN S Y=$P(SRA(202),"^",26) D DT W ?68,"("_$E(X,1,8)_")"
  W !,"Albumin:",?14,$J($P(SRA(201),U,8),4)," g/dl" S Y=$P(SRA(202),"^",8) D DT W ?25,"("_$E(X,1,8)_")"
- W ?41,"LDL:",?57,$J($P(SRA(201),U,25),4),SROUN S Y=$P(SRA(202),"^",25) D DT W ?68,"("_$E(X,1,8)_")"
+ W ?41,"HDL:",?57,$J($P(SRA(201),U,21),4),SROUN S Y=$P(SRA(202),"^",22) D DT W ?68,"("_$E(X,1,8)_")"
  W !,"Triglyceride:",?14,$J($P(SRA(201),U,22),4),SROUN S Y=$P(SRA(202),"^",22) D DT W ?25,"("_$E(X,1,8)_")"
- W ?41,"Hemoglobin A1c:",?57,$J($P(SRA(201),U,28),4)," %" S Y=$P(SRA(202.1),"^") D DT W ?68,"("_$E(X,1,8)_")"
+ W ?41,"LDL:",?57,$J($P(SRA(201),U,25),4),SROUN S Y=$P(SRA(202),"^",25) D DT W ?68,"("_$E(X,1,8)_")"
  W !,"Potassium:",?14,$J($P(SRA(201),U,23),4)," mg/L" S Y=$P(SRA(202),"^",23) D DT W ?25,"("_$E(X,1,8)_")"
- W ?41,"BNP:",?57,$J($P(SRA(201),U,29),4),SROUN S Y=$P(SRA(202.1),"^",2) D DT W ?68,"("_$E(X,1,8)_")"
- W !,"T. Bilirubin:",?14,$J($P(SRA(201),U,24),4),SROUN S Y=$P(SRA(202),"^",24) D DT W ?25,"("_$E(X,1,8)_")"
+ W ?41,"Hemoglobin A1c:",?57,$J($P(SRA(201),U,28),4)," %" S Y=$P(SRA(202.1),"^") D DT W ?68,"("_$E(X,1,8)_")"
  Q
 DD ;Detailed Discharge Information
  N VAINDT,SRPTF,SRRES

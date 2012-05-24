@@ -1,5 +1,5 @@
-FBAACCB ;AISC/GRR-CLERK CLOSE BATCH ; 11/24/10 1:32pm
- ;;3.5;FEE BASIS;**4,61,77,116**;JAN 30, 1995;Build 30
+FBAACCB ;AISC/GRR-CLERK CLOSE BATCH ;8/7/2003
+ ;;3.5;FEE BASIS;**4,61,77**;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  K QQ D DT^DICRW
 BT W !! S DIC="^FBAA(161.7,",DIC(0)="AEQ",DIC("S")=$S($D(^XUSEC("FBAASUPERVISOR",DUZ)):"I $G(^(""ST""))=""O""",1:"I $P(^(0),U,5)=DUZ&($G(^(""ST""))=""O"")") D ^DIC K DIC("S")
@@ -11,36 +11,13 @@ BT W !! S DIC="^FBAA(161.7,",DIC(0)="AEQ",DIC("S")=$S($D(^XUSEC("FBAASUPERVISOR"
 RDD S DIR(0)="Y",DIR("A")="Want to review batch",DIR("B")="NO",DIR("?")="If you want a detail list of each payment line, answer ""Yes"" otherwise press Return key" D ^DIR K DIR
  G BT:$D(DIRUT) W:Y @IOF D:Y LIST:FBTYPE="B3",LISTP:FBTYPE="B5",LISTT^FBAACCB0:FBTYPE="B2",LISTC^FBAACCB1:FBTYPE="B9"
 RDD1 S DIR(0)="Y",DIR("A")="Do you still want to close Batch",DIR("B")="YES" D ^DIR K DIR G BT:'Y!$D(DIRUT)
- N FBARY,FBOLD,FBINVT
- ;
  S C=0,T=0 G PHARM^FBAACCB1:FBTYPE="B5",TRAV^FBAACCB1:FBTYPE="B2",CHNH^FBAACCB1:FBTYPE="B9"
  F J=0:0 S J=$O(^FBAAC("AC",B,J)) Q:J'>0  F K=0:0 S K=$O(^FBAAC("AC",B,J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAAC("AC",B,J,K,L)) Q:L'>0  F M=0:0 S M=$O(^FBAAC("AC",B,J,K,L,M)) Q:M'>0  D GOT
-FIN ; FB*3.5*116 - check and handle $0 invoices
- D CHECK(.FBARY)
- I $D(FBARY) D  G BT
- . ;D EN^DDIOL(.FBARY)
- . W *7,!!?2,"Batch cannot be closed. Listed invoices are zero dollar "
- . W *7,!?2,"and must be corrected or removed from the batch."
- ; end of changes
- ;
- S $P(FZ,"^",9)=T,$P(FZ,"^",11)=C
+FIN S $P(FZ,"^",9)=T,$P(FZ,"^",11)=C
  S $P(FZ,"^",13)=DT,^FBAA(161.7,B,0)=FZ,^FBAA(161.7,B,"ST")="C",^FBAA(161.7,"AC","C",B)="",DA=B,DR="0;ST" K ^FBAA(161.7,"AC","O",B),^FBAA(161.7,"AB","O",$P(^FBAA(161.7,B,0),"^",5),B) W !! D EN^DIQ W !!,"Batch Closed" G BT
- ;
 GOT S Y(0)=$G(^FBAAC(J,1,K,1,L,1,M,0)),FBIN=$P(Y(0),"^",16)
- ; HIPAA 5010 - count line items that have 0.00 amount paid
- S T=T+$P(Y(0),"^",3),C=C+1
- ; FB*3.5*116 -collect amount paid for each invoice in batch
- S FBARY(FBIN)=$G(FBARY(FBIN))+$P(Y(0),"^",3)
+ I $P(Y(0),"^",3)>0 S T=T+$P(Y(0),"^",3),C=C+1
  Q
- ;
-CHECK(FBINV) ; order thru array and save zero dollar invoices; report any zero dollar invoices
- ; FBINV = array of invoices
- N FBAAIN
- S FBAAIN=0 F  S FBAAIN=$O(FBINV(FBAAIN)) Q:'FBAAIN  D
- . I FBINV(FBAAIN)'>0 W !!,"Invoice #: "_FBAAIN_" totals $0.00"
- . E  K FBINV(FBAAIN) ; remove array elements that represent non-zero dollar invoices
- Q
- ;
 LIST S Q="",$P(Q,"=",80)="="
  S IOP=$S($D(ION):ION,1:"HOME") D ^%ZIS K IOP
 ENM D HED S (FBIN,FBINOLD)="",(FBAAOUT,FBINTOT)=0 F XY=0:0 S FBIN=$O(^FBAAC("AJ",B,FBIN)) Q:FBIN=""!($G(FBAAOUT))  D INTOT^FBAACCB0 F J=0:0 S J=$O(^FBAAC("AJ",B,FBIN,J)) Q:J'>0!($G(FBAAOUT))  D GMORE^FBAACCB0

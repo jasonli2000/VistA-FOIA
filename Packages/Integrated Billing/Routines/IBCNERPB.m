@@ -1,8 +1,8 @@
-IBCNERPB ;DAOU/RO -  eIV PAYER LINK REPORT ;AUG-2003
- ;;2.0;INTEGRATED BILLING;**184,252,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERPB ;DAOU/RO -  IIV PAYER LINK REPORT ;AUG-2003
+ ;;2.0;INTEGRATED BILLING;**184,252,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification Interface
+ ; IIV - Insurance Identification and Verification Interface
  ;
  ; Input parameters: N/A
  ; Other relevant variables ZTSAVED for queueing:
@@ -28,12 +28,12 @@ EN ; Main entry pt
  S STOP=0
  S IBCNERTN="IBCNERPB"
  W @IOF
- W !,"eIV Payer Link Report",!
+ W !,"IIV Payer Link Report",!
  W !,"In order for an Insurance Company to be eligible for electronic insurance"
- W !,"eligibility communications via the eIV software, the Insurance Company"
+ W !,"eligibility communications via the IIV software, the Insurance Company"
  W !,"needs to be linked to an appropriate payer from the National EDI Payer list."
  W !,"The National EDI Payer list contains the names of the payers that are"
- W !,"currently participating with the eIV process."
+ W !,"currently participating with the IIV process."
  W !!,"This report option provides information to assist with finding unlinked"
  W !,"insurance companies or payers, which can subsequently be linked through the"
  W !,"INSURANCE COMPANY EDIT option."
@@ -155,7 +155,7 @@ PAYER ; Select Payer - File #365.12
  W !!!
  S DIC(0)="ABEQ"
  S DIC("A")=$$FO^IBCNEUT1("Select a Payer (RETURN for ALL Payers): ",39,"L")
- ; Do not allow '~NO PAYER' or non-eIV payers
+ ; Do not allow '~NO PAYER' or non-IIV payers
  S DIC("S")="I ($P(^(0),U,1)'=""~NO PAYER""),$$PYRAPP^IBCNEUT5(""IIV"",$G(Y))'="""""
  S DIC="^IBE(365.12,"
  D ^DIC
@@ -205,7 +205,7 @@ DEVICE(IBCNERTN,IBCNESPC) ; Device Handler and possible TaskManager calls
  N ZTRTN,ZTDESC,ZTSAVE,POP
  ;
  S ZTRTN="COMPILE^IBCNERPB("""_IBCNERTN_""",.IBCNESPC)"
- S ZTDESC="IBCNE eIV Payer Link Report"
+ S ZTDESC="IBCNE IIV Payer Link Report"
  S ZTSAVE("IBCNESPC(")=""
  S ZTSAVE("IBCNERTN")=""
  D EN^XUTMDEVQ(ZTRTN,ZTDESC,.ZTSAVE)

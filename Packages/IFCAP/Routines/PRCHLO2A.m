@@ -1,7 +1,6 @@
-PRCHLO2A ;WOIFO/RLL/DAP-EXTRACT ROUTINE (cont.)CLO REPORT SERVER ;5/22/09  14:12
- ;;5.1;IFCAP;**83,130**;Oct 20, 2000;Build 25
- ;Per VHA Directive 2004-038, this routine should not be modified.
- ; DBIA 10093 - Read file 49 via FileMan.
+PRCHLO2A ;WOIFO/RLL/DAP-EXTRACT ROUTINE (cont.)CLO REPORT SERVER ; 11/3/05 8:22am
+V ;;5.1;IFCAP;**83**;; Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ; Continuation of PRCHLO2. This program includes the extract
  ; logic for each of the identified tables.
  ;
@@ -58,7 +57,6 @@ LPPOPTR ; Loop on Prompt Payment Terms
  . Q
  Q
 LPPOOB ; Loop on PO Obligation
- N X
  I CKOB1>0  D
  . S PPO=0
  . F  S PPO=$O(^PRC(442,POID,10,PPO)) Q:PPO=""  D
@@ -72,18 +70,8 @@ LPPOOB ; Loop on PO Obligation
  . . I PP5="" S PP5E2=""
  . . I PP1'="" S PP1A=$P(PP1,".",5),PP1=$P(PP1A,"@",1)
  . . S PPALL=PP1_U_PP2E2_U_PP3_U_PP4_U_PP5E2
- . . S PPALL=PPALL_U_PP2                      ;DUZ Obligated By
- . . S PPALL=PPALL_U_PP5                      ;IEN 1358 Adjustment
- . . S X=$P(PPOVAL,U,6) S:X'="" X=$$FMTE^XLFDT($P(X,"."))
- . . S PPALL=PPALL_U_X           ;Date Signed
- . . S X=$P(PPOVAL,U,12) S:X'="" X=$$FMTE^XLFDT(X)
- . . S PPALL=PPALL_U_X          ;Obligation Process Date
- . . S X=$P(PPOVAL,U,13) S:X'="" X=$P("JAN;FEB;MAR;APR;MAY;JUN;JUL;AUG;SEP;OCT;NOV;DEC",";",+$E(X,4,5))_" "_(1700+$E(X,1,3))
- . . S PPALL=PPALL_U_X          ;Accounting Period
  . . ;
- . . S PP2=$P($G(^VA(200,+PP2,5)),U)
- . . S PP3=$S(PP2="":"",1:$$GET1^DIQ(49,+PP2_",",.01))
- . . S PPALL=PPALL_U_PP2_U_PP3                ;OBL BY SERVICE INT/EXT
+ . . ;
  . . ;
  . . S ^TMP($J,"POOBLG",POID,PPO)=PPOKEY_U_PPO_U_PPALL
  . . Q

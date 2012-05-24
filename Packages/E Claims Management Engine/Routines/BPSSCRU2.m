@@ -1,5 +1,5 @@
 BPSSCRU2 ;BHAM ISC/SS - ECME SCREEN UTILITIES ;05-APR-05
- ;;1.0;E CLAIMS MGMT ENGINE;**1,3,5,10**;JUN 2004;Build 27
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,3,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;USER SCREEN
  Q
@@ -15,7 +15,7 @@ GETMWC(BP59) ;*/
  ;
  ;initially this was designed to convert numbers to letters to display on the screen
  ;but later the Pharmacy designed API that returns letters instead of numbers
- ;so now this function just returns what it receives in its parameter, while it does not 
+ ;so now this function just returns what it receives in its parameter, while it does not
  ;make any sense, we still keep it in order to prevent changes in other four routines:
  ; BPSREOP1, BPSSCR02, BPSSCR03, BPSSCR04
 MWCNAME(BPMWC) ;
@@ -51,9 +51,9 @@ GETINSUR(BP59) ;get insurance info by the pointer of #9002313.59
  S BPINSNM=$P(BPX,U,1)
  S BPHONE=$P(BPX,U,2)
  ;Get a temporary ID for the insurance from ^TMP list of insurances.
- ;If doesn't exist yet then create a new record in ^TMP list of insurances 
+ ;If doesn't exist yet then create a new record in ^TMP list of insurances
  ;   for this insurance and return the ID for the record.
- ;A lifetime for ^TMP list of insurances is the time period the user is using 
+ ;A lifetime for ^TMP list of insurances is the time period the user is using
  ;   the User Screen menu option
  S BPINSID=$$CHKINSUR^BPSSCR(BPINSNM,BPHONE)
  I $L(BPHONE)=0 S BPHONE=" "
@@ -88,15 +88,15 @@ GETPATID(BP59) ;
 RXST(BP59) ;
  N BPRXREF
  S BPRXREF=$$RXREF^BPSSCRU2(BP59)
- ;display status ONLY if the refill is the most recent 
+ ;display status ONLY if the refill is the most recent
  ;otherwise display blanks (three spaces for sorting purposes)
- I +$P(BPRXREF,U,2)'=(+$$LSTRFL^PSOBPSU1(+$P(BPRXREF,U,1))) Q "**"
+ I +$P(BPRXREF,U,2)'=(+$$LSTRFL^PSOBPSU1(+$P(BPRXREF,U,1))) Q "***"
  Q $$RXSTANAM($$RXSTATUS(+$P(BPRXREF,U,1)))
  ;/**
  ;RX status
- ;Input 
+ ;Input
  ; RXNUM:
- ;  ien of file #52 (if MODE=0) 
+ ;  ien of file #52 (if MODE=0)
  ;  or RX number (if MODE=1)
  ;----------
  ;Output:
@@ -108,26 +108,26 @@ RXSTATUS(RXNUM) ;*/
  I BPRET="" Q -1
  Q BPRET
  ;/**
- ;if RX "valid" 
+ ;if RX "valid"
 RXACTIVE(BPRXSTAT) ;*/
  ; 0    not valid
- ; 1    valid (i.e. ACTIVE/NON-VERIFIED/REFILL/HOLD/DRUG INTERACTIONS/SUSPENDED) 
+ ; 1    valid (i.e. ACTIVE/NON-VERIFIED/REFILL/HOLD/DRUG INTERACTIONS/SUSPENDED)
  ; -1   doesn't exist
  Q:BPRXSTAT<6 1  ;active
  ;/**
  ;RX status text
 RXSTANAM(BPRXSTAT) ;*/
- Q:BPRXSTAT=0 "AC"  ; ACTIVE; 
- Q:BPRXSTAT=1 "NV"  ; NON-VERIFIED; 
- Q:BPRXSTAT=3 "HL"  ; HOLD; 
- Q:BPRXSTAT=5 "SU"  ; SUSPENDED; 
- Q:BPRXSTAT=11 "EX"  ; EXPIRED; 
- Q:BPRXSTAT=12 "DS"  ; DISCONTINUED; 
- Q:BPRXSTAT=13 "DL"  ; DELETED; 
- Q:BPRXSTAT=14 "DS"  ; DISCONTINUED BY PROVIDER; 
- Q:BPRXSTAT=15 "DS"  ; DISCONTINUED (EDIT); 
- Q:BPRXSTAT=16 "HL"  ; PROVIDER HOLD; 
- Q:BPRXSTAT=-1 "??"
+ Q:BPRXSTAT=0 "ACT"  ; ACTIVE;
+ Q:BPRXSTAT=1 "NVER"  ; NON-VERIFIED;
+ Q:BPRXSTAT=3 "HLD"  ; HOLD;
+ Q:BPRXSTAT=5 "SUS"  ; SUSPENDED;
+ Q:BPRXSTAT=11 "EXP"  ; EXPIRED;
+ Q:BPRXSTAT=12 "DIS"  ; DISCONTINUED;
+ Q:BPRXSTAT=13 "DEL"  ; DELETED;
+ Q:BPRXSTAT=14 "DIS"  ; DISCONTINUED BY PROVIDER;
+ Q:BPRXSTAT=15 "DIS"  ; DISCONTINUED (EDIT);
+ Q:BPRXSTAT=16 "HLD"  ; PROVIDER HOLD;
+ Q:BPRXSTAT=-1 "???"
  Q ""
  ;/**
  ;Input:
@@ -145,14 +145,14 @@ ISRXREL(BP59) ;
  ;
  ;release status
 RL(BP59) ;
- Q $S($$ISRXREL(BP59)>0:"R",1:"N")
+ Q $S($$ISRXREL(BP59)>0:"RL",1:"NR")
  ;/**
  ;get refill (including original refill) info by BP59
  ;Input:
  ; BP59 - pointer to file #9002313.59
  ;Output:
  ;returns:
- ;on error : "-1"  
+ ;on error : "-1"
  ;on success : refill# ^ release date ^label print date ^ fill date ^ issue date
 REFILINF(BP59) ;*/
  N BP1 S BP1=$$RXREF(BP59)
@@ -198,7 +198,7 @@ REFDISDT(BPRX,BPREF) ;
 IFREFILL(BPRX,BPREF) ;
  Q $$RXSUBF1^BPSUTIL1(BPRX,52,52.1,BPREF,.01,"I")'=""
  ;/**
- ;input 
+ ;input
  ;ptr to 9002313.59
  ;output :
  ; BB - back billing
@@ -236,7 +236,7 @@ GETDRG59(BP59) ;
  Q $$GETDRUG(+BPX)
  ;
  ;
- ;review %% for each of claims in the array 
+ ;review %% for each of claims in the array
  ;and calculate "overall" "done" status
  ;input:
  ; BPARR59 - array of ptr to #9002313.59
@@ -250,6 +250,17 @@ FINISHST(BPARR59) ;
  I BPFIN=1 Q "**FINISHED**"
  Q ""
  ;
+ ;/**
+ ;BP59 - ptr to 9002313.59
+ ;output :
+ ;ECME number
+ ; 7 digits of the prescription IEN file 52
+ ;or 7 spaces
+ECMENUM(BP59) ;*/
+ N X
+ S X=$P($G(^BPST(BP59,0)),"^")
+ I X="" Q $$FORMAT(X,7," ",1)
+ Q $$FORMAT(X\1,7,"0",1)
  ;
  ;BPRX - ptr to #52
 RXNUM(BPRX) ;
@@ -257,13 +268,11 @@ RXNUM(BPRX) ;
  ;
  ;/**
  ;get NDC
- ;input 
+ ;input
  ;BPRX - ptr to #52
  ;BPREF - refill # (0,1,2,3...)
 NDC(BPRX,BPREF) ;*/
- N X
- S X=$TR($$GETNDC^PSONDCUT(BPRX,BPREF),"-","") ;remove dashes
- Q X
+ Q $$GETNDC^PSONDCUT(BPRX,BPREF)
  ;
 DRGNAME(BP59) ;drug name BP59 -ptr to .59 file
  N BPRX
@@ -289,18 +298,3 @@ FORMAT(BPSTR,BPSMLEN,BPSCHR,BPSLFT) ;
  Q:BPSLFT ZZ_BPSTR
  Q BPSTR_ZZ
  ;
- ;/**
- ;BP59 - ptr to 9002313.59
- ;output :
- ;ECME number from 9002313.02
- ; 7 or 12 digits of the prescription IEN file 52
- ; or 12 spaces
-ECMENUM(BP59) ;*/
- N BPST0,BPST4,PC,PF,PR,X
- S BPST0=$G(^BPST(BP59,0)),PC=$P(BPST0,U,4),PF=$P(BPST0,U,9)
- S BPST4=$G(^BPST(BP59,4)),PR=$P(BPST4,U,1)
- I PR]"" S PC=PR ;This is a reversal
- I PC=""!(PF="") Q $$FORMAT("",12," ",1)
- S X=$P($G(^BPSC(PC,400,PF,400)),U,2)
- I X="" Q $$FORMAT(X,12," ",1)
- Q $E(X,3,14)

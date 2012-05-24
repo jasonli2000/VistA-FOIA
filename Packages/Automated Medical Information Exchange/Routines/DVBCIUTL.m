@@ -1,33 +1,16 @@
 DVBCIUTL ;ALB/GTS-AMIE INSUFFICIENT RPT UTILITY RTN ; 11/14/94  9:15 AM
- ;;2.7;AMIE;**13,17,19,149**;Apr 10, 1995;Build 16
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.7;AMIE;**13,17,19**;Apr 10, 1995
  ;
  ;** Version Changes
  ;   2.7 - New routine (Enhc 15)
  ;
 DETHD ;** Detailed Report header
- N DVBAI,DVBATXT S DVBAI=2
  S:'$D(DVBAPG1) TVAR(1,0)="0,15,0,1,0^Detailed Insufficient Exam Report"
  S:$D(DVBAPG1) TVAR(1,0)="0,15,0,1,1^Detailed Insufficient Exam Report"
- S DVBATXT=$$PRHD(DVBAPRTY)
- S TVAR(DVBAI,0)="0,"_((63-$L(DVBATXT))\2)_",0,1,0^"_DVBATXT
- S DVBAI=DVBAI+1
- S TVAR(DVBAI,0)="0,11,0,2,0^For Date Range: "_STRTDT_" to "_LSTDT
+ S TVAR(2,0)="0,11,0,2,0^For Date Range: "_STRTDT_" to "_LSTDT
  D WR^DVBAUTL4("TVAR")
  K TVAR
  Q
- ;
- ;Input : DVBAPRTY - Priority Exam Code (File #396.3 Fld #9)
- ;Output: Description for Priority Exam Code
-PRHD(DVBAPRTY) ;priority exam type header info
- N DVBATXT
- S DVBATXT=$S((DVBAPRTY["BDD"):"Benefits Delivery at Discharge",1:"X")
- S:(DVBATXT="X") DVBATXT=$S((DVBAPRTY["QS"):"Quick Start",1:"X")
- S:(DVBATXT="X") DVBATXT=$S((DVBAPRTY["DCS"):"DES Claimed Condition by Service Member",1:"X")
- S:(DVBATXT="X") DVBATXT=$S((DVBAPRTY["DFD"):"DES Fit for Duty",1:"X")
- S:(DVBATXT="X") DVBATXT=$S((DVBAPRTY["AO"):"Agent Orange",1:"Excludes Exam Priorities: AO,BDD,DCS,DFD,QS")
- S:(DVBATXT'["Excludes") DVBATXT="Priority of Exam: "_DVBATXT
- Q $G(DVBATXT)
  ;
 EXMOUT ;** Output exam information for reason/type
  I $Y>(IOSL-9) DO
@@ -45,8 +28,7 @@ EXMOUT ;** Output exam information for reason/type
  .I '$D(DVBAXMPT) DO
  ..W !
  ..D TYPEOUT
- ..S DVBAXMPT=""
- .S (DVBARQDT,DVBAXDT,DVBAXRS)=""
+ ..S DVBAXMPT="",(DVBARQDT,DVBAXDT,DVBAXRS)=""
  .S REQDA=$P(^DVB(396.4,XMDA,0),U,2) ;*REQDA of PRIORITY Insuf 2507
  .I $D(^DVB(396.4,XMDA,"CAN")) D
  ..S DVBAXDT=$P(^DVB(396.4,XMDA,"CAN"),U,1),DVBAXRS=$P(^("CAN"),U,3)
@@ -130,7 +112,7 @@ RSEL ;** Select Reasons
  ;
 XMSEL ;** Select Exams
  ;** The selection prompt is defaulted to ALL.  If the user selects
- ;**  'All', only exams entered on requests with a priority of 
+ ;**  'All', only exams entered on requests with a priority of
  ;**  'Insufficient' will be reported.  Not all exams.
  ;
  W @IOF,!
@@ -150,18 +132,3 @@ XMSEL ;** Select Exams
  .I $D(Y),(+Y=-1) S DVBCYQ=1
  K DTOUT,DUOUT,Y,DIC,DVBCYQ
  Q
- ;
- ;Input: DVBADIRA - Prompt to display for DIR call
- ;Ouput: Code selected from set or ^ if user exited selection
-EXMPRTY(DVBADIRA) ;** Select Priority of Exam
- N DIR,X,Y,DTOUT,DUOUT,DIRUT,DIROUT
- S DIR(0)="S^AO:Agent Orange;BDD:Benefits Delivery at Discharge / Quick Start;"
- S DIR(0)=DIR(0)_"DES:DES Claimed Condition by Service Member / Fit for Duty;"
- S DIR(0)=DIR(0)_"ALL:All Others"
- S DIR("A")=$S($G(DVBADIRA)]"":DVBADIRA,1:"Select Priority of Exam for the Report")
- S DIR("B")="All Others"
- S DIR("T")=DTIME  ;time-out value specified by system
- S DIR("?",1)="Select the priority of exam(s) to report on or ALL for the original report,"
- S DIR("?")="which excludes the AO, BDD and DES exam priorities."
- D ^DIR
- Q Y

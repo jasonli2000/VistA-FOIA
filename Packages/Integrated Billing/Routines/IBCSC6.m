@@ -1,6 +1,6 @@
 IBCSC6 ;ALB/MJB - MCCR SCREEN 6 (INPT. BILLING INFO) ;27 MAY 88 10:19
- ;;2.0;INTEGRATED BILLING;**52,80,109,106,51,137,343,400,432**;21-MAR-94;Build 192
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**52,80,109,106,51,137,343**;21-MAR-94;Build 16
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;MAP TO DGCRSC6
  ;
@@ -14,15 +14,20 @@ EN I $P(^DGCR(399,IBIFN,0),"^",5)>2 G EN^IBCSC7
  ;
 1 S Z=1,IBW=1 X IBWW W " Bill Type   : ",$S('$D(IBBT1):IBU,IBBT1="":IBU,1:IBBT1)
  W $J("",14),"Loc. of Care: ",$E($G(IBBTP1),1,30) K IBBTP1
- ;W !?4,"Covered Days: ",$S(IB("U2")="":IBU,$P(IB("U2"),U,2)'="":$P(IB("U2"),U,2),1:IBU)
- W !?4,"Charge Type : ",$S($P(IB(0),U,27)=1:"INSTITUTIONAL",$P(IB(0),U,27)=2:"PROFESSIONAL",1:IBU)
- ; IB*2.0*432 - remove Covered, Non-covered and co-insurance days
- ;W !?4,"Non-Cov Days: ",$S(IB("U2")="":IBU,$P(IB("U2"),U,3)'="":$P(IB("U2"),U,3),1:IBU)
+ W !?4,"Covered Days: ",$S(IB("U2")="":IBU,$P(IB("U2"),U,2)'="":$P(IB("U2"),U,2),1:IBU)
+ W ?35,"Bill Classif: ",$E($G(IBBTP2),1,30) K IBBTP2
+ W !?4,"Non-Cov Days: ",$S(IB("U2")="":IBU,$P(IB("U2"),U,3)'="":$P(IB("U2"),U,3),1:IBU)
  W ?38,"Timeframe: ",$S($D(IBBTP3):$E(IBBTP3,1,30),1:"") K IBBTP3
- W !?4,"Form Type   : ",$P($G(^IBE(353,+$P(IB(0),U,19),0)),U,1)
+ W !?4,"Charge Type : ",$S($P(IB(0),U,27)=1:"INSTITUTIONAL",$P(IB(0),U,27)=2:"PROFESSIONAL",1:IBU)
  W ?39,"Division: ",$E($P($G(^DG(40.8,+$P(IB(0),U,22),0)),U,1),1,30)
- W !,?4,"Bill Classif: ",$E($G(IBBTP2),1,30) K IBBTP2
- ;W ?34,"Co-Insur Days: ",$S($P(IB("U2"),U,7)="":$S($$MCRONBIL^IBEFUNC(IBIFN):IBU,1:IBUN),1:$P(IB("U2"),U,7))
+ ; PRXM/KJH - Add Taxonomy code to display for patch 343.
+ W !?34,"Div. Taxonomy: "
+ S IBZ=$$GET1^DIQ(8932.1,+$P(IB("U3"),U,2),"X12 CODE") W $S(IBZ'="":IBZ,1:IBU)
+ S IBZ=$$GET1^DIQ(8932.1,+$P(IB("U3"),U,2),"SPECIALTY CODE") W $S(IBZ'="":" ("_IBZ_")",1:"")
+ W !?4,"Form Type   : ",$P($G(^IBE(353,+$P(IB(0),U,19),0)),U,1)
+ W ?34,"Co-Insur Days: ",$S($P(IB("U2"),U,7)="":$S($$MCRONBIL^IBEFUNC(IBIFN):IBU,1:IBUN),1:$P(IB("U2"),U,7))
+ ;
+ ;W !?4,"Provider # : ",$S(IB("U2")="":IBU,$P(IB("U2"),U,2)'="":$P(IB("U2"),U,2),1:IBU)
  ;
 ROI S Z=2,IBW=1 X IBWW
  W " Sensitive?  : ",$S(IB("U")="":IBU,$P(IB("U"),U,5)="":IBU,$P(IB("U"),U,5)=1:"YES",1:"NO")
@@ -35,6 +40,9 @@ ROI S Z=2,IBW=1 X IBWW
  ;
 BED S Z=4,IBW=1 X IBWW
  W " Bedsection  : ",$S(IB("U")="":IBU,$P(IB("U"),U,11)'="":$P(^DGCR(399.1,$P(IB("U"),U,11),0),U,1),1:IBU)
+ ;S IBI=1,D1=0,IBLS=$S($D(DGNEWLOS):0,IB("U")="":0,$P(IB("U"),U,15)'="":$P(IB("U"),U,15),1:0) K DGNEWLOS
+ ;I 'IBLS S D0=DFN,(D1,DGPMIFN)=$O(^DGPM("AMV1",$P(IBIP,U,2),DFN,0)),X2=$P(IB("U"),"^"),X1=$P(IB("U"),"^",2) D ^%DTC S IBLS(1)=X
+ ;I 'IBLS K X D:DGPMIFN ^DGPMLOS S IBLS=$S($D(X):$P(X,U,5),1:IBLS(1)),IBLS=$S(IBLS(1)<IBLS:IBLS(1),1:IBLS) S:'IBLS IBLS=1 S (DA,Y)=IBIFN,DIE="^DGCR(399,",DR="165///"_IBLS D ^DIE K DR
  W !?4,"LOS         : ",IBLS
  ;
  I $P($G(^DPT(DFN,.3)),"^")="Y" D SC I IBSCM>0 W !?4,"PTF record indicates ",IBSCM," of ",IBM," movements are for Service Connected Care."

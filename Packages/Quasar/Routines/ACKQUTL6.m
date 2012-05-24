@@ -1,8 +1,8 @@
-ACKQUTL6 ;HCIOFO/BH-A&SP Utilities routine ; 12/28/07 11:04am
- ;;3.0;QUASAR;**1,7,17**;Feb 11, 2000;Build 28
+ACKQUTL6 ;HCIOFO/BH-A&SP Utilities routine ; 5/6/03 11:07am
+ ;;3.0;QUASAR;**1,7**;Feb 11, 2000
  ;Per VHA Directive 10-93-142, this routine SHOULD NOT be modified.
  ;
-DATACHEK(X,ACKVIEN) ;  Checks that the input (X) is a valid time also checks that 
+DATACHEK(X,ACKVIEN) ;  Checks that the input (X) is a valid time also checks that
  ;          current user has supervisor status
  ;
  I $$TIMECHEK^ACKQASU5(ACKVIEN,"") Q 0
@@ -135,7 +135,7 @@ FILE ;
  ;
 IDATE(D0,Y) ;  Checks that the entered Inactive date falls after the
  ;          Active date (if one has been entered).
- I Y="" Q 1  ;  Its valid to not enter an inactivation date. 
+ I Y="" Q 1  ;  Its valid to not enter an inactivation date.
  N ACKACT
  S ACKACT=$$GET1^DIQ(509850.3,D0,.03,"I") I ACKACT="" Q 1
  I Y<ACKACT Q 0
@@ -149,17 +149,13 @@ ADATE(D0,Y) ;  Checks that the entered Active date falls before the
  Q 1
  ;
 STAFFREF(X,DA) ;    Cross Reference called from Cross Reference 'Logic'
- Q  ;Disabled With the removal of "D" X-ref ACKQ*3*17
- ;
+ ;            of .01 field of Staff file.
  N ACKNAME
- ;ACKQ*3*17
- ;S ACKNAME=$$GET1^DIQ(8930.3,X_",",.01)
- S ACKNAME=$$GET1^DIQ(200,X_",",.01)
+ S ACKNAME=$$GET1^DIQ(8930.3,X_",",.01)
  S ^ACK(509850.3,"D",ACKNAME,DA)=""
  Q
  ;
 REINDEX() ;   Re-Indexes 'D' Cross Reference of Staff file
- Q  ;Disabled With the removal of "D" X-ref ACKQ*3*17
  ;   First checks that all ^USR(8930.3 entries that 509850.3 points to
  ;   still exist
  N ACK01,ACK,ACKARR,ACKCNT
@@ -188,13 +184,11 @@ REINDEX() ;   Re-Indexes 'D' Cross Reference of Staff file
  N DA,D0,X,Y
  K ^ACK(509850.3,"D")
  S DIK="^ACK(509850.3,"
- S DIK(1)=".07^D"
+ S DIK(1)=".01^D"
  D ENALL^DIK
  Q 1
  ;
 SETARR(ACK) ;
- Q  ;Disabled With the removal of "D" X-ref ACKQ*3*17
- ;
  N ACKNAME
  S ACKNAME=""
  F  S ACKNAME=$O(^ACK(509850.3,"D",ACKNAME)) Q:ACKNAME=""  D

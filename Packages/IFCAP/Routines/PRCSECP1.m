@@ -1,6 +1,6 @@
-PRCSECP1 ;SF-ISC/LJP/DGL-COPY A TRANSACTION CON'T ;7/29/99
-V ;;5.1;IFCAP;**148**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCSECP1 ;SF-ISC/LJP/DGL-COPY A TRANSACTION CON'T ; 7/29/99 1:54pm
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 S1 ;subroutine to copy transactions of form type 1 (i.e. 1358)
  K PRCSTMP
  N I,PRCSIP
@@ -49,12 +49,11 @@ S3 ;Note: S3 commented out (prior to patch 182) so it falls through to S4
  ;D S4 Q
  ;
  ;
-S4 ;copy vendor info, sort group and authoritie(s)
+S4 ;copy vendor info and sort group
  ;
- N PRC11
  S:$D(^PRCS(410,T1,2)) ^PRCS(410,DA,2)=^(2)
- I $D(^PRCS(410,T1,11)) S PRC11=^(11),^PRCS(410,DA,11)=$P(PRC11,"^")_"^^^"_$P(PRC11,"^",4,5)
- ;following line (copy sub control point) commented out before P182 
+ S:$D(^PRCS(410,T1,11)) ^PRCS(410,DA,11)=$P(^(11),U,1)
+ ;following line (copy sub control point) commented out before P182
  ;I $D(^PRCS(410,T1,12,0)) S ^PRCS(410,DA,12,0)=^(0),PRCSI=12,PRCSK=0 D S6
  Q
  ;

@@ -1,5 +1,5 @@
 IBCRHU1 ;ALB/ARH - RATES: UPLOAD UTILITIES ; 22-MAY-1996
- ;;2.0;INTEGRATED BILLING;**52,106,138,245,427**;21-MAR-94;Build 7
+ ;;2.0;INTEGRATED BILLING;**52,106,138,245**;21-MAR-94
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;
@@ -83,5 +83,5 @@ CHKFL(CS,FILE,IBSUBFL) ; Check the Charge Set and Host file are defined and matc
 CHKFLQ Q IBX
  ;
 VDATE(X) ; check for valid date
- N Y S Y=0 I +$G(X)?7N,X>2801010,X<3191232 S Y=1
+ N Y S Y=0 I +$G(X)?7N,X>2801010,X<3091232 S Y=1
  Q Y

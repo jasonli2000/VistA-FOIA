@@ -1,6 +1,5 @@
-HLCSUTL ;ALB/MTC - CS Utility Routines ;06/03/2008 11:57
- ;;1.6;HEALTH LEVEL SEVEN;**2,19,58,64,65,142**;Oct 13, 1995;Build 17
- ;Per VHA Directive 2004-038, this routine should not be modified.
+HLCSUTL ;ALB/MTC - CS Utility Routines ;05/31/2000  13:34
+ ;;1.6;HEALTH LEVEL SEVEN;**2,19,58,64,65**;Oct 13, 1995
  ;
  Q
  ;
@@ -12,7 +11,7 @@ READ(HLDHANG,HLDBSIZE,HLTRM) ;  This function will perform a read on the device 
  ;         HLTRM   - Passed by reference to return termination char
  ; OUTPUT:          <Data> - Ok
  ;                  -1^TIMEOUT : fails
- ;         
+ ;
  N RESULT,X,Y
  ;
  K HLTOUT
@@ -43,7 +42,7 @@ NEXTLINE(LL0,LL1,LINE,ARR,QUE) ;  This function will return the next line from t
  ;        RESULT - Position last segment was found or "" if no line
  ;                 was found.
  ;
- ; 
+ ;
  N RESULT,HLQUE,X,I
  S RESULT="",HLQUE=$S(QUE="IN":1,QUE="OUT":2,1:"")
  ;-- start looking for next line
@@ -161,16 +160,10 @@ HLNEXT ;-- This routine is used to return the next segment from file 772
  . S HLQUIT=1 Q
  S HLQUIT=$O(^HL(772,HLMTIEN,"IN",HLQUIT))
  I HLQUIT D  Q
- . ; patch HL*1.6*142 start
- . N HLQUIT2  ; use to save the last ien
  . S HLNODE=$G(^HL(772,HLMTIEN,"IN",HLQUIT,0)),HLI=0
- . ; F  S HLQUIT=$O(^HL(772,HLMTIEN,"IN",HLQUIT)) Q:'HLQUIT  D  Q:HLDONE
- . F  S HLQUIT2=HLQUIT,HLQUIT=$O(^HL(772,HLMTIEN,"IN",HLQUIT)) Q:'HLQUIT  D  Q:HLDONE
+ . F  S HLQUIT=$O(^HL(772,HLMTIEN,"IN",HLQUIT)) Q:'HLQUIT  D  Q:HLDONE
  .. I ^HL(772,HLMTIEN,"IN",HLQUIT,0)="" S HLDONE=1 Q
  .. S HLI=HLI+1,HLNODE(HLI)=$G(^HL(772,HLMTIEN,"IN",HLQUIT,0)) Q
- . ; for the occurrence when the last segment is not followed by <CR>
- . I HLQUIT="" S HLQUIT=HLQUIT2
- . ; patch HL*1.6*142 end
  ;no more nodes, kill flag and quit
  K HLDONE1 Q
  ;

@@ -1,6 +1,5 @@
-XQ1 ; SEA/MJM - DRIVER FOR MENUMAN (PART 2) ;08/28/08  13:20
- ;;8.0;KERNEL;**1,15,59,67,46,151,170,242,446**;Jul 10, 1995;Build 35
- ;Per VHA Directive 2004-038, this routine should not be modified.
+XQ1 ; SEA/MJM - DRIVER FOR MENUMAN (PART 2) ;10/29/2003  11:27
+ ;;8.0;KERNEL;**1,15,59,67,46,151,170,242**;Jul 10, 1995
  S DIC=19,DIC(0)="AEQM" D ^DIC Q:Y<0  S (XQDIC,XQY)=+Y K DIC,XQUR,Y,^VA(200,DUZ,202.1)
  D INIT^XQ12
  G M^XQ
@@ -10,7 +9,7 @@ KILL K D,D0,D1,DA,DIC,DIE,DIR,DIS,DR,XQI,XQV,XQW,XQZ
  ;
 OUT ;Exit point for all option types
  S U="^"
- I $D(XQXFLG("ZEBRA")) L ^XWB("SESSION",XQXFLG("ZEBRA")):15 ;Clear by setting new lock
+ I $D(XQXFLG("ZEBRA")) L ^XWB("SESSION",XQXFLG("ZEBRA")) ;Clear by setting new lock
  E  L  ;Clear the lock table
  ;
  I $D(ZTQUEUED),'$D(XQUIT) D
@@ -155,25 +154,21 @@ ZTSK ;Task Manager entry point
  K ZTQPARAM ;Build params from schedule in case we delete it.
  I $D(^DIC(19.2,XQSCH,3)),$L(^(3)) S ZTQPARAM=^(3)
  I $D(^DIC(19.2,XQSCH,2)) D  ;Build other symbols
- . N X1,X2 S X2=XQSCH N XQSCH,XQY,XQ
+ . S X2=XQSCH N XQSCH,XQY,XQ
  . F X1=0:0 S X1=$O(^DIC(19.2,X2,2,X1)) Q:X1'>0  S X=^(X1,0),@($P(X,U)_"="_$P(X,U,2))
  . Q
- ;
- S X=$P($G(^DIC(19.2,XQSCH,1.1)),U) I X>0 D DUZ^XUP(X) ;User to run job ;p446
-REQ D  ;Set the user and Requeue
- . N DA,DIE,DR,X,X1,X2
- . S X1=$P(XQ,U,2),X2=$P(XQ,U,6) ;Get params for new schedule
- . S DA=XQSCH,DIE="^DIC(19.2,",DR=$S((X2="")&($P(XQ,U,9)=""):".01///@",X2="":"2///@",1:"2////"_$$SCH^XLFDT(X2,+X1,1))
- . L +^%ZTSK(ZTSK,0):15 D ^DIE L -^%ZTSK(ZTSK,0) ;File new schedule
- . Q
- ;ZTREQ is set by TM.
-ZTSK2 I '$D(XQY) K ZTREQ Q  ;Leave task
+REQ S X1=$P(XQ,U,2),X2=$P(XQ,U,6) ;Get params for new schedule
+ S DA=XQSCH,DIE="^DIC(19.2,",DR=$S((X2="")&($P(XQ,U,9)=""):".01///@",X2="":"2///@",1:"2////"_$$SCH^XLFDT(X2,+X1,1))
+ L +^%ZTSK(ZTSK,0) D ^DIE L -^%ZTSK(ZTSK,0) ;File new schedule
+ K DA,DIE,DR,X1,X2,XQ
+ S X=$P($G(^DIC(19.2,XQSCH,1.1)),U) I X>0 D DUZ^XUP(X) ;User to run job
+ZTSK2 S ZTREQ="@" Q:'$D(XQY)
  D UI^XQ12
  Q:'$D(^DIC(19,XQY,0))  S XQY0=^(0),XQT=$P(XQY0,U,4) Q:XQT'="A"&(XQT'="P")&(XQT'="R")
  ;Kernel no longer supports reseting priority
  ;S X=$P(XQY0,U,8) I X>0,X<11 X ^%ZOSF("PRIORITY")
  I $P(XQY0,U,3)]""!($D(XQUIT)) S XQT="KILL"
  ;
- S %=$$S^%ZTLOAD("Run Task")
+ S XQ=$$S^%ZTLOAD("Run Task")
 RUN S:XQT="P"&$L(IO) XQIOP=ION_";"_IOST_";"_IOM_";"_IOSL G @XQT
  Q

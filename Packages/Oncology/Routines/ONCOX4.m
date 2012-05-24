@@ -1,4 +1,4 @@
-ONCOX4 ; GENERATED FROM 'ONCOX4' PRINT TEMPLATE (#845) ; 12/24/96 ; (FILE 165.5, MARGIN=132)
+ONCOX4 ; GENERATED FROM 'ONCOX4' PRINT TEMPLATE (#845) ; 09/19/10 ; (FILE 165.5, MARGIN=132)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,8 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(845,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 M DXS=^DIPT(845,"DXS")
+ S I(0)="^ONCO(165.5,",J(0)=165.5
  D T Q:'DN  D N W ?0 X DXS(1,9) K DIP K:DN Y W X
  D T Q:'DN  D N D N:$X>1 Q:'DN  W ?1 W "Primary Surgeon:  "
  X DXS(2,9.2) X "F %=2:1:$L(X) I $E(X,%)?1U,$E(X,%-1)?1A S X=$E(X,0,%-1)_$C($A(X,%)+32)_$E(X,%+1,999)" K DIP K:DN Y W X

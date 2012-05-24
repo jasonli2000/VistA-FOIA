@@ -1,10 +1,10 @@
 RCCPCSTM ;WASH-ISC@ALTOONA,PA/LDB-Patient Statement ;2/14/97  5:12 PM
-V ;;4.5;Accounts Receivable;**70,219**;Mar 20, 1995;Build 18
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;4.5;Accounts Receivable;**70**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;ENTRY FROM NIGHTLY PROCESS
  NEW HDAT,DEB
 STM ;called by RCCPCPS to print >32K at site
- NEW DAT,END,LDT1,LDT3,SDT,SITE,PRNT,X1,X2 S COMM=0
+ NEW DAT,END,LDT1,LDT3,SDT,SITE,PRNT,X1,X2
  D DT^DICRW,SITE^PRCAGU
  S:$G(HDAT)="" HDAT=DT S SDT=+$E(HDAT,6,7),DAT=HDAT
  D NOW^%DTC S END=%
@@ -29,7 +29,7 @@ STS ;start statement process
  I BBAL=0,$G(SITE("ZERO")) G STSQ ;zero balance
  I BBAL'>0,'$D(^TMP("PRCAGT",$J,DEB)) G STSQ ;no amt due no activity
  I BBAL<0,BBAL>-.99 G STSQ ;refund less than 1.00
- I BBAL'<0,'$D(^XTMP("PRCAGU",$J,DEB)),'COMM G STSQ ;third letter printed,not comment
+ I BBAL'<0,'$$ACT^PRCAGT(DEB,LDT3) G STSQ ;no activty past 3 stat
  S TBAL=TBAL+PBAL
  D EN^PRCAGST(DEB,.TBAL,PDAT,PBAL) S SITE("SCAN")="" ;print statement
  D EN^PRCAGF(DEB,TBAL) S ERR="" ;get forms and print
@@ -37,6 +37,4 @@ STS ;start statement process
  I EVN D CLOSE^RCEVDRV1(EVN)
  D UPDAT^PRCAGU(DEB,DT) ;set bill letter field
  S SITE("SCAN")=$G(^RC(342,1,5))
-STSQ ;
- K ^XTMP("PRCAGU",$J),COMM
- Q
+STSQ Q

@@ -1,5 +1,5 @@
 PRCHL4 ;VACO/HNC/VAC - REMOTE PROCEDURE, LIST LOGISTICS DATA FILE 442 ; 4/17/07 3:47pm
- ;;5.1;IFCAP;**103,121**;Oct 20, 2000;Build 2
+ ;;5.1;IFCAP;**103**;Oct 20, 2000;Build 25
  ;Per VHA Directive 2004-038, this routine should not be modified
  ;DBIA# 4345 giving permission to reference Prosthetics data
  ;hnc - Aug 21, 2006 add item detail to main grid
@@ -16,7 +16,7 @@ PRCHL4 ;VACO/HNC/VAC - REMOTE PROCEDURE, LIST LOGISTICS DATA FILE 442 ; 4/17/07 
  ;piece 7 = 1.4 Appropriation; display 14
  ;piece 8 = 2 cost center; display 8
  ;piece 9 = 5 vendor; display 12
- ;piece 10 = 15 number of line items on po; display 11 
+ ;piece 10 = 15 number of line items on po; display 11
  ;piece 11 = station, derived from PO Number; display 1
  ;piece 12 = 6.4 IEN 442; display 18
  ;piece 13 = .02 method; display 4
@@ -83,7 +83,7 @@ ITMDET ;item detail
  S CNT=0
  ;First check number of line items on PO, stop if more than 80
  I $P(^TMP($J,PRCHLB),U,10)>80 S $P(^TMP($J,PRCHLB,1),U,10)="<** More than 80 Line Items **>" Q
- D GETS^DIQ(442,PRCHLB,".01","EN","ITM")
+ D GETS^DIQ(442,PRCHLB,"40*;.01","EN","ITM")
  S PRCHPO=$G(ITM("442",PRCHLB_",",".01","E"))
  S PRCHIEN=""
  I PRCHPO'="" S PRCHIEN=$O(^RMPR(664,"G",$P(PRCHPO,"-",2),PRCHIEN))
@@ -126,24 +126,23 @@ ITMDET ;item detail
  .  .I FLEX2="ITM" S $P(^TMP($J,PRCHLB,CNT),U,20)="Shipping"
  .  .I FLEX3="ITM" S $P(^TMP($J,PRCHLB,CNT),U,21)="Shipping"
  .;IFCAP item
- S B=0 F  S B=$O(^PRC(442,PRCHLB,2,B)) Q:'B  D
- . S PRCR=$G(^PRC(442,PRCHLB,2,B,0)),PRCR2=$G(^PRC(442,PRCHLB,2,B,2))
- . S IFITM=$P(PRCR,U,5)
+ S B="" F  S B=$O(ITM(442.01,B)) Q:'B  D
+ . S IFITM=$G(ITM(442.01,B,1.5,"E"))
  . D GETS^DIQ(441,IFITM,".01;.05;51","E","ITMSTR")
  . S ITMD=$G(ITMSTR(441,IFITM_",",.05,"E"))
  . S IFITM1=$G(ITMSTR(441,IFITM_",",.01,"E"))
  . S NIF=$G(ITMSTR(441,IFITM_",",51,"E"))
  . S LICNT=$P(B,",",1)
- . S QTY=$P(PRCR,U,2)
- . S UOP="" S:$P(PRCR,U,3)'="" UOP=$P($G(^PRCD(420.5,$P(PRCR,U,3),0)),U)
- . S BOC=$P(PRCR,U,4)
- . S CBOA=$P(PRCR2,U,2)
- . S AUC=$TR($P(PRCR,U,9),"$","")
- . S FSC=$P(PRCR2,U,3)
- . S VSN=$P(PRCR,U,6)
- . S UCF=$P(PRCR,U,17)
- . S TCST=$P(PRCR2,U)
- . S ITMDD=$G(^PRC(442,PRCHLB,2,B,1,1,0))
+ . S QTY=$G(ITM(442.01,B,2,"E"))
+ . S UOP=$G(ITM(442.01,B,3,"E"))
+ . S BOC=$G(ITM(442.01,B,3.5,"E"))
+ . S CBOA=$G(ITM(442.01,B,4,"E"))
+ . S AUC=$TR($G(ITM(442.01,B,5,"E")),"$","")
+ . S FSC=$G(ITM(442.01,B,8,"E"))
+ . S VSN=$G(ITM(442.01,B,9,"E"))
+ . S UCF=$G(ITM(442.01,B,9.7,"E"))
+ . S TCST=$G(ITM(442.01,B,15,"E"))
+ . S ITMDD=$G(ITM(442.01,B,1,1))
  . I ITMD'="" S ITMD=ITMD_" "
  . S ITMD=ITMD_"1st Line: "_ITMDD
  . K ITMDD
@@ -160,7 +159,7 @@ ITMDET ;item detail
  .I NIF'="" S IFITM1=IFITM1_" NIF: "_NIF
  .I IFITM1'="" S $P(^TMP($J,PRCHLB,CNT),U,13)="Item Master: "_IFITM1
  .S $P(^TMP($J,PRCHLB,CNT),U,14)=$G(RMXM(442,PRCHLB_",",.01))_"-I "_LICNT
- K PRCR,PRCR2,PRCHLB,CNT,ITM,ITMSTR,IFITM,ITMD,IFITM1,LICNT,QTY,UOP,BOC,CBOA,AUC,FSC,VSN,UCF,TCST,NIF,B,PRCHPO,PITMSTR,PRCHB,PRCHIEN,HCPCS,SHIP,SHIPF
+ K PRCHLB,CNT,ITM,ITMSTR,IFITM,ITMD,IFITM1,LICNT,QTY,UOP,BOC,CBOA,AUC,FSC,VSN,UCF,TCST,NIF,B,PRCHPO,PITMSTR,PRCHB,PRCHIEN,HCPCS,SHIP,SHIPF
  Q
 EXIT ;
  Q

@@ -1,8 +1,8 @@
-IBXSC23 ; ;01/20/98
+IBXSC23 ; ;09/19/10
  D DE G BEGIN
 DE S DIE="^DPT(",DIC=DIE,DP=2,DL=2,DIEL=0,DU="" K DG,DE,DB Q:$O(^DPT(DA,""))=""
- I $D(^(.22)) S %Z=^(.22) S %=$P(%Z,U,6) S:%]"" DE(4)=%
- I $D(^(.25)) S %Z=^(.25) S %=$P(%Z,U,4) S:%]"" DE(1)=% S %=$P(%Z,U,5) S:%]"" DE(2)=% S %=$P(%Z,U,6) S:%]"" DE(3)=% S %=$P(%Z,U,8) S:%]"" DE(5)=%
+ I $D(^(.22)) S %Z=^(.22) S %=$P(%Z,U,6) S:%]"" DE(3)=%
+ I $D(^(.25)) S %Z=^(.25) S %=$P(%Z,U,5) S:%]"" DE(1)=% S %=$P(%Z,U,6) S:%]"" DE(2)=% S %=$P(%Z,U,8) S:%]"" DE(4)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -15,17 +15,17 @@ TR R X:DTIME E  S (DTOUT,X)=U W $C(7)
 A K DQ(DQ) S DQ=DQ+1
 B G @DQ
 RE G PR:$D(DE(DQ)) D W,TR
-N I X="" G A:DV'["R",X:'DV,X:D'>0,A
+N I X="" G NKEY:$D(^DD("KEY","F",DP,DIFLD)),A:DV'["R",X:'DV,X:D'>0,A
 RD G QS:X?."?" I X["^" D D G ^DIE17
  I X="@" D D G Z^DIE2
  I X=" ",DV["d",DV'["P",$D(^DISV(DUZ,"DIE",DLB)) S X=^(DLB) I DV'["D",DV'["S" W "  "_X
 T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) I X?.ANP D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
  K DDER G X
-P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
+P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) G:DV["*" AST^DIED D NOSCR^DIED S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
  I $P(DQ(DQ),U,5)'["$",X?.1"-".N.1".".N,$P(DQ(DQ),U,5,99)["+X'=X" S X=+X
 V D @("X"_DQ) K YS
-Z K DIC("S"),DLAYGO I $D(X),X'=U S DG(DW)=X S:DV["d" ^DISV(DUZ,"DIE",DLB)=X G A
+Z K DIC("S"),DLAYGO I $D(X),X'=U D:$G(DE(DW,"INDEX")) SAVEVALS G:'$$KEYCHK UNIQFERR^DIE17 S DG(DW)=X S:DV["d" ^DISV(DUZ,"DIE",DLB)=X G A
 X W:'$D(ZTQUEUED) $C(7),"??" I $D(DB(DQ)) G Z^DIE17
  S X="?BAD"
 QS S DZ=X D D,QQ^DIEQ G B
@@ -43,43 +43,45 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  I $D(DB(DQ)),'$D(DIQUIET) N DIQUIET S DIQUIET=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
+SAVEVALS S @DIEZTMP@("V",DP,DIIENS,DIFLD,"O")=$G(DE(DQ)) S:$D(^("F"))[0 ^("F")=$G(DE(DQ))
+ I $D(DE(DW,"4/")) S @DIEZTMP@("V",DP,DIIENS,DIFLD,"4/")=""
+ E  K @DIEZTMP@("V",DP,DIIENS,DIFLD,"4/")
+ Q
+NKEY W:'$D(ZTQUEUED) "??  Required key field" S X="?BAD" G QS
+KEYCHK() Q:$G(DE(DW,"KEY"))="" 1 Q @DE(DW,"KEY")
 BEGIN S DNM="IBXSC23",DQ=1
-1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW=".25;4",DV="FX",DU="",DLB="SPOUSE'S EMP STREET [LINE 3]",DIFLD=.254
+1 S DW=".25;5",DV="FX",DU="",DLB="SPOUSE'S EMPLOYER'S CITY",DIFLD=.255
  G RE
-X1 K:$L(X)>35!($L(X)<3) X I $D(X) S DFN=DA D SE^DGLOCK2
+X1 K:$L(X)>20!($L(X)<2) X I $D(X) S DFN=DA D SE^DGLOCK2
  I $D(X),X'?.ANP K X
  Q
  ;
-2 S DW=".25;5",DV="FX",DU="",DLB="SPOUSE'S EMPLOYER'S CITY",DIFLD=.255
- G RE
-X2 K:$L(X)>20!($L(X)<2) X I $D(X) S DFN=DA D SE^DGLOCK2
- I $D(X),X'?.ANP K X
- Q
- ;
-3 S DW=".25;6",DV="P5'X",DU="",DLB="SPOUSE'S EMPLOYER'S STATE",DIFLD=.256
+2 S DW=".25;6",DV="P5'X",DU="",DLB="SPOUSE'S EMPLOYER'S STATE",DIFLD=.256
  S DU="DIC(5,"
  G RE
-X3 S DFN=DA D SE^DGLOCK2
+X2 S DFN=DA D SE^DGLOCK2
  Q
  ;
-4 S DW=".22;6",DV="FOX",DU="",DLB="SPOUSE'S EMP ZIP+4",DIFLD=.2206
- S DQ(4,2)="S Y(0)=Y D ZIPOUT^VAFADDR"
- S DE(DW)="C4^IBXSC23"
+3 S DW=".22;6",DV="FOX",DU="",DLB="SPOUSE'S EMP ZIP+4",DIFLD=.2206
+ S DQ(3,2)="S Y(0)=Y D ZIPOUT^VAFADDR"
+ S DE(DW)="C3^IBXSC23"
  G RE
-C4 G C4S:$D(DE(4))[0 K DB S X=DE(4),DIC=DIE
+C3 G C3S:$D(DE(3))[0 K DB
+ S X=DE(3),DIC=DIE
  D KILL^DGREGDD1(DA,.257,.25,7,$E(X,1,5))
-C4S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+C3S S X="" G:DG(DQ)=X C3F1 K DB
+ S X=DG(DQ),DIC=DIE
  D SET^DGREGDD1(DA,.257,.25,7,$E(X,1,5))
- Q
-X4 K:X[""""!($A(X)=45) X I $D(X) S DFN=DA D SE^DGLOCK2 I $D(X) K:$L(X)>15!($L(X)<5) X I $D(X) D ZIPIN^VAFADDR
+C3F1 Q
+X3 K:X[""""!($A(X)=45) X I $D(X) S DFN=DA D SE^DGLOCK2 I $D(X) K:$L(X)>15!($L(X)<5) X I $D(X) D ZIPIN^VAFADDR
  I $D(X),X'?.ANP K X
  Q
  ;
-5 D:$D(DG)>9 F^DIE17,DE S DQ=5,DW=".25;8",DV="FOX",DU="",DLB="SPOUSE'S EMP PHONE NUMBER",DIFLD=.258
+4 D:$D(DG)>9 F^DIE17,DE S DQ=4,DW=".25;8",DV="FOX",DU="",DLB="SPOUSE'S EMP PHONE NUMBER",DIFLD=.258
  G RE
-X5 K:$L(X)>20!($L(X)<4) X I $D(X) S DFN=DA D SE^DGLOCK2
+X4 K:$L(X)>20!($L(X)<4) X I $D(X) S DFN=DA D SE^DGLOCK2
  I $D(X),X'?.ANP K X
  Q
  ;
-6 S DQ=7 ;@42
-7 G 1^DIE17
+5 S DQ=6 ;@42
+6 G 1^DIE17

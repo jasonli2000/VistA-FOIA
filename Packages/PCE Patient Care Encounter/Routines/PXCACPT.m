@@ -1,5 +1,5 @@
-PXCACPT ;ISL/dee & LEA/Chylton,SCK - Validates & Translates data from the PCE Device Interface into PCE's PXK format for CPTs ;5/24/04 3:51pm
- ;;1.0;PCE PATIENT CARE ENCOUNTER;**27,33,73,121,124,194**;Aug 12, 1996;Build 2
+PXCACPT ;ISL/dee & LEA/Chylton - Validates & Translates data from the PCE Device Interface into PCE's PXK format for CPTs ;5/24/04 3:51pm
+ ;;1.0;PCE PATIENT CARE ENCOUNTER;**27,33,73,121,124**;Aug 12, 1996
  Q
  ; Variables
  ;   PXCAPROC  Copy of a Procedure node of the PXCA array
@@ -27,9 +27,8 @@ PROC(PXCA,PXCABULD,PXCAERRS,PXCAEVAL) ;
  .. I PXCAPROC="" S PXCA("ERROR","PROCEDURE",PXCAPRV,PXCAINDX,0)="PROCEDURE data missing" Q
  .. S PXCAITEM=$P(PXCAPROC,U,1)
  .. I PXCAITEM]"" D
- ... ;S D=$G(^ICPT(+PXCAITEM,0))
- ... S D=$$CPT^ICPTCOD(+PXCAITEM)
- ... I D<0 S PXCA("ERROR","PROCEDURE",PXCAPRV,PXCAINDX,1)="CPT code not in File 81^"_PXCAITEM
+ ... S D=$G(^ICPT(+PXCAITEM,0))
+ ... I D="" S PXCA("ERROR","PROCEDURE",PXCAPRV,PXCAINDX,1)="CPT code not in File 81^"_PXCAITEM
  ... E  I '(+$$CPTSCREN^PXBUTL(PXCAITEM,+PXCADT)) S PXCA("ERROR","PROCEDURE",PXCAPRV,PXCAINDX,1)="CPT code is INACTIVE^"_PXCAITEM
  .. E  D
  ... S PXCATRT=$O(^AUTTTRT("B",+$P(PXCAPROC,"^",6),""))

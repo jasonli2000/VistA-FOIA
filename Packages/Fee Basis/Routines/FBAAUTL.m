@@ -1,5 +1,5 @@
-FBAAUTL ;AISC/GRR,SBW-Fee Basis Utility Routine ; 4/23/10 3:06pm
- ;;3.5;FEE BASIS;**101,114**;JAN 30, 1995;Build 7
+FBAAUTL ;AISC/GRR,SBW-Fee Basis Utility Routine ;7/NOV/2006
+ ;;3.5;FEE BASIS;**101**;JAN 30, 1995;Build 2
  ;;Per VHA Directive 2004-038, this routine should not be modified.
 DATE N FBDT S FBPOP=0 K BEGDATE,ENDDATE K:$G(%DT)'["A" %DT W !!,"**** Date Range Selection ****"
  S FBDT=$S($D(%DT):1,1:0) W ! S %DT=$S(FBDT:%DT,1:"APEX"),%DT("A")="   Beginning DATE : " D ^%DT S:Y<0 FBPOP=1 Q:Y<0  S (%DT(0),BEGDATE)=Y
@@ -23,21 +23,16 @@ SITEP ;SET FBSITE(0),FBSITE(1) VARIABLE TO FEE SITE PARAMETERS
 TM S X=$E($P(X,".",2)_"0000",1,4),%=X>1159 S:X>1259 X=X-1200 S X=X\100_":"_$E(X#100+100,2,3)_" "_$E("AP",%+1)_"M" Q
 PDF S:Y Y=$E(Y,4,5)_"/"_$E(Y,6,7)_"/"_$E(Y,2,3) Q
 GETNXB ;GET NEXT AVAILABLE BATCH NUMBER
- L +^FBAA(161.4):$G(DILOCKTM,3) I '$T D  G GETNXB
- .W !,"Another user is opening a batch.  Trying again.",!
- I '$D(^FBAA(161.4,1,"FBNUM")) S ^FBAA(161.4,1,"FBNUM")="1^1"
+ L +^FBAA(161.4) I '$D(^FBAA(161.4,1,"FBNUM")) S ^FBAA(161.4,1,"FBNUM")="1^1"
  I '$P($G(^FBAA(161.4,1,"FBNUM")),"^") S $P(^("FBNUM"),"^")=1
  S FBBN=$P(^FBAA(161.4,1,"FBNUM"),"^")
- ;I FBBN>99899,$S('$D(^FBAA(161.4,1,"PURGE")):1,$P(^FBAA(161.4,1,"PURGE"),"^",1)'>0:1,1:"") D WARNBT
- I $P(^FBAA(161.7,0),U,4)>99899 D WARNBT ;*114
+ I FBBN>99899,$S('$D(^FBAA(161.4,1,"PURGE")):1,$P(^FBAA(161.4,1,"PURGE"),"^",1)'>0:1,1:"") D WARNBT
  S $P(^FBAA(161.4,1,"FBNUM"),"^",1)=$S(FBBN+1>99999:1,1:FBBN+1) I '$$CHKBI^FBAAUTL4(FBBN,1) L -^FBAA(161.4) G GETNXB
  L -^FBAA(161.4) Q
 WARNBT W !,*7,"There are ",99999-FBBN," batches left before the BATCH PURGE routine",!,"needs to be run. Contact your IRM Service!",!!
  Q
-GETNXI ;GET NEXT AVAILABLE INVOICE NUMBER 
- L +^FBAA(161.4):$G(DILOCKTM,3) I '$T D  G GETNXI
- .W !,"Another user is obtaining an invoice number.  Trying again.",!
- I '$D(^FBAA(161.4,1,"FBNUM")) S ^FBAA(161.4,1,"FBNUM")="1^1"
+GETNXI ;GET NEXT AVAILABLE INVOICE NUMBER
+ L +^FBAA(161.4) I '$D(^FBAA(161.4,1,"FBNUM")) S ^FBAA(161.4,1,"FBNUM")="1^1"
  I '$P($G(^FBAA(161.4,1,"FBNUM")),U,2) S $P(^("FBNUM"),U,2)=1
  S FBAAIN=$P(^FBAA(161.4,1,"FBNUM"),"^",2),$P(^("FBNUM"),"^",2)=$S(FBAAIN+1>9999999:1,1:FBAAIN+1) I '$$CHKBI^FBAAUTL4(FBAAIN) L -^FBAA(161.4) G GETNXI
  L -^FBAA(161.4) Q

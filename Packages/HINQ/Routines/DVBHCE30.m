@@ -1,4 +1,4 @@
-DVBHCE30 ; ;07/14/09
+DVBHCE30 ; ;12/27/07
  D DE G BEGIN
 DE S DIE="^DPT(D0,.372,",DIC=DIE,DP=2.04,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^DPT(D0,.372,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(1)=% S %=$P(%Z,U,3) S:%]"" DE(2)=% S %=$P(%Z,U,4) S:%]"" DE(3)=% S %=$P(%Z,U,5) S:%]"" DE(4)=% S %=$P(%Z,U,6) S:%]"" DE(5)=%
@@ -115,7 +115,7 @@ C2X1(DION) K X
  S X=$G(X(1))
  Q
 C2F2 Q
-X2 S DFN=DA(1) D:X SC^DGLOCK1 I $D(X) D EK^DGLOCK 
+X2 S DFN=DA(1) D:X SC^DGLOCK1 I $D(X) D EK^DGLOCK
  Q
  ;
 3 D:$D(DG)>9 F^DIE17,DE S DQ=3,DW="0;4",DV="S",DU="",DLB="EXTREMITY AFFECTED",DIFLD=4

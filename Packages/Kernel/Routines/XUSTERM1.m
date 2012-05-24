@@ -1,5 +1,5 @@
-XUSTERM1 ;SEA/WDE - DEACTIVATE USER ;06/08/09  15:06
- ;;8.0;KERNEL;**102,180,208,222,274,313,332,360,384,436,514**;Jul 10, 1995;Build 8
+XUSTERM1 ;SEA/WDE - DEACTIVATE USER ;6:40 AM  11 Oct 2006
+ ;;8.0;KERNEL;**102,180,208,222,274,313,332,360,384,436**;Jul 10, 1995;Build 2
 ENALL ;Interactive scan all
  S U="^",DTIME=$G(DTIME,60)
  W !!,"This option can purge all access & verify codes, mail baskets, messages,",!,"authorized senders access, keys, and electronic signature codes of users who have been terminated."
@@ -15,9 +15,8 @@ QUE W !,"Do you wish to have this queued for a later time "
  I %=0 K X,XUVE Q
  ;Fall thru if user doesn't queue
 CHECK ;Entry point for taskman.
- N XUDT540,XUDT90,XUDT30,FDA,XUDT,XUAAW
+ N XUDT540,XUDT90,XUDT30,FDA,XUDT
  S U="^",DT=$$DT^XLFDT(),XUDT90=$$HTFM^XLFDT($H-90,1),XUDT30=$$HTFM^XLFDT($H-30,1)
- S XUAAW=+$P($G(^XTV(8989.3,1,3)),U,4) ;Academic Waiver
  S XUDT540=$$HTFM^XLFDT($H-540,1) ;*p332
  S XUDA=.6,XUVE=$G(XUVE,0)
  F  S XUDA=$O(^VA(200,XUDA)) Q:XUDA'>0  S XUJ=$G(^(XUDA,0)) D
@@ -46,10 +45,9 @@ AUSER(XUDA) ;If DISUSERed and Last Sign > 540[18Mo.*30] days, then remove"AUSER"
  I $L(Q),Q<XUDT540 K ^VA(200,"AUSER",$P(XUJ,U),XUDA) ;*p360;*p384
  Q
  ;
- ;If site has an Academic Affiliation Waiver the last sign-on moves to 90 days from 30.
 NOSIGNON() ;Check last signon. Return 1 if should disable account
  N Q S Q=$P($G(^VA(200,XUDA,1.1)),U) ;Get last sign-on
- I $L(Q),Q>$S('XUAAW:XUDT30,1:XUDT90) Q 0 ;Last sign-on within 30/90 days VA Handbook 6500 ;p514
+ I $L(Q),Q>XUDT90 Q 0 ;Last sign-on within 90 days
  S Q=$P($G(^VA(200,XUDA,1.1)),U,4) ;Get last Edit date
  I $L(Q),Q>XUDT30 Q 0 ;User edited in last 30 days
  S Q=$P($G(^VA(200,XUDA,1)),U,7) ;Create Date

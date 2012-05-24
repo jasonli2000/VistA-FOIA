@@ -1,5 +1,5 @@
 PRCH7PA1 ;Hines IOFO/RVD - PROS IFCAP GUI ADD PO ;8/13/03  07:58
- ;;5.1;IFCAP;**68,122**;Oct 20, 2000;Build 1
+ ;;5.1;IFCAP;**68**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;This routine will take the next Common Numbering Series and update
@@ -34,7 +34,7 @@ EN1 ;
  S PRCUPBO=$G(PRCN(442.6,PRC4426_",",2))
  I PRCNEXT="" S RESULTS(0)="^The Common Numbering Series is Null."
  S PRCNEXT=PRCNEXT+1
- I PRCNEXT>PRCUPBO S RESULTS(0)="^The Common Numbering Series Exceeds the limit, please use a different Common Numbering Series." L -^PRC(442.6,PRC4426,0) Q
+ I PRCNEXT>PRCUPBO S RESULTS(0)="^The Common Numbering Series Exceeds the limit, please use a different Common Numbering Series." Q
  ;calculate PO to be 6 places.
  D NUM
  S PRCNEXT=+PRCNEXT

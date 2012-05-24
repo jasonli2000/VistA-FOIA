@@ -1,17 +1,13 @@
-FBAACCB1 ;AISC/GRR-CLERK CLOSE BATCH CONTINUED ; 11/24/10 10:27am
- ;;3.5;FEE BASIS;**55,61,116**;JAN 30, 1995;Build 30
+FBAACCB1 ;AISC/GRR-CLERK CLOSE BATCH CONTINUED ;8/7/2003
+ ;;3.5;FEE BASIS;**55,61**;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 PHARM ;ENTRY FOR PHARMACY BATCH CALCULATE TOTAL DOLLARS AND LINE COUNT
- ; HIPAA 5010 - count line items that have 0.00 amount paid
- F A=0:0 S A=$O(^FBAA(162.1,"AE",B,A)) Q:A'>0  F B2=0:0 S B2=$O(^FBAA(162.1,"AE",B,A,B2)) Q:B2'>0  I $D(^FBAA(162.1,A,"RX",B2,0)) S Z(0)=^(0) D MOREP
+ F A=0:0 S A=$O(^FBAA(162.1,"AE",B,A)) Q:A'>0  F B2=0:0 S B2=$O(^FBAA(162.1,"AE",B,A,B2)) Q:B2'>0  I $D(^FBAA(162.1,A,"RX",B2,0)) S Z(0)=^(0) D:$P(Z(0),"^",16)>0 MOREP
  G FIN^FBAACCB
 MOREP S T=T+$P(Z(0),"^",16),C=C+1 Q
- ;
 TRAV ;ENTRY FOR TRAVEL BATCH CALCULATE TOTAL DOLLARS AND LINE COUNT
- ; HIPAA 5010 - count line items that have 0.00 amount paid
- F J=0:0 S J=$O(^FBAAC("AD",B,J)) Q:J'>0  F K=0:0 S K=$O(^FBAAC("AD",B,J,K)) Q:K'>0  I $D(^FBAAC(J,3,K,0)) S Z(0)=^(0) D MORET
+ F J=0:0 S J=$O(^FBAAC("AD",B,J)) Q:J'>0  F K=0:0 S K=$O(^FBAAC("AD",B,J,K)) Q:K'>0  I $D(^FBAAC(J,3,K,0)) S Z(0)=^(0) D:$P(Z(0),"^",3)>0 MORET
  G FIN^FBAACCB
- ;
 MORET S T=T+$P(Z(0),"^",3),C=C+1 Q
 LISTC S Q="",$P(Q,"=",80)="=",(FBAAOUT,FBLISTC)=0,IOP=$S($D(ION):ION,1:"HOME") D ^%ZIS K IOP
 PRTC D HEDC
@@ -47,19 +43,9 @@ CDAT S FBPDT=$E(FBPDT,4,5)_"/"_$S($E(FBPDT,6,7)="00":$E(FBPDT,2,3),1:$E(FBPDT,6,
 HEDC W "Patient Name",?20,"('*' Reimbursement to Veteran   '+' Cancellation Activity)",!,?13,"('#' Voided Payment)",?60,"Batch Number"
  W !,?3,"Vendor Name",?45,"Vendor ID",?57,"Invoice #",?68,"Dt Inv Rec'd",!,?3,"FR DATE",?14,"TO DATE  CLAIMED   PAID",?41,"ADJ CODE",!,Q,!
  Q
-CHNH ; FB*3.5*116
- S (J,FZ("CNT"))=0 F  S J=$O(^FBAAI("AC",B,J)) Q:J'>0  I $D(^FBAAI(J,0)) S Z(0)=^(0) D MORECH D:$P(FZ,U,15)'="Y" INVCNT
- S:$G(FZ("CNT")) $P(FZ,U,10)=FZ("CNT") K FZ("CNT")  ; CNH batch
- G FIN^FBAACCB
- ;
-MORECH ; HIPAA 5010 - count line items that have 0.00 amount paid
- S T=T+$P(Z(0),"^",9),C=C+1
- ; FB*3.5*116 - build array of invoices
- ;do not build array for CH batches not exempt from the pricer
- Q:($P(FZ,"^",18)'="Y")&($P(FZ,"^",15)="Y") 
- S FBARY($P(Z(0),"^"))=+$P(Z(0),"^",9)
- Q
- ;
+CHNH S (J,FZ("CNT"))=0 F  S J=$O(^FBAAI("AC",B,J)) Q:J'>0  I $D(^FBAAI(J,0)) S Z(0)=^(0) D:$P(Z(0),"^",9)>0!($P(FZ,"^",15)="Y") MORECH D:$P(FZ,U,15)'="Y" INVCNT
+ S:$G(FZ("CNT")) $P(FZ,U,10)=FZ("CNT") K FZ("CNT") G FIN^FBAACCB
+MORECH S T=T+$P(Z(0),"^",9),C=C+1 Q
 WRTDX W ?4,"Dx: ",$$ICD9^FBCSV1($P(FBDX,"^",FBK),$P($G(Z(0)),"^",6)),"  " Q  ;CSV
 WRTPC W ?4,"Proc: ",$$ICD0^FBCSV1($P(FBPROC,"^",FBL),$P($G(Z(0)),"^",6)),"  " Q  ;CSV
 MORE ;

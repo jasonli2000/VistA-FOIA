@@ -1,4 +1,4 @@
-IBXSC68 ; ;08/13/09
+IBXSC68 ; ;12/13/08
  D DE G BEGIN
 DE S DIE="^DGCR(399,D0,""RC"",",DIC=DIE,DP=399.042,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^DGCR(399,D0,"RC",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=% S %=$P(%Z,U,2) S:%]"" DE(2)=% S %=$P(%Z,U,3) S:%]"" DE(3)=% S %=$P(%Z,U,4) S:%]"" DE(4)=% S %=$P(%Z,U,5) S:%]"" DE(5)=% S %=$P(%Z,U,6) S:%]"" DE(7)=% S %=$P(%Z,U,7) S:%]"" DE(9)=%
@@ -132,7 +132,7 @@ X5 S DIC("S")="I $P(^(0),U,5)" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
  ;
 6 D:$D(DG)>9 F^DIE17,DE S DQ=6,DW="0;9",DV="NJ8,2",DU="",DLB="NON-COVERED CHARGE",DIFLD=.09
  G RE
-X6 S:X["$" X=$P(X,"$",2) K:X'?.N.1".".2N!(X>99999)!(X<0)!(X?.E1"."3.N) X
+X6 S:X["$" X=$P(X,"$",2) K:X'?.N.1".".2N!(X>99999)!(X<0) X
  Q
  ;
 7 S DW="0;6",DV="*P81'",DU="",DLB="PROCEDURE",DIFLD=.06

@@ -1,5 +1,5 @@
-BPSJVAL2 ;BHAM ISC/LJF - Validate Pharmacy data ;3/5/08  11:14
- ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5,7**;JUN 2004;Build 46
+BPSJVAL2 ;BHAM ISC/LJF - Validate Pharmacy data ;2004-03-01
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  N PHARMIX,RET,DIR,X
@@ -68,7 +68,7 @@ VALIDATE(BPSJDDD) ;
  . S RETCODE(RIX)=ZNOTE_RETCODE(RIX)
  Q
 5 ; Hour of Operation
- S ZNOTE="" ; not sending anymore
+ S ZNOTE="   HOURS OF OPERATION - VALID"
  Q
 6 ; Mailing Address - R
  S ZNOTE=$$TRIMTAIL(RETCODE(RIX))

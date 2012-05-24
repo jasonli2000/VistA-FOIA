@@ -1,6 +1,6 @@
-IBCCCB ;ALB/ARH - COPY BILL FOR COB ;2/13/06 10:46am
- ;;2.0;INTEGRATED BILLING;**80,106,51,151,137,182,155,323,436,432**;21-MAR-94;Build 192
- ;;Per VHA Directive 2004-38, this routine should not be modified.
+IBCCCB ;ALB/ARH - COPY BILL FOR COB ; 2/13/06 10:46am
+ ;;2.0;INTEGRATED BILLING;**80,106,51,151,137,182,155,323**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ; Copy bill for COB w/out cancelling, update some flds
  ; Primary->Secondary->Tertiary
@@ -11,12 +11,6 @@ ASK ;
  ;
  S IBX=$$PB^IBJTU2 S:+IBX=2 IBIFN=$P(IBX,U,2) I +IBX=1 S DFN=$P(IBX,U,2),IBV=1,IBAC=5 D DATE^IBCB
  I '$G(IBIFN) G EXIT
- ;
- ; IB*2.0*432 Restrict access to only allow claims that are NOT on the new CBW Worklist
- I $P($G(^DGCR(399,IBIFN,"S1")),U,7)=1,$G(IBMRANOT)'=1 D  G ASK
- . W !!?4,"This bill appears on the CBW Management Work List.  Please use the"
- . W !?4,"'CBW Management Menu' options for all processing related to this bill."
- . Q
  ;
  ; Restrict access to this process for REQUEST MRA bills in 2 Cases:
  ; 1. No MRA EOB's on File for bill
@@ -130,79 +124,27 @@ NEXTP ; If current bill=MEDICARE WNR and valid 'next payer', use same
  ;
 SKIP ; Jump here if skipping over the preceeding reads
  ;
- ;** start IB*2*436 **
- ;
- ;IB2INSNO = Secondary Insurance Number - IEN 
- ;IBGRPNO  = Group Insurance Number     - IEN 
- ;IBTYNAME = TYPE OF PLAN name          - for example: MEDIGAP (SUPPLEMENTAL)
- ;IBTYPLAN = TYPE OF PLAN               - IEN
- ;IBPNCAT  = Plan category              - Part A or B
- ;IBMDGFL  = Medigap Supplemental Flag
- ;IBFRMTYP = Form type
- ;
- N IB2INSNO,IBGRPNO,IBMDGPFL,IBTYNAME,IBTYPLAN,IBINPAT,IBPNCAT,IBFRMTYP
- S (IB2INSNO,IBGRPNO,IBTYNAME,IBTYPLAN,IBPNCAT,IBFRMTYP)=""
- S IBMDGPFL=0
- ;
- ; Get secondary insurance information
- I $D(^DGCR(399,IBIFN,"M")) D
- . S IB2INSNO=+$P($G(^DGCR(399,IBIFN,"M")),U,2)  ; secondary insurance
- . S IBGRPNO=+$P($G(^DGCR(399,IBIFN,"I2")),U,18) ; group plan number
- . S IBTYPLAN=+$P($G(^IBA(355.3,IBGRPNO,0)),U,9) ; type of plan - IEN
- . I (IBTYPLAN=0)!(IB2INSNO=0)!(IBGRPNO=0) Q
- . S IBTYNAME=$P($G(^IBE(355.1,IBTYPLAN,0)),U,1) ; type of plan - name
- . I IBTYNAME="MEDIGAP (SUPPLEMENTAL)" S IBMDGPFL=1 Q 
- ;
- S IBFRMTYP=$P($G(^DGCR(399,IBIFN,0)),U,19)  ; Form Type 2=1500, 3=UB
- S IBPNCAT=$S(IBFRMTYP=2:"B",1:"A")    ; plan category - PART A or B
- ;
- ;
  ; If payer is Medicare (WNR) update payer sequence and quit
- I IBMRAO!($G(IBSTSM)=1) D  I $G(IBSTSM)'=1 G END
+ I IBMRAO D  G END
  . N IBPRTOT,IBTOTCHG,IBPTRESP
  . S IBTOTCHG=0
- . ;
  . ; Get Total Charges from BILLS/CLAIMS (#399) file
  . S IBTOTCHG=$P($G(^DGCR(399,IBIFN,"U1")),U,1)
- . ;
  . ; Calculate Patient Responsibility for Bill
- . S IBPTRESP=$$PREOBTOT^IBCEU0(IBIFN,$G(IBSTSM))
- . S IBINPAT=$$INPAT^IBCEF(IBIFN)     ;Inpat/Outpat Flag
- . ;
- . ; Process inpatients (see IB*2*436 RSD/flow chart for details)
- . I IBINPAT,$G(IBSTSM)'=1 D
- . . I IBPNCAT="A" D  ; Plan type is A  (institutional claim)
- . . . ;patient responsibility
- . . . S IBPRTOT=IBTOTCHG-IBPTRESP
- . . I IBPNCAT'="A" D   ; Other plan type   (Part B, professional claim)
- . . . I 'IBMDGPFL D  ; Not MEDIGAP (SUPPLEMENTAL)
- . . . . ;patient responsibility + Medicare unallowed amount (aka Medicare contr. adj.)
- . . . . S IBPRTOT=IBTOTCHG-(IBPTRESP+$$MRACALC2^IBCEMU2(IBIFN))
- . . . I IBMDGPFL D  ; MEDIGAP (SUPPLEMENTAL)
- . . . . ;patient responsibility
- . . . . S IBPRTOT=IBTOTCHG-IBPTRESP
- . ;
- . ; Process outpatients (see IB*2*436 RSD/flow chart for details)
- . I 'IBINPAT,$G(IBSTSM)'=1  D  ; Outpatient processing
- . . I IBMDGPFL D  ; MEDIGAP (SUPPLEMENTAL)
- . . . ;patient responsibility
- . . . S IBPRTOT=IBTOTCHG-IBPTRESP
- . . I 'IBMDGPFL  D  ; Not MEDIGAP (SUPPLEMENTAL) 
- . . . ;patient responsibility + Medicare unallowed amount (aka Medicare contr. adj.)
- . . . S IBPRTOT=IBTOTCHG-(IBPTRESP+$$MRACALC2^IBCEMU2(IBIFN))
- . ;
- . ; ** End IB*2*436 **
- . ;
- . S:$G(IBSTSM)=1 IBPRTOT=$$EOBTOT^IBCEU1(IBIFN,$$COBN^IBCEF(IBIFN)) ;Pat Resp for non-medicare
+ . S IBPTRESP=$$PREOBTOT^IBCEU0(IBIFN)
+ . ; Calculate Patient Primary/Secondary Prior Payment (field 218 or 219 of File 399)
+ . ; These fields are stored in DGCR(399,IBIFN,"U2") pieces 4 and 5 respectively
+ . ; Calculate: Prior Payment= Total Submitted Charges - Patient Responsibility
+ . S IBPRTOT=IBTOTCHG-IBPTRESP
  . I IBPRTOT<0 S IBPRTOT=0      ; don't allow negative prior payment or offset
  . S IBCOB("U2",IBCOBN+2)=IBPRTOT
- . D:$G(IBSTSM)'=1 COBCHG^IBCCC2(IBIFN,IBMRAIO,.IBCOB)
+ . D COBCHG^IBCCC2(IBIFN,IBMRAIO,.IBCOB)
  . D STAT^IBCEMU2(IBIFN,1.5,1)     ; mra eob status update
  . I $G(IBSILENT) S IBERRMSG=""
  . Q
  ;
  ; We should NOT get to here in silent mode .... just in case
- I $G(IBSILENT),$G(IBSTSM)'=1 G END    ; currently only MCRWNR in silent mode
+ I $G(IBSILENT) G END    ; currently only MCRWNR in silent mode
  ;
  ; Payer is not Medicare (WNR) - Perform additional steps
  S IBCOB(0,15)=""
@@ -239,13 +181,13 @@ DSPRB(IBIFN) ; display related bills
  Q
  ;
  ; ==============
- ; 
+ ;
  ; Copy a bill for Reasonable Charges without cancelling it, update certain fields
  ;
  ; there is always both inpt inst (created first) and prof charges, always need both bills
  ; there may be both outpt inst (created first) and prof charges, may not need both bills
  ; if billing by episode rather than by day (current standard) then may need multiple prof bills per day
- ; 
+ ;
  ; Inst bills are copied to create prof Bills automatically
  ; Subsequent prof bills may be created if the user wants them
  ;

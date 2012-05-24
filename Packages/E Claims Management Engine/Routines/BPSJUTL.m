@@ -1,6 +1,8 @@
-BPSJUTL ;BHAM ISC/LJF - e-Pharmacy Utils ;4/17/08  16:13
- ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5,7**;JUN 2004;Build 46
+BPSJUTL ;BHAM ISC/LJF - e-Pharmacy Utils ;16-OCT-2003
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;
+ Q
  ;
 HLP(PROTOCOL) ;  Find the Protocol IEN
  Q +$O(^ORD(101,"B",PROTOCOL,0))
@@ -14,12 +16,14 @@ VAHL7ECH(HL) ; Hl7 Encoding Characters
  ;
 MSG(BPSJMM,BPSJRTN) ; Message Handler
  ;
- N XMDUZ,XMSUB,XMY,XMTEXT,XMZ,BPSX,BPSY
+ N XMDUZ,XMSUB,XMY,XMTEXT,BPMSJMG
  ;
+ I $G(U)="" S U="^"
  I $G(BPSJRTN)]"" S BPSJMM(.0001)="Source Process: "_BPSJRTN
- F BPSX=1,2 S BPSY=$P($G(^BPS(9002313.99,1,"VITRIA")),"^",BPSX) I BPSY S XMY(BPSY)="" S:$L($G(^VA(200,BPSY,.15))) XMY(^(.15))=""
- Q:'$D(XMY)
- S XMTEXT="BPSJMM(",XMSUB="ECME Registration Problem.",XMDUZ="ECME PACKAGE"
+ S BPMSJMG=$O(^BPS(9002313.99,0)) Q:'BPMSJMG
+ S BPMSJMG=+$G(^BPS(9002313.99,BPMSJMG,"VITRIA")) Q:'BPMSJMG
+ S BPMSJMG=$G(^VA(200,BPMSJMG,.15)) Q:BPMSJMG=""
+ S XMY(BPMSJMG)="",XMTEXT="BPSJMM(",XMSUB="ECME Registration Problem."
  D ^XMD
  ;
  Q

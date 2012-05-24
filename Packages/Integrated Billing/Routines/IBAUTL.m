@@ -1,5 +1,5 @@
 IBAUTL ;ALB/AAS - INTEGRATED BILLING APPLICATION UTILITIES ; 14-FEB-91
- ;;2.0;INTEGRATED BILLING;**93,156,347,429**;21-MAR-94;Build 62
+V ;;2.0;INTEGRATED BILLING;**93,156,347**;21-MAR-94;Build 24
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ;
@@ -7,7 +7,6 @@ COST ;  - find charges for transaction type, when only one
  N IBD,IBN,IB K X1
  S IBD=-(DT+.9) F  S IBD=$O(^IBE(350.2,"AIVDT",DA,IBD)) Q:'IBD  S IBN=0 F  S IBN=$O(^IBE(350.2,"AIVDT",DA,IBD,IBN)) Q:'IBN  S IB=$G(^IBE(350.2,IBN,0)) I IB]"",'$P(IB,"^",5)!($P(IB,"^",5)>DT) S X1=$P(IB,"^",4) G COSTQ
 COSTQ S X1=+$G(X1)
- I $L($G(^IBE(350.2,IBN,20))) X ^(20) I  S X1=X1+$P($G(^IBE(350.2,IBN,0)),"^",6)
  Q
  ;
 FY I $D(X) S IBAFY=$$FY^IBOUTL(X)

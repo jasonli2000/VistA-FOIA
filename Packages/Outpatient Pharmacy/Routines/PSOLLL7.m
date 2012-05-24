@@ -1,5 +1,5 @@
 PSOLLL7 ;BHAM/JLC - LASER LABEL MULTI RX REFILL REQUEST FORM ;12/12/92
- ;;7.0;OUTPATIENT PHARMACY;**120,161,200,326**;DEC 1997;Build 11
+ ;;7.0;OUTPATIENT PHARMACY;**120,161,200**;DEC 1997;Build 7
  ;
  ;Reference to ^PS(59.7 supported by DBIA 694
  ;Reference to ^PS(55 supported by DBIA 2228
@@ -50,7 +50,7 @@ RFILL2 F AMC=0:0 S AMC=$O(^PSRX(PSRXX,1,AMC)) Q:'AMC  S PSRFL=PSRFL-1
 RZX S PSRXX=+^PS(55,DFN,"P",PSRX,0)
  I $D(^PSRX(PSRXX,0)) S PSRFL=$P(^(0),"^",9) D:$D(^(1))&PSRFL RFILL2 I PSRFL>0,$P($G(^PSRX(PSRXX,"STA")),"^")<10,134'[$E(+$P($G(^("STA")),"^")),$P(^(2),"^",6)>DT S RX(PSRXX)=$P(^(2),"^",6)_"^"_PSRFL
  Q
-HDR S T=PNM D PRINT(T)
+HDR S T=PNM_"  "_SSNP D PRINT(T)
  D ADD^VADPT
  I $G(VAPA(1))="" G HDR5
  F I=1:1:3 I $G(VAPA(I))]"" S T=VAPA(I) D PRINT(T)
@@ -91,7 +91,7 @@ QUEUE ; ENTRY POINT TO PRINT STAND-ALONE MULTI-RX FORM
  I '$D(PSOINST) D SITE
  W !
  I $D(DFN) G GETPT2
-GETPT S DIC("A")="Enter patient to reprint Multi-Rx refill form for: ",DIC(0)="QEAM" D EN^PSOPATLK S Y=PSOPTLK I Y<0!("^"[X) K PSOPTLK,DIC Q
+GETPT S DIC="^DPT(",DIC("A")="Enter patient to reprint Multi-Rx refill form for: ",DIC(0)="QEAM" D ^DIC K P,DIC("A") I Y<0!("^"[X) K DIC,DUOUT,DTOUT,DIROUT,DIRUT Q
  S DFN=$P(Y,"^")
 GETPT2 D DEM^VADPT S PNM=VADM(1)
  I $P(VADM(6),"^",2)]"" D  G GETPT
@@ -100,7 +100,7 @@ Q1 W ! K POP,ZTSK S %ZIS("B")="",%ZIS="MNQ",%ZIS("A")="Select LABEL DEVICE: " D 
  I $G(POP) Q
  I $G(IOST(0)),'$D(^%ZIS(2,IOST(0),55,"B","LL")) W !,"Must specify a laser labels printer for Multi-Rx form." G Q1
  I '$G(IOST(0)) W !,"Nothing queued to print." H 1 Q
- D 6^VADPT,PID^VADPT6 S SSNP=""
+ D 6^VADPT,PID^VADPT6 S SSNP=$G(VA("BID"))
  D NOW^%DTC S Y=$P(%,"."),PSOFNOW=% X ^DD("DD") S PSONOW=Y
  F G="DFN","PNM","PSOPAR","PSOSITE","SSNP","PSONOW","PSOSYS","PSOINST" S:$D(@G) ZTSAVE(G)=""
  S ZTRTN="DQ^PSOLLL7",ZTIO=PSLION,ZTDESC="Outpatient Pharmacy Multi-Rx print",ZTDTH=$H,PDUZ=DUZ

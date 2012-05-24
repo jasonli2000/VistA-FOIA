@@ -1,5 +1,14 @@
-HDISVCMR ;CT/GRR Data Standardization ; 06 Oct 2005  2:12 PM
+HDISVCMR ;CT/GRR Data Standardization ; 20 APR 2006  12:17
  ;;1.0;HEALTH DATA & INFORMATICS;**1,2**;Feb 22, 2005
+ ;
+ ; 2005 05 16 (VA/JRP): fix broken IF/ELSE statement in EN.
+ ;
+ ; 2005 10 06 (VA/JRP): remove last parameter from call to
+ ; $$SNDXML^HDISVM02 at CREATE+12.
+ ;
+ ; 2006 04 11 (WV/TOAD): fix undefined error at CR8OUT when it is called
+ ; from CREATE+4, as was the case when GMRA*4*23 was installed on the
+ ; VOE server.
  ;
 EN(HDISDOM,HDISFILE) ;
  ;Input parameter:
@@ -40,5 +49,5 @@ CREATE(HDISDOM,HDISFILE,HDISFN) ;
  S HDISOUT=$$STATUPD^HDISVCUT(HDISFILE,HDISFN,2)
  I 'HDISOUT S HDISMESS=$P(HDISOUT,"^",2) D ERR^HDISVF09(HDISNM,HDISDT,HDISMESS) G CR8OUT
  ;
-CR8OUT K @HDISARRY
+CR8OUT I $G(DISARRAY)'="" K @HDISARRY ; WV/TOAD: added IF to avoid UNDEF
  Q

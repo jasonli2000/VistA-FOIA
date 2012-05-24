@@ -1,6 +1,6 @@
-PRCPRPC1 ;WISC/RFJ,DWA-patient distribution costs (sort) ; 06/23/2009  2:12 PM
- ;;5.1;IFCAP;**27,136**;Oct 20, 2000;Build 6
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCPRPC1 ;WISC/RFJ,DWA-patient distribution costs (sort)                ;11 Mar 94
+ ;;5.1;IFCAP;**27**;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
  ;
@@ -25,7 +25,7 @@ SORT ;  sort data
  .   I PATNAME']PRCPPATS!(PRCPPATE']PATNAME) Q
  .   ;
  .   ;  check opcode
- .   S OPCODE=$P($$ICPT^PRCPCUT1(+$P(SURGDATA,U),+DATA),"^") I OPCODE="" S OPCODE=" "
+ .   S OPCODE=$P($$ICPT^PRCPCUT1(+$P(SURGDATA,"^")),"^") I OPCODE="" S OPCODE=" "
  .   I OPCODE']PRCPOPCS!(PRCPOPCE']OPCODE) Q
  .   ;
  .   S INOUTPAT=$P(DATA,"^",4) I INOUTPAT="" S INOUTPAT=" "

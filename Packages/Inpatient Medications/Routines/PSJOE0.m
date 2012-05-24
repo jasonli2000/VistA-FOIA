@@ -1,5 +1,5 @@
-PSJOE0 ;BIR/CML3-INPATIENT PROFILE AND ORDER ENTRY ; 4/15/10 2:45pm
- ;;5.0; INPATIENT MEDICATIONS ;**47,56,110,133,162,241**;16 DEC 97;Build 10
+PSJOE0 ;BIR/CML3-INPATIENT PROFILE AND ORDER ENTRY ;17 SEP 97 /  1:41 PM
+ ;;5.0; INPATIENT MEDICATIONS ;**47,56,110,133,162**;16 DEC 97
  ;
  ; Reference to ^PS(51.2 is supported by DBIA 2178.
  ; Reference to ^PS(55 is supported by DBIA 2191.
@@ -14,7 +14,7 @@ ENVW ; ask user to select or view any of the orders shown
  ;G:X="^" DONE I X]"" S PSGOEA=""
  G:X["^" DONE I X]"" S PSGOEA=""
  K PSJDLW
- I  F PSJOE=1:1:PSGODDD S PSGOE=PSJOE F PSJOE1=1:1:$L(PSGODDD(PSJOE),",")-1 S PSJOE2=$P(PSGODDD(PSJOE),",",PSJOE1),(PSGORD,PSJORD)=^TMP("PSJON",$J,PSJOE2) G:$D(PSJDLW) DONE D 
+ I  F PSJOE=1:1:PSGODDD S PSGOE=PSJOE F PSJOE1=1:1:$L(PSGODDD(PSJOE),",")-1 S PSJOE2=$P(PSGODDD(PSJOE),",",PSJOE1),(PSGORD,PSJORD)=^TMP("PSJON",$J,PSJOE2) G:$D(PSJDLW) DONE D
  .I PSJORD=+PSJORD N PSJO,PSJO1 S PSJO=PSJORD,PSJO1=0 F  S PSJO1=$O(^PS(53.1,"ACX",PSJO,PSJO1)) Q:'PSJO1  Q:PSGOEA["^"  Q:$D(PSJDLW)  S PSJORD=PSJO1_"P" D GODO S PSJORD=""
  .Q:PSJORD=""  Q:PSGOEA["^"
  .D GODO Q:PSGOEA["^"
@@ -68,6 +68,10 @@ ASKTYP ; Ask if completing as IV or UD.
 OLDCOM(DFN,PSJORD) ;
  Q:$$COMPLEX^PSJOE(DFN,PSJORD)
  N DURFLG S DURFLG=$S($G(PSJORD)["P":$G(^PS(53.1,+PSJORD,2.5)),$G(PSJORD)["V":$G(^PS(55,DFN,"IV",+PSJORD,2.5)),1:$G(^PS(55,DFN,5,+PSJORD,2.5))) I $P(DURFLG,"^",2)]"" D
+ . D CLEAR^VALM1 W !!!!!?21," * WARNING * "
+ . W !!!?5,"The following order contains a Requested Duration"
+ . W !?12,"and may be part of a complex dose!"
+ . W !!," Review the entire profile to determine appropriate action(s).",!!!!!!! D PAUSE^VALM1
  . D CLEAR^VALM1 W !!!!!?21," * WARNING * "
  . W !!!?5,"The following order contains a Requested Duration"
  . W !?12,"and may be part of a complex dose!"

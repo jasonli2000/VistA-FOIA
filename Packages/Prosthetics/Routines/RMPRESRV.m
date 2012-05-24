@@ -1,5 +1,5 @@
 RMPRESRV ;PHX/HNC - SERVER ROUTINE FOR NATIONAL DATA EXTRACT ; 1/19/2005
- ;;3.0;PROSTHETICS;**12,18,24,51,59,103,125**;Feb 09, 1996;Build 21
+ ;;3.0;PROSTHETICS;**12,18,24,51,59,103**;Feb 09, 1996
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;DBIA # 10072 - for routine REMSBMSG^XMA1C
@@ -21,23 +21,6 @@ RMPRESRV ;PHX/HNC - SERVER ROUTINE FOR NATIONAL DATA EXTRACT ; 1/19/2005
  .I XMRG["DOR1" D A1^RMPR9DO("00","99","ALL",RMPRDORS,RMPRDOR1,RMPRDORW) S XMSER="S."_XQSOP,XMZ=XQMSG D REMSBMSG^XMA1C Q
  ;new items to file 661.1
  I XMRG="ITEM SERVER 661.1" G EN^RMPRET
- ;retransmit a date for patient notification patch 125
- I XMRG="RETRANS NOTIFICATION INFO" D  G IN1^RMPRDVN
- . X XMREC S BDATE=$P(XMRG,"*",2)
- . ;Send message to local VAMC staff and to PCM VACO Staff on Outlook
- . S XMDUZ=.5
- . S XMY("G.RMPR SERVER")=""
- . S XMY("VHACOPSASPIPReport@med.va.gov")=""
- . S XMSUB="Retransmit Patient Notification Data "_$P($$SITE^VASITE,U,2)
- . S RMPRMSG(1)="The National PSAS Server has been activated today by Prosthetics HQ."
- . S RMPRMSG(2)="Please note data for Patient Notification was not received"
- . S RMPRMSG(3)=""
- . S RMPRMSG(4)="This was activated by "_$P(XMFROM,"@",1)
- . S RMPRMSG(5)=""
- . S XMTEXT="RMPRMSG("
- . D ^XMD
- . ;call routine to gather data
- . Q
  ;pip EXCEL extract
  I $P(XMRG,"*",1)="PIP ROLL-UP" S RMPRPIP1=$P(XMRG,"*",2),RMPRPIP2=$P(XMRG,"*",3) G ^RMPR5HQ1
  ;pip REPORT extract

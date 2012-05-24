@@ -1,21 +1,21 @@
 IBCNEHL3 ;DAOU/ALA - HL7 Process Incoming RPI Continued ;03-JUL-2002  ; Compiled June 2, 2005 14:20:19
- ;;2.0;INTEGRATED BILLING;**300,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**300**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;**Program Description**
  ;  This is a continuation of IBCNEHL1 which processes an incoming
  ;  RPI IIV message.
- ;  
+ ;
  ;  This routine is based on IBCNEHLS which was introduced with patch 184, and subsequently
  ;  patched with patch 271.  IBCNEHLS is obsolete and deleted with patch 300.
  ;
  Q   ; no direct calls allow
  ;
 ERROR(TQN,ERACT,ERCON,TRCN) ; Entry point
- ; Input:  TQN - IEN for eIV Transmission Queue (#365.1), required
+ ; Input:  TQN - IEN for IIV Transmission Queue (#365.1), required
  ;         ERACT - Error Action Code (#365.14), required
  ;         ERCON - Error Condition Code (#365.17), required
- ;         TRCN - Trace # from eIV Response (#365)
+ ;         TRCN - Trace # from IIV Response (#365)
  ;
  ;         IIVSTAT - IIV status transmitted by EC
  ;                   Note: MAP(IIVSTAT) = IIV STATUS IEN
@@ -188,8 +188,8 @@ PCK ; Payer Check
  ..; If message id/payer found & Response (#365) status equals
  . ; 'Response Received', RIEN is still null so that this tag knows
  . ; to create a new unsolicited response entry
- . ; 
- . ; If payer response received to ~NO PAYER, update eIV Response file
+ . ;
+ . ; If payer response received to ~NO PAYER, update IIV Response file
  . ; w/ responding payer
  . I RIEN="" S PRDATA=$G(^IBCN(365,PRIEN,0)) I $P(PRDATA,U,3)=NOPAYER,$P(PRDATA,U,6)'=3,$P(PRDATA,U,10)="O" D  Q
  .. S RIEN=PRIEN,QFL=1
@@ -241,7 +241,7 @@ IIVPROC(BUFF) ; Set IIV Processed Date to current dt/tm & IIV stat (aka SYMBOL)
  N IDUZ,UP
  S UP(355.33,BUFF_",",.15)=$$NOW^XLFDT()
  ;  Set IDUZ to the specific, non-human user.
- S IDUZ=$$FIND1^DIC(200,"","X","INTERFACE,IB EIV")
+ S IDUZ=$$FIND1^DIC(200,"","X","INTERFACE,IB IIV")
  D FILE^DIE("I","UP","ERROR")
  ; set the symbol of the buffer entry
  D BUFF^IBCNEUT2(BUFF,SYMBOL)  ; reset symbol to appropriate value

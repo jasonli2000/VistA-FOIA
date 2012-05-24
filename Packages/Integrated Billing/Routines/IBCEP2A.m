@@ -1,8 +1,8 @@
 IBCEP2A ;ALB/TMP - EDI UTILITIES for provider ID ;25-APR-01
- ;;2.0;INTEGRATED BILLING;**137,232,320,348,349,400**;21-MAR-94;Build 52
+ ;;2.0;INTEGRATED BILLING;**137,232,320,348,349**;21-MAR-94;Build 46
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
-ALT(IBPERF,IBSRC,IBALT,IBINS4,IBPTYP) ; set source level to next higher level 
+ALT(IBPERF,IBSRC,IBALT,IBINS4,IBPTYP) ; set source level to next higher level
  ; or set the alternate type and source if performing provider id
  ; alternate type and source exist
  ; IBPERF = 1 if performing provider id is requested
@@ -25,27 +25,16 @@ IDSET(IBPTYP,IBINS4,IBPERF,IBSPEC,IBSRC,IBUP) ; set variables for provider id ty
  ;
 CAREST(IBIFN) ; Return state file ien of state where care was performed
  ; IBIFN = ien of bill in file 399
- N STATE,IBU2,NVAFAC,IB0,EVDT,IBDIV,INST
+ ; Get it from rendering facility or if none, the billing facility
+ N Z,IBXDATA,STATE
  S STATE=""
- ;
- ; non-VA care
- S IBU2=$G(^DGCR(399,IBIFN,"U2"))
- S NVAFAC=+$P(IBU2,U,10)          ; non-VA facility
- I NVAFAC S STATE=+$P($G(^IBA(355.93,NVAFAC,0)),U,7) G CARESTX
- ;
- ; VA care
- S IB0=$G(^DGCR(399,IBIFN,0))
- S EVDT=$P(IB0,U,3)                         ; claim event date
- I 'EVDT S EVDT=DT                          ;   - default today if undefined
- S IBDIV=+$P(IB0,U,22)                      ; division ptr file 40.8
- I 'IBDIV S IBDIV=$$PRIM^VASITE(EVDT)       ;   - default primary division as of event date
- I IBDIV'>0 S IBDIV=$$PRIM^VASITE()         ;   - default main division as of today's date
- S INST=+$$SITE^VASITE(EVDT,IBDIV)          ; division institution ptr file 4
- I INST'>0 S INST=+$$SITE^VASITE(DT,IBDIV)  ;   - default div as of today's date
- I INST'>0 S INST=+$$SITE^VASITE            ;   - default main institution
- S STATE=+$P($G(^DIC(4,INST,0)),U,2)        ; state file ien from Institution file
- ;
-CARESTX ;
+ D F^IBCEF("N-RENDERING INSTITUTION",,,IBIFN)
+ I IBXDATA D
+ . I '$P(IBXDATA,U,2) S STATE=+$P($G(^DIC(4,+IBXDATA,0)),U,2) Q
+ . S STATE=+$P($G(^IBA(355.93,+IBXDATA,0)),U,7)
+ E  D
+ . D F^IBCEF("N-AGENT CASHIER STATE",,,IBIFN)
+ . S STATE=IBXDATA
  Q STATE
  ;
 RECALCA(IBIFN) ; Recalculate all performing provider id's on bill IBIFN
@@ -110,9 +99,9 @@ INSPAR(IBIFN,SEQ) ;
 GETTYP(IBXIEN,IBCOBN,IBFUNC) ; Function returns provider id type for insurance co
  ; with COB of IBCOBN on claim ien IBXIEN in first ^ pc and 1 in second
  ; ^ piece if the id is required
- ; 
+ ;
  ; IBFUNC=1:REFERRING;2:OPERATING;3:RENDERING;4:ATTENDING;5:SUPERVISING;9:OTHER
- ; 
+ ;
  N A,R,Z,Z0
  S A="",R=0
  S:'$G(IBCOBN)!(IBCOBN>3) IBCOBN=$$COBN^IBCEF(IBXIEN)
@@ -133,7 +122,7 @@ UNIQ1(IBIFN,IBINS,IBPTYP,IBPROV,IBUNIT,IBCU,IBT) ; Match most-least specific
  N Q,Z0,Z1,Z2,IBID,IBX
  S IBID=""
  S IBX=$P($G(^IBA(355.9,+IBCU,0)),U,3) S:"0"[IBX IBX="*N/A*"
- S Z0=$$FT^IBCEF(IBIFN),Z0=$S(Z0=2:2,Z0=3:1,1:0),Z1=$$INPAT^IBCEF(IBIFN) S:'Z1 Z1=2 S Z2=$$ISRX^IBCEF1(IBIFN)
+ S Z0=$$FT^IBCEF(IBIFN),Z0=$S(Z0=2:2,Z0=3:1,1:0),Z1=$$INPAT^IBCEF(IBIFN,1) S:'Z1 Z1=2 S Z2=$$ISRX^IBCEF1(IBIFN)
  ;
  ; Match all elements
  F Q=$S(Z2:3,1:Z1),$S(Z2:Z1,1:"") I Q'="",$D(^IBA(355.9,"AUNIQ",IBPROV,IBINS,IBX,Z0,Q,IBPTYP,IBCU)) S IBID=$P($G(^IBA(355.9,IBCU,0)),U,7),$P(IBT,U,2,3)=(IBCU_U_355.9) Q
@@ -159,7 +148,7 @@ UNIQ2(IBIFN,IBINS,IBPTYP,IBUNIT,IBCU,IBT) ; Match on most-least specific
  ;
  N Q,Z0,Z1,Z2,IBID,IBX
  S IBID="" S:"0"[$G(IBUNIT) IBUNIT="*N/A*"
- S Z0=$$FT^IBCEF(IBIFN),Z0=$S(Z0=2:2,Z0=3:1,1:0),Z1=$$INPAT^IBCEF(IBIFN) S:'Z1 Z1=2 S Z2=$$ISRX^IBCEF1(IBIFN)
+ S Z0=$$FT^IBCEF(IBIFN),Z0=$S(Z0=2:2,Z0=3:1,1:0),Z1=$$INPAT^IBCEF(IBIFN,1) S:'Z1 Z1=2 S Z2=$$ISRX^IBCEF1(IBIFN)
  ;
  ; Match all elements
  F Q=$S(Z2:3,1:Z1),$S(Z2:Z1,1:"") I Q'="",$D(^IBA(355.91,"AUNIQ",IBINS,IBUNIT,Z0,Q,IBPTYP,IBCU)) S IBID=$P($G(^IBA(355.91,IBCU,0)),U,7),$P(IBT,U,2,3)=(IBCU_U_355.91) Q

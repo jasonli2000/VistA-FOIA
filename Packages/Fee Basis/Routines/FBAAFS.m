@@ -1,7 +1,7 @@
-FBAAFS ;WCIOFO/dmk,SAB-OUTPATIENT FEE SCHEDULE ; 8/16/10 6:01pm
- ;;3.5;FEE BASIS;**4,53,71,92,99,111,115**;JAN 30, 1995;Build 9
- ;;Per VHA Directive 2004-038, this routine should not be modified.
-LOOKUP ; Entry point for option to get fee schedule amount
+FBAAFS ;WCIOFO/dmk,SAB-OUTPATIENT FEE SCHEDULE ;5/27/2006
+ ;;3.5;FEE BASIS;**4,53,71,92,99**;JAN 30, 1995
+ ;
+LOOKUP ; Entry point for option to get fee schdule amount
  ; without having to enter in a payment
  ;
  W !!
@@ -162,11 +162,8 @@ ANES(CPT) ; call to determine if the CPT code has a major category
  ; CPT = 5 digit CPT code (EXTERNAL)
  ; returns 1 if CPT is an anesthesia code else return 0.
  ;
- N FBCAT,FBMCAT
  S CPT=$G(CPT)
- S FBCAT=$P($$CPT^ICPTCOD(CPT),U,4)
- S FBMCAT=$P($$CAT^ICPTAPIU(FBCAT),U,4)
- Q $S(FBMCAT="ANESTHESIA":1,1:0)
+ Q $S(+CPT>99&(+CPT<2000):1,1:0)
  ;
 FAC(POS) ; call to determine if the place of service is a facility
  ; Input
@@ -179,9 +176,9 @@ FAC(POS) ; call to determine if the place of service is a facility
  S (CODE,RET)=""
  I $G(POS)]"" S CODE=$$GET1^DIQ(353.1,POS,.01)
  ; list of codes considered as facility settings
- S FCODE="^05^06^07^08^21^22^23^24^26^31^34^41^42^51^52^53^56^61^"
+ S FCODE="^21^22^23^24^26^31^34^41^42^51^52^53^56^61^"
  ; list of codes considered as non-facility settings
- S NFCODE="^01^03^04^09^11^12^13^14^15^16^17^20^25^32^33^49^50^54^55^57^60^62^65^71^72^81^99^"
+ S NFCODE="^01^03^04^09^11^12^13^14^15^20^25^32^33^49^50^54^55^57^60^62^65^71^72^81^99^"
  I FCODE[(U_CODE_U) S RET=1
  I NFCODE[(U_CODE_U) S RET=0
  Q RET

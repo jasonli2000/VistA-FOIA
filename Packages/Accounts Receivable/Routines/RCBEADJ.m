@@ -1,6 +1,6 @@
 RCBEADJ ;WISC/RFJ-adjustment ;1 Mar 2001
- ;;4.5;Accounts Receivable;**169,172,204,173,208,233**;Mar 20, 1995;Build 4
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;4.5;Accounts Receivable;**169,172,204,173,208**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
  ;
@@ -15,7 +15,7 @@ INCREASE ;  menu option: create an increase adjustment
  ;
 ADJUST(RCBETYPE,RCEDI) ;  create an adjustment
  ;  rcbetype = INCREASE for increase or DECREASE for decrease
- ;  rcedi = the ien of the bill selected via the EDI Worklist;ien of 
+ ;  rcedi = the ien of the bill selected via the EDI Worklist;ien of
  ;          the ERA entry or null/undefined if bill should be selected
  N RCBILLDA
  F  D  Q:RCBILLDA<0!$G(RCEDI)
@@ -61,7 +61,7 @@ ADJBILL(RCBETYPE,RCBILLDA,RCEDIWL) ;  adjust a bill
  .   I +$P(RCBALANC,"^",4)'=+$P(RCDATA7,"^",4) W "  <<-- OUT OF BALANCE"
  .   W !,"               CC Balance:",$J($P(RCBALANC,"^",5),12,2),$J($P(RCDATA7,"^",5),12,2)
  .   I +$P(RCBALANC,"^",5)'=+$P(RCDATA7,"^",5) W "  <<-- OUT OF BALANCE"
- .   W !,"                  ------- ",$J("-------------",12),$J("-------------",12)
+ .   W !,"                  ------- ",$J("----------",12),$J("----------",12)
  .   W !,"                    TOTAL:",$J(TOTALCAL,12,2),$J(TOTALSTO,12,2)
  .   I +TOTALCAL'=+TOTALSTO W "  <<-- OUT OF BALANCE"
  .   ;
@@ -107,10 +107,10 @@ ADJBILL(RCBETYPE,RCBILLDA,RCEDIWL) ;  adjust a bill
  ;  show what the new transaction will look like
  S RCDATA7=$G(^PRCA(430,RCBILLDA,7))
  W !!,"If you process the transaction, the bill will look like:"
- W !,"Current Principal Balance: ",$J($P(RCDATA7,"^"),11,2)
- W !,"  NEW ",RCBETYPE," Adjustment: ",$J(RCAMOUNT,11,2)
- W !,"                           -----------"
- W !,"    NEW Principal Balance: ",$J($P(RCDATA7,"^")+RCAMOUNT,11,2)
+ W !,"Current Principal Balance: ",$J($P(RCDATA7,"^"),9,2)
+ W !,"  NEW ",RCBETYPE," Adjustment: ",$J(RCAMOUNT,9,2)
+ W !,"                           ---------"
+ W !,"    NEW Principal Balance: ",$J($P(RCDATA7,"^")+RCAMOUNT,9,2)
  ;
  ;  ask to enter transaction
  S Y=$$ASKOK(RCBETYPE) I Y'=1 D UNLOCK Q
@@ -215,7 +215,7 @@ ADJNUM(RCBILLDA) ;  get next adjustment number for a bill
 AMOUNT(RCBILLDA,RCBETYPE) ;  enter the adjustment amount for a bill
  N DIR,DIRUT,DTOUT,DUOUT,PRINBAL,X,Y
  S PRINBAL=+$P($G(^PRCA(430,RCBILLDA,7)),"^")
- I RCBETYPE="INCREASE" S PRINBAL=9999999.99
+ I RCBETYPE="INCREASE" S PRINBAL=99999.99
  W !!,"Enter the ",RCBETYPE," Adjustment AMOUNT, from .01 to ",$J(PRINBAL,0,2),"."
  S DIR(0)="NAO^.01:"_PRINBAL_":2"
  S DIR("A")="  "_RCBETYPE_" PRINCIPAL BALANCE BY: "

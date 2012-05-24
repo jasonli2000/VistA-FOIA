@@ -1,5 +1,5 @@
 VACPT ;ALB/GRR - DISPLAY CPT COPYRIGHT INF ; 12 APR 1989@1400
- ;;5.3;Registration;**123,124,138**;Aug 13, 1993
+ ;;5.3;Registration;**123,124,138**;Aug 13, 1993;Build 1
  ;
  ;  This routine now calls the CPT api for displaying the
  ; CPT COPYRIGHT information

@@ -1,8 +1,8 @@
-IBCNERPC ;DAOU/RO - eIV PAYER LINK REPORT COMPILE ;AUG-2003
- ;;2.0;INTEGRATED BILLING;**184,252,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERPC ;DAOU/RO - IIV PAYER LINK REPORT COMPILE ;AUG-2003
+ ;;2.0;INTEGRATED BILLING;**184,252,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification
+ ; IIV - Insurance Identification and Verification
  ;
  ; Input vars from IBCNERPB:
  ;  IBCNESPC("REP")=1 for Payer List report, 2 for Company List
@@ -15,13 +15,13 @@ IBCNERPC ;DAOU/RO - eIV PAYER LINK REPORT COMPILE ;AUG-2003
  ;  IBCNESPC("IMAT")=Partial matching Ins carriers
  ;
  ; Output vars used by IBCNERPC:
- ;  
+ ;
  ;   IBCNERTN="IBCNERPB"
  ;   SORT1=depends on sorting option chosen
  ;   SORT2=Payer Name (Report by Payer) or Ins Company Name (if report is Insurance)
- ;  ^TMP($J,IBCNERTN,SORT1,SORT2,CNT) 
+ ;  ^TMP($J,IBCNERTN,SORT1,SORT2,CNT)
  ;   CNT=Seq ct
- ;  ^TMP($J,IBCNERTN,SORT1,SORT2,CNT,1) 
+ ;  ^TMP($J,IBCNERTN,SORT1,SORT2,CNT,1)
  ;
  ; Must call at EN
  Q
@@ -51,7 +51,7 @@ EN(IBCNERTN,IBCNESPC) ; Entry
  ; Ins Report
  I IBREP=2 G INS
  ;
- ; Loop thru the eIV payer File (#365.12)
+ ; Loop thru the IIV payer File (#365.12)
  S IBPY=0,SORT1=""
  F  S IBPY=$O(^IBE(365.12,IBPY)) Q:'IBPY  D  Q:$G(ZTSTOP)
  . I $D(ZTQUEUED),$$S^%ZTLOAD() S ZTSTOP=1 Q
@@ -168,5 +168,5 @@ IMAT ; Prompt to allow users to select partial Ins carrier to include
  D ^DIR K DIR
  I $D(DUOUT)!$D(DTOUT) S Y="" S STOP=1 G IMATX
  S IBCNESPC("IMAT")=Y
- ;                                                                       
+ ;
 IMATX Q

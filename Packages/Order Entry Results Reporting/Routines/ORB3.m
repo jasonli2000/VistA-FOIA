@@ -1,10 +1,6 @@
-ORB3 ; slc/CLA,WAT - Main routine for OE/RR 3 notifications ;6/6/01  10:46 [8/16/05 5:33am]
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**31,74,91,105,139,190,220,253,265,296**;Dec 17, 1997;Build 19
+ORB3 ; slc/CLA - Main routine for OE/RR 3 notifications ;6/6/01  10:46 [8/16/05 5:33am]
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**31,74,91,105,139,190,220,253,265**;Dec 17, 1997;Build 17
  ;;Per VHA Directive 2004-038, this routine should not be modified.
- ;
- ;This routine invokes to following ICR(s):
- ;ICR 4156     ;REGISTRATION, COMBAT VETERAN STATUS
- ;
 EN(ORN,ORBDFN,ORNUM,ORBADUZ,ORBPMSG,ORBPDATA) ;
  ;
  N ORBENT
@@ -92,8 +88,7 @@ DOALERT ; Entry point for alert logic outside of TaskMan
  .I XQAFLG="R" S XQAROU=$P(ORBN,"^",6)_"^"_$P(ORBN,"^",7)
  .I $G(ORBPDATA)'="" S XQADATA=ORBPDATA
  .S ORPTNAM=$E(VADM(1)_"         ",1,9)
- .I $G(ORN)=27 N CVMRKR,RSLT S RSLT=$$CVEDT^DGCV(DFN) I $P($G(RSLT),U)&($P($G(RSLT),U,3)) S CVMRKR=" CV "_$$FMTE^XLFDT($P($G(RSLT),U,2),"5DZ") ;WAT
- .S XQAMSG=ORPTNAM_" "_"("_$E(ORPTNAM)_$E(VA("BID"),1,4)_")"_$G(CVMRKR)_": " ;WAT
+ .S XQAMSG=ORPTNAM_" "_"("_$E(ORPTNAM)_$E(VA("BID"),1,4)_")"_": "
  .S XQAMSG=XQAMSG_$S(ORBPMSG'="":ORBPMSG,1:$P(ORBN,"^",3))
  .S XQAARCH=$$GET^XPAR(ORBENT,"ORB ARCHIVE PERIOD",ORN,"I")
  .S XQASUPV=$$GET^XPAR(ORBENT,"ORB FORWARD SUPERVISOR",ORN,"I")

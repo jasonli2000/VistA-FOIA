@@ -1,6 +1,6 @@
-DIC ;SFISC/XAK,TKW,SEA/TOAD-VA FileMan: Lookup, Part 1 ;6/28/2009
- ;;22.0;VA FileMan;**4,17,20,78,164**;Mar 30, 1999;Build 20
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DIC ;SFISC/XAK,TKW,SEA/TOAD-VA FileMan: Lookup, Part 1 ;10:06 AM  19 Mar 2001
+ ;;22.0;VA FileMan;**4,17,20,78**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  N %,D,DF,DIFILEI,DIENS,DINDEX,DS,DIASKOK K DO S U="^",DIC(0)=$G(DIC(0))
  D GETFILE^DIC0(.DIC,.DIFILEI,.DIENS) I DIFILEI="" S Y=-1 Q
  S %=$P("K^",U,DIC(0)["K"),(D,DINDEX,DINDEX("START"))=$$DINDEX^DICL(DIFILEI,%)
@@ -60,7 +60,7 @@ F1 S (DD,DS,DS(0),DS("DD"))=0
  . Q:$G(DIROUT)
  . I DS(0),$P(DS(0),U,2)="" S:DIC(0)["Y"&($O(Y(0))) Y=0 D DING Q
  . Q:'($D(DS)#2)
- . I (DS(0)=0!($P(DS(0),U,2)="U")),DS("DD")=DS,(DO(2)["O"!($G(DIASKOK))!(DIC(0)["T")),DO(2)'["A",DO(2)'["P",DO(2)'["V",DO(2)'["D",DO(2)'["S",DIC(0)["L" D L^DICM
+ . I (DS(0)=0!($P(DS(0),U,2)="U")),DS("DD")=DS,(DO(2)["O"!($G(DIASKOK))!(DIC(0)["T")),DO(2)'["A",DIC(0)["L" D L^DICM
  . Q
  D Q^DIC2 Q
  ;

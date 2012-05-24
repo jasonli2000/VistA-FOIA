@@ -1,6 +1,6 @@
-IBCNEUT5 ;DAOU/ALA - eIV MISC. UTILITIES ;20-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,284,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNEUT5 ;DAOU/ALA - IIV MISC. UTILITIES ;20-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,284,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;**Program Description**
  ;  This program contains some general utilities or functions
@@ -14,11 +14,11 @@ MSG(MGRP,XMSUB,XMTEXT,FROMFLAG,XMY) ;  Send a MailMan Message
  ;   XMSUB = Subject Line (required)
  ;   XMTEXT = Message Text Array Name in open format:  "MSG(" (required)
  ;   FROMFLAG = Flag indicating from whom the message is sent (optional)
- ;         false/undefined:  from the specific, non-human eIV user
+ ;         false/undefined:  from the specific, non-human IIV user
  ;                    true:  from the actual user (DUZ)
  ;   XMY = recipients array; pass by reference (optional)
  ;         The possible recipients are the sender, the Mail Group in the
- ;         first parameter, and anybody else already defined in the XMY 
+ ;         first parameter, and anybody else already defined in the XMY
  ;         array when this parameter is used.
  ;
  ; New MailMan variables and also some FileMan variables.  The FileMan
@@ -29,7 +29,8 @@ MSG(MGRP,XMSUB,XMTEXT,FROMFLAG,XMY) ;  Send a MailMan Message
  NEW TMPSUB,TMPTEXT,TMPY,XX
  ;
  I $G(FROMFLAG),$G(DUZ) S XMDUZ=DUZ
- E  S XMDUZ="eIV INTERFACE (IB)"
+ E  S XMDUZ="IIV INTERFACE (IB)"
+ ;I $G(DUZ) S XMY(DUZ)=""      ; original location of line - moved below
  I $G(MGRP)'="" S XMY("G."_MGRP)=""
  ; If no recipients are defined, send to postmaster
  I '$D(XMY) S XMY(.5)=""
@@ -58,7 +59,7 @@ MSG(MGRP,XMSUB,XMTEXT,FROMFLAG,XMY) ;  Send a MailMan Message
  Q
  ;
  ;
-BFEXIST(DFN,INSNAME) ; Function returns 1 if an Entered Ins Buffer File 
+BFEXIST(DFN,INSNAME) ; Function returns 1 if an Entered Ins Buffer File
  ; entry exists with the same DFN and INSNAME, otherwise it returns a 0
  ;
  ; DFN - Patient DFN
@@ -73,7 +74,7 @@ BFEXIST(DFN,INSNAME) ; Function returns 1 if an Entered Ins Buffer File
  F  S IEN=$O(^IBA(355.33,"C",DFN,IEN)) Q:'IEN!EXIST  D
  .  ; Quit if status is NOT 'Entered'
  .  I $P($G(^IBA(355.33,IEN,0)),U,4)'="E" Q
- .  ; Quit if Ins Buffer Ins Co Name (trimmed) is NOT EQUAL to 
+ .  ; Quit if Ins Buffer Ins Co Name (trimmed) is NOT EQUAL to
  .  ;  the Ins Co Name parameter (trimmed)
  .  I $$TRIM^XLFSTR($P($G(^IBA(355.33,IEN,20)),U))'=INSNAME Q
  .  ; Match found
@@ -83,7 +84,7 @@ BFEXIT ;
  Q EXIST
  ;
  ;
-MGRP() ; Get the Mail Group for the eIV Interface - IB Site Parameters (51.04)
+MGRP() ; Get the Mail Group for the IIV Interface - IB Site Parameters (51.04)
  Q $$GET1^DIQ(350.9,"1,",51.04,"E")
  ;
  ;
@@ -101,7 +102,7 @@ PYRAPPX ;
  ;
  ;
 ACTAPP(IEN) ; Active payer applications
- ; This function will return 1 if any of the payer applications for 
+ ; This function will return 1 if any of the payer applications for
  ; this payer (being passed in by the payer IEN) are NOT deactivated.
  ; This should not be confused with the other payer application fields
  ; such as national active or local active.  The deactivated field is
@@ -121,7 +122,7 @@ ACTAPP(IEN) ; Active payer applications
  Q ACTAPP
  ;
 ADDTQ(DFN,PAYER,SRVDT,FDAYS,ANYPAYER) ; Function  - Returns flag (0/1)
- ; 1 - TQ File entry can be added as the service date for the patient 
+ ; 1 - TQ File entry can be added as the service date for the patient
  ;     and payer >= MAX TQ service date + Freshness Days
  ;     If ANYPAYER is set, check for recent entries for this patient and
  ;     any payer
@@ -135,7 +136,7 @@ ADDTQ(DFN,PAYER,SRVDT,FDAYS,ANYPAYER) ; Function  - Returns flag (0/1)
  ;  ANYPAYER - NUMERIC>0 if checking for any payer
  ;
  N ADDTQ,MAXDT
- ; 
+ ;
  S ADDTQ=1
  I ($G(DFN)="")!($G(SRVDT)="")!($G(FDAYS)="") S ADDTQ=0 G ADDTQX
  I '$G(ANYPAYER),$G(PAYER)="" S ADDTQ=0 G ADDTQX
@@ -143,7 +144,7 @@ ADDTQ(DFN,PAYER,SRVDT,FDAYS,ANYPAYER) ; Function  - Returns flag (0/1)
  S MAXDT=$$TQMAXSV(DFN,$G(PAYER),$G(ANYPAYER))
  I MAXDT="" G ADDTQX
  ; If Service Date < Max Service Date + Freshness Days, do not add
- I SRVDT'>$$FMADD^XLFDT(MAXDT,FDAYS) S ADDTQ=0
+ I SRVDT<$$FMADD^XLFDT(MAXDT,FDAYS) S ADDTQ=0
  ;
 ADDTQX ; ADDTQ exit pt
  Q ADDTQ
@@ -176,7 +177,7 @@ TQUPDSV(DFN,PAYER,SRVDT) ; Update service dates & freshness dates for TQ
  .. I STS=4 S ERACT="" D  I ERACT="P" Q
  .. . ; Last msg sent
  .. . S HL7IEN=$O(^IBCN(365.1,DA,2," "),-1) Q:'HL7IEN
- .. . ; Assoc eIV Response IEN
+ .. . ; Assoc IIV Response IEN
  .. . S RIEN=$P($G(^IBCN(365.1,DA,2,HL7IEN,0)),U,3) Q:'RIEN
  .. . ; Error Action IEN (365.018)
  .. . S ERACT=$P($G(^IBCN(365,RIEN,1)),U,15) Q:'ERACT
@@ -206,7 +207,7 @@ TQUPDSVX ; TQUPDSV exit pt
  Q
  ;
 TQMAXSV(DFN,PAYER,ANYPAYER) ; Returns MAX(TQ Service Date) for Patient & Payer
- ; Input: 
+ ; Input:
  ;  DFN     - Patient DFN (2)
  ;  PAYER   - Payer IEN (365.12) (If no PAYER passed in, check them all)
  ;  ANYPAYER - NUMERIC>0 if checking for any payer
@@ -227,6 +228,21 @@ TQMAXSV(DFN,PAYER,ANYPAYER) ; Returns MAX(TQ Service Date) for Patient & Payer
  ;
 TQMAXSVX ; TQMAXSV exit pt
  Q TQMAXSV
+ ;
+ ;
+SNDSSN(PIEN,APP) ; Determine Transmit SSN flag based on Payer and Payer
+ ; Application values
+ ; Input:
+ ;  PIEN - Payer IEN (365.12)
+ ;  APP  - Payer application description (like "IIV")
+ N IBFLG
+ ;
+ S IBFLG=0
+ ;
+ I $G(PIEN)=""!($G(APP)="") G SNDSSNX
+ S IBFLG=+$P($G(^IBE(365.12,PIEN,1,+$$PYRAPP(APP,PIEN),0)),U,10)
+ ;
+SNDSSNX Q IBFLG
  ;
 SAVFRSH(TQIEN,DTDIFF) ; Update TQ freshness date based on service date diff
  ;

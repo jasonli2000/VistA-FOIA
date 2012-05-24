@@ -1,5 +1,5 @@
-ECXNUTPP ;ALB/JRC - Nut Production Worksheet Print ; 4/12/09 11:31pm
- ;;3.0;DSS EXTRACTS;**92,119**;Dec 22, 1997;Build 19
+ECXNUTPP ;ALB/JRC - Nut Production Worksheet Print ; 11/2/06 8:41am
+ ;;3.0;DSS EXTRACTS;**92**;Dec 22, 1997;Build 30
  ;
 EN ;entry point from option
  ;Queue Report
@@ -28,7 +28,6 @@ EN1 ;Tasked entry point
  .D FOOTER I STOP D EXIT Q
  .D WAIT I STOP D EXIT Q
  .K ^TMP($J,"ECX")
- D FILECHK
 EXIT K ^TMP($J,"ECX")
  Q
 GETDATA ;Get data
@@ -99,7 +98,7 @@ FOOTER ;Print footer
  Q
  ;
 FHEADER ;Footer header
- W !,?1,"DSS PRODUCTS",!,?1,LN
+ W !!!,?1,"DSS PRODUCTS",!,?1,LN
  Q
  ;
 DSSPRO ;DSS standardized products
@@ -111,30 +110,6 @@ DSSPRO ;DSS standardized products
  .I $Y>(IOSL-5) D WAIT Q:STOP  D HEADER,FHEADER
  Q
  ;
-FILECHK ;check files for missing diets
- N CNT,IEN,X1,X2,FILE,TYPE,NAME,TYP
- D HEADER2
- F TYPE="PD","SF","SO","TF" D
- . S TYP=$O(^ECX(728.45,"B",TYPE,0))
- . S CNT=0
- . W !!!
- . S FILE=$S(TYPE="PD":116.2,TYPE="SF":118,TYPE="TF":118.2,TYPE="SO":118.3)
- . F IEN=0:0 S IEN=$O(^FH(FILE,IEN)) Q:'IEN  D
- .. I '$D(^ECX(728.45,+$G(TYP),1,"B",IEN_";FH("_FILE_",")) D
- ... S X1=$$GET1^DIQ(FILE,IEN,.01,"E")
- ... S X2=$$GET1^DIQ(FILE,IEN,99,"E")
- ...W !?3,X1,"   (",IEN,")",?50,TYPE,?56,X2 S CNT=CNT+1
- ...I $Y>(IOSL-5) D HEADER2
- . I CNT=0 W !?3,"NOTHING TO REPORT FOR "_TYPE_" DIET."
- Q
-HEADER2 ;header for file check
- S PAGE=$G(PAGE)+1
- W @IOF
- W !!,"THE FOLLOWING DIETS ARE MISSING FROM DSS WORKSHEETS",?70,"PAGE ",PAGE,!
- W !?3,"DIET",?50,"DIET",?56,"INACTIVE"
- W !,?50,"TYPE",?58,"FLAG"
- W !?3,"----",?50,"----",?56,"--------",!
- Q
 PRODUCTS ;Standardized assigned products for nutrition diets
  ;;PD^REGULAR
  ;;PD^FULL LIQS

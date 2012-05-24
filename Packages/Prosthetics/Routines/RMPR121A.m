@@ -1,6 +1,6 @@
 RMPR121A ;PHX/HNC -CREATE GUI PURCHASE CARD TRANSACTION CONT. ;3/1/2003
- ;;3.0;PROSTHETICS;**90,157**;Feb 09, 1996;Build 11
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;3.0;PROSTHETICS;**90**;Feb 09, 1996
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;04/01/05 Note some codeing for future use such as pt address.
 DELIV I RMPRY=1 D
  .S RMPRDDF="1^Y"
@@ -23,7 +23,6 @@ DELIV I RMPRY=1 D
  .S RMPRZIP=$P(^RMPR(664,RMPRA,3),U,9)
  ;deliver to other
  S RMPRDELN=RMPRY(0),$P(^RMPR(664,RMPRA,3),U)=RMPRDELN
- S RMPRDLVD=$P(^RMPR(664,RMPRA,3),U,2)
  I RMPRY=3 S RMPRDELN=$P(^RMPR(664,RMPRA,3),U,4)
  I RMPRY=4 S RMPRDELN=$P(^RMPR(664,RMPRA,3),U,4)
  Q

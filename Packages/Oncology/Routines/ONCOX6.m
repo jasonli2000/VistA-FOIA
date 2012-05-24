@@ -1,4 +1,4 @@
-ONCOX6 ; GENERATED FROM 'ONCOX6' PRINT TEMPLATE (#847) ; 08/02/04 ; (FILE 165.5, MARGIN=132)
+ONCOX6 ; GENERATED FROM 'ONCOX6' PRINT TEMPLATE (#847) ; 09/19/10 ; (FILE 165.5, MARGIN=132)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -42,13 +42,13 @@ BEGIN ;
  D N:$X>1 Q:'DN  W ?1 W "Other Stage:  "
  S X=$G(^ONCO(165.5,D0,2)) D N:$X>17 Q:'DN  W ?17 S Y=$P(X,U,21) S Y=$S(Y="":Y,$D(^ONCO(164.3,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,30)
  D N:$X>1 Q:'DN  W ?1 W "Size of Tumor: "
- D N:$X>16 Q:'DN  W ?16 S Y=$P(X,U,9) S Y(0)=Y D STOT^ONCOOT W $J(Y,7)
+ D N:$X>16 Q:'DN  W ?16 S Y=$P(X,U,9) S Y(0)=Y D STOT^ONCOOT W $E(Y,1,30)
  D N:$X>1 Q:'DN  W ?1 W "Positive nodes: "
- S X=$G(^ONCO(165.5,D0,2)) D N:$X>19 Q:'DN  W ?19 S Y=$P(X,U,12) S Y(0)=Y D RNP^ONCOOT W $J(Y,3)
+ S X=$G(^ONCO(165.5,D0,2)) D N:$X>19 Q:'DN  W ?19 S Y=$P(X,U,12) S Y(0)=Y D RNP^ONCOOT W $E(Y,1,30)
  D N:$X>49 Q:'DN  W ?49 W "Peripheral Blood Inv.: "
  S X=$G(^ONCO(165.5,D0,24)) D N:$X>72 Q:'DN  W ?72 S Y=$P(X,U,5) W:Y]"" $S($D(DXS(6,Y)):DXS(6,Y),1:Y)
  D N:$X>1 Q:'DN  W ?1 W "Nodes Examined: "
- S X=$G(^ONCO(165.5,D0,2)) D N:$X>19 Q:'DN  W ?19 S Y=$P(X,U,13) S Y(0)=Y D RNE^ONCOOT W $J(Y,3)
+ S X=$G(^ONCO(165.5,D0,2)) D N:$X>19 Q:'DN  W ?19 S Y=$P(X,U,13) S Y(0)=Y D RNE^ONCOOT W $E(Y,1,30)
  D N:$X>49 Q:'DN  W ?49 W "Associated with HIV: "
  S X=$G(^ONCO(165.5,D0,2)) D N:$X>70 Q:'DN  W ?70 S Y=$P(X,U,23) W:Y]"" $S($D(DXS(7,Y)):DXS(7,Y),1:Y)
  D N:$X>1 Q:'DN  W ?1 W "Extension:  "

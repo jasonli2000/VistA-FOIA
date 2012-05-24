@@ -1,10 +1,10 @@
-PRCHLO3 ;WOIFO/RLL-EXTRACT ROUTINE CLO REPORT SERVER ; 10/8/10 9:08am
- ;;5.1;IFCAP;**83,130,151**;Oct 20, 2000;Build 4
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCHLO3 ;WOIFO/RLL-EXTRACT ROUTINE CLO REPORT SERVER ; 12/19/05 10:25am
+V ;;5.1;IFCAP;**83**;; Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ; Continuation of PRCHLO2
  ;
  ; PRCHLO3 routines are used to Write out the Header and data
- ; associated with each of the 23 tables created for the Clinical
+ ; associated with each of the 19 tables created for the Clinical
  ; logistics Report Server. The files are built from the extracts
  ; located in the ^TMP($J) global.
  ;
@@ -14,29 +14,12 @@ POMASTH ; Po Master Table Header file
  W "^MethodOfProcessing^LocalProcReasonCode^ExpendableNonExpendable"
  W "^SupplyStatus^SupplyStatusOrder^FiscalStatusOrder^FCP"
  W "^Appropriation^CostCenter^SubAccount1^SubAmount1^SubAccount2"
- W "^SubAmount2^IENprimary2237^IENmethodOfProcessing^IENsupplyStatus"
- W "^IENsubaccount1^IENsubaccount2^Vendor^RequestingService^FobPoint"
+ W "^SubAmount2^Vendor^RequestingService^FobPoint"
  W "^OriginalDeliveryDate^EstCost^SourceCode^EstShipping"
  W "^ShippingLineItemNum^LineItemCount^PaPpmAuthBuyer"
  W "^AgentAssignedPo^DatePoAssigned^Remarks^OldPoRecord^NewPoRecord"
- W "^PaPpmAuthBuyerSVCint^PaPpmAuthBuyerSVCext"
- W "^AgentAssignedDuz^AgentAssignedSVCint^AgentAssignedSVCext"
  W "^PcdoVendor^PurchaseCardUser^PurchaseCost^PurchaseCardHolder"
- W "^Pcdo2237^TotalAmount^NetAmount"
- W "^PurchaseCardUserSVCint^PurchaseCardUserSVCext"
- W "^PurchaseCardHolderSVCint^PurchaseCardHolderSVCext^BBFY"
- W "^EndDateForServiceOrder^AutoAccrue^SubstationIEN^SubstationExternal"
- W "^VendorIEN^VendorFMSCode^VendorAlt-Addr-Ind^VendorDandB"
- W "^Month^Quarter^LastDigitFicalYear^Actual1358Balance"
- W "^Fiscal1358Balance^Est1358Balance^BulletinSent^InterfacePkgPrefix"
- W "^DocumentID/CommonNumber^DoYouWantToSendThisEDI"
- W "^ReasonNotCompeted^NumberOfOffers^PreAwardSynopsis"
- W "^AlternativeAdvertising^SolicitationProcedure^EvaluatedPreference"
- W "^FundingAgencyCode^FundingAgencyOfficeCode^MultiYear"
- W "^EPADesignatedProduct^ContractBundling^ExtentCompeted"
- W "^Perf.BasedServiceContract^ClingerCohen^PlaceOfPerfThisStation"
- W "^PlaceOfPerformance^SendtoFPDS^DuzPABuyer^DuzPCUser^DuzPCHolder"
- W "^RegionalACQcenter",!
+ W "^Pcdo2237^TotalAmount^NetAmount",!
  Q
 POMASTW ; Write PO Master table data
  N GPOID,GPOND
@@ -54,9 +37,7 @@ POOBHD ; PO Obligation Header
  ;
  W "PoIdNum^PurchaseOrderNum^PoDate^MonthYrRun^StationNum^"
  W "ObDataIdNum^Tdateref^ObligatedBy^TransactionAmount^"
- W "AmendmentNumber^Z1358Adjustment^DUZObligatedBy^IEN1358Adjustment^"
- W "DateSigned^ObligationProcessDate^"
- W "AccountingPeriod^ObligatedBySVCint^ObligatedBySVCext",!
+ W "AmendmentNumber^Z1358Adjustment",!
  Q
  ;
 POOBW ; Write PO Obligation data
@@ -102,9 +83,7 @@ POPARTW ; PO Partial Data Write
 PO2237H ; Po 2237 Header
  W "PoIdNum^PurchaseOrderNum^PoDate^MonthYrRun^StationNum^"
  W "Z2237IdNum^Z2237RefNum^AccountableOfficer^DateSigned^"
- W "PurchasingAgent^TypeOfRequest^SourceOfRequest^InvDistPoint^"
- W "DuzPA^DuzAccountableOfficer^PASVCint^PASVCext^"
- W "AccountableOfficeSVCint^AccountableOfficeSVCext",!
+ W "PurchasingAgent^TypeOfRequest^SourceOfRequest^InvDistPoint",!
  Q
  ;
 PO2237W ; PO 2237 Write Data
@@ -118,7 +97,7 @@ PO2237W ; PO 2237 Write Data
  Q
 POBOCH ; PO BOC Header
  W "PoIdNum^PurchaseOrderNum^PoDate^MonthYrRun^StationNum^"
- W "BocIdNum^Subaccount^SubAmount^FMSline",!
+ W "BocIdNum^Subaccount^SubAmount",!
  Q
 POBOCW ; PO BOC Write Data
  N POBOC,POBOC1
@@ -184,11 +163,8 @@ PAMTBKH ; PO Amount Breakout Code Header
  Q
 POAMDH ; PO Amendment Header
  W "PoIdNum^PurchaseOrderNum^PoDate^MonthYrRun^StationNum^"
- W "AmendmentIdNum^Amendment^EffectiveDate^AmountChanged^"
- W "PappmAuthBuyer^AmendmentAdjStatus^"
- W "DuzPappmAuthBuyer^DuzFiscalApprover^NameFiscalApprover^"
- W "PappmAuthBuyerSVCint^PappmAuthBuyerSVCext^"
- W "FiscalApproverSVCint^FiscalApproverSVCext",!
+ W "AmendmentIdNum^Amendment^EffectiveChange^AmountChanged^"
+ W "PappmAuthBuyer^AmendmentAdjStatus",!
  Q
 POAMDW ; PO Amendment Write Data
  N POAMD,POAMD1,POAMD2
@@ -239,84 +215,6 @@ PAMTBKW ; Write Breakout Code data
  . . F  S BCD2=$O(^TMP($J,"POBKCOD",BCD,BCD1,BCD2)) Q:BCD2=""  D
  . . . ;
  . . . W $G(^TMP($J,"POBKCOD",BCD,BCD1,BCD2,0)),!
- . . Q
- . Q
- Q
-CONTRPH ; Write File 410 header (Control Point Activities)
- W "TransactionNumber^TransactionIEN^StationNumber^MonthYrRun^TransactionType^FormType^"
- W "SubStationIEN^SubStationEXT^RunningBalQuarterDate^RunningBalStatus^"
- W "DateOfRequest^ClassOfRequestIEN^ClassOfRequestEXT^Vendor^"
- W "VendorAddress1^VendorAddress2^VendorAddress3^VendorAddress4^"
- W "VendorCity^VendorState^VendorZIPcode^VendorContact^VendorPhone^"
- W "VendorIEN^VendorName^VendorFMSCode^VendorAlt-Addr-Ind^"
- W "VendorDandB^VendorContractNumber^ControlPoint^CostCenter^"
- W "BOC1^BOC1Amount^AccountingData^FcpPrj^BBFY^"
- W "CommittedCost^DateCommitted^ObligatedActualCost^"
- W "DateObligated^PurchaseOrderObligationNumber^AdjustmentAmount^"
- W "DateOBLAjusted^TransactionAmount^"
- W "ObligatedByDUZ^ObligatedByName^ObligatedBySVCint^"
- W "ObligatedBySVCext^ObligationValCodeDateTime^"
- W "RequestorDUZ^RequestorName^RequestorSVCint^RequestorSVCext^"
- W "RequestorTitle^ApprovOfficialDUZ^ApprovOfficialName^"
- W "ApprovOfficialSVCint^ApprovOfficialSVCext^ApprovOfficialTitle^"
- W "DateSigned^ESCodeDateTime^"
- W "Justification^SortGroup^StationPONoIEN^StationPONoEXT^PoDate^Status^"
- W "Comments^ReasonForReturn^"
- ;added by patch 151 to support new fields
- W "AuthIEN^AuthCode^AuthDesc^SubAuthIEN^SubAuthCode^SubAuthDesc^"
- W "ServiceStartDate^ServiceEndDate",!
- Q
-CONTRPW ; Write File 410 data (Control Point Activities)
- N GPOID,GPOND
- S GPOID=0,GPOND=""
- F  S GPOID=$O(^TMP($J,"CONTRP",GPOID)) Q:GPOID=""  D
- . F  S GPOND=$O(^TMP($J,"CONTRP",GPOID,GPOND)) Q:GPOND=""  D
- . . W $G(^TMP($J,"CONTRP",GPOID,GPOND))
- . . Q
- . W !    ; new line for each file #410 entry
- . Q
- Q
-SUBCPH ; Write File 410.04 header (Sub Control Point)
- W "TransactionNumber^TransactionIEN^StationNumber^StationPONoIEN^StationPONoEXT^PoDate^MonthYrRun^SubControlPoint^Amount^SCPAMT",!
- Q
-SUBCPW ; Write File 410.04 data (Sub Control Point)
- N GPOID,GPOND
- S GPOID=0,GPOND=""
- F  S GPOID=$O(^TMP($J,"SUBCP",GPOID)) Q:GPOID=""  D
- . F  S GPOND=$O(^TMP($J,"SUBCP",GPOID,GPOND)) Q:GPOND=""  D
- . . W $G(^TMP($J,"SUBCP",GPOID,GPOND)),!
- . . Q
- . Q
- Q
-DR1358H ; Write File 424 header (1358 Daily Record)
- W "PoIdNum^PurchaseOrderNum^PoDate^MonthYrRun^StationNum^AuthorizationNumber^TransactionType^"
- W "LiquidationAmount^AuthBalance^ObligationAmount^DateTime^UserDUZ^"
- W "UserName^UserSVCint^UserSVCext^CompletedFlag^Reference^"
- W "LastSequenceUsed^AuthAmount^"
- W "OriginalAuthAmount^LastEditByDUZ^LastEditByName^LastEditBySVCint^"
- W "LastEditBySVCext^CPApointerIEN^CPApointerEXT^Comments^InterfaceID",!
- Q
-DR1358W ; Write File 424 data (1358 Daily Record)
- N GPOID,GPOND
- S GPOID=0,GPOND=""
- F  S GPOID=$O(^TMP($J,"DR1358",GPOID)) Q:GPOID=""  D
- . F  S GPOND=$O(^TMP($J,"DR1358",GPOID,GPOND)) Q:GPOND=""  D
- . . W $G(^TMP($J,"DR1358",GPOID,GPOND)),!
- . . Q
- . Q
- Q
-AD1358H ; Write File 424.1 header (1358 Authorization Detail)
- W "PoIdNum^PurchaseOrderNum^PoDate^MonthYrRun^StationNum^BillNumber^RecordType^AuthPointerIEN^AuthPointerEXT^AuthAmount^"
- W "DateTime^UserDUZ^UserName^UserSVCint^UserSVCext^"
- W "VendorInvoiceNumber^FinalBill^Reference^LastEditedByDUZ^"
- W "LastEditedByName^LastEditedBySVCint^LastEditedBySVCext^Description",!
- Q
-AD1358W ; Write File 424.1 data (1358 Authorization Detail)
- N GPOID,GPOND
- S GPOID=0,GPOND=""
- F  S GPOID=$O(^TMP($J,"AD1358",GPOID)) Q:GPOID=""  D
- . F  S GPOND=$O(^TMP($J,"AD1358",GPOID,GPOND)) Q:GPOND=""  D
- . . W $G(^TMP($J,"AD1358",GPOID,GPOND)),!
  . . Q
  . Q
  Q

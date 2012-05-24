@@ -1,6 +1,6 @@
-IBEBR ;ALB/AAS - Add/Edit IB ACTION CHARGE FILE ;3-MAR-92
- ;;2.0;INTEGRATED BILLING;**34,52,429**;21-MAR-94;Build 62
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBEBR ;ALB/AAS - Add/Edit IB ACTION CHARGE FILE; 3-MAR-92
+ ;;Version 2.0 ; INTEGRATED BILLING ;**34,52**; 21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 % ; entry point
  D HOME^%ZIS W @IOF
@@ -61,7 +61,7 @@ FILE ;  -add new entries in 350.2 and edit
  ;
  ;  -if a new entry
  S IBNEW=$P(Y,"^",3)
- K DR S DR="" S IBORIG=$O(^IBE(350.2,"B",IBPD,0)),IBLAST=$O(^IBE(350.2,"B",IBPD,+Y),-1) I IBNEW S DR=".02///"_IBEFDT_";.03///"_$P($G(^IBE(350.2,+IBORIG,0)),"^",3)_";"
+ K DR S DR="" S IBORIG=$O(^IBE(350.2,"B",IBPD,0)) I IBNEW S DR=".02///"_IBEFDT_";.03///"_$P($G(^IBE(350.2,+IBORIG,0)),"^",3)_";"
  ;
  S DIE="^IBE(350.2,",DA=+Y,DR=DR_".04;.06;.05;" D ^DIE K DIE
  ;
@@ -70,8 +70,6 @@ FILE ;  -add new entries in 350.2 and edit
  ;
  ;  -set computed logic for new entry if needed
  S IB10=$G(^IBE(350.2,+IBORIG,10)) I IB10]"" S ^IBE(350.2,DA,10)=IB10
- ;  -set additional amount logic if needed (from last one)
- S IB20=$G(^IBE(350.2,+IBLAST,20)) I IB20]"" S ^IBE(350.2,DA,20)=IB20
  ;
  ;  -logic for rx3-rx6
  S IB=0,IB0=$G(^IBE(350.2,DA,0)) F  S IB=$O(IBPD(IB)) Q:'IB  D
@@ -79,12 +77,11 @@ FILE ;  -add new entries in 350.2 and edit
  . I 'IBNEW S DA=$O(^IBE(350.2,"AIVDT",IBATYP,-IBEFDT,0)) Q:'DA
  . I IBNEW S X=IBPD(IB),DIC="^IBE(350.2,",DIC(0)="L" K DD,DO D FILE^DICN Q:Y<0  S DA=+Y
  . S DIE="^IBE(350.2,",DR=".02////"_IBEFDT_";.03////"_IBATYP_";.04////"_$P(IB0,"^",4)_";.05////"_$S($P(IB0,"^",5)]"":$P(IB0,"^",5),1:"@")_";.06////"_$S($P(IB0,"^",6)]"":$P(IB0,"^",6),1:"@") D ^DIE
- . I IB20]"" S ^IBE(350.2,DA,20)=IB20
  ;
 FILEQ K IB10,DIC,DIE,DR,DA,IBNEW,IBORIG,DIK Q
  ;
 END ;Kill vars
- K I,X,Y,IBNOD,IBPD,DIR,DIC,DIE,DIK,DA,DR,DA,IB10,IBORIG,IB,IB0,IBP,IBEFDT,IBSEL,IBX,IBRUN,IB20,IBLAST
+ K I,X,Y,IBNOD,IBPD,DIR,DIC,DIE,DIK,DA,DR,DA,IB10,IBORIG,IB,IB0,IBP,IBEFDT,IBSEL,IBX,IBRUN
  Q
  ;
  ;;

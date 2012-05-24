@@ -1,5 +1,5 @@
 LRDIDLE0 ;DALOI/JMC; Create audit trail of changed values ;Feb 21, 2003
- ;;5.2;LAB SERVICE;**140,171,153,286,396**;Sep 27, 1994;Build 3
+ ;;5.2;LAB SERVICE;**140,171,153,286**;Sep 27, 1994
  ; Called by LRVER3
  ;
 INIT ;
@@ -24,14 +24,11 @@ EVAL ;
  ;
  ; Normalcy flag changed
  I $P($G(LRSA(LRSB,2)),"^",2) D
- . S LRNEW=$P(LRSB(LRSB),"^",2) S:LRNEW="" LRNEW="normal" D  ; new value
- . . I $P(LRSB(LRSB),"^")="canc"!($P(LRSB(LRSB),"^")="CANC") S LRNEW="canc"
+ . S LRNEW=$P(LRSB(LRSB),"^",2) S:LRNEW="" LRNEW="normal" ; new value
  . S LROLD=$P(LRSA(LRSB),"^",2) S:LROLD="" LROLD="normal" ; old value
  . S LRSQ9=LROLD_" by ["_$$USERID($P(LRSA(LRSB),"^",4))_"]" ; old result
- . S LRJ=LRJ+1,LRTXT(LRJ)=LRSA(LRSB,1)_" flagged incorrectly as "_LRSQ9_"."
- . S LRJ=LRJ+1 D
- . . I LRNEW="canc" S LRTXT(LRJ)="Abnormal flag removed on "_LRCHDT7_" by ["_LRUSER_"]." Q
- . . S LRTXT(LRJ)="Changed to "_LRNEW_" on "_LRCHDT7_" by ["_LRUSER_"]."
+ . S LRJ=LRJ+1,LRTXT(LRJ)=LRSA(LRSB,1)_" normalcy reported incorrectly as "_LRSQ9_"."
+ . S LRJ=LRJ+1,LRTXT(LRJ)="Changed to "_LRNEW_" on "_LRCHDT7_" by ["_LRUSER_"]."
  ;
  ; Check normal ranges
  I $P($G(LRSA(LRSB,2)),"^",5) D

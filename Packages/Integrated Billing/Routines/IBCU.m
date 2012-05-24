@@ -1,6 +1,6 @@
 IBCU ;ALB/MRL - BILLING UTILITY ROUTINE ;01 JUN 88 12:00
- ;;2.0;INTEGRATED BILLING;**52,106,51,191,232,323,320,384,432**;21-MAR-94;Build 192
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**52,106,51,191,232,323,320**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;MAP TO DGCRU
  ;
@@ -39,14 +39,14 @@ REV ;Input Transform for Revenue Code
  I '$D(IBC) I $D(^DGCR(399.2,X,0)) I '$P(^DGCR(399.2,X,0),"^",3) W !!,"Only ACTIVE Revenue Codes may be selected!!",!! K X Q
  Q
  ;
-YN S X=$E(X),X=$S(X=1:X,X=0:X,X="Y":1,X="y":1,X="n":0,X="N":0,1:2) I X'=2 D EN^DDIOL("  ("_$S(X:"YES",1:"NO")_")","","?0") Q
- D EN^DDIOL("NOT A VALID CHOICE!","","!?4") K X Q
+YN S X=$E(X),X=$S(X=1:X,X=0:X,X="Y":1,X="y":1,X="n":0,X="N":0,1:2) I X'=2 W "  (",$S(X:"YES",1:"NO"),")" Q
+ W !?4,"NOT A VALID CHOICE!",*7 K X Q
  Q
  ;
 NOPTF ; Input transform for file 399, field 159.5 (NON-VA ADMIT TIME)
  N %DT
  I X>24 K:X'=99 X Q
- I $P($G(^DGCR(399,DA,0)),U,8) K X Q  ; PTF pointer exists 
+ I $P($G(^DGCR(399,DA,0)),U,8) K X Q  ; PTF pointer exists
  S X=$TR(X,"M ") S:X=0 X="12A" S:X<12 X=$TR(X,"A")
  S:X?1N.N&($L(X)<3) Y="."_$E("0",$L(X))_X S:X'?1.2N %DT="TPR",X=DT_"@"_X D:$L(X)>2 ^%DT S X=$E($P(Y,".",2)_"00",1,2)#24 K:Y=-1 X
  Q
@@ -135,8 +135,7 @@ PRVNUM(IBIFN,IBINS,COB) ; Trigger code (399:122,123,124)
  ; claim and the billing provider # already exists, then leave it
  I $G(IBPRCOB),IBX'="" G PRVNQ
  ;
- ;patch 432 enh5:  The IB system shall no longer add the following default Billing Provider Secondary ID to all Medicare Part A (Institutional) general/psychiatric claims:  674499 Psychiatric, 670899 General
- ;I +$G(IBIFN),COB N DA S DA=IBIFN I $$MCRACK^IBCBB3(+IBIFN,$P($G(^DGCR(399,+IBIFN,"TX")),U,5),+COB) S IBX=$$MCRANUM^IBCBB3(+IBIFN) G PRVNQ
+ I +$G(IBIFN),COB N DA S DA=IBIFN I $$MCRACK^IBCBB3(+IBIFN,$P($G(^DGCR(399,+IBIFN,"TX")),U,5),+COB) S IBX=$$MCRANUM^IBCBB3(+IBIFN) G PRVNQ
  ;
  ; WCJ - 1/17/06 - Some Insurances require certain electronic plan types to have no secondary ID
  ; Check if this plan type requires a blank sec id to go out for this insurance
@@ -155,8 +154,7 @@ PRVNUM(IBIFN,IBINS,COB) ; Trigger code (399:122,123,124)
  ;
  S IBX=$$FACNUM^IBCEP2B(IBIFN,COB)
  ;
- ; PATCH 432 ENH5:  The IB system shall no longer add a default Billing Provider Secondary ID to a claim.
- ;I IBX="" S IBX=$$GET1^DIQ(350.9,1,1.05)
+ I IBX="" S IBX=$$GET1^DIQ(350.9,1,1.05)
  ;
 PRVNQ Q IBX
  ;
@@ -194,8 +192,7 @@ PRVQUAL(IBIFN,IBINS,COB) ; Trigger code for Bill P/S/T Prov QUAL (399:128,129,13
  ; billing provider qualifier already exists, then leave it alone
  I $G(IBPRCOB),IBX'="" G PRVQUALQ
  ;
- ; PATCH 432 ENH5:  The IB system shall no longer add a default Billing Provider Secondary ID to a claim.
- ;I +$G(IBIFN),COB N DA S DA=IBIFN I $$MCRACK^IBCBB3(+IBIFN,$P($G(^DGCR(399,+IBIFN,"TX")),U,5),+COB) S IBX=$$FIND1^DIC(355.97,,"MX","MEDICARE PART A") G PRVQUALQ
+ I +$G(IBIFN),COB N DA S DA=IBIFN I $$MCRACK^IBCBB3(+IBIFN,$P($G(^DGCR(399,+IBIFN,"TX")),U,5),+COB) S IBX=$$FIND1^DIC(355.97,,"MX","MEDICARE PART A") G PRVQUALQ
  ;
  ; Some Insurances require certain electronic plan types to have no secondary ID
  ; If this is the case, there is no qualifier

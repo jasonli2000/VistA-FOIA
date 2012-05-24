@@ -1,6 +1,6 @@
-FBAAVD ;AISC/DMK-DISPLAY/EDIT VENDOR DEMOGRAPHICS ; 8/28/09 12:35pm
- ;;3.5;FEE BASIS;**9,98,111**;JAN 30, 1995;Build 17
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+FBAAVD ;AISC/DMK-DISPLAY/EDIT VENDOR DEMOGRAPHICS ;11 Apr 2006  2:54 PM
+ ;;3.5;FEE BASIS;**9,98**;JAN 30, 1995;Build 54
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;FBTEMP set = 1 if called from input template
 RDV ;ask vendor
  W ! K DFN,FBRATE S FEEO="",DIC="^FBAAV(",DIC(0)="AEQLM",DLAYGO=161.2,DIC("DR")="1;6;7;8" D ^DIC K DIC,DLAYGO G Q:$D(DTOUT)!(X="")!($D(DUOUT)),RDV:Y<0 S DA=+Y
@@ -79,9 +79,8 @@ SETGL ;called to file an entry in 161.25 (vendor correction file)
  I $S('$G(DA):1,$G(FBT)="C"&('$D(FBIEN1)):1,1:0) Q
  S Z1=$G(^FBAAV(DA,0)),FBTOV=$S($P(Z1,U,7)=3:"P",1:"O")
  I $G(FBT)="N"!($G(FBT)="R") S DIE="^FBAAV(",DR="9///@;13///@" D ^DIE K DIE
- I '$D(^FBAA(161.25,DA,0)) F  L +^FBAA(161.25,DA):$G(DILOCKTM,3) Q:$T  W:'$D(ZTQUEUED) !,"Unable to setup SG MRA transaction.  Trying again."
- K DD,DO S (X,DINUM)=DA,DIC="^FBAA(161.25,",DIC(0)="L",DLAYGO=161.25 D FILE^DICN K DLAYGO L -^FBAA(161.25,DA) Q:Y<0
-NEXT L +^FBAA(161.25,DA):$G(DILOCKTM,3) I '$T W:'$D(ZTQUEUED) !,"Unable to setup NEXT MRA transaction.  Trying again.",! G NEXT
+ I '$D(^FBAA(161.25,DA,0)) L +^FBAA(161.25,DA) K DD,DO S (X,DINUM)=DA,DIC="^FBAA(161.25,",DIC(0)="L",DLAYGO=161.25 D FILE^DICN K DLAYGO L -^FBAA(161.25,DA) Q:Y<0
+NEXT L +^FBAA(161.25,DA):1 I '$T W:'$D(ZTQUEUED) !,"Unable to setup MRA transaction.  Trying again.",! G NEXT
  S DIE="^FBAA(161.25,",DR="[FBAA VENDOR MRA]" D ^DIE L -^FBAA(161.25,DA)
  K DIE,DIC,Y
  Q

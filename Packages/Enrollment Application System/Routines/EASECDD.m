@@ -1,5 +1,5 @@
 EASECDD ;ALB/LBD - Executable help for fields in file #408.21  ;4 SEP 2001
- ;;1.0;ENROLLMENT APPLICATION SYSTEM;**5,7,34,40,100**;Mar 15, 2001;Build 6
+ ;;1.0;ENROLLMENT APPLICATION SYSTEM;**5,7,34,40**;Mar 15, 2001
  ;
 8 ; Social Security
  W !,?8,"Enter in this field the annual amount of Social Security"
@@ -83,7 +83,7 @@ EASECDD ;ALB/LBD - Executable help for fields in file #408.21  ;4 SEP 2001
  .W !,?8,"Enter in this field the annual amount of All Other Income"
  .W !,?8,"received during the current calendar year (i.e., inheritance amounts,"
  .W !,?8,"tort settlement payments)."
- ;W !!,?8,"A monthly amount can be entered with an '*' after it.",!
+ W !!,?8,"A monthly amount can be entered with an '*' after it.",!
  S X="?"
  Q
 101 ; Medical Expenses

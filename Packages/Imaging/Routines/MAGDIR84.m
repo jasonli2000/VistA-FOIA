@@ -1,6 +1,5 @@
-MAGDIR84 ;WOIFO/PMK - Read a DICOM image file ; 19 Sep 2007 9:43 AM
- ;;3.0;IMAGING;**11,54**;03-July-2009;;Build 1424
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGDIR84 ;WOIFO/PMK - Read a DICOM image file ; 09/30/2003  09:19
+ ;;3.0;IMAGING;**11**;14-April-2004
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGDIR84 ;WOIFO/PMK - Read a DICOM image file ; 19 Sep 2007 9:43 AM
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -15,6 +15,7 @@ MAGDIR84 ;WOIFO/PMK - Read a DICOM image file ; 19 Sep 2007 9:43 AM
  ;; | to be a violation of US Federal Statutes.                     |
  ;; +---------------------------------------------------------------+
  ;;
+ ;
  ; M2MB server
  ;
  ; This routine handles the "PATIENT SAFETY" REQUEST item.
@@ -22,17 +23,18 @@ MAGDIR84 ;WOIFO/PMK - Read a DICOM image file ; 19 Sep 2007 9:43 AM
  ; It checks the 0-node of ^MAG(2005) and other files to verify that
  ; they have not been unintentionally decremented.  This is a safety
  ; precaution to prevent an earlier copy of the global from being used.
- ; 
- ; This problem can be caused either by using the VA AXP DSM 
+ ;
+ ; This problem can be caused either by using the VA AXP DSM
  ; Global/Volume Set Repacking Utility or by restoring an old
  ; copy of the global.
- ; 
+ ;
 ENTRY ; entry point from ^MAGDIR8
  N LASTIEN ;-- internal entry number of last image in ^MAG(2005)
  N LASTPTR ;-- value of "LAST IMAGE POINTER"
  N FILE ;----- name of MUMPS file containing 0-node for testing
  N FILENAME ;- human-readable name of file begin tested
  N NEWVALUE ;- updated value for the last pointer
+ N NODENAME ;- subscript of "LAST <filename> POINTER" in ^MAGDICOM
  N RESULTS ;-- result string (working variable)
  ;
  N EMAIL,LASTIMG,LASTRAD,SYSTITLE
@@ -88,17 +90,17 @@ CHECK() ; check the last internal entry with that previously saved
  ;
 CHECK1() ; check the last internal entry number against the largest know value
  S LASTIEN=$O(@FILE@(" "),-1) ; changed from piece 3 of zero node - PMK 6/4/02
+ S NODENAME="LAST "_FILENAME_" POINTER"
  S NEWVALUE=LASTPTR,LASTPTR=+LASTPTR
  I LASTIEN=LASTPTR Q 0 ; no change
  I LASTIEN>LASTPTR D UPDATE Q 1 ; record last ien in ^MAGDICOM
  ;
- ; if last entry was deleted, LASTIEN should be one less than LASTPTR 
+ ; if last entry was deleted, LASTIEN should be one less than LASTPTR
  I LASTIEN=(LASTPTR-1) D UPDATE Q 1 ; a delete must have happened
  Q -1 ; the last entry number is less that it should be
  ;
 UPDATE ; record the largest known internal entry number in ^MAGDICOM
- N Y
- S Y=$$HTE^XLFDT($H,1)
- S NEWVALUE=LASTIEN_" "_$P(Y,",")_" at "_$P(Y,"@",2)
+ N %,%H,%I,X,Y
+ D NOW^%DTC,YX^%DTC S Y=$P(Y,",")_" at "_$P(Y,"@",2)
+ S NEWVALUE=LASTIEN_" "_Y
  Q
- ;

@@ -1,13 +1,13 @@
 IBCNEHL2 ;DAOU/ALA - HL7 Process Incoming RPI Msgs (cont.) ;26-JUN-2002  ; Compiled December 16, 2004 15:29:37
- ;;2.0;INTEGRATED BILLING;**300,345,416,438**;21-MAR-94;Build 52
+ ;;2.0;INTEGRATED BILLING;**300,345**;21-MAR-94;Build 28
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ;**Program Description**
  ;  This pgm will process the indiv segments of the
- ;  incoming eIV response msgs.
+ ;  incoming IIV response msgs.
  ;
  ; * Each of these tags are called by IBCNEHL1.
- ; 
+ ;
  ;  This routine is based on IBCNEHLP which was introduced with patch 184, and subsequently
  ;  patched with patches 252 and 271.  IBCNEHLP is obsolete and deleted with patch 300.
  ;
@@ -102,22 +102,19 @@ IN1(ERROR,IBSEG,RIEN,SUBID) ;  Process the IN1 Insurance seg
  N COB,EFFDT,EXPDT,GNAME,GNUMB,MBRID,PAYRID,PYRNM,RSUPDT,SRVDT
  N PYLEDT,CERDT,RELTN
  ;
- ; Austin sending responses with an error indicator will populate IBSEG(3) w/ 
- ;9 zeros in order to send the HL7 required field when the payer does not 
+ ; Austin sending responses with an error indicator will populate IBSEG(3) w/
+ ;9 zeros in order to send the HL7 required field when the payer does not
  ;send a value for this field
  S MBRID=$$DECHL7($G(IBSEG(3))) I ACK="AE",($TR(MBRID,0)="") S MBRID=""
  S PAYRID=$G(IBSEG(4)),PYRNM=$G(IBSEG(5))
  S GNAME=$$DECHL7($G(IBSEG(10))),GNUMB=$$DECHL7($G(IBSEG(9)))
- ; make sure group number is not longer than 17 chars, send mailman notification
- ; if trucncation is necessary
- I $L(GNUMB)>17 D TRNCWARN^IBCNEHLU(GNUMB,$G(TRACE)) S GNUMB=$E(GNUMB,1,17)
  S EFFDT=$G(IBSEG(13)),EXPDT=$G(IBSEG(14))
  S COB=$G(IBSEG(23)),SRVDT=$G(IBSEG(27))
  S PYLEDT=$G(IBSEG(30)),RELTN=$G(IBSEG(18))
  ;
  ; Relationship codes sent through the HL7 msg are X12 codes
- ; X12 codes from the interface that are special cases: "21"=unknown, "40"=cadaver donor
- S RELTN=$S(RELTN="21":"",RELTN="40":"G8",1:RELTN)
+ ; X12 codes from the interface "01"=spouse, "18"=self "21"=unknown, "34"=other adult
+ S RELTN=$S(RELTN="01":"02",RELTN="18":"01",RELTN="21":"09",1:"")
  S EFFDT=$$FMDATE^HLFNC(EFFDT),EXPDT=$$FMDATE^HLFNC(EXPDT)
  S SRVDT=$$FMDATE^HLFNC(SRVDT),PYLEDT=$$FMDATE^HLFNC(PYLEDT)
  ;
@@ -127,7 +124,7 @@ IN1(ERROR,IBSEG,RIEN,SUBID) ;  Process the IN1 Insurance seg
  S RSUPDT(365,RIEN_",",1.12)=EXPDT,RSUPDT(365,RIEN_",",1.1)=SRVDT
  S RSUPDT(365,RIEN_",",1.19)=PYLEDT
  S RSUPDT(365,RIEN_",",1.13)=COB,RSUPDT(365,RIEN_",",1.18)=MBRID
- S RSUPDT(365,RIEN_",",8.01)=RELTN
+ S RSUPDT(365,RIEN_",",1.09)=RELTN
  D FILE^DIE("I","RSUPDT","ERROR")
 IN1X ;
  Q
@@ -157,14 +154,14 @@ ZEB(EBDA,ERROR,IBSEG,RIEN) ;  Process the ZEB Elig/Benefit seg
  ; Output:
  ; EBDA,ERROR
  ;
- N D1,DA,DIC,DILN,DISYS,DLAYGO,EBN,IENS,II,MSG,PRMODS,RSUPDT,STC,STCSTR,SUBJECT,X,XMY,Y,MA
+ N D1,DA,DIC,DILN,DISYS,DLAYGO,EBN,IENS,II,MSG,RSUPDT,SUBJECT,X,XMY,Y,MA
  ;
- ; Set a default eIV Status value of # ("V")
+ ; Set a default IIV Status value of # ("V")
  I IIVSTAT="" D
- .   I IBSEG(7)'="eIV Eligibility Determination" S IIVSTAT="V" Q
+ .   I IBSEG(7)'="IIV Eligibility Determination" S IIVSTAT="V" Q
  .   I $F("_1_6_V_","_"_IBSEG(3)_"_") S IIVSTAT=IBSEG(3) Q
  .   ; Unknown code received from the EC
- .   S SUBJECT="eIV: Invalid Eligibility Status flag"
+ .   S SUBJECT="IIV: Invalid Eligibility Status flag"
  .   S MSG(1)="An invalid Eligibility Status flag '"_$G(IBSEG(3))_"' was received for site "_$P($$SITE^VASITE,"^",3)_","
  .   S MSG(2)="trace number "_$G(TRACE,"unknown")_" and message control id "_$G(MSGID,"unknown")_"."
  .   S MSG(3)="It has been interpreted as an ambiguous response in VistA."
@@ -183,25 +180,13 @@ ZEB(EBDA,ERROR,IBSEG,RIEN) ;  Process the ZEB Elig/Benefit seg
  ;
  ; decode plan description ZEB segment
  S IBSEG(7)=$$DECHL7($G(IBSEG(7)))
- S RSUPDT(365.02,IENS,".02")=$P($G(IBSEG(3)),HLCMP) ; elig/benefit info
- S RSUPDT(365.02,IENS,".03")=$P($G(IBSEG(4)),HLCMP) ; coverage level
- S RSUPDT(365.02,IENS,".05")=$P($G(IBSEG(6)),HLCMP) ; insurance type
- S RSUPDT(365.02,IENS,".06")=$G(IBSEG(7))           ; plan coverage
- S RSUPDT(365.02,IENS,".07")=$P($G(IBSEG(8)),HLCMP) ; time period qualifier
+ F II=2:1:7 S RSUPDT(365.02,IENS,".0"_II)=$G(IBSEG(II+1))
  S MA=$G(IBSEG(9)) I $TR(MA," ","")'="" S MA=$J(MA,0,2)
- S RSUPDT(365.02,IENS,".08")=$$NUMCHK(MA)            ; Monetary amt
- S RSUPDT(365.02,IENS,".09")=$$NUMCHK($G(IBSEG(10))) ; Percent
- S RSUPDT(365.02,IENS,".1")=$G(IBSEG(11))            ; Quantity Qual.
+ S RSUPDT(365.02,IENS,".08")=MA                     ; Monetary amt
+ S RSUPDT(365.02,IENS,".09")=$G(IBSEG(10))          ; Percent
+ S RSUPDT(365.02,IENS,".1")=$G(IBSEG(11))           ; Quantity Qual.
  F II=11:1:13 S RSUPDT(365.02,IENS,"."_II)=$G(IBSEG(II+1))
- S RSUPDT(365.02,IENS,"1.01")=$P($G(IBSEG(15)),HLCMP) ; Procedure coding method
- S RSUPDT(365.02,IENS,"1.02")=$G(IBSEG(16)) ; Procedure code
- ; Procedure modifiers
- S PRMODS=$G(IBSEG(17)) F II=1:1:4 S RSUPDT(365.02,IENS,"1.0"_(II+2))=$TR($P(PRMODS,HLREP,II),HL("ECH"))
- D FILE^DIE("ET","RSUPDT","ERROR") I $D(ERROR) Q
- ; service type codes
- K RSUPDT S STCSTR=$P($G(IBSEG(5)),HLCMP)
- F II=1:1 S STC=$P(STCSTR,HLREP,II) Q:STC=""  S RSUPDT(365.292,"+"_II_","_IENS,".01")=STC
- I $D(RSUPDT) D UPDATE^DIE("E","RSUPDT",,"ERROR")
+ D FILE^DIE("E","RSUPDT","ERROR")
 ZEBX ;
  Q
  ;
@@ -264,6 +249,3 @@ DECHL7(STR,HLSEP,ECHARS) ; Decode HL7 escape seqs in data fields
  ;
 DECHL7X ; Exit w/return values
  Q STR
- ;
-NUMCHK(N) ; make sure that numeric value N is not greater than 99999
- Q $S(+N>99999:99999,1:N)

@@ -1,5 +1,5 @@
 RMPRPS34 ;HISC/RVD/HNC -Check 661.1 and Save Inventory flag ;9/2/04  12:13
- ;;3.0;PROSTHETICS;**34,39,48,58,64,69,76,84,91,154**;FEB 09,1996;Build 6
+ ;;3.0;PROSTHETICS;**34,39,48,58,64,69,76,84,91**;FEB 09,1996
  ;RVD patch #76 - 2003 HCPCS update
  ;                replace inactive CPT Code in #660, starting 1/1/03
  ;
@@ -70,17 +70,21 @@ UPCPT ;update Inactive CPT code starting 4/1/02
  W !,"Start Converting Inactive CPT code....",!
  K RMUPD
  S U="^"
- F ROI=3031231:0 S ROI=$O(^RMPR(660,"B",ROI)) Q:ROI'>0  F ROJ=0:0 S ROJ=$O(^RMPR(660,"B",ROI,ROJ)) Q:ROJ'>0  S RM0=$G(^RMPR(660,ROJ,0)) D 
+ F ROI=3031231:0 S ROI=$O(^RMPR(660,"B",ROI)) Q:ROI'>0  F ROJ=0:0 S ROJ=$O(^RMPR(660,"B",ROI,ROJ)) Q:ROJ'>0  S RM0=$G(^RMPR(660,ROJ,0)) D
  .S RMCPI=$P(RM0,U,22)
  .Q:'$G(RMCPI)
  .S RM60=ROJ
  .S RMCPT="104840"
  .S RMUPD(660,RM60_",",4.1)=RMCPT
  .D FILE^DIE("","RMUPD","")
+ .;Update PCE, if Inactive CPT code was generated with PCE data.
+ .K RMUPD
+ .I $D(^RMPR(660,RM60,10)),$P(^RMPR(660,RM60,10),U,12) D
+ ..S RMCHK=$$SENDPCE^RMPRPCEA(RM60)
  K RMUPD,ROI,ROJ,RMCPT,RMCPI,RM0,RM60
  W !,"Done Converting Inactive CPT code....",!
  ;
-DUP ;repoint duplicate HCPCS (660, 664, 664.1, 665, 661.2, 661.3 
+DUP ;repoint duplicate HCPCS (660, 664, 664.1, 665, 661.2, 661.3
  ;and delete from file 661.1
  ;D HCPCD^RMPRPS35(113,952)
  ;convert amis grouper for entries w/ wheelchair hcpcs.

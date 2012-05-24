@@ -1,5 +1,5 @@
-DGENA3 ;ALB/CJM,ISA/KWP,RTK,TDM,LBD,PHH,PJR,TDM - Enrollment API - Consistency check 05/05/99 ; 4/10/09 1:27pm
- ;;5.3;Registration;**232,306,327,367,417,454,456,491,514,451,808**;Aug 13,1993;Build 4
+DGENA3 ;ALB/CJM,ISA/KWP,RTK,TDM,LBD,PHH,PJR - Enrollment API - Consistency check 05/05/99 ; 7/16/04 1:33pm
+ ;;5.3;Registration;**232,306,327,367,417,454,456,491,514,451**;Aug 13,1993
  ;CHECKand TESTVAL moved from DGENA1
 CHECK(DGENR,DGPAT,ERRMSG) ;
  ;Phase II consistency checks do not include INACTIVE(3),REJECTED(4),SUSPENDED(5),EXPIRED(8),PENDING(9) enrollment statuses.  References to these statuses have been removed.
@@ -63,10 +63,9 @@ CHECK(DGENR,DGPAT,ERRMSG) ;
  .;if status is CANCELED/DECLINED, then reason is required
  .I (DGENR("STATUS")=7),'DGENR("REASON") S ERRMSG="STATUS OF CANCELED/DECLINED REQUIRES REASON" Q
  .;if status is DECEASED and Date of Death is missing, send bulletin
- .; This bulletin has been disabled.  DG*5.3*808
- .;I DGENR("STATUS")=6 D
- .;.I $D(DGPAT),'DGPAT("DEATH") D BULLETIN
- .;.I '$D(DGPAT),'$$DEATH^DGENPTA(DGENR("DFN")) D BULLETIN
+ .I DGENR("STATUS")=6 D
+ ..I $D(DGPAT),'DGPAT("DEATH") D BULLETIN
+ ..I '$D(DGPAT),'$$DEATH^DGENPTA(DGENR("DFN")) D BULLETIN
  .Q:(ERRMSG'="")
  .;certain statuses not allowed for a dead patient
  .I $D(DGPAT),DGPAT("DEATH"),(DGENR("STATUS")=1)!(DGENR("STATUS")=2) S ERRMSG="ENROLLMENT STATUS OF VERIFIED OR UNVERIFIED NOT ALLOWED FOR A DECEASED PATIENT" Q
@@ -93,8 +92,6 @@ TESTVAL(SUB,VAL) ;
  ..D CHK^DIE(27.11,FIELD,,VAL,.RESULT) I RESULT="^" S VALID=0 Q
  Q VALID
 BULLETIN ; Status vs. Date of Death Data Discrepancy Bulletin
- ; This bulletin has been disabled.  DG*5.3*808
- Q
  N DGBULL,DGLINE,DGMGRP,DGNAME,DIFROM,VA,VAERR,XMTEXT,XMSUB,XMDUZ
  S DGMGRP=$O(^XMB(3.8,"B","DGEN ELIGIBILITY ALERT",""))
  Q:'DGMGRP

@@ -1,6 +1,5 @@
 IBCNSGE ;ALB/ESG - Insurance Company EDI Parameter Report ;07-JAN-2005
- ;;2.0;INTEGRATED BILLING;**296,400**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**296**;21-MAR-94
  ;
  ; eClaims Plus
  ; Identify insurance companies and display EDI parameter information.
@@ -107,7 +106,7 @@ RANGEX ;
 SORT ; Choose the sorting method
  NEW DIR,X,Y,DTOUT,DUOUT,DIRUT,DIROUT
  W !!?5,"*** Sort Criteria ***"
- S DIR(0)="SO^1:Insurance Company Name;2:Prof Electronic Bill ID;3:Inst Electronic Bill ID;4:Electronic Type;5:Type Of Coverage;6:Use VAMC as Billing Provider"
+ S DIR(0)="SO^1:Insurance Company Name;2:Prof Electronic Bill ID;3:Inst Electronic Bill ID;4:Electronic Type;5:Type Of Coverage"
  S DIR("A")="Sort By",DIR("B")=1
  D ^DIR K DIR
  I $D(DIRUT) S STOP=1 G SORTX
@@ -118,7 +117,7 @@ SORTX ;
 COMPILE ; Entry point for task; compile scratch global, print, clean-up
  ;
  NEW RTN,INSIEN,INSNM,DATA,ADDR,EDI,PROFID,INSTID,NAME,STREET,CITY
- NEW STATE,TYPCOV,TRANS,INSTYP,SORT,TMP,FLG,FLGP,FLGI,SWBCK
+ NEW STATE,TYPCOV,TRANS,INSTYP,SORT,TMP
  ;
  S RTN="IBCNSGE"
  KILL ^TMP($J,RTN)   ; init
@@ -157,9 +156,6 @@ CALC(INS) ; extract insurance data for company ien=INS
  S DATA=$G(^DIC(36,INS,0))
  S ADDR=$G(^DIC(36,INS,.11))
  S EDI=$G(^DIC(36,INS,3))
- S FLG=$G(^DIC(36,INS,4))
- S FLGP=+$P(FLG,U,11)      ; prof switchback flag
- S FLGI=+$P(FLG,U,12)      ; inst switchback flag
  S PROFID=$P(EDI,U,2)
  S INSTID=$P(EDI,U,4)
  ;
@@ -173,10 +169,6 @@ CALC(INS) ; extract insurance data for company ien=INS
  S TYPCOV=$$EXTERNAL^DILFD(36,.13,,$P(DATA,U,13))
  S TRANS=$$EXTERNAL^DILFD(36,3.01,,$P(EDI,U,1))
  S INSTYP=$$EXTERNAL^DILFD(36,3.09,,$P(EDI,U,9))
- S SWBCK="~"     ; default no switchback flags set; sort these at the end
- I FLGP,FLGI S SWBCK="BOTH"
- I FLGP,'FLGI S SWBCK="PROF"
- I 'FLGP,FLGI S SWBCK="INST"
  ;
  S SORT=" "
  I IBRSORT=1,NAME'="" S SORT=" "_NAME
@@ -184,9 +176,8 @@ CALC(INS) ; extract insurance data for company ien=INS
  I IBRSORT=3,INSTID'="" S SORT=" "_INSTID
  I IBRSORT=4,INSTYP'="" S SORT=" "_INSTYP
  I IBRSORT=5,TYPCOV'="" S SORT=" "_TYPCOV
- I IBRSORT=6,SWBCK'="" S SORT=" "_SWBCK
  ;
- S TMP=NAME_U_STREET_U_CITY_U_STATE_U_INSTYP_U_TYPCOV_U_TRANS_U_INSTID_U_PROFID_U_SWBCK
+ S TMP=NAME_U_STREET_U_CITY_U_STATE_U_INSTYP_U_TYPCOV_U_TRANS_U_INSTID_U_PROFID
  S ^TMP($J,RTN,SORT,NAME,INS)=TMP
 CALCX ;
  Q
@@ -206,19 +197,17 @@ PRINT ; print the report to the specified device
  .. S INS=0
  .. F  S INS=$O(^TMP($J,RTN,SORT,NAME,INS)) Q:'INS  D  Q:STOP
  ... S DATA=$G(^TMP($J,RTN,SORT,NAME,INS))
- ... I $P(DATA,U,10)["~" S $P(DATA,U,10)=""
  ... I $Y+1>MAXCNT!'PAGECNT D HEADER Q:STOP
- ... W !,$E($P(DATA,U,1),1,25)       ; name
- ... W ?27,$E($P(DATA,U,2),1,19)     ; address1
- ... W ?47,$E($P(DATA,U,3),1,13)     ; city, st
- ... I $P(DATA,U,3)'="",$P(DATA,U,4)'="" W ","
+ ... W !,$E($P(DATA,U,1),1,27)       ; name
+ ... W ?29,$E($P(DATA,U,2),1,19)     ; address1
+ ... W ?50,$E($P(DATA,U,3),1,13)     ; city, st
+ ... I $P(DATA,U,3)'="",$P(DATA,U,4)'="" W ", "
  ... W $E($P(DATA,U,4),1,2)
- ... W ?65,$E($P(DATA,U,7),1,8)      ; transmit elec
- ... W ?75,$E($P(DATA,U,8),1,8)      ; inst payer id
- ... W ?84,$E($P(DATA,U,9),1,8)      ; prof payer id
- ... W ?94,$E($P(DATA,U,5),1,12)     ; ins type
- ... W ?108,$E($P(DATA,U,6),1,18)    ; type of cov
- ... W ?128,$E($P(DATA,U,10),1,4)    ; switchback flag
+ ... W ?69,$E($P(DATA,U,7),1,8)      ; transmit elec
+ ... W ?79,$E($P(DATA,U,8),1,8)      ; inst payer id
+ ... W ?89,$E($P(DATA,U,9),1,8)      ; prof payer id
+ ... W ?99,$E($P(DATA,U,5),1,12)     ; ins type
+ ... W ?113,$E($P(DATA,U,6),1,19)    ; type of cov
  ... Q
  .. Q
  . Q
@@ -259,15 +248,14 @@ HEADER ; page break and report header information
  I IBRSORT=3 W "Inst ID"
  I IBRSORT=4 W "Electronic Type"
  I IBRSORT=5 W "Type of Coverage"
- I IBRSORT=6 W "Use VAMC as Billing Provider"
  S HDR=$$FMTE^XLFDT($$NOW^XLFDT,"1Z"),TAB=132-$L(HDR)-1
  W ?TAB,HDR
  ;
- W !,"Only Blank or 'PRNT' Bill ID's = ",$S(IBRBID:"YES",1:"NO"),?128,"VAMC"
+ W !,"Only Blank or 'PRNT' Bill ID's = ",$S(IBRBID:"YES",1:"NO")
  ;
- W !?65,"Electron",?75,"Inst",?84,"Prof",?94,"Electronic",?128,"Bill"
- W !,"Insurance Company Name",?27,"Street Address",?47,"City"
- W ?65,"Transmit",?76,"ID",?85,"ID",?97,"Type",?108,"Type of Coverage",?128,"Prov"
+ W !?69,"Electron",?79,"Inst",?89,"Prof",?99,"Electronic"
+ W !,"Insurance Company Name",?29,"Street Address",?50,"City"
+ W ?69,"Transmit",?80,"ID",?90,"ID",?102,"Type",?113,"Type of Coverage"
  W !,$$RJ^XLFSTR("",132,"=")
  ;
  ; check for a stop request

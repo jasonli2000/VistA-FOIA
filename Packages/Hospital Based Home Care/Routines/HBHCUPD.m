@@ -1,13 +1,11 @@
 HBHCUPD ; LR VAMC(IRMS)/MJT-HBHC update missing data in ^HBHC(631) using ^HBHC(634.1) & ^HBHC(634.3) as input for which records/fields to update, HBHC(634.2 errors must be corrected using PCE software, 634.2 data killed @ end of processing;9804
- ;;1.0;HOSPITAL BASED HOME CARE;**2,6,8,10,24**;NOV 01, 1993;Build 201
- ; HBHC(634.7 MFH errors must be corrected using MFH option, 634.7 killed here so validity processing can occur again
- I $P($G(^HBHC(631.9,1,0)),U,9)]"" K ^HBHC(634.7) S ^HBHC(634.7,0)="HBHC MEDICAL FOSTER HOME ERROR(S)^634.7P"
+ ;;1.0;HOSPITAL BASED HOME CARE;**2,6,8,10**;NOV 01, 1993
  I ('$D(^HBHC(634.1,"B")))&($D(^HBHC(634.2,"B")))&('$D(^HBHC(634.3,"B")))&('$D(^HBHC(634.5,"B"))) D PCEMSG^HBHCUTL3 S HBHCFLAG=1 G PSEUDO
 PROMPT ; Prompt user for patient name
  W ! K DIC S DIC="^DPT(",DIC(0)="AEMQ" D ^DIC
  G:Y=-1 PSEUDO
  S HBHCDPT=+Y
- I ('$D(^HBHC(634.1,"B",HBHCDPT)))&('$D(^HBHC(634.2,"B",HBHCDPT)))&('$D(^HBHC(634.3,"B",HBHCDPT)))&('$D(^HBHC(634.5,"B",HBHCDPT))) W $C(7),!!,"This patient has no records containing errors on file.",! H 3 G PROMPT
+ I ('$D(^HBHC(634.1,"B",HBHCDPT)))&('$D(^HBHC(634.2,"B",HBHCDPT)))&('$D(^HBHC(634.3,"B",HBHCDPT)))&('$D(^HBHC(634.5,"B",HBHCDPT))) W *7,!!,"This patient has no records containing errors on file.",! H 3 G PROMPT
  F HBHCFILE=634.1,634.3 I $D(^HBHC(HBHCFILE,"B",HBHCDPT)) K DR S HBHCFORM=$S(HBHCFILE=634.1:3,1:5) S:HBHCFORM=5 HBHCCNT=1 S HBHCIEN="" F  S HBHCIEN=$O(^HBHC(HBHCFILE,"B",HBHCDPT,HBHCIEN)) Q:HBHCIEN=""  D PROCESS
  G PROMPT
 PSEUDO ; Process pseudo SSN message
@@ -20,8 +18,8 @@ EXIT ; Exit module
  K HBHCQ1,HBHCRFLG,HBHCSUB,HBHCTFLG,HBHCTXT,HBHCUPD,HBHCWRD1,HBHCWRD2,HBHCWRD3,HBHCY0,Y
  Q
 PROCESS ; Process errors via DIE
- S DA=$P(^HBHC(HBHCFILE,HBHCIEN,0),U,2),HBHCTXT=$S(HBHCFORM=3:"Evaluation/Admission",1:"Discharge")
- L +^HBHC(631,DA):0 I '$T W $C(7),!!,"Another user is editing this "_HBHCTXT_" entry.",! H 3 Q
+ S DA=$P(^HBHC(HBHCFILE,HBHCIEN,0),U,2),HBHCTXT=$S(HBHCFORM=3:"Evalution/Admission",1:"Discharge")
+ L +^HBHC(631,DA):0 I '$T W *7,!!,"Another user is editing this "_HBHCTXT_" entry.",! H 3 Q
  S:HBHCFORM=3 (DR,HBHCDR)=^HBHC(HBHCFILE,HBHCIEN,1)
  I HBHCFORM=5 S HBHCSUB=0 F  S HBHCSUB=$O(^HBHC(HBHCFILE,HBHCIEN,HBHCSUB)) Q:HBHCSUB'>0  D SET
  K DIE S DIE="^HBHC(631,",DIE("NO^")="OUTOK"

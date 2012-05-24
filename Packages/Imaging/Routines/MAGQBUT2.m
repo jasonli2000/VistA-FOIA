@@ -1,6 +1,5 @@
-MAGQBUT2 ;WOIFO/SRR/RMP - IMAGE SITE PARAMETERS COMPANION ; 31 Jan 2011 3:06 PM
- ;;3.0;IMAGING;**7,8,20,81,39**;Mar 19, 2002;Build 2010;Mar 08, 2011
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGQBUT2 ;WOIFO/SRR/RMP -IMAGE SITE PARAMETERS COMPANION [ 11/08/2001 17:18 ]
+ ;;3.0;IMAGING;**7,8,20**;Apr 12, 2006
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGQBUT2 ;WOIFO/SRR/RMP - IMAGE SITE PARAMETERS COMPANION ; 31 Jan 2011 3:06 PM
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -15,8 +15,39 @@ MAGQBUT2 ;WOIFO/SRR/RMP - IMAGE SITE PARAMETERS COMPANION ; 31 Jan 2011 3:06 PM
  ;; | to be a violation of US Federal Statutes.                     |
  ;; +---------------------------------------------------------------+
  ;;
+VSTAV() ;
+ N VER,IEN,ARRAY,VALUE,LATEST
+ S VER=$$VERSION^XPDUTL("IMAGING")
+ S:$T(LAST^XPDUTL)]"" VER=VER_"^"_$$LAST^XPDUTL("IMAGING",VER)
+ Q VER
+IWSV(WSD,WSC,WSV,PLACE) ;IMAGE WORKSTATION VERSIONS
+ N IEN,NODE,RD,OS
+ S RD=$$FMADD^XLFDT($$NOW^XLFDT,-180,"","","")
+ S IEN=0
+ F  S IEN=$O(^MAG(2006.81,"C",PLACE,IEN)) Q:IEN'?1N.N  D
+ . S NODE=^MAG(2006.81,IEN,0)
+ . Q:($P(NODE,U,3)<RD)
+ . S OS=$P($G(^MAG(2006.81,IEN,1)),U,2)
+ . I $P(NODE,"^",9)'="" D
+ . . S INDEX=$P(NODE,"^",9),INDEX=$S(OS="":INDEX,1:INDEX_U_OS)
+ . . S WSD(INDEX)=$G(WSD(INDEX))+1
+ . I $P(NODE,"^",13)'="" D
+ . . S INDEX=$P(NODE,"^",13),INDEX=$S(OS="":INDEX,1:INDEX_U_OS)
+ . . S WSC(INDEX)=$G(WSC(INDEX))+1
+ . I $P(NODE,"^",15)'="" D
+ . . S INDEX=$P(NODE,"^",15),INDEX=$S(OS="":INDEX,1:INDEX_U_OS)
+ . . S WSV(INDEX)=$G(WSV(INDEX))+1
+ Q
+DICOMV(DCMG) ;Version of DICOM
+ N X,ARRAY,IEN,NAME
+ S X=""
+ F  S X=$O(^MAG(2006.83,"B",X)) Q:X=""  D
+ . S IEN=$O(^MAG(2006.83,"B",X,"")) Q:IEN'?1N.N
+ . S DCMG($P(^MAG(2006.83,IEN,0),U,3))=$G(DCMG($P(^MAG(2006.83,IEN,0),U,3)))+1
+ Q $S($D(DCMG):1,1:0)
+VISTARV() ;
+ Q $$VERSION^XPDUTL("MAGJ RADIOLOGY")
 MAGSYS(LIST) ;
- ; RPC[MAGQ SYSTEM]
  N VAIEN,NODE,MGIEN,UNAME,TDATE
  S MGIEN=$$FIND1^DIC(3.8,"","MX","MAG SERVER","","","ERR")
  S VAIEN=0
@@ -30,7 +61,7 @@ MAGSYS(LIST) ;
  . I MGIEN?1N.N,$$FIND1^DIC(3.81,","_MGIEN_",","QA",VAIEN,"","","ERR") Q
  . S LIST(VAIEN)=VAIEN_"^"_UNAME
  Q
-IMPAR(RESULT,QIEN) ; Import Array
+IMPAR(RESULT,QIEN) ;
  N INDX,CNT
  S (INDX,CNT)=0
  F  S INDX=$O(^MAG(2006.034,QIEN,1,INDX)) Q:INDX'?1N.N  D
@@ -39,6 +70,13 @@ IMPAR(RESULT,QIEN) ; Import Array
  I CNT<1 S RESULT(0)="0^Corrupted Import Array"
  E  S RESULT(0)="1"
  Q
+SNS(PLACE) ;
+ N RESULT,INDEX
+ S INDEX=0
+ S RESULT=$P(^MAG(2006.1,PLACE,0),U,2)
+ F  S INDEX=$O(^MAG(2006.1,PLACE,4,INDEX)) Q:INDEX'?1N.N  D
+ . S RESULT=RESULT_U_$P($G(^MAG(2006.1,PLACE,4,INDEX,0)),U)
+ Q RESULT
 CHKIMG(IEN) ;
  ; Given an Image IEN, return:
  ;   1: Case # or accession #
@@ -58,7 +96,7 @@ CHKIMG(IEN) ;
  ; PDFN: Parent file DFN
  ; GRG:  virtual Parent File Image Multiple
  ; IOR: Image Object Referenced (by parent)
- N GF,GP,G0,GR,GRD,GRG,GR0,IDFN,IENV,P0,PD0,PD1,PD2,PF,PT,X,X0,X2,N0,N1,R,T,GPDFN,PACS,IOR,APR,I,PDFN
+ N GF,GP,G0,GR,GRD,GRG,GR0,IDFN,IENV,P0,PD0,PD1,PD2,PF,PT,X0,X2,N0,N1,R,T,GPDFN,PACS,IOR,APR,I,PDFN
  S X="ERR^MAGQBTM",@^%ZOSF("TRAP")
  S R="^^^^^"
  S T(1)="No Image ptr in AP"
@@ -83,13 +121,11 @@ CHKIMG(IEN) ;
  I X0="" S $P(R,"^",5)=T(13)_"~1" Q R
  S IDFN=$P(X0,"^",7),$P(R,"^",4)=IDFN
  S PT(3.9)="^XMB(3.9,PD0,|Mail message||2|^XMB(3.9,PD0,2005,|MAIL"
- ; The following 5 Lab subsections must be in-synch with FILE+42^MAGGTLB1
- ; IA #1962
- S PT(63)="^LR(PD0,GF,PD1,|Autopsy (microscopic)|AY|1|^LR(PD0,GF,PD1,2005.1,|AUM"
+ S PT(63)="^LR(PD0,GF,PD1,|Autopsy (microscopic)|AY|1|^LR(PD0,GF,PD1,2005,|AUM"
  S PT(63.02)="^LR(PD0,GF,PD1,|Electron microscopy|EM|1|^LR(PD0,GF,PD1,2005,|EM"
  S PT(63.08)="^LR(PD0,GF,PD1,|Surgical pathology|SP|1|^LR(PD0,GF,PD1,2005,|SP"
  S PT(63.09)="^LR(PD0,GF,PD1,|Cytology|CY|1|^LR(PD0,GF,PD1,2005,|CY|"
- S PT(63.2)="^LR(PD0,GF,PD1,|Autopsy (gross)|AY|1|^LR(PD0,GF,PD1,2005,|AUG"
+ S PT(63.2)="^LR(PD0,GF,PD1,|Autopsy (gross)|AU|1|^LR(PD0,GF,PD1,2005,|AUG"
  S PT(70)="^RADPT(PDFN,|Radiology Patient||1|"
  S PT(74)="^RARPT(PD0,|Radiology||2|^RARPT(PD0,2005,|RAD"
  S PT(130)="^SRF(PD0,|Surgery||1|^SRF(PD0,2005,|SUR"
@@ -183,74 +219,4 @@ PF(IEN,IC,N0,PF,PD0,PD1,PD2,PACS,IOR,APR) ;
  S PF=$P(N2,"^",6),PD0=$P(N2,"^",7),PD1=$P(N2,"^",10),PD2=$P(N2,"^",8)
  I PACS S APR=$S(PD0?1N.N:1,1:0)
  E  S APR=$S(((PF'="")&(PD0?1N.N)):1,$P($G(^MAG(2005,IOR,100)),U)?1N.N:1,$P($G(^MAG(2005,IOR,0)),U,6)="18":1,1:0)
- Q
-DBQ(QIEN,PLACE,ZNODE) ;
- N INDX
- F INDX="DELETE","ABSTRACT","JUKEBOX","JBTOHD","PREFET","IMPORT","EVAL" D
- . K ^MAGQUEUE(2006.03,"C",PLACE,INDX,QIEN)
- . K:$P(ZNODE,U,5)]"" ^MAGQUEUE(2006.03,"D",PLACE,INDX,$E($P(ZNODE,U,5),1,30),QIEN)
- . I INDX="JUKEBOX" D
- . . K:$P(ZNODE,U,7) ^MAGQUEUE(2006.03,"E",PLACE,$P(ZNODE,U,7),QIEN) Q
- . I "^JBTOHD^PREFET^"[("^"_INDX_"^") D
- . . K:((+$P(ZNODE,U,7))&($P(ZNODE,U,8)]"")) ^MAGQUEUE(2006.03,"F",PLACE,$P(ZNODE,U,7),$P(ZNODE,U,8),QIEN) Q
- K ^MAGQUEUE(2006.03,QIEN,0)
- Q
-DQUE(QIEN,QONLY) ;
- N ZNODE,TYPE,MAGIEN,PLACE,QP,TMP,DA,IMPORTIEN
- S ZNODE=$G(^MAGQUEUE(2006.03,QIEN,0))
- S PLACE=$P(ZNODE,U,12)
- S TYPE=$P(ZNODE,U)
- I TYPE="" D DBQ^MAGQBUT2(QIEN,PLACE,ZNODE) Q
- I "^IMPORT^"[("^"_TYPE_"^") S IMPORTIEN=$S($P(ZNODE,U,11)?1N.N:$P(ZNODE,U,11),1:QIEN)
- S MAGIEN=$P(ZNODE,U,7)
- S QP=$O(^MAGQUEUE(2006.031,"C",PLACE,TYPE,""))
- L +^MAGQUEUE(2006.031,QP,0):1E9
- S TMP=$G(^MAGQUEUE(2006.031,QP,0))
- S $P(TMP,U,5)=$P(TMP,U,5)-1
- S ^MAGQUEUE(2006.031,QP,0)=TMP
- L -^MAGQUEUE(2006.031,QP,0)
- K ^MAGQUEUE(2006.03,"C",PLACE,$P(ZNODE,U),QIEN)
- K ^MAGQUEUE(2006.03,QIEN,0)
- I $P(ZNODE,U,5)]"" D
- . K ^MAGQUEUE(2006.03,"D",PLACE,TYPE,$E($P(ZNODE,U,5),1,30),QIEN)
- L +^MAGQUEUE(2006.03,0):1E9
- S $P(^MAGQUEUE(2006.03,0),"^",4)=$P(^MAGQUEUE(2006.03,0),"^",4)-1
- L -^MAGQUEUE(2006.03,0)
- I "^IMPORT^"[("^"_TYPE_"^"),'$D(QONLY) D  Q
- . I $D(^MAG(2006.041,"B",IMPORTIEN)) D
- . . N TRACKID,ASIEN,SIEN
- . . S ASIEN=$O(^MAG(2006.041,"B",IMPORTIEN)) Q:ASIEN=""
- . . S TRACKID=$P($G(^MAG(2006.041,ASIEN)),U,2) Q:TRACKID=""
- . . S ASIEN="A",ASIEN=$O(^MAG(2006.041,"C",TRACKID,ASIEN),-1)
- . . F  S SIEN=$O(^MAG(2006.041,"C",TRACKID,SIEN),-1) Q:'SIEN  D
- . . . S DIK="^MAG(2006.041,",DA=SIEN
- . . . D ^DIK K DIK,DA
- . . . Q
- . . Q
- . S DIK="^MAG(2006.034,",DA=IMPORTIEN D ^DIK
- . K DIK,DA
- . K:MAGIEN ^MAGQUEUE(2006.03,"E",PLACE,MAGIEN,IMPORTIEN)
- . Q 
- Q:("^JBTOHD^PREFET^JUKEBOX^")'[("^"_TYPE_"^")
- S MAGIEN=$P(ZNODE,U,7)
- Q:'MAGIEN
- I TYPE="JUKEBOX" D  Q
- . K ^MAGQUEUE(2006.03,"E",PLACE,MAGIEN,QIEN)
- I "^JBTOHD^PREFET^"[("^"_TYPE_"^") D  Q
- . Q:$P(ZNODE,U,8)']""
- . K ^MAGQUEUE(2006.03,"F",PLACE,MAGIEN,$P(ZNODE,U,8),QIEN)
- . Q
- Q
-DQUE1(RESULT,QIEN) ;[MAGQB QUEDEL]
- N X,TYPE
- S X="ERR^MAGQBTM",@^%ZOSF("TRAP")
- S RESULT=0
- S TYPE=$P($G(^MAGQUEUE(2006.03,QIEN,0)),U)
- D QRNGE^MAGQBUT5(.RESULT,TYPE,"DEL",QIEN,QIEN)
- S RESULT=1
- Q
-JBQUE(RESULT,QIEN) ; RPC[MAGQ JBQUE]
- S X="ERR^MAGQBTM",@^%ZOSF("TRAP")
- I '+QIEN S RESULT=0 Q
- S RESULT=$$JUKEBOX^MAGBAPI(QIEN,$$PLACE^MAGBAPI(+$G(DUZ(2))))
  Q

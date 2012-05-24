@@ -1,12 +1,13 @@
 XOBVRH ;mjk/alb - VistaLink Request Handler Utilities ; 07/27/2002  13:00
- ;;1.6;VistALink;;May 08, 2009;Build 15
- ;Per VHA directive 2004-038, this routine should not be modified.
+ ;;1.5;VistALink;;Sep 09, 2005
+ ;;Foundations Toolbox Release v1.5 [Build: 1.5.0.026]
+ ;
  QUIT
  ;
  ; ------------------------------------------------------------------
  ;                       Message Type Handler Utilities
  ; ------------------------------------------------------------------
- ; 
+ ;
  ; -- set up msg type info using message name
 MSGNAME(XOBMSG,XOBHDLR) ; -- set up msg type info
  QUIT $$SETMSG(XOBMSG,"NAME",.XOBHDLR)
@@ -36,12 +37,6 @@ CACHE(XOBHDLR) ; -- cache req handlers
 SETMSG(XOBMSG,XOBXREF,XOBHDLR) ;
  NEW TYPE,TYPEO
  KILL XOBHDLR(0)
- ;
- ; -- bad message type (empty)
- IF $GET(XOBMSG)="" DO  QUIT TYPE
- . SET TYPE=0
- . SET XOBHDLR(0)=0
- . SET XOBHDLR(0,"ERROR")="No message type defined"
  ;
  ; -- already cached?
  SET TYPE=$ORDER(XOBHDLR(XOBXREF,XOBMSG,""))

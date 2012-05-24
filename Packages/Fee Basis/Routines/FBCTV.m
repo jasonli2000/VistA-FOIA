@@ -1,8 +1,9 @@
-FBCTV ; GENERATED FROM 'FB VENDOR UPDATE' INPUT TEMPLATE(#1055), FILE 161.2;06/29/07
+FBCTV ; GENERATED FROM 'FB VENDOR UPDATE' INPUT TEMPLATE(#1055), FILE 161.2;09/19/10
  D DE G BEGIN
 DE S DIE="^FBAAV(",DIC=DIE,DP=161.2,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^FBAAV(DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(2)=% S %=$P(%Z,U,2) S:%]"" DE(3)=% S %=$P(%Z,U,3) S:%]"" DE(4)=% S %=$P(%Z,U,4) S:%]"" DE(5)=% S %=$P(%Z,U,5) S:%]"" DE(6)=% S %=$P(%Z,U,6) S:%]"" DE(7)=% S %=$P(%Z,U,7) S:%]"" DE(8)=%
- I  S %=$P(%Z,U,8) S:%]"" DE(9)=% S %=$P(%Z,U,9) S:%]"" DE(10)=% S %=$P(%Z,U,10) S:%]"" DE(11)=% S %=$P(%Z,U,13) S:%]"" DE(12)=% S %=$P(%Z,U,14) S:%]"" DE(13)=%,DE(14)=%
+ I  S %=$P(%Z,U,8) S:%]"" DE(9)=% S %=$P(%Z,U,9) S:%]"" DE(10)=% S %=$P(%Z,U,10) S:%]"" DE(11)=% S %=$P(%Z,U,13) S:%]"" DE(12)=% S %=$P(%Z,U,14) S:%]"" DE(13)=%,DE(14)=% S %=$P(%Z,U,17) S:%]"" DE(17)=% S %=$P(%Z,U,18) S:%]"" DE(18)=%
+ I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,1) S:%]"" DE(21)=% S %=$P(%Z,U,10) S:%]"" DE(22)=%,DE(23)=%
  I $D(^(3)) S %Z=^(3) S %=$P(%Z,U,2) S:%]"" DE(15)=%
  K %Z Q
  ;
@@ -191,10 +192,58 @@ X14 Q
  S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
  G RD:X="@",Z
 C15 G C15S:$D(DE(15))[0 K DB
- D ^FBCTV1
+ S X=DE(15),DIC=DIE
+ K ^FBAAV("NPI",$E(X,1,30),DA)
+ S X=DE(15),DIC=DIE
+ K ^FBAAV("NPIHISTORY",$E(X,1,30),DA)
 C15S S X="" G:DG(DQ)=X C15F1 K DB
- D ^FBCTV2
+ S X=DG(DQ),DIC=DIE
+ S ^FBAAV("NPI",$E(X,1,30),DA)=""
+ S X=DG(DQ),DIC=DIE
+ S ^FBAAV("NPIHISTORY",$E(X,1,30),DA)=""
 C15F1 Q
 X15 Q
 16 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=16 G A
-17 D:$D(DG)>9 F^DIE17 G ^FBCTV3
+17 D:$D(DG)>9 F^DIE17,DE S DQ=17,DW="0;17",DV="F",DU="",DLB="MEDICARE ID NUMBER",DIFLD=22
+ S X=$P(Z1,U,17)
+ S Y=X
+ S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD:X="@",Z
+X17 Q
+18 S DW="0;18",DV="F",DU="",DLB="MAIL ROUTE CODE",DIFLD=5.18
+ S X=$P(Z1,U,18)
+ S Y=X
+ S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD:X="@",Z
+X18 Q
+19 S DQ=20 ;@10
+20 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=20 D X20 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X20 S:'$D(Z3) Y="@20"
+ Q
+21 S DW="1;1",DV="F",DU="",DLB="PHONE NUMBER",DIFLD=14
+ S X=$P(Z3,U,1)
+ S Y=X
+ S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD:X="@",Z
+X21 Q
+22 S DW="1;10",DV="S",DU="",DLB="BUSINESS TYPE (FPDS)",DIFLD=24
+ S DU="1:SMALL BUSINESS;2:LARGE BUSINESS;3:OUTSIDE U.S.;4:OTHER ENTITIES;"
+ S Y="@"
+ S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD:X="@",Z
+X22 Q
+23 S DW="1;10",DV="S",DU="",DLB="BUSINESS TYPE (FPDS)",DIFLD=24
+ S DU="1:SMALL BUSINESS;2:LARGE BUSINESS;3:OUTSIDE U.S.;4:OTHER ENTITIES;"
+ S X=$P(Z3,U,10)
+ S Y=X
+ S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD:X="@",Z
+X23 Q
+24 S DQ=25 ;@20
+25 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=25 D X25 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X25 S:'$D(Z4) Y=""
+ Q
+26 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=26 D X26 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X26 S:$G(FBTMPCK) Y="@30"
+ Q
+27 D:$D(DG)>9 F^DIE17 G ^FBCTV1

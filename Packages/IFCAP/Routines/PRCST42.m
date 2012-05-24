@@ -1,7 +1,6 @@
-PRCST42 ; ;10/27/00
+PRCST42 ; ;09/19/10
  D DE G BEGIN
-DE S DIE="^PRCS(410,D0,""IT"",",DIC=DIE,DP=410.02,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^PRCS(410,D0,"IT",DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(2)=% S %=$P(%Z,U,2) S:%]"" DE(4)=% S %=$P(%Z,U,3) S:%]"" DE(5)=% S %=$P(%Z,U,4) S:%]"" DE(9)=% S %=$P(%Z,U,6) S:%]"" DE(6)=% S %=$P(%Z,U,7) S:%]"" DE(7)=%
+DE S DIE="^PRCS(410,",DIC=DIE,DP=410,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRCS(410,DA,""))=""
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -49,103 +48,13 @@ SAVEVALS S @DIEZTMP@("V",DP,DIIENS,DIFLD,"O")=$G(DE(DQ)) S:$D(^("F"))[0 ^("F")=$
 NKEY W:'$D(ZTQUEUED) "??  Required key field" S X="?BAD" G QS
 KEYCHK() Q:$G(DE(DW,"KEY"))="" 1 Q @DE(DW,"KEY")
 BEGIN S DNM="PRCST42",DQ=1
-1 S DQ=2 ;@1
-2 S DW="0;1",DV="MRNJ3,0",DU="",DLB="LINE ITEM NUMBER",DIFLD=.01
- S DE(DW)="C2^PRCST42"
- S Y="1"
- G Y
-C2 G C2S:$D(DE(2))[0 K DB
- S X=DE(2),DIC=DIE
- K ^PRCS(410,DA(1),"IT","B",$E(X,1,30),DA)
- S X=DE(2),DIC=DIE
- K ^PRCS(410,DA(1),"IT","AB",$E(X,1,30),DA)
-C2S S X="" Q:DG(DQ)=X  K DB
- S X=DG(DQ),DIC=DIE
- S ^PRCS(410,DA(1),"IT","B",$E(X,1,30),DA)=""
- S X=DG(DQ),DIC=DIE
- S ^PRCS(410,DA(1),"IT","AB",$E(X,1,30),DA)=""
- Q
-X2 K:+X'=X!(X>999)!(X<1)!(X?.E1"."1N.N) X
- Q
+1 S D=0 K DE(1) ;45
+ S Y="JUSTIFICATION^W^^0;1^Q",DG="8",DC="^410.06" D DIEN^DIWE K DE(1) G A
  ;
-3 D:$D(DG)>9 F^DIE17,DE S DQ=3,D=0 K DE(1) ;1
- S Y="DESCRIPTION^W^^0;1^Q",DG="1",DC="^410.03" D DIEN^DIWE K DE(1) G A
+2 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=2 D X2 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X2 W !,"ORIGINATOR: ",$P(^VA(200,$P(^PRCS(410,DA,14),"^"),0),"^")
+ Q
+3 S D=0 K DE(1) ;60
+ S Y="COMMENTS^W^^0;1^Q",DG="CO",DC="^410.05" D DIEN^DIWE K DE(1) G A
  ;
-4 S DW="0;2",DV="RNJ9,2",DU="",DLB="QUANTITY",DIFLD=2
- S DE(DW)="C4^PRCST42"
- G RE
-C4 G C4S:$D(DE(4))[0 K DB
- S X=DE(4),DIC=DIE
- X "S E=0,E(1)="""" S:'$D(^PRCS(410,DA(1),4)) ^(4)="""" F E(0)=1:1 S E=$O(^PRCS(410,DA(1),""IT"",E)) S:E?1N.N&(E'=DA) E(1)=E(1)+($P(^(E,0),U,2)*$P(^(0),U,7)) I E'?1N.N X ^DD(410.02,2,1,1,1.4) K E Q"
-C4S S X="" Q:DG(DQ)=X  K DB
- S X=DG(DQ),DIC=DIE
- X "S E=0,E(1)="""" S:'$D(^PRCS(410,DA(1),4)) ^(4)="""" F E(0)=1:1 S E=$O(^PRCS(410,DA(1),""IT"",E)) S:E?1N.N E(1)=E(1)+($P(^(E,0),U,2)*$P(^(0),U,7)) I E'?1N.N X ^DD(410.02,2,1,1,1.4) K E Q"
- Q
-X4 K:+X'=X!(X>999999)!(X<.01)!(X?.E1"."3N.N) X
- Q
- ;
-5 D:$D(DG)>9 F^DIE17,DE S DQ=5,DW="0;3",DV="RP420.5'",DU="",DLB="UNIT OF PURCHASE",DIFLD=3
- S DU="PRCD(420.5,"
- G RE
-X5 Q
-6 S DW="0;6",DV="FX",DU="",DLB="STOCK NUMBER",DIFLD=6
- G RE
-X6 K:$L(X)>24!($L(X)<1)!(X'?.ANP) X
- I $D(X),X'?.ANP K X
- Q
- ;
-7 S DW="0;7",DV="RNJ10,2X",DU="",DLB="EST. ITEM (UNIT) COST",DIFLD=7
- S DE(DW)="C7^PRCST42"
- G RE
-C7 G C7S:$D(DE(7))[0 K DB
- S X=DE(7),DIC=DIE
- X "S E=0,E(1)="""" S:'$D(^PRCS(410,DA(1),4)) ^(4)="""" F E(0)=1:1 S E=$O(^PRCS(410,DA(1),""IT"",E)) S:E?1N.N&(E'=DA) E(1)=E(1)+($P(^(E,0),U,2)*$P(^(0),U,7)) I E'?1N.N X ^DD(410.02,2,1,1,1.4) K E Q"
-C7S S X="" Q:DG(DQ)=X  K DB
- S X=DG(DQ),DIC=DIE
- X "S E=0,E(1)="""" S:'$D(^PRCS(410,DA(1),4)) ^(4)="""" F E(0)=1:1 S E=$O(^PRCS(410,DA(1),""IT"",E)) S:E?1N.N E(1)=E(1)+($P(^(E,0),U,2)*$P(^(0),U,7)) I E'?1N.N X ^DD(410.02,2,1,1,1.4) K E Q"
- Q
-X7 S:X["$" X=$P(X,"$",2) Q:X?1"N/C"  K:+X'=X&(X'?.N1"."2N)!(X>9999999)!(X<0) X I $D(X) S:X=0 X="N/C"
- Q
- ;
-8 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=8 D X8 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X8 S X=$P($G(^PRCS(410,DA(1),3)),U,3) I X]"" S X=$$GETBOCNT^PRCSECP(PRC("SITE"),+PRC("CP"),+X) I (+X=1) S $P(^PRCS(410,DA(1),"IT",DA,0),U,4)=$P(X,U,2),Y="@44" W !,"BOC: ",$P(X,U,2)
- Q
-9 D:$D(DG)>9 F^DIE17,DE S DQ=9,DW="0;4",DV="RFX",DU="",DLB="BOC",DIFLD=4
- S DE(DW)="C9^PRCST42"
- S X="" S:$D(PRCS("SUB")) X=PRCS("SUB")
- S Y=X
- G Y
-C9 G C9S:$D(DE(9))[0 K DB
- S X=DE(9),DIC=DIE
- K ^PRCS(410,"AD",$E(X,1,30),DA(1))
-C9S S X="" Q:DG(DQ)=X  K DB
- S X=DG(DQ),DIC=DIE
- S ^PRCS(410,"AD",$E(X,1,30),DA(1))=""
- Q
-X9 K:X[""""!($A(X)=45) X I $D(X) D SUB^PRCSES
- I $D(X),X'?.ANP K X
- Q
- ;
-10 S DQ=11 ;@44
-11 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=11 D X11 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X11 D 2^PRCSCK
- Q
-12 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=12 D X12 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X12 I $D(PRCSERR),PRCSERR S Y=PRCSERR K PRCSERR
- Q
-13 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=13 D X13 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X13 D QRB^PRCSCK
- Q
-14 D:$D(DG)>9 F^DIE17,DE S DQ=14,D=0 K DE(1) ;12
- S DIFLD=12,DGO="^PRCST43",DC="2^410.212I^2^",DV="410.212MNJ2,0",DW="0;1",DOW="DELIVERY SCHEDULE",DLB="Select "_DOW S:D DC=DC_D
- G RE:D I $D(DSC(410.212))#2,$P(DSC(410.212),"I $D(^UTILITY(",1)="" X DSC(410.212) S D=$O(^(0)) S:D="" D=-1 G M14
- S D=$S($D(^PRCS(410,D0,"IT",DA,2,0)):$P(^(0),U,3,4),$O(^(0))'="":$O(^(0)),1:-1)
-M14 I D>0 S DC=DC_D I $D(^PRCS(410,D0,"IT",DA,2,+D,0)) S DE(14)=$P(^(0),U,1)
- G RE
-R14 D DE
- S D=$S($D(^PRCS(410,D0,"IT",DA,2,0)):$P(^(0),U,3,4),1:1) G 14+1
- ;
-15 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=15 D X15 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X15 K PRCSMDP
- Q
-16 G 1^DIE17
+4 G 0^DIE17

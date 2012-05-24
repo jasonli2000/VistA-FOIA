@@ -1,10 +1,8 @@
 RMPREOL ;HINES/RVD  SUSPENSE PROCESSING/LINK TO 2319 ; 14-AUG-2001
- ;;3.0;PROSTHETICS;**62,83**;Feb 09, 1996;Build 20
- ;
- ;HNC #83 add free text ordering provider 3/11/05
+ ;;3.0;PROSTHETICS;**62**;Feb 09, 1996
  ;
  ; RVD patch #62 - new routine for suspense list template.
- ;                 if link to 2319 record is needed. 
+ ;                 if link to 2319 record is needed.
 EN ; -- main entry point for RMPREO
  D ^%ZISC
  N STRING,CLREND,COLUMN,LINE,ON,OFF
@@ -45,8 +43,7 @@ INIT ; -- init variables and list array
  .S RRX=$$SETFLD^VALM1(CDATE,RRX,"DATE")
  .S WHO1=""
  .I $P(^RMPR(668,RMPRA,0),U,11)'="" S WHO1=$$WHO^RMPREOU($P(^RMPR(668,RMPRA,0),U,11),12)
- .I $P($G(^RMPR(668,RMPRA,"IFC1")),U,3)'="" S WHO1=$$WHO^RMPREOU("",12,RMPRA)
- .;
+ .;I WHO1'="" S RRX=$$SETFLD^VALM1(WHO1,RRX,"WHO")
  .S RRX=$$SETFLD^VALM1(WHO1,RRX,"WHO")
  .K WHO,WHO1
  .;type

@@ -1,11 +1,11 @@
 PRSPSAPU ;WOIFO/JAH - PT Physician, supervisor approval utils ;01/22/05
- ;;4.0;PAID;**93,125**;Sep 21, 1995;Build 6
+ ;;4.0;PAID;**93**;Sep 21, 1995;Build 7
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  Q
 ONEPTP(TLE) ; get one or all ptp's from a TLE
  ; if the selection hasn't a memo or hasn't an ESR to be approved
  ; then inform and re-ask
- ; 
+ ;
  ; return PRSIEN for successful PTP selection
  ; return 0 for all PTP's in T&L
  ; return -1 for abort/timeout
@@ -23,7 +23,7 @@ ONEPTP(TLE) ; get one or all ptp's from a TLE
  Q PTP
  ;
 ALL1PTP(TLE) ; ask for one part time physician from a TLE or ALL
- I TLE'?1A.E,TLE'>0 Q PRSIEN
+ Q:TLE'>0
  N DIC,PRSIEN,D,Y,DUOUT,DTOUT
  S PRSIEN=""
  S DIC("A")="Select an EMPLOYEE or press RETURN for ALL: "
@@ -66,7 +66,7 @@ DISPLAY(PRSIEN,PPI,CNT) ;display PPI signed esr days for super review/action
  ; CNT(1)= days w/status from supervisor during this option
  ; PGLNS = lines on current page
  ; DYLNS = lines in a day
- ; 
+ ;
  N I,PRSD,ESRDTS,ESEG,ESR,PGLNS,DAYLNS,OUT
  D HDRESR^PRSPSAP1(PRSIEN,PPI,.PGLNS)
  ;

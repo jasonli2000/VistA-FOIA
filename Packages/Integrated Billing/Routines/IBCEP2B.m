@@ -1,26 +1,21 @@
 IBCEP2B ;ALB/TMP - EDI UTILITIES for provider ID ;18-MAY-04
- ;;2.0;INTEGRATED BILLING;**232,320,400,432**;21-MAR-94;Build 192
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**232,320**;21-MAR-94
  ;
-PROVID(IBIFN,IBPRIEN,IBCOBN,DIPA) ; Provider id entry on billing screen 10, and line level provider input on billing screens 4&5.
+PROVID(IBIFN,IBPRIEN,IBCOBN,DIPA) ; Provider id entry on billing screen 8
  ; IBIFN = ien file 399
- ; IBPRIEN = ien file 399.0222, or ien file 399.0404.
+ ; IBPRIEN = ien file 399.0222
  ; IBCOBN = the COB number of the id being edited
  ; DIPA = passed by ref, returned with id data
  ; DIPA("EDIT")=-1 if no id editing  = 1 if edit id   = 2 if stuff id
  ; DIPA("PRID")= id to stuff   DIPA("PRIDT")= id type to stuff
  N PRN0,Z
  Q:'$G(^DGCR(399,IBIFN,"I1"))
- I $G(IBLNPRV),'$G(IBLNPRV("LNPRVIEN")),'$G(IBLNPRV("PROCIEN")) Q  ; DEM;432 - If line provider user input.
- ; DEM;432 - Updated variable PRNO to be equal to line level provider if we are coming from line level provider user input.
- S PRN0=$S($G(IBLNPRV):$G(^DGCR(399,IBIFN,"CP",IBLNPRV("PROCIEN"),"LNPRV",IBLNPRV("LNPRVIEN"),0)),1:$G(^DGCR(399,IBIFN,"PRV",IBPRIEN,0)))
+ S PRN0=$G(^DGCR(399,IBIFN,"PRV",IBPRIEN,0))
  S DIPA("EDIT")=1,(DIPA("PRID"),DIPA("PRIDT"))=""
  W @IOF
  W !,?19,"**** SECONDARY PERFORMING PROVIDER IDs ****"
  W !!,$P("PRIMARY^SECONDARY^TERTIARY",U,IBCOBN)_" INSURANCE CO: "_$P($G(^DIC(36,+$G(^DGCR(399,IBIFN,"I"_IBCOBN)),0)),U)
- ; DEM;432 - Added line and conditions if line level provider user input.
- I '$G(IBLNPRV) W !,"PROVIDER: "_$$EXTERNAL^DILFD(399.0222,.02,"",$P(PRN0,U,2))_" ("_$$EXTERNAL^DILFD(399.0222,.01,"",+PRN0)_")",!
- I $G(IBLNPRV) W !,"Line Level Provider: "_$$EXTERNAL^DILFD(399.0404,.02,"",$P(PRN0,U,2))_" ("_$$EXTERNAL^DILFD(399.0404,.01,"",+PRN0)_")",!
+ W !,"PROVIDER: "_$$EXTERNAL^DILFD(399.0222,.02,"",$P(PRN0,U,2))_" ("_$$EXTERNAL^DILFD(399.0222,.01,"",+PRN0)_")",!
  ;
  I $P(PRN0,U,4+IBCOBN)="" K DIPA("PRID"),DIPA("PRIDT") D NEWID(IBIFN,IBPRIEN,IBCOBN,.DIPA) ; No id currently exists for the ins seq/prov
  ;
@@ -29,12 +24,10 @@ PROVID(IBIFN,IBPRIEN,IBCOBN,DIPA) ; Provider id entry on billing screen 10, and 
 NEWID(IBIFN,IBPRIEN,IBCOBN,DIPA) ;
  N IBDEF,IBCT,IBNUM,IBINS,IBFRM,IBCAR,IBARR,IBARRS,IB0,IBM,IBQUIT,IBSEL,PRN,PRT,PRN,PRN0,DIR,X,Y,Z,Z0,IBZ,IBZ1,IBTYP,IBREQ,IBREQT,IBTYPN,IBID,IBUSED
  S IBREQ=0,IBREQT=""
- Q:($G(IBLNPRV))&('$G(IBLNPRV("LNPRVIEN"))&'$G(IBLNPRV("PROCIEN")))  ; DEM;432 - If line provider user input.
- ; DEM;432 - Updated variable PRNO to be equal to line level provider if we are coming from line level provider user input.
- S PRN0=$S($G(IBLNPRV):$G(^DGCR(399,IBIFN,"CP",IBLNPRV("PROCIEN"),"LNPRV",IBLNPRV("LNPRVIEN"),0)),1:$G(^DGCR(399,IBIFN,"PRV",IBPRIEN,0)))
+ S PRN0=$G(^DGCR(399,IBIFN,"PRV",IBPRIEN,0))
  S Z(IBCOBN)=$S($G(DIPA("I"_IBCOBN)):$$GETTYP^IBCEP2A(IBIFN,IBCOBN,$P(PRN0,U)),1:"")
- S IBINS=+$G(^DGCR(399,IBIFN,"I"_IBCOBN)),IB0=$S($G(IBLNPRV):$G(^DGCR(399,IBIFN,"CP",IBLNPRV("PROCIEN"),"LNPRV",IBLNPRV("LNPRVIEN"),0)),1:$G(^DGCR(399,IBIFN,"PRV",IBPRIEN,0)))
- S IBCAR=$$INPAT^IBCEF(IBIFN),IBCAR=$S('IBCAR:2,1:1)
+ S IBINS=+$G(^DGCR(399,IBIFN,"I"_IBCOBN)),IB0=$G(^DGCR(399,IBIFN,"PRV",IBPRIEN,0))
+ S IBCAR=$$INPAT^IBCEF(IBIFN,1),IBCAR=$S('IBCAR:2,1:1)
  S IBFRM=$$FT^IBCEF(IBIFN),IBFRM=$S(IBFRM=2:2,1:1)
  I $P(Z(IBCOBN),U) D
  . W !,"INS. COMPANY'S DEFAULT SECONDARY ID TYPE IS: "_$$EXTERNAL^DILFD(36,4.01,"",$P(Z(IBCOBN),U)) S IBREQT=+Z(IBCOBN)
@@ -125,32 +118,30 @@ GETBPNUM(IBINS) ;
  S IBID=$$BF^IBCU()
  S Z=0 F  S Z=$O(^IBA(355.92,"B",IBINS,Z)) Q:'Z  D
  . S Z0=$G(^IBA(355.92,Z,0))
- . Q:$P(Z0,U,8)'="E"  ; WCJ 1/13/06  There are several ID types in this file 
+ . Q:$P(Z0,U,8)'="E"  ; WCJ 1/13/06  There are several ID types in this file
  . Q:$P(Z0,U,3)]""
+ .; I $P(Z0,U,6)=IBID S ^TMP($J,"IBBF_ID",$S($P(Z0,U,5)=IBMAIN:0,1:+$P(Z0,U,5)),+$P(Z0,U,4))=$P(Z0,U,7)
  . S ^TMP($J,"IBBF_ID",$S($P(Z0,U,5)=IBMAIN:0,1:+$P(Z0,U,5)),+$P(Z0,U,4))=$P(Z0,U,7)
  . S ^TMP($J,"IBBF_ID",$S($P(Z0,U,5)=IBMAIN:0,1:+$P(Z0,U,5)),+$P(Z0,U,4),"QUAL")=$P(Z0,U,6)
  Q
  ;
-MAIN() ; Returns ien of main division of the database
- Q +$$PRIM^VASITE()
+MAIN() ; Returns ien of default division or the main division for facility if
+ ; no IB DEFAULT DIVISION set
+ N IBMAIN
+ S IBMAIN=$P($G(^IBE(350.9,1,1)),U,25) S:'IBMAIN IBMAIN=+$$PRIM^VASITE()
+ Q IBMAIN
  ;
 FACNUM(IBIFN,IBCOB,IBQF) ; Function returns the current division's fac billing
  ; prov id for the COB insurance sequence from file 355.92
  ; IBIFN = ien file 399
  ; IBCOB = # of COB ins seq or if "", current assumed
  ; IBQF - 1 if qualifier is to be returned instead of ID
- N Z,IBDIV,IBFT,X,BPZ
- S X="",IBDIV=0
- S:'$G(IBCOB) IBCOB=+$$COBN^IBCEF(IBIFN)
- ;
- ; IB*2*400 - esg - 11/7/08 - Determine the division associated with the billing provider first
- S BPZ=+$$B^IBCEF79(IBIFN,IBCOB)                     ; Inst file pointer as the billing provider for payer seq IBCOB
- I BPZ S IBDIV=+$O(^DG(40.8,"AD",BPZ,0))             ; Billing Provider division (may not exist)
- ;
- I 'IBDIV S IBDIV=+$P($G(^DGCR(399,IBIFN,0)),U,22)   ; Division on claim
- I 'IBDIV S IBDIV=$$MAIN()                           ; main division
- ;
+ N Z,IBDIV,IBFT,X
+ S X=""
+ S IBDIV=+$P($G(^DGCR(399,IBIFN,0)),U,22)
+ S:'IBDIV IBDIV=$$MAIN()
  S IBFT=$$FT^IBCEF(IBIFN),IBFT=$S(IBFT=3:1,1:2)
+ S:'$G(IBCOB) IBCOB=+$$COBN^IBCEF(IBIFN)
  K ^TMP($J,"IBBF_ID")
  D GETBPNUM(+$P($G(^DGCR(399,IBIFN,"M")),U,IBCOB))
  I IBDIV=+$G(^TMP($J,"IBBF_ID")) S IBDIV=0

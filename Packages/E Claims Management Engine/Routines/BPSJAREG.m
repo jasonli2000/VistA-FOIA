@@ -1,5 +1,5 @@
-BPSJAREG ;BHAM ISC/LJF - HL7 Application Registration MFN Message ;03/07/08  13:26
- ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5,7**;JUN 2004;Build 46
+BPSJAREG ;BHAM ISC/LJF - HL7 Application Registration MFN Message ;21-NOV-2003
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ;  This program will process the outgoing registration MFN message
@@ -18,6 +18,10 @@ BPSJAREG ;BHAM ISC/LJF - HL7 Application Registration MFN Message ;03/07/08  13:
  ; MGRP    = E-Mail message group
  ; MSG     = Message
  ;
+INI ;
+INIT ; Unconditional jump....
+ G ^BPSJINIT
+ Q
  ;
 BPSJVAL(BPSJVAL) ; Validation entry point - HL7 message processing prevented
  ;
@@ -25,12 +29,24 @@ TASKMAN ; Entry point for taskman to run this routine
  ;
  N DA,HL,HL7DTG,HLECH,HLEID,HLFS,HLLNK,HLRESET,HLPRO
  N IPA,IPP
- N MGRP,MSG,MCT,BPSJARES,BPVALFN,DA
+ N MGRP,MSG,MCT,BPSJARES,BPVALFN
  ;
  S MCT=0,BPSJVAL=+$G(BPSJVAL)
  K ^TMP("HLS",$J)
  ;
- S BPVALFN=9002313.99,DA=1
+ S BPVALFN=9002313.99
+ ;
+ ; Create/update BPS Setup record
+ ; Returns record number in DA
+ D VERSION^BPSJINIT(BPVALFN)
+ ;
+ ; The following code was copied from BPSJINIT w/o edits for patch BPS*1*2
+ ; It is probably not needed since VERSION^BPSJINIT sets the version
+ ; Need to delete/clean up in the next release
+ K DIC,DIE,DINUM,DIR,DIRUT,DIROUT,DLAYGO,DR,DTOUT,DUOUT,X,Y
+ S DR=$P($G(^BPS(BPVALFN,DA,"VITRIA")),U,3)
+ I DR>2,DR=+DR
+ E  S DIE=$$ROOT^DILFD(BPVALFN),DR="6003////3" D ^DIE
  ;
  ;  Get Link data from HL7 table
  S HLPRO="BPSJ REGISTER",(IPA,IPP)=""
@@ -44,7 +60,6 @@ TASKMAN ; Entry point for taskman to run this routine
  ;
  ;  Initialize the HL7
  D INIT^HLFNC2(HLPRO,.HL)
- I $G(HL) S MCT=MCT+1,MSG(MCT)="HL7 initialization failed.",MCT=MCT+1,MSG(MCT)=HL Q
  S HLFS=$G(HL("FS")) I HLFS="" S HLFS="|"
  S HLECH=$E($G(HL("ECH")),1) I HLECH="" S HLECH="^"
  S HL("SITE")=$$SITE^VASITE,HL("SAF")=$P(HL("SITE"),U,2,3)
@@ -61,7 +76,7 @@ TASKMAN ; Entry point for taskman to run this routine
  ;
  ;  Set the MFE segment
  S ^TMP("HLS",$J,2)="MFE"_HLFS_"MUP"_HLFS_HLFS_HL7DTG_HLFS
- S ^TMP("HLS",$J,2)=^TMP("HLS",$J,2)_$P(HL("SITE"),"^",3)_HLFS_"ST"
+ S ^TMP("HLS",$J,2)=^TMP("HLS",$J,2)_+HL("SITE")_HLFS_"ST"
  ;
  ; Set the ZQR segment
  S ^TMP("HLS",$J,3)=$$EN^BPSJZQR(.HL)
@@ -81,7 +96,6 @@ TASKMAN ; Entry point for taskman to run this routine
  .. D MSG^BPSJUTL(.MSG,"ECME Application Registration")
  . I BPSJVAL D    ;Interactive: show success
  .. W !!,"ECME Application Registration HL7 Message successfully created."
- . S $P(^BPS(9002313.99,1,0),"^",4)=$$NOW^XLFDT
  ;
 FINI ; Clean up
  K ^TMP("HLS",$J)

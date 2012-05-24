@@ -1,6 +1,6 @@
 IBCU3 ;ALB/AAS - BILLING UTILITY ROUTINE (CONTINUED) ; 4/4/03 8:49am
- ;;2.0;INTEGRATED BILLING;**52,80,91,106,51,137,211,245,348,399,400**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**52,80,91,106,51,137,211,245,348**;21-MAR-94;Build 5
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;MAP TO DGCRU3
 SC(DFN) ; returns 1 if service connection indicated, 0 otherwise (based on VAEL(3))
@@ -50,13 +50,16 @@ FTN(FT) ;returns name of the form type passed in, "" if not defined
 FT(IFN,IBRESET) ;return the correct form type for a bill (trigger code in 399 to set .19)
  ; if IBRESET is not a positive value ('IBRESET), returns the bills current form type (if defined)
  ; if IBRESET is a positive value (+IBRESET), interpret form type according to following rules (for triggers):
- ;    first use if bill is inst (UB) or prof (1500) (399,.27), then current (399,.19), then UB
- N X,Y,FTC,FTT
- S X="",IFN=+$G(IFN),Y=$G(^DGCR(399,IFN,0))
+ ;    first use ins co default (36,.14), then bill is inst (UB) or prof (1500) (399,.27),
+ ;    then current (399,.19), then UB
+ N X,Y,FTC,FTN,FTI,FTT,INS S X="",IFN=+$G(IFN),Y=$G(^DGCR(399,IFN,0))
  S FTC=$P(Y,U,19) I FTC=1 S FTC=3
  I '$G(IBRESET),+FTC S X=FTC G FTQ
  S FTT=$S($P(Y,U,27)=1:3,$P(Y,U,27)=2:2,1:"")
- S X=$S(+FTT:FTT,+FTC:FTC,1:3)
+ S INS=+$G(^DGCR(399,IFN,"MP"))
+ I 'INS,$$MCRWNR^IBEFUNC($$CURR^IBCEF2(IFN)) S INS=+$$CURR^IBCEF2(IFN)
+ S FTI=$P($G(^DIC(36,+INS,0)),U,14)
+ S X=$S(+FTI:FTI,+FTT:FTT,+FTC:FTC,1:3)
 FTQ Q X
  ;
 FNT(FTN) ;returns the ifn of the form type name passed in, must be exact match, 0 if none found
@@ -116,5 +119,4 @@ BOTHER(IBIFN,IBDT) ; return Bedsection of Type of Care if date is Other Type of 
  I +$G(IBIFN),+IBDT S IBX=0 F  S IBX=$O(^DGCR(399,IBIFN,"OT",IBX)) Q:'IBX  D
  . S IBY=$G(^DGCR(399,IBIFN,"OT",IBX,0)) Q:'IBY
  . I IBDT'<$P(IBY,U,2),IBDT<$P(IBY,U,3) S IBFND=+IBY
- . I IBDT=($P(IBY,U,2)\1),IBDT=($P(IBY,U,3)\1) S IBFND=+IBY ; 1 day SNF stay
  Q IBFND

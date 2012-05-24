@@ -1,14 +1,11 @@
-IVMCMB ;ALB/SEK,BRM,TDM - SEND INCOME TEST TRANSMISSION BULLETIN ; 4/2/09 1:19pm
- ;;2.0;INCOME VERIFICATION MATCH;**17,49,140**;21-OCT-94;Build 2
+IVMCMB ;ALB/SEK,BRM - SEND INCOME TEST TRANSMISSION BULLETIN ; 12/18/01 1:21pm
+ ;;2.0;INCOME VERIFICATION MATCH;**17,49**;21-OCT-94
  ;
  ;  Input array required:
  ;    ^TMP($J,"IVMBULL"  --  contains lists of tests which were uploaded
  ;     dfn^type of test^dt of test^category^action
  ;
 BULL ; Send mail message notifying site of uploaded income tests.
- ;
- G BULLQ        ; This bulletin has been disabled.  IVM*2*140
- ;
  K IVMTEXT
  I '$D(^TMP($J,"IVMBULL")) G BULLQ
  S XMSUB="HEC INCOME TEST UPLOAD"
@@ -34,7 +31,7 @@ BULL ; Send mail message notifying site of uploaded income tests.
 BULLQ K IVMBCTR,IVMBDA,IVMBULLM,^TMP($J,"IVMBULL"),IVMPAT,Y
  Q
  ;
-BULL1(DFN,WDATE,SITE) ; 
+BULL1(DFN,WDATE,SITE) ;
  ;Send message notifying site of hardship determination
  ;
  N IVMTEXT,IVMPAT
@@ -51,7 +48,7 @@ BULL1(DFN,WDATE,SITE) ;
  D MAIL^IVMUFNC("DGMT MT/CT UPLOAD ALERTS")
  Q
  ;
-BULL2(DFN,WDATE,SITE) ; 
+BULL2(DFN,WDATE,SITE) ;
  ;Send message notifying site of deletion of hardship determination
  ;
  N IVMTEXT,IVMPAT
@@ -68,7 +65,7 @@ BULL2(DFN,WDATE,SITE) ;
  D MAIL^IVMUFNC("DGMT MT/CT UPLOAD ALERTS")
  Q
  ;
-BULL3(DFN) ; 
+BULL3(DFN) ;
  ;Send message notifying site to discontinue net-worth adjudication
  ;
  Q:('$G(DFN))

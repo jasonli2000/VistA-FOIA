@@ -1,6 +1,5 @@
 MAGFILEB ;WOIFO/RED - CREATE FILE REFERENCE FROM ^MAG(2005) ; 10/22/2002  06:39
- ;;3.0;IMAGING;**8,48,39**;Mar 19, 2002;Build 2010;Mar 08, 2011
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+ ;;3.0;IMAGING;**8,48**;Jan 11, 2005
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGFILEB ;WOIFO/RED - CREATE FILE REFERENCE FROM ^MAG(2005) ; 10/22/2002  06:39
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -15,10 +15,9 @@ MAGFILEB ;WOIFO/RED - CREATE FILE REFERENCE FROM ^MAG(2005) ; 10/22/2002  06:39
  ;; | to be a violation of US Federal Statutes.                     |
  ;; +---------------------------------------------------------------+
  ;;
- Q
  ; CALL WITH MAGXX=IEN NUMBER IN IMAGE FILE (2005)
  ;Calling FINDFILE requires FILETYPE to be defined ["FULL"|"ABSTRACT"|"BIG"|"TEXT"]
- ;   returns : 
+ ;   returns :
  ; ..MAGFILE1 =          FILENAME ONLY
  ; ..MAGFILE1(.01)=      .01 FIELD OF FILE (2005)
  ; ..MAGFILE1("ERROR") = Message if NetWork device is offline and Image Not On JB
@@ -27,11 +26,11 @@ MAGFILEB ;WOIFO/RED - CREATE FILE REFERENCE FROM ^MAG(2005) ; 10/22/2002  06:39
  ; ..MAGJBOL =                   NULL("")  OR " ** "_Name of Platter that is Offline"_" ** "
  ; ..MAGOFFLN =                  NULL("")  OR "1"   "1" means image is on platter that is offline.
  ; ..MAGPLACE =                  PLACE of Image. (IEN of IMAGING SITE PARAMETERS FILE)
- ; ..                                      Determined from Network Location file                 
- ; ..MAGPREF  =          Full Path of Image Network (or Jukebox) Directory 
+ ; ..                                      Determined from Network Location file
+ ; ..MAGPREF  =          Full Path of Image Network (or Jukebox) Directory
  ;
- ;Calling other TAGS (VST,VSTNOCP,ABS,ABSNOCP,BIG,BIGNOCP,FULL,ABSTRACT,BIGFILE)      
- ;   return all of above and : 
+ ;Calling other TAGS (VST,VSTNOCP,ABS,ABSNOCP,BIG,BIGNOCP,FULL,ABSTRACT,BIGFILE)
+ ;   return all of above and :
  ; ..MAGFILE  =          FILE NAME WITH FULL PATH FOLLOWED BY $C(0)
  ; ..MAGFILE2 =          FILE NAME WITH FULL PATH W/O $C(0)
  ; .. Deletes MAGXX
@@ -74,7 +73,7 @@ FINDFILE ;
  S MAG0=^MAG(2005,+MAGXX,0),MAGFILE1=$P(MAG0,"^",2)
  S MAGFILE1(.01)=$P(MAG0,"^") ; for MAILMAN interface
  S MAGFILE1=$P(MAGFILE1,"\",$L(MAGFILE1,"\"))
- ; 
+ ;
  I FILETYPE="TEXT" S FILETYPE="FULL" S $P(MAGFILE1,".",2)="TXT"
  ;
  I FILETYPE="FULL" D  ; code for full size image
@@ -97,13 +96,11 @@ FINDFILE ;
  . Q
  ;
  I FILETYPE="BIG" D  Q:MAGERR  ; code for big file
- . N EXT,FBIG  ;
+ . N FBIG
  . S FBIG=$G(^MAG(2005,MAGXX,"FBIG"))
  . I FBIG="" D  Q  ; no big file exists
  . . S MAGPREF="",MAGFILE1="-1~BIG File Does NOT Exist",MAGERR=1
- . . Q
- . S EXT=$P(FBIG,"^",3) I EXT="" S EXT="BIG"
- . S $P(MAGFILE1,".",2)=EXT
+ . S $P(MAGFILE1,".",2)="BIG"
  . S MAGREF=$P(FBIG,"^") ; get file from magnetic disk, if possible
  . I MAGREF="" S MAGREF=$P(FBIG,"^",2) ; get file from jukebox
  . Q
@@ -151,7 +148,7 @@ FINDFILE ;
  ;
  Q
  ;
-DIRHASH(FILENAME,NETLOCN) ; determine the hierarchical file directory hash 
+DIRHASH(FILENAME,NETLOCN) ; determine the hierarchical file directory hash
  ;
  ; Input Variables:
  ; FILENAME -- the name of the file, with or without the extension
@@ -168,9 +165,9 @@ DIRHASH(FILENAME,NETLOCN) ; determine the hierarchical file directory hash
  . E  S HASH=$E(FN,1,4) F I=5,7,9,11 S HASH=HASH_"\"_$E(FN,I,I+1)
  . S HASH=HASH_"\" ; add the trailing directory separator
  . Q
- E  S HASH="" ; flat directory structure, no hierarchical hashing 
+ E  S HASH="" ; flat directory structure, no hierarchical hashing
  Q HASH
- ; 
+ ;
 NOWHERE ; File is not anywhere on the jukebox -- output error message
  ; Requested image file is not on the Jukebox
  S MAGPREF="",MAGFILE1="-1^"_MAGXX_"^^NOWHERE"
@@ -182,7 +179,7 @@ OFFLINE ; Jukebox Cartridge is off-line -- output error message
  S MAGPREF="",MAGFILE1="-1^"_MAGXX_"^"_$P(MAG0,"^",5)_"^OFFLINE"
  Q
 IMOFFLN(FILE) ;Check to see if image is offline (jb platter removed)
- N XX,X,Y
+ N XX,X
  I '$L(FILE) Q 0
  S X=FILE X ^%ZOSF("UPPERCASE") S FILE=Y
  I $D(^MAGQUEUE(2006.033,"B",FILE)) D   Q 1

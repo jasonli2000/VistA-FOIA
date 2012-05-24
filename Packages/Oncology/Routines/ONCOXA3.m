@@ -1,4 +1,4 @@
-ONCOXA3 ; GENERATED FROM 'ONCOXA3' PRINT TEMPLATE (#829) ; 03/11/05 ; (FILE 165.5, MARGIN=80)
+ONCOXA3 ; GENERATED FROM 'ONCOXA3' PRINT TEMPLATE (#829) ; 09/19/10 ; (FILE 165.5, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -16,13 +16,13 @@ BEGIN ;
  D N:$X>2 Q:'DN  W ?2 W "Diagnostic confirmation: "
  S X=$G(^ONCO(165.5,D0,2)) S Y=$P(X,U,6) W:Y]"" $S($D(DXS(1,Y)):DXS(1,Y),1:Y)
  D N:$X>2 Q:'DN  W ?2 W "Tumor size: "
- S Y=$P(X,U,9) S Y(0)=Y D STOT^ONCOOT W $J(Y,7)
+ S Y=$P(X,U,9) S Y(0)=Y D STOT^ONCOOT W $E(Y,1,30)
  D N:$X>2 Q:'DN  W ?2 W "Extension: "
  S X=$G(^ONCO(165.5,D0,2)) S Y=$P(X,U,10) S Y(0)=Y S ONCOX="E",ONCFLD=30 D OT^ONCODEL W $J(Y,2)
  D N:$X>2 Q:'DN  W ?2 W "Regional lymph nodes positive: "
- S X=$G(^ONCO(165.5,D0,2)) S Y=$P(X,U,12) S Y(0)=Y D RNP^ONCOOT W $J(Y,3)
+ S X=$G(^ONCO(165.5,D0,2)) S Y=$P(X,U,12) S Y(0)=Y D RNP^ONCOOT W $E(Y,1,30)
  D N:$X>2 Q:'DN  W ?2 W "Regional lymph nodes examined: "
- S X=$G(^ONCO(165.5,D0,2)) S Y=$P(X,U,13) S Y(0)=Y D RNE^ONCOOT W $J(Y,3)
+ S X=$G(^ONCO(165.5,D0,2)) S Y=$P(X,U,13) S Y(0)=Y D RNE^ONCOOT W $E(Y,1,30)
  D N:$X>2 Q:'DN  W ?2 W "Lymph nodes: "
  S X=$G(^ONCO(165.5,D0,2)) S Y=$P(X,U,11) S Y(0)=Y S ONCOX="L" D OT^ONCODEL W $J(Y,2)
  D N:$X>2 Q:'DN  W ?2 W "SEER Summary Stage 2000: "

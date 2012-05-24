@@ -1,5 +1,5 @@
 GMRCSRVS ;SLC/DCM,JFR - Add/Edit services in File 123.5. ;6/14/00 12:00
- ;;3.0;CONSULT/REQUEST TRACKING;**1,16,40,53,63**;DEC 27, 1997;Build 10
+ ;;3.0;CONSULT/REQUEST TRACKING;**1,16,40,53**;DEC 27, 1997;Build 3
  ;
 EN ;set up services entry point
  ;GMRCOLDU=Service Usage field. If changed, GMRCOLDU shows the change (See ^DD(123.5,2,0) for field description).
@@ -14,7 +14,7 @@ EN ;set up services entry point
  .S DIE=DIC,DR="[GMRC SETUP REQUEST SERVICE]",DIE("NO^")="OUTOK"
  .D ^DIE
  .Q
- I $D(DA) S GMRCACT=$S($P(^GMR(123.5,GMRCSRVC,0),"^",2)=9:"MDC",$P(^(0),"^",2)=1:"MDC",1:GMRCACT) D
+ S GMRCACT=$S($P(^GMR(123.5,GMRCSRVC,0),"^",2)=9:"MDC",$P(^(0),"^",2)=1:"MDC",1:GMRCACT) D
  .S GMRCSSNM=$P(^GMR(123.5,GMRCSRVC,0),"^",1)
  .I GMRCACT'="MAD",GMRCSSNM'=GMRCOSNM S GMRCACT="MUP"
  .I $S(GMRCACT'="MAD":1,GMRCACT'="MUP":1,1:0),$L(GMRCOLDU),GMRCOLDU=$P(^GMR(123.5,GMRCSRVC,0),"^",2) S GMRCACT="NOACT"

@@ -1,4 +1,4 @@
-DGPMX67 ; ;06/08/09
+DGPMX67 ; ;11/06/06
  D DE G BEGIN
 DE S DIE="^DGPM(",DIC=DIE,DP=405,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DGPM(DA,""))=""
  I $D(^("USR")) S %Z=^("USR") S %=$P(%Z,U,3) S:%]"" DE(4)=% S %=$P(%Z,U,4) S:%]"" DE(6)=%

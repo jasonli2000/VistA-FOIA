@@ -1,5 +1,5 @@
-ECXWRD ;BIR/CML,ALB/JAP  Print Active Wards for Fiscal Year ;9/17/10  15:10
- ;;3.0;DSS EXTRACTS;**2,8,127**;Dec 22, 1997;Build 36
+ECXWRD ;BIR/CML,ALB/JAP  Print Active Wards for Fiscal Year ; Nov 25,1996
+ ;;3.0;DSS EXTRACTS;**2,8**;Dec 22, 1997
  ;
 EN ;entry point from option
  N DATE,YR,MON,FY,POP,ZTSK
@@ -49,7 +49,7 @@ START ;
  ...D:$Y+4>IOSL HDR Q:QFLG  W !?5,$E(ECXWDN,1,20),?30,ECXDEPT,?45,$P(DATA,U,1),?60,$E($P(DATA,U,2),1,18),?80,$P(DATA,U,3)
  ...Q:ECXDEPT=""
  ...D:$Y+4>IOSL HDR Q:QFLG
- ...;W !?30,"[Svc: "_$E($P(DATA,U,5),1,20)_"   "_"Prod. Unit: "_$E($P(DATA,U,6),1,40)_"   "_"Div: "_$P(DATA,U,7)_"]",!
+ ...W !?30,"[Svc: "_$E($P(DATA,U,5),1,20)_"   "_"Prod. Unit: "_$E($P(DATA,U,6),1,40)_"   "_"Div: "_$P(DATA,U,7)_"]",!
  I $E(IOST)="C"&('QFLG) S DIR(0)="E" D  D ^DIR K DIR
  .S SS=22-$Y F JJ=1:1:SS W !
  W:$E(IOST)'="C" @IOF D ^%ZISC S:$D(ZTQUEUED) ZTREQ="@"
@@ -57,7 +57,7 @@ START ;
  Q
  ;
 CHK ;has this ward been active?
- ; output      
+ ; output
  ; X = 1 if inactive (out-of-service), 0 otherwise
  ;
  N ECX,ECY

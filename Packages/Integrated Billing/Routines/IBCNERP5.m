@@ -1,8 +1,8 @@
-IBCNERP5 ;DAOU/BHS - IBCNE eIV PAYER REPORT COMPILE ;03-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,300,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERP5 ;DAOU/BHS - IBCNE IIV PAYER REPORT COMPILE ;03-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,271,300**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification Interface
+ ; IIV - Insurance Identification and Verification Interface
  ;
  ; Input variables from IBCNERP4:
  ;   IBCNERTN = "IBCNERP4"
@@ -17,7 +17,7 @@ IBCNERP5 ;DAOU/BHS - IBCNE eIV PAYER REPORT COMPILE ;03-JUN-2002
  ;                                       RetryTransCt^Non-ErrorRespCt^
  ;                                       ErrorRespCount^TotRespTime-days^
  ;                                       CommFailRespCount^PendRespCount^
- ;                                       eIVDeactivatedDt
+ ;                                       eIIVDeactivatedDt
  ;        IBCNERTN = "IBCNERP4"
  ;        SORT1 = PayerName (SORT=1) or -InquiryCount(SORT=2)
  ;        SORT2 = PayerIEN (SORT=1) or PayerName (SORT=2)
@@ -52,7 +52,7 @@ EN(IBCNERTN,IBCNESPC) ; Entry point
  S IBCNESRT=$G(IBCNESPC("SORT"))
  S IBCNEDTL=$G(IBCNESPC("DTL"))
  ;
- ; Loop through the eIV Transmission Queue File (#365.1) 
+ ; Loop through the IIV Transmission Queue File (#365.1)
  ;  by Date/Time Created Cross-Reference
  S IBCNEDT=$O(^IBCN(365.1,"AE",IBCNEDT1),-1)
  F  S IBCNEDT=$O(^IBCN(365.1,"AE",IBCNEDT)) Q:IBCNEDT=""!($P(IBCNEDT,".",1)>IBCNEDT2)  D  Q:$G(ZTSTOP)
@@ -94,14 +94,26 @@ EN(IBCNERTN,IBCNESPC) ; Entry point
  I $G(ZTSTOP)!(IBCNESRT=1) G EXIT
  ;
  ; Resort if sorted by Total Inquiries
- M ^TMP($J,IBCNERTN_"X")=^TMP($J,IBCNERTN)
+ ; M ^TMP($J,IBCNERTN_"X")=^TMP($J,IBCNERTN)
+ N %X,%Y,SUB2
+ S SUB2=IBCNERTN_"X"
+ S %X="^TMP($J,IBCNERTN,"
+ S %Y="^TMP($J,SUB2,"
+ I $D(^TMP($J,IBCNERTN))#10=1 S ^TMP($J,SUB2)=^TMP($J,IBCNERTN)
+ D %XY^%RCR K %X,%Y,SUB2
  KILL ^TMP($J,IBCNERTN)
  S PYR=""
  F  S PYR=$O(^TMP($J,IBCNERTN_"X",PYR)) Q:PYR=""  D
  .  S IEN=0
  .  F  S IEN=$O(^TMP($J,IBCNERTN_"X",PYR,IEN)) Q:'IEN  D
  .  .  S INQS=-$G(^TMP($J,IBCNERTN_"X",PYR,IEN,"*"))
- .  .  M ^TMP($J,IBCNERTN,INQS,PYR,IEN)=^TMP($J,IBCNERTN_"X",PYR,IEN,"*")
+ .  .  ;M ^TMP($J,IBCNERTN,INQS,PYR,IEN)=^TMP($J,IBCNERTN_"X",PYR,IEN,"*")
+ .  .  N %X,%Y,SUB2
+ .  .  S SUB2=IBCNERTN_"X"
+ .  .  S %X="^TMP($J,SUB2,PYR,IEN,""*"","
+ .  .  S %Y="^TMP($J,IBCNERTN,INQS,PYR,IEN,"
+ .  .  I $D(^TMP($J,SUB2,PYR,IEN,"*"))#10=1 S ^TMP($J,IBCNERTN,INQS,PYR,IEN)=^TMP($J,SUB2,PYR,IEN,"*")
+ .  .  D %XY^%RCR K %X,%Y,SUB2
  .  .  QUIT
  .  QUIT
  ; KILL temporary report global - used to resort
@@ -112,7 +124,7 @@ EXIT ; EN Exit point
  ;
  ;
 GETDATA(IEN,RPTDATA,DTL,PYNM,PYIEN,PYR) ; Retrieve data for this inquiry and response(s)
- ; Output: 
+ ; Output:
  ;  RPTDATA(PayerName,PayerIEN) = Created(1)^Cancelled(0/1)^Queued(0/1)^
  ;   #1stTrans^#Retries^#Non-ErrorResponses^#ErrorResponses^
  ;   #ofDaysforResponses^#Timeouts^#Pending^DeactivationDTM
@@ -121,7 +133,7 @@ GETDATA(IEN,RPTDATA,DTL,PYNM,PYIEN,PYR) ; Retrieve data for this inquiry and res
  NEW HLIEN,HLID,RIEN,RDATA0,RPYIEN,RPYNM,RDATA1,ERRTXT,X1,X2,FIRST,APIEN
  ;
  S RPTDATA(PYNM,PYIEN)=1
- ; Determine Deactivation DTM for eIV application
+ ; Determine Deactivation DTM for eIIV application
  S APIEN=$$PYRAPP^IBCNEUT5("IIV",PYIEN)
  I APIEN,$P($G(^IBE(365.12,PYIEN,1,APIEN,0)),U,11) S $P(RPTDATA(PYNM,PYIEN),U,11)=$P($G(^IBE(365.12,PYIEN,1,APIEN,0)),U,12)
  ; Logic by Transmission Status
@@ -145,23 +157,23 @@ GETDATA(IEN,RPTDATA,DTL,PYNM,PYIEN,PYR) ; Retrieve data for this inquiry and res
  .  .  ; Apply payer filter here, too!
  .  .  ; If there is a Payer filter, check against the IEN
  .  .  I PYR'="",RPYIEN'=PYR Q
- .  .  ; Determine Deactivation DTM for eIV application
+ .  .  ; Determine Deactivation DTM for eIIV application
  .  .  S APIEN=$$PYRAPP^IBCNEUT5("IIV",RPYIEN)
  .  .  I APIEN,$P($G(^IBE(365.12,RPYIEN,1,APIEN,0)),U,11) S $P(RPTDATA(RPYNM,RPYIEN),U,11)=$P($G(^IBE(365.12,RPYIEN,1,APIEN,0)),U,12)
  .  .  S RDATA1=$G(^IBCN(365,RIEN,1))
  .  .  S ERRTXT=$G(^IBCN(365,RIEN,4))
  .  .  ; Transmitted (Pending)
  .  .  I $P(RDATA0,U,6)=2 D  Q
- .  .  . ; Increment for response pending 
+ .  .  . ; Increment for response pending
  .  .  . S $P(RPTDATA(RPYNM,RPYIEN),U,10)=$P($G(RPTDATA(RPYNM,RPYIEN)),U,10)+1
  .  .  ; Timeout (Communication Failure)
  .  .  I $P(RDATA0,U,6)=5 D  Q
- .  .  . ; Increment for response timeout 
+ .  .  . ; Increment for response timeout
  .  .  . S $P(RPTDATA(RPYNM,RPYIEN),U,9)=$P($G(RPTDATA(RPYNM,RPYIEN)),U,9)+1
  .  .  ; Response Received - gather additional information
  .  .  I $P(RDATA0,U,6)=3 D  Q
- .  .  . ; Determine response time (in days) as difference between 
- .  .  . ;  eIV Response File - Date/Time Response Received and
+ .  .  . ; Determine response time (in days) as difference between
+ .  .  . ;  IIV Response File - Date/Time Response Received and
  .  .  . ;                      Date/Time Response Created (based on HL7)
  .  .  . S X1=$P(RDATA0,U,8)
  .  .  . S X2=$P(RDATA0,U,7)

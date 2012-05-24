@@ -1,5 +1,5 @@
 ECMLMN ;ALB/ESD - Multiple patients processing ;26 AUG 1997 14:42
- ;;2.0; EVENT CAPTURE ;**5,10,15,13,17,18,23,42,47,54,76**;8 May 96;Build 6
+ ;;2.0; EVENT CAPTURE ;**5,10,15,13,17,18,23,42,47,54**;8 May 96
  ;
  ;
 EN ;- Entry point for multiple patients (part of Multiple Dates/Procs option)
@@ -16,7 +16,7 @@ EN ;- Entry point for multiple patients (part of Multiple Dates/Procs option)
  ;
 ENPAT(ECFL,ECONE) ;- Ask patient name, ordering section, inpat/outpat,
  ;                  dx, assoc clinic, and classification questions
- ;                  (AO, IR, EC, SC, MST, HNC, CV, SHAD)
+ ;                  (AO, IR, EC, SC, MST, HNC, CV)
  ;
 SEL K ECNXT,ECPAT,ECORD,ECPCE,ECPCEQ,ECS
  S ECFL=1,ECS=""
@@ -59,7 +59,7 @@ BLDPAT ;- Build ^TMP("ECPAT",$J) array with patient data
  S $P(^TMP("ECPAT",$J,$P(ECPAT,"^")),"^",12)=""
  S $P(^TMP("ECPAT",$J,$P(ECPAT,"^")),"^",1)=$P(ECPAT,"^",2)
  S $P(^TMP("ECPAT",$J,$P(ECPAT,"^")),"^",2)=+$P(ECORD,"^")
- F ECNODE="I/O","CLIN","CLINNM","DX","DXNM","AO","ENV","IR","SC","ELIG","MST","HNC","CV","SHAD" D
+ F ECNODE="I/O","CLIN","CLINNM","DX","DXNM","AO","ENV","IR","SC","ELIG","MST","HNC","CV" D
  . S ECNUM=ECNUM+1
  . S $P(^TMP("ECPAT",$J,$P(ECPAT,"^")),"^",ECNUM)=$S(ECNODE="CLINNM":$P($G(ECPCE("CLIN")),"^",2),ECNODE="DXNM":$P($G(ECPCE("DX")),"^",2),1:$P($G(ECPCE(ECNODE)),"^"))
  I $D(ECPCE("DXS")) M ^TMP("ECPAT",$J,$P(ECPAT,"^"),"DXS")=ECPCE("DXS")
@@ -113,7 +113,7 @@ BLDLM ;- Display patient data
  D SET(ECX)
  ;
  ;- Tmp array ECMPTIDX contains:
- ;  Cnt^DFN^Name^Ord Sect^In/Out^Clin^Clin Nam^DX^DX Nam^AO^EC^IR^SC^Elig^MST^HNC^CV^SHAD
+ ;  Cnt^DFN^Name^Ord Sect^In/Out^Clin^Clin Nam^DX^DX Nam^AO^EC^IR^SC^Elig^MST^HNC^CV
  ;
  S ^TMP("ECMPTIDX",$J,ECPTCNT)=VALMCNT_"^"_ECDFN_"^"_$G(^TMP("ECPAT",$J,ECDFN))
  ;- Set secondary diagnosis codes in array ECMPTIDX
@@ -147,7 +147,7 @@ PRDSP ;- Display selected procedure dates/times and procedures
  . S ECPR=$S(ECCPT'="":ECCPT_" ",1:ECCPT)_$P(^TMP("ECMPIDX",$J,I),"^",4)
  . S X=$$SETSTR^VALM1(ECPR,X,42,VALMWD)
  . D SET(X)
- . ;set modifier in ^TMP global for display 
+ . ;set modifier in ^TMP global for display
  . S J="" F  S J=$O(^TMP("ECMPIDX",$J,I,"MOD",J)) Q:J=""  S X="" D
  . . S X=$$SETSTR^VALM1("  - "_J_" "_$P(^TMP("ECMPIDX",$J,I,"MOD",J),"^"),X,41,VALMWD)
  . . D SET(X)
@@ -229,7 +229,7 @@ HELPTXT ; - Help text
  ;;        those patients previously entered
  ;;  FP - File Patients will enter the patients into the Event Capture
  ;;        procedure database
- ;;  
+ ;;
  ;; NOTE: The procedures you have entered with this option MUST be filed
  ;;       with the 'FP' action for the data to be filed into the Event
  ;;       Capture system.

@@ -1,12 +1,12 @@
-IBCNERP1 ;DAOU/BHS - IBCNE USER IF eIV RESPONSE REPORT ;03-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERP1 ;DAOU/BHS - IBCNE USER IF IIV RESPONSE REPORT ;03-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification Interface
+ ; IIV - Insurance Identification and Verification Interface
  ;
  ; Input parameters: N/A
  ; Other relevant variables ZTSAVED for queueing:
- ;  IBCNERTN = "IBCNERP1" (current routine name for queueing the 
+ ;  IBCNERTN = "IBCNERP1" (current routine name for queueing the
  ;   COMPILE process)
  ;  IBCNESPC("BEGDT")=start dt for rpt
  ;  IBCNESPC("ENDDT")=end dt for rpt
@@ -17,7 +17,7 @@ IBCNERP1 ;DAOU/BHS - IBCNE USER IF eIV RESPONSE REPORT ;03-JUN-2002
  ;   Responses) for date range (by unique Payer/Pat pair)
  ;  IBCNESPC("TRCN")=Trace #^IEN, if non-null all other params are null
  ;  IBCNESPC("RFLAG")=Report Flag used to indicate which report is being
- ;   run.  Response Report (0), Inactive Report (1), or Ambiguous 
+ ;   run.  Response Report (0), Inactive Report (1), or Ambiguous
  ;   Report (2).
  ;  IBCNESPC("DTEXP")=Expiration date used in the inactive policy report
  ;
@@ -31,15 +31,15 @@ EN(IPRF) ; Main entry pt
  S STOP=0
  S IBCNERTN="IBCNERP1"
  W @IOF
- W !,"eIV ",$S(IPRF=1:"Inactive Policy",IPRF=2:"Ambiguous Policy",1:"Response")," Report",!
+ W !,"IIV ",$S(IPRF=1:"Inactive Policy",IPRF=2:"Ambiguous Policy",1:"Response")," Report",!
  I $G(IPRF) D
- . W !,"Please select a date range to view ",$S(IPRF=1:"inactive",1:"ambiguous")," policy information that the eIV"
+ . W !,"Please select a date range to view ",$S(IPRF=1:"inactive",1:"ambiguous")," policy information that the IIV"
  . W !,"process turned up while attempting to discover previously unknown"
  . W !,"insurance policies. (Date range selection is based on the date that"
- . W !,"eIV receives the response from the payer.)"
+ . W !,"IIV receives the response from the payer.)"
  ;
  I '$G(IPRF) D
- . W !,"Insurance verification responses are received daily."
+ . W !,"Insurance verification and identification responses are received daily."
  . W !,"Please select a date range in which responses were received to view the"
  . W !,"associated response detail.  Otherwise, select a Trace # to view specific"
  . W !,"response detail."
@@ -68,7 +68,7 @@ EXIT ; Exit pt
  Q
  ;
  ;
-COMPILE(IBCNERTN,IBCNESPC) ; 
+COMPILE(IBCNERTN,IBCNESPC) ;
  ; Entry point called from EN^XUTMDEVQ in either direct or queued mode.
  ; Input params:
  ;  IBCNERTN = Routine name for ^TMP($J,...
@@ -80,13 +80,11 @@ COMPILE(IBCNERTN,IBCNESPC) ;
  I IBCNERTN="IBCNERP1" D EN^IBCNERP2(IBCNERTN,.IBCNESPC)
  I IBCNERTN="IBCNERP4" D EN^IBCNERP5(IBCNERTN,.IBCNESPC)
  I IBCNERTN="IBCNERP7" D EN^IBCNERP8(IBCNERTN,.IBCNESPC)
- I IBCNERTN="IBCNERPF" D EN^IBCNERPG(IBCNERTN,.IBCNESPC)
  ; Print
  I '$G(ZTSTOP) D
  . I IBCNERTN="IBCNERP1" D EN3^IBCNERPA(IBCNERTN,.IBCNESPC)
  . I IBCNERTN="IBCNERP4" D EN6^IBCNERPA(IBCNERTN,.IBCNESPC)
  . I IBCNERTN="IBCNERP7" D EN^IBCNERP9(IBCNERTN,.IBCNESPC)
- . I IBCNERTN="IBCNERPF" D EN^IBCNERPH(IBCNERTN,.IBCNESPC)
  ; Close device
  D ^%ZISC
  ; Kill scratch globals
@@ -122,7 +120,7 @@ DTRANGE ; Determine start and end dates for date range param
  ;
  S DIR(0)="D^:-NOW:EX"
  S DIR("A")="Start DATE"
- S DIR("?",1)="   Please enter a valid date for which an eIV Response"
+ S DIR("?",1)="   Please enter a valid date for which an IIV Response"
  S DIR("?")="   would have been received. Future dates are not allowed."
  D ^DIR K DIR
  I $D(DIRUT) S STOP=1 G DTRANGX
@@ -130,7 +128,7 @@ DTRANGE ; Determine start and end dates for date range param
  ; End date
 DTRANG1 S DIR(0)="DA^"_Y_":-NOW:EX"
  S DIR("A")="  End DATE:  "
- S DIR("?",1)="   Please enter a valid date for which an eIV Response"
+ S DIR("?",1)="   Please enter a valid date for which an IIV Response"
  S DIR("?",2)="   would have been received.  This date must not precede"
  S DIR("?")="   the Start Date.  Future dates are not allowed."
  D ^DIR K DIR
@@ -147,7 +145,7 @@ PYRSEL ; Select one payer or ALL - File #365.12
  W !
  S DIC(0)="ABEQ"
  S DIC("A")=$$FO^IBCNEUT1("Payer or <Return> for All Payers: ",40,"R")
- ; Do not allow selection of '~NO PAYER' and non-eIV payers
+ ; Do not allow selection of '~NO PAYER' and non-IIV payers
  S DIC("S")="I ($P(^(0),U,1)'=""~NO PAYER""),$$PYRAPP^IBCNEUT5(""IIV"",$G(Y))'="""""
  S DIC="^IBE(365.12,"
  D ^DIC
@@ -213,7 +211,7 @@ DTEXP ; Prompt for oldest expiration date to pull for.
 DTEXPX ; DTEXP Exit
  Q
  ;
-SORT ; Prompt to allow users to sort the report by Payer(default) or 
+SORT ; Prompt to allow users to sort the report by Payer(default) or
  ;  Patient
  ; Init vars
  N DIR,X,Y,DIRUT
@@ -269,9 +267,9 @@ DEVICE(IBCNERTN,IBCNESPC) ; Device Handler and possible TaskManager calls
  ; Init vars
  N ZTRTN,ZTDESC,ZTSAVE,POP
  ;
- I IBCNERTN="IBCNERP4"!(IBCNERTN="IBCNERPF"&($G(IBCNESPC("TYPE"))="D")) W !!!,"*** This report is 132 characters wide ***",!
+ I IBCNERTN="IBCNERP4" W !!!,"*** This report is 132 characters wide ***",!
  S ZTRTN="COMPILE^IBCNERP1("""_IBCNERTN_""",.IBCNESPC)"
- S ZTDESC="IBCNE eIV "_$S(IBCNERTN="IBCNERP1":"Response",IBCNERTN="IBCNERPF":"Insurance Update",1:"Payer")_" Report"
+ S ZTDESC="IBCNE IIV "_$S(IBCNERTN="IBCNERP1":"Response",1:"Payer")_" Report"
  S ZTSAVE("IBCNESPC(")=""
  S ZTSAVE("IBCNERTN")=""
  D EN^XUTMDEVQ(ZTRTN,ZTDESC,.ZTSAVE)

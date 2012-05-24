@@ -1,5 +1,5 @@
 PRCASER1 ;WASH-ISC@ALTOONA,PA/RGY-Accept transaction from billing engine ;9/8/93  2:21 PM
-V ;;4.5;Accounts Receivable;**48,104,165,233**;Mar 20, 1995;Build 4
+V ;;4.5;Accounts Receivable;**48,104,165**;Mar 20, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  NEW AMT,AMT1,PRCAERR,PRCABN,PRCADJ,X1,XMDUZ,XMSUB,XMTEXT,XMY,DEBT
  I '$D(X) S PRCAERR="-1^PRCA020" G Q
@@ -13,10 +13,10 @@ V ;;4.5;Accounts Receivable;**48,104,165,233**;Mar 20, 1995;Build 4
  I $P(X,"^",5)'?7N S PRCAERR="-1^PRCA024" G Q
  S (AMT1,AMT)=$P(X,"^",2)
  D DEC(PRCABN,.AMT,$P(X,"^",4),$P(X,U,6),$P(X,U,5))
- S XMDUZ="AR Package",XMTEXT="X1(",DEBT=$P($G(^PRCA(430,PRCABN,0)),"^",9),DEBT=$E($$NAM^RCFN01(DEBT),1)_" ("_$E($$SSN^RCFN01(DEBT),6,9)_")"
- I AMT'=AMT1 S X1(1)="A decrease adjustment for bill/Pt name (SSN) #"_$P(X,"^",3)_"/"_DEBT_" has been",XMSUB="Automatic Adj: "_$P(X,"^",3)
- I AMT=AMT1 S X1(1)="**** NOTICE: A decrease adjustment for bill/Pt name (SSN) #"_$P(X,U,3)_"/"_DEBT,XMSUB="Manual Adj: "_$P(X,U,3),X1(3)=" "
- S Y=DT X ^DD("DD") S X1(2)=$S(AMT'=AMT1:"automatically",1:"needs to be manually")_" applied in the amount of $"_$J($S(AMT1=AMT:AMT1,1:AMT1-AMT),0,2)_" on "_Y_"."
+ S XMDUZ="AR Package",XMTEXT="X1(",DEBT=$P($G(^PRCA(430,PRCABN,0)),"^",9),DEBT=$E($$NAM^RCFN01(DEBT),1,10)_" ("_$E($$SSN^RCFN01(DEBT),6,9)_")"
+ I AMT'=AMT1 S X1(1)="A decrease adjustment for bill #"_$P(X,"^",3)_" has been automatically",XMSUB="Automatic Adj: "_$P(X,"^",3)_"/"_DEBT
+ I AMT=AMT1 S X1(1)="****** NOTICE: A decrease adjustment for bill #"_$P(X,U,3)_" needs to be manually",XMSUB="Manual Adj: "_$P(X,U,3)_"/"_DEBT,X1(3)=" "
+ S Y=DT X ^DD("DD") S X1(2)="applied in the amount of $"_$J($S(AMT1=AMT:AMT1,1:AMT1-AMT),0,2)_" on "_Y_"."
  I AMT,AMT'=AMT1 S X1(3)="Please review bill for proper application of the unapplied amount of $"_$J(AMT,0,2)_"."
  S X1(4)=" ",X1(5)="Data sent from Service"
  S X1(6)="        Amount: $"_$J(AMT1,0,2)

@@ -1,6 +1,6 @@
 PRCPRCAT ;WISC/RFJ/DL-order form ;  1/28/98  1000
-V ;;5.1;IFCAP;**1,132**;Oct 20, 2000;Build 3
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;**1**;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  D ^PRCPUSEL Q:'$G(PRCP("I"))
  N PRCPBLNK,PRCPDATE,PRCPEND,PRCPINFR,PRCPINPT,PRCPFLAG,PRCPFONE,PRCPFNON,PRCPSSIT,X,Y,Z
  K X S X(1)="The Order Form prints the current or selected inventory point's items sorted by main storage location and description.  Blanks for daily ordering may be included."
@@ -95,5 +95,5 @@ H S %=NOW_"  PAGE "_PAGE,PAGE=PAGE+1 I PAGE'=2!(SCREEN) W @IOF
  W $C(13),"ORDER FORM FOR: ",PRCPINNM,?(IOM-$L(%)),%
  W !?5,"FOR THE MONTH-YEAR: ",PRCPDATE
  W ?58,$J("STAND",6),$J("NORM",6),$J("UNIT",10),!,"DESCRIPTION",?29,"MI#",?35,"NSN",?50,$J("UNIT/IS",8),$J("REOPT",6),$J("STLVL",6),$J("COST",10)
- S %="",$P(%,"-",IOM+1)="" W !,%,!
+ S %="",$P(%,"-",IOM+1)="" W !,%
  Q

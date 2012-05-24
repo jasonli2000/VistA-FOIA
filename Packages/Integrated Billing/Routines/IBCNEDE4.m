@@ -1,11 +1,6 @@
 IBCNEDE4 ;DAOU/ALA - NO INSURANCE DATA EXTRACT ;24-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
- ;
- ; ***** Note *****
- ; IB*2*416 removed the ability to perform Identification inquiries.
- ; However, this code is being left as is for future changes.
- ; But this routine is no longer called from IBCNEDE.
+ ;;2.0;INTEGRATED BILLING;**184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;**Program Description**
  ;  This program finds veterans who have been seen within a
@@ -188,7 +183,7 @@ POP(IBCNCNT,MAXCNT,SRVICEDT,FDAYS,APPTFLG,IBDDI) ; Get Popular Insurances
  ; If the site does not check inactive insurances and the patient
  ; has inactive insurances, set up the array of payers to skip.
  ; This will be used to screen the patient's inactive payers from being
- ; included with the most popular payers. 
+ ; included with the most popular payers.
  I 'INACT,$D(IBDDI) D
  . N INCP,INSPAYID
  . S INCP="" F  S INCP=$O(IBDDI(INCP)) Q:'INCP  D

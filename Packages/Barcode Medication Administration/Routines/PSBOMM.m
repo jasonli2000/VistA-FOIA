@@ -1,5 +1,5 @@
 PSBOMM ;BIRMINGHAM/EFC-MISSED MEDS ;Mar 2004
- ;;3.0;BAR CODE MED ADMIN;**26,32,56**;Mar 2004;Build 10
+ ;;3.0;BAR CODE MED ADMIN;**26,32**;Mar 2004;Build 32
  ;Per VHA Directive 2004-038 (or future revisions regarding same), this routine should not be modified.
  ;
  ; Reference/IA
@@ -11,7 +11,7 @@ EN ;
  S PSBSTART=$P(PSBRPT(.1),U,6)+$P(PSBRPT(.1),U,7),PSBSTOP=$P(PSBRPT(.1),U,8)+$P(PSBRPT(.1),U,9)
  D DEFLT^PSBOMM2
  K PSBOCRIT,PSBACRIT,PSBS
- S PSBOCRIT="^A^H^O" ;PSB*3*56 Adds the On Call Status to the Missed Meds Report
+ S PSBOCRIT="^A^H"
  S:$P(PSBFUTR,U,8) PSBOCRIT=PSBOCRIT_"^D^DE" S:$P(PSBFUTR,U,7) PSBOCRIT=PSBOCRIT_"^E"
  S PSBACRIT="MG"
  S:$P(PSBFUTR,U,17) PSBACRIT=PSBACRIT_"H" S:$P(PSBFUTR,U,18) PSBACRIT=PSBACRIT_"R"
@@ -55,7 +55,7 @@ EN1 ;
  ..Q:PSBNGF
  ..Q:PSBOSTS="N"
  ..Q:PSBSM
- ..S PSBS(DFN,PSBONX,$S(PSBOSTS="A":"Active",PSBOSTS="H":"On Hold",PSBOSTS="D":"DC'd",PSBOSTS="DE":"DC'd (Edit)",PSBOSTS="E":"Expired",PSBOSTS="O":"On Call",1:" *Unknown* "))=""
+ ..S PSBS(DFN,PSBONX,$S(PSBOSTS="A":"Active",PSBOSTS="H":"On Hold",PSBOSTS="D":"DC'd",PSBOSTS="DE":"DC'd (Edit)",PSBOSTS="E":"Expired",1:" *Unknown* "))=""
  ..S PSBSTXP(PSBONX,$$DTFMT^PSBOMM2(PSBOSP))=""
  ..S PSBCADM=0
  ..I PSBADST="" D  Q:$G(PSBADST)=""  S PSBCADM=1
@@ -93,7 +93,7 @@ EN1 ;
  ..I PSBG D PARTG1^PSBOMM2($O(PSBG(PSBONX,"")))
  ..D NOW^%DTC
  ..Q:(PSBOCRIT'[PSBOSTS)
- ..S PSBS(DFN,PSBONX,$S(PSBOSTS="A":"Active",PSBOSTS="H":"On Hold",PSBOSTS="D":"DC'd",PSBOSTS="DE":"DC'd (Edit)",PSBOSTS="E":"Expired",PSBOSTS="O":"On Call",1:" * ERROR * "))=""
+ ..S PSBS(DFN,PSBONX,$S(PSBOSTS="A":"Active",PSBOSTS="H":"On Hold",PSBOSTS="D":"DC'd",PSBOSTS="DE":"DC'd (Edit)",PSBOSTS="E":"Expired",1:" * ERROR * "))=""
  ..D:'PSBG!(PSBACRIT[$G(PSBXSTS,1))
  ...S VAR=""
  ...K ^TMP("PSJ2",$J),^TMP("PSB1",$J),PSBOACTL D EN^PSJBCMA2(DFN,PSBONX,1) I ^TMP("PSJ2",$J,0)'=1 D

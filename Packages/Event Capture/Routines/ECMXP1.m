@@ -1,9 +1,7 @@
-ECMXP1 ; ;08/18/09
+ECMXP1 ; ;09/19/10
  D DE G BEGIN
 DE S DIE="^ECH(",DIC=DIE,DP=721,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^ECH(DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,19) S:%]"" DE(9)=% S %=$P(%Z,U,20) S:%]"" DE(10)=% S %=$P(%Z,U,22) S:%]"" DE(11)=% S %=$P(%Z,U,23) S:%]"" DE(12)=%
- I $D(^("P")) S %Z=^("P") S %=$P(%Z,U,3) S:%]"" DE(1)=% S %=$P(%Z,U,4) S:%]"" DE(2)=% S %=$P(%Z,U,5) S:%]"" DE(3)=% S %=$P(%Z,U,6) S:%]"" DE(4)=% S %=$P(%Z,U,9) S:%]"" DE(5)=% S %=$P(%Z,U,10) S:%]"" DE(6)=% S %=$P(%Z,U,11) S:%]"" DE(7)=%
- I  S %=$P(%Z,U,12) S:%]"" DE(8)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,22) S:%]"" DE(1)=% S %=$P(%Z,U,23) S:%]"" DE(2)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -51,88 +49,18 @@ SAVEVALS S @DIEZTMP@("V",DP,DIIENS,DIFLD,"O")=$G(DE(DQ)) S:$D(^("F"))[0 ^("F")=$
 NKEY W:'$D(ZTQUEUED) "??  Required key field" S X="?BAD" G QS
 KEYCHK() Q:$G(DE(DW,"KEY"))="" 1 Q @DE(DW,"KEY")
 BEGIN S DNM="ECMXP1",DQ=1
-1 S DW="P;3",DV="S",DU="",DLB="AGENT ORANGE",DIFLD=21
- S DU="Y:YES;N:NO;U:UNKNOWN;"
- S X=$G(ECPTR("AO"))
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X1 Q
-2 S DW="P;4",DV="S",DU="",DLB="RADIATION EXPOSURE",DIFLD=22
- S DU="Y:YES;N:NO;U:UNKNOWN;"
- S X=$G(ECPTR("IR"))
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X2 Q
-3 S DW="P;5",DV="S",DU="",DLB="SW ASIA CONDITIONS",DIFLD=23
- S DU="Y:YES;N:NO;U:UNKNOWN;"
- S X=$G(ECPTR("ENV"))
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X3 Q
-4 S DW="P;6",DV="S",DU="",DLB="SERVICE CONNECTED",DIFLD=24
- S DU="Y:YES;N:NO;"
- S X=$G(ECPTR("SC"))
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X4 Q
-5 S DW="P;9",DV="S",DU="",DLB="MILITARY SEXUAL TRAUMA",DIFLD=35
- S DU="Y:YES;N:NO;U:UNKNOWN;"
- S X=$G(ECPTR("MST"))
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X5 Q
-6 S DW="P;10",DV="S",DU="",DLB="HEAD/NECK CANCER",DIFLD=39
- S DU="Y:YES;N:NO;U:UNKNOWN;"
- S X=$G(ECPTR("HNC"))
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X6 Q
-7 S DW="P;11",DV="S",DU="",DLB="COMBAT VETERAN",DIFLD=40
- S DU="Y:YES;N:NO;U:UNKNOWN;"
- S X=$G(ECPTR("CV"))
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X7 Q
-8 S DW="P;12",DV="S",DU="",DLB="PROJECT 112/SHAD",DIFLD=41
- S DU="Y:YES;N:NO;U:UNKNOWN;"
- S X=$G(ECPTR("SHAD"))
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X8 Q
-9 S DW="0;19",DV="*P44'X",DU="",DLB="ASSOCIATED CLINIC",DIFLD=26
- S DU="SC("
- S X=$G(ECPTR("CLIN"))
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X9 Q
-10 S DW="0;20",DV="P40.7'",DU="",DLB="DSS ID",DIFLD=27
- S DU="DIC(40.7,"
- S X=$P($G(^SC(+$G(ECPTR("CLIN")),0)),"^",7)
- S Y=X
- S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X10 Q
-11 S DW="0;22",DV="RS",DU="",DLB="IN/OUTPATIENT",DIFLD=29
+1 S DW="0;22",DV="RS",DU="",DLB="IN/OUTPATIENT",DIFLD=29
  S DU="I:INPATIENT;O:OUTPATIENT;"
  S X=$G(ECPTR("IO"))
  S Y=X
  S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
  G RD:X="@",Z
-X11 Q
-12 S DW="0;23",DV="*P720.5'",DU="",DLB="PROCEDURE REASON",DIFLD=34
+X1 Q
+2 S DW="0;23",DV="*P720.5'",DU="",DLB="PROCEDURE REASON",DIFLD=34
  S DU="ECL("
  S X=$G(ECPRR("REAS"))
  S Y=X
  S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
  G RD:X="@",Z
-X12 Q
-13 G 0^DIE17
+X2 Q
+3 G 0^DIE17

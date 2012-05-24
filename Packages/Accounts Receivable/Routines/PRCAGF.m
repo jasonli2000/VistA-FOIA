@@ -1,5 +1,5 @@
 PRCAGF ;WASH-ISC@ALTOONA,PA/CMS-Print Form Letters ;5/1/95  3:04 PM
-V ;;4.5;Accounts Receivable;**1,48,141,190,225,259**;Mar 20, 1995;Build 9
+V ;;4.5;Accounts Receivable;**1,48,141,190,225**;Mar 20, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 EN(DEB,SB,PRNT) ;entry send Debtor number and statemet bal
  NEW PRCABN,CR,NOT,STAT
@@ -37,9 +37,7 @@ LT(PRCABN,SB,REPNOT) ;find which letter to print needs Site variable
  I CAT=CE,$P(LET,U,1)="" S LT=$O(^RC(343,"B","FL 4-520a",0)) D PRT(LT,PRCABN) Q
  I VEN[(","_CAT_","),$P(LET,U,1)="" S LT=$O(^RC(343,"B","FL 4-521",0)) D PRT(LT,PRCABN) Q
  I CAT=CE!(CAT=EXE)!(VEN[(","_CAT_",")),$P(LET,U,2)="" S LT=$O(^RC(343,"B","FL 4-483a",0)) D PRT(LT,PRCABN) Q
- ;I CAT=CE!(CAT=EH)!(CAT=INE)!(CAT=EXE)!(VEN[(","_CAT_","))!(CAT=CV)!(CAT=CU),$P(LET,U,3)="",SB>25,SB<600 S LT=$O(^RC(343,"B","FL 4-483",0)) D PRT(LT,PRCABN,1) Q
- ;CHANGE GREATER THAN $25 TO GREATER THAN $0 - PRCA*4.5*259
- I CAT=CE!(CAT=EH)!(CAT=INE)!(CAT=EXE)!(VEN[(","_CAT_","))!(CAT=CV)!(CAT=CU),$P(LET,U,3)="",SB>0,SB<600 S LT=$O(^RC(343,"B","FL 4-483",0)) D PRT(LT,PRCABN,1) Q
+ I CAT=CE!(CAT=EH)!(CAT=INE)!(CAT=EXE)!(VEN[(","_CAT_","))!(CAT=CV)!(CAT=CU),$P(LET,U,3)="",SB>25,SB<600 S LT=$O(^RC(343,"B","FL 4-483",0)) D PRT(LT,PRCABN,1) Q
  I CAT=CE!(CAT=EXE)!(VEN[(","_CAT_",")),SB>599.99,$P(LET,U,3)="" S LT=$O(^RC(343,"B","FL 4-485",0)) D PRT(LT,PRCABN,1) Q
  Q
 PRT(LT,PRCABN,TOP) ;print letter

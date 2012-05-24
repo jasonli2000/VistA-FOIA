@@ -1,12 +1,13 @@
 XOBVLIB ;; mjk/alb - VistaLink Programmer Library ; 07/27/2002  13:00
- ;;1.6;VistALink;;May 08, 2009;Build 15
- ;Per VHA directive 2004-038, this routine should not be modified.
+ ;;1.5;VistALink;;Sep 09, 2005
+ ;;Foundations Toolbox Release v1.5 [Build: 1.5.0.026]
+ ;
  QUIT
  ; --------------------------------------------------------------
  ;              Application Developer Supported Calls
  ; --------------------------------------------------------------
  ;
-XMLHDR() ; -- provides current XML standard header 
+XMLHDR() ; -- provides current XML standard header
  QUIT "<?xml version=""1.0"" encoding=""utf-8"" ?>"
  ;
 CHARCHK(STR) ; -- replace xml character limits with entities
@@ -46,7 +47,7 @@ SETTO(TO) ; -- set time out value on the fly
  ; --------------------------------------------------------------
  ;                 Foundations Developer Calls (Unsupported)
  ; --------------------------------------------------------------
- ; 
+ ;
 VLHDR(NUM) ; -- provides current VistaLink standard header
  NEW X,TYPE,SCHEMA
  ;
@@ -79,11 +80,11 @@ ERROR(XOBDAT) ; -- send error type message
  ;
 BUILD(XOBY,XOBDAT) ;  -- store built xml in passed store reference (XOBY)
  ; -- input format
- ; XOBDAT("MESSAGE TYPE") = # type of message (ex. 2 = gov.va.med.foundations.vistalink.rpc.fault :: See TYPE tag) 
+ ; XOBDAT("MESSAGE TYPE") = # type of message (ex. 2 = gov.va.med.foundations.vistalink.rpc.fault :: See TYPE tag)
  ; XOBDAT("ERRORS",<integer>,"CODE")         = error code
  ; XOBDAT("ERRORS",<integer>,"ERROR TYPE")   = type of error (system/application/security)
  ; XOBDAT("ERRORS",<integer>,"MESSAGE",<integer>) = error message
- ; 
+ ;
  ;  -- SOAP related information
  ; XOBDAT("ERRORS",<integer>,"FAULT CODE")   = high level code on where error occurred (ex. Client, Server, etc.)
  ;          - Default: Server
@@ -91,7 +92,7 @@ BUILD(XOBY,XOBDAT) ;  -- store built xml in passed store reference (XOBY)
  ;          - Default: System Error
  ; XOBDAT("ERRORS",<integer>,"FAULT ACTOR")  = RPC, routine, etc. running when error occurred
  ;          - Default: [none]
- ; 
+ ;
  NEW XOBCODE,XOBI,XOBERR,XOBLINE,XOBETYPE
  SET XOBLINE=0
  ;
@@ -130,7 +131,7 @@ GETRATE() ; -- get J2SE heartbeat rate in seconds
  SET X=$PIECE($GET(^XOB(18.01,1,0)),"^",2)
  QUIT $SELECT(X:X,1:180)
  ;
-GETDELTA() ; -- get J2SE latency delta in seconds
+GETDELTA() ; -- get J2SE latancy delta in seconds
  NEW X
  SET X=$PIECE($GET(^XOB(18.01,1,0)),"^",3)
  QUIT $SELECT(X:X,1:180)
@@ -140,7 +141,7 @@ GETASTO() ; -- get J2EE application server time out in seconds (one day = 86400)
  SET X=$PIECE($GET(^XOB(18.01,1,0)),"^",4)
  QUIT $SELECT(X:X,1:86400)
  ;
-GETRASTO() ; -- get J2EE application server reauthenticated session time out in seconds (ten minutes = 600)
+GETRASTO() ; -- get J2EE application server reauthenticated seesion time out in seconds (ten minutes = 600)
  NEW X
  SET X=$PIECE($GET(^XOB(18.01,1,0)),"^",5)
  QUIT $SELECT(X:X,1:600)
@@ -158,10 +159,8 @@ ENVHDR(TYPE,SCHEMA) ; -- vistalink beg tag (header)
  SET X=$$XMLHDR()
  SET X=X_"<VistaLink"
  SET X=X_" messageType="""_TYPE_""""
- SET VLVER="1.6"
- ; -- indicates to VL v1.5 client that this VL v1.6 server is backwards compatible
- IF $GET(XOBDATA("VL VERSION"))="1.5" SET VLVER="1.5"
- ; -- indicates to VL v1.0 client that this VL v1.6 server is backwards compatible
+ ; -- indicates to VL v1.0 client that this VL v1.5 server is backwards compatible
+ SET VLVER="1.5"
  IF $GET(XOBDATA("VL VERSION"))="1.0" SET VLVER="1.0"
  SET X=X_" version="""_VLVER_""""
  SET X=X_" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"""

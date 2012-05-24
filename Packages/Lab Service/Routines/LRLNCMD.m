@@ -1,5 +1,5 @@
 LRLNCMD ;DALOI/CA/FHS-MAP LAB TESTS TO DEFAULT LOINC CODES ;1-MAY-1999
- ;;5.2;LAB SERVICE;**232,278,280,407**;Sep 27,1994;Build 1
+ ;;5.2;LAB SERVICE;**232,278,280**;Sep 27,1994
  ;=================================================================
  ; Ask VistA test to map-Lookup in Lab Test file #60
 START ;entry point from option LR LOINC MAPPING
@@ -19,7 +19,6 @@ DEFAULT ;ENTRY POINT FROM LRLNC0
  I $G(LREND),$G(LRLNC1) K LREND Q
  I $G(LREND) D EXIT G START
  I '$G(LRCODE) D LOINC
- I $G(LRNO),$G(LRLNC1) K LREND Q
  I $G(LRNO) D EXIT G START
  I $G(LREND),$G(LRLNC1) K LREND Q
  I $G(LREND) D EXIT G START
@@ -123,7 +122,7 @@ SHOWPRE ;DISPLAY LOINC CODE ALREADY MAPPED TO NLT
  S:'$D(LRDEL) DIR("?")="If you enter yes, the current default LOINC code will be overwritten with the default LOINC code that you have chosen."
  S:$D(LRDEL) DIR("?")="If you enter yes, the current default LOINC code will be deleted."
  D ^DIR K DIR
- Q 
+ Q
 DELETE ;DELETE/UNMAP DEFAULT LOINC CODE
  S LREND=0,LRDEL=1 D TEST
  I $G(LREND) G EXIT

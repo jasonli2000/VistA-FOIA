@@ -1,5 +1,5 @@
 EASEZF3 ;ALB/jap - Filing 1010EZ Data to Patient Database ;10/31/00  13:07
- ;;1.0;ENROLLMENT APPLICATION SYSTEM;**1,57,100**;Mar 15, 2001;Build 6
+ ;;1.0;ENROLLMENT APPLICATION SYSTEM;**1,57**;Mar 15, 2001
  ;
 SP ;file Spouse data
  N C,MULTIPLE,FILE,SUBFILE,FLD,XDATA,ACCEPT,SUBIEN,SEX,EZDATA,EAS,ERR
@@ -17,7 +17,7 @@ SP ;file Spouse data
  .S XLINK=$G(FLINK("SP",MULTIPLE,FILE))
  .;record in file #408.13 is needed for all further data filng
  .Q:(FILE'=408.13)&('$G(FLINK("SP",MULTIPLE,408.13)))
- .;for data elements with link to database, 
+ .;for data elements with link to database,
  .;only file 1010EZ data if accepted by user;
  .;data in external format
  .I XLINK D
@@ -26,7 +26,7 @@ SP ;file Spouse data
  ...S XDATA=SP(MULTIPLE,FILE,SUBFILE,FLD),ACCEPT=$P(XDATA,U,2)
  ...I FILE=408.13,FLD=.09 S XDATA=$TR(XDATA,"-","")
  ...I ACCEPT D LINK^EASEZF2(XDATA,FILE,FLD,"SP",MULTIPLE)
- .;for data elements with no link to database, 
+ .;for data elements with no link to database,
  .;always create new record(s) to store 1010EZ data;
  .;put data in internal format
  .I 'XLINK D
@@ -75,7 +75,7 @@ F40812(TYPE,MULT) ;create a new record in file #408.12
  I TYPE="SP" S RELATE=2
  I TYPE="CN" D
  .S X=$P($G(CN(MULT,FILE,SUBFILE,".02")),U,1)
- .S RELATE=$S(X="SON":3,X="DAUGHTER":4,X="STEPSON":5,X="STEPDAUGHTER":6,1:99)
+ .S RELATE=$S(X="SON":3,X="DAUGHTER":4,1:99)
  ;verify that no record points to known file #408.13 record
  S C=FLINK(TYPE,MULT,408.13)_";DGPR(408.13,"
  I $D(^DGPR(408.12,"C",C)) S DGPRIEN=$O(^DGPR(408.12,"C",C,0))

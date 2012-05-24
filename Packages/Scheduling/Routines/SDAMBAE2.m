@@ -1,5 +1,5 @@
 SDAMBAE2 ;ALB/BOK - ADD/EDIT CON'T ;11/21/91  12:15 ;
- ;;5.3;Scheduling;**15,79,111,132**;Aug 13, 1993
+ ;;5.3;Scheduling;**15,79,111,132**;Aug 13, 1993;Build 1
  ;
 APP ; -- screen on APPOINTMENT TYPE field in VISIT file CLINIC STOP multiple
  ;      Z - zeroth node of app type file - NAKED REFERENCE - ^SD(409.1,IFN,0)

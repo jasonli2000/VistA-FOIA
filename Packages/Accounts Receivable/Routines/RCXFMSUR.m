@@ -1,6 +1,6 @@
-RCXFMSUR ;WISC/RFJ-revenue source codes ; 10/19/10 1:47pm
- ;;4.5;Accounts Receivable;**90,101,170,203,173,220,231,273**;Mar 20, 1995;Build 3
- ;;Per VHA Directive 2004-038,this routine should not be modified.
+RCXFMSUR ;WISC/RFJ-revenue source codes ;1 Oct 97
+ ;;4.5;Accounts Receivable;**90,101,170,203,173,220,231**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
  ;
@@ -20,12 +20,6 @@ CALCRSC(BILLDA,RCEFT) ;  calculate the revenue source code for a bill
  I CATEGDA=26 D STORE(BILLDA,"ARRV") Q "ARRV"
  ;
  S COLUMN1=$$COLUMN1
- ;
- ; check for 3rd party RX bills after 4/27/2011 for col 2
- N RX3P S RX3P=0
- I ("PH"=$$TYP^IBRFN(BILLDA)) D
- .  S RX3P=$$CHECKRXS^RCXFMSUF(BILLDA)
- ;
  S COLUMN2=$$COLUMN2
  ;
  ;  if column2 cannot be determined, return the rsc of ARRV
@@ -63,15 +57,11 @@ COLUMN2() ;  return column 2 number
  I CATEGDA=4 Q 2     ; outpatient care (nsc)
  I CATEGDA=3 Q 3     ; nursing home care (nsc)
  I CATEGDA=1 Q 4     ; ineligible hospital
- I CATEGDA=9&$G(RX3P) Q "R"    ; pharmacy reimbursable health insurance
  I CATEGDA=9 Q 5     ; reimbursable health insurance
- I CATEGDA=10&$G(RX3P) Q "S"     ; pharmacy tort feasor
- I CATEGDA=10 Q 6    ; tort feasor
- I CATEGDA=6&$G(RX3P) Q "T"     ;pharmacy workman's comp
+ I CATEGDA=10 Q 6    ; tort fesor
  I CATEGDA=6 Q 7     ; workmans comp
  I CATEGDA=18 Q 8    ; c (means test)
  I CATEGDA=2 Q 9     ; emergency/humanitarian
- I CATEGDA=7&$G(RX3P) Q "Q"     ;pharmacy no fault auto acc
  I CATEGDA=7 Q "A"   ; no fault auto accident
  I CATEGDA=22 Q "B"  ; rx copay/sc vet
  I CATEGDA=23 Q "C"  ; rx copay/nsc vet
@@ -176,7 +166,7 @@ ADDEDIT ;  enter/edit revenue source codes for fund 0160A1 bills.  These
  . S X1=X,X=$$UPPER^VALM1(X)
  . I $E(X)="?",X?."?" D ^DIC Q:Y<1
  . I X=""!($E(X)=U) S RCRJFLAG=1 Q
- . I $D(^RC(347.3,"B",X)) S Y=+$O(^(X,0)) W "   ",X,"  ",$P($G(^RC(347.3,Y,0)),U,2) W:$P(^(0),U,3) "  INACTIVE" D UPD Q 
+ . I $D(^RC(347.3,"B",X)) S Y=+$O(^(X,0)) W "   ",X,"  ",$P($G(^RC(347.3,Y,0)),U,2) W:$P(^(0),U,3) "  INACTIVE" D UPD Q
  . S X2=$L(X1),X3=$C($A($E(X1,X2))-1),X3=$E(X1,1,X2-1)_X3,X3=$O(^RC(347.3,"C",X3)) I $E(X3,1,X2)=X1 S X=X1
  . S D="C" D IX^DIC Q:Y<1  D UPD Q
  Q
@@ -192,7 +182,7 @@ RSC ;revenue code (#430/255)
 SHOW ;  show/calculate revenue source code for a selected bill
  W !!,"This option will show the calculated Revenue Source Code for a selected"
  W !,"bill.  The Revenue Source Code is only calculated for accrued bills in"
- I DT'<$$ADDPTEDT^PRCAACC() W !,"funds 528701,528703,528704,528709/4032,528711"
+ I DT'<$$ADDPTEDT^PRCAACC() W !,"funds 528701,528703,528704,528709/4032"
  I DT<$$ADDPTEDT^PRCAACC() W !,"funds 5287.1,5287.3,5287.4,4032"
  ;
  N %,%Y,BILLDA,C,DIC,FUND,I,RCRJFLAG,RSC,X,Y

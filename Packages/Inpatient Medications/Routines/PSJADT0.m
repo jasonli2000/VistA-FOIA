@@ -1,7 +1,8 @@
 PSJADT0 ;BIR/CML3,PR,MLM-AUTO DC/HOLD CANCEL ;11 Aug 98 / 8:25 AM
- ;;5.0; INPATIENT MEDICATIONS ;**17,111,112,135,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**17,111,112,135**;16 DEC 97
  ;
  ;Reference to ^PS(55 supported by DBIA #2191.
+ ;Reference to ^PS(59.7 supported by DBIA #2181.
  ;
 ENDC ; dc active orders first, then non-verified orders
  W:'$D(PSJQUIET)&'$D(DGQUIET) !,"...discontinuing Inpatient Medication orders..."
@@ -10,13 +11,12 @@ ENDC ; dc active orders first, then non-verified orders
  I PSGALO=1010!(PSGALO=1030)!(PSGALO=1050) D AUDDD
  D ENUNM^PSGOU S PSGALR=10,DIE="^PS(55,"_PSGP_",5," S:PSJFW PSGTOL=1,PSGUOW=PSJFW,PSGTOO=1
  F PSJS=PSGDT:0 S PSJS=$O(^PS(55,PSGP,5,"AUS",PSJS)) Q:'PSJS  F PSJDA=0:0 S PSJDA=$O(^PS(55,PSGP,5,"AUS",PSJS,PSJDA)) Q:'PSJDA  D
- .Q:'$$DCIMO(PSGP,PSJDA,"U") 
+ .Q:'$$DCIMO(PSGP,PSJDA,"U")
  .;first naked reference below refers to the full global reference to the right of the = sign (inside the $S)
  .K DA S DA(1)=PSGP,DA=PSJDA,PSGAL("C")=0,$P(^(2),"^",3)=$S($D(^PS(55,PSGP,5,DA,2)):$P(^(2),"^",4),1:"")
  .D ^PSGAL5
  .K TMP
  .S TMP(55.06,""_PSJDA_","_PSGP_","_"",28)="D"
- .S TMP(55.06,""_PSJDA_","_PSGP_","_"",136)=$S(PSGALO=1010:"DD",1:"DA")
  .D FILE^DIE("","TMP")
  .K TMP
  .S TMP(55.06,""_PSJDA_","_PSGP_","_"",34)=PSJDCDT
@@ -47,7 +47,6 @@ DC ;
  .K TMP
  K PSIVALT S PSIVAC="AD",PSIVALCK="STOP",PSIVREA="D",PSIVAL=$S('+$G(PSGALO):$G(PSIVRES),1:$P($G(^PS(53.3,+PSGALO,0)),U)) D D1^PSIVOPT2,LOG^PSIVORAL
  K TMP
- S TMP(55.01,""_+ON_","_DFN_","_"",157)=$S(PSGALO=1010:"DD",1:"DA")
  S TMP(55.01,""_+ON_","_DFN_","_"",.03)=PSJDCDT
  S TMP(55.01,""_+ON_","_DFN_","_"",121)=1
  D FILE^DIE("","TMP")

@@ -1,11 +1,10 @@
-RORX002 ;HOIFO/SG,VAC - CURRENT INPATIENT LIST ;4/7/09 2:06pm
- ;;1.5;CLINICAL CASE REGISTRIES;**1,8**;Feb 17, 2006;Build 8
+RORX002 ;HCIOFO/SG - CURRENT INPATIENT LIST ; 10/20/06 4:09pm
+ ;;1.5;CLINICAL CASE REGISTRIES;**1**;Feb 17, 2006;Build 24
  ;
  ; This routine uses the following IAs:
  ;
+ ; #325          ADM^VADPT2 (controlled)
  ; #10061        51^VADPT (supported)
- ;
- ; Routine modified March 2009 for ICD9 filter for INCLUDE or EXCLUDE
  ;
  Q
  ;
@@ -132,12 +131,10 @@ PTLIST(REPORT,INPCNT) ;
  ;
 QUERY(INPCNT,SFLAGS) ;
  N CNT,DFN,ECNT,IEN,IENS,RC,TCNT,TMP,VA,VADM,VAHOW,VAIP,VAROOT,XREFNODE,WARD
- N RCC,FLAG
  S XREFNODE=$NA(^RORDATA(798,"AC",+RORREG))
  S (CNT,ECNT,INPCNT,RC)=0
  ;--- Browse through the registry records
  S IEN=0
- S FLAG=$G(RORTSK("PARAMS","ICD9FILT","A","FILTER"))
  F  S IEN=$O(@XREFNODE@(IEN))  Q:IEN'>0  D  Q:RC<0
  . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
@@ -146,13 +143,6 @@ QUERY(INPCNT,SFLAGS) ;
  . Q:$$SKIP^RORXU005(IEN,SFLAGS)
  . ;--- Process the registry record
  . S DFN=$$PTIEN^RORUTL01(IEN)  Q:DFN'>0
- .; --- Check the ICD9 filter
- . S RCC=0
- . I FLAG'="ALL" D
- . . S RCC=$$ICD^RORXU010(DFN,RORREG)
- . I (FLAG="INCLUDE")&(RCC=0) Q
- . I (FLAG="EXCLUDE")&(RCC=1) Q
- .;--- End of ICD9 Filter check
  . K VA,VADM,VAIP  S VAIP("D")=DT\1  D 51^VADPT
  . S WARD=$P(VAIP(5),U,2)  Q:WARD=""
  . S TMP=$S($G(VA("BID"))'="":VA("BID"),1:"UNKN") ; Last 4 of SSN

@@ -1,5 +1,5 @@
 RMPR9LN1 ;HOIFO/HNC -  FLEX FIELD SORT;9/18/02 11:38
- ;;3.0;PROSTHETICS;**90,75,60,125**;Feb 09, 1996;Build 21
+ ;;3.0;PROSTHETICS;**90,75,60**;Feb 09, 1996;Build 18
  ;SPS - Patch 75 added DALC section at the end.
 EN(RESULT) ;
  ;RESULT passed to broker in ^TMP($J,
@@ -23,12 +23,9 @@ HLST ;pick list
  ;;12;Souce
  ;;14;Total Cost
  ;;16;Remarks
- ;;20;DELIVERY VERIFICATION DATE
- ;;20.1;DELIVERY VERIFICATION STATUS
  ;;23;Transaction Number or PO Number
  ;;24;Brief Description
  ;;25;Deliver To
- ;;26;Date Required
  ;;27;Initiator
  ;;38.1;Exclude/Waiver
  ;;38.7;Contract #

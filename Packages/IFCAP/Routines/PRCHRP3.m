@@ -1,21 +1,18 @@
 PRCHRP3 ;WISC/KMB/CR SUMMARY OF UNPAID PURCHASE CARDS ;7/15/98  8:43 AM
- ;;5.1;IFCAP;**8,131,149**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;5.1;IFCAP;**8**;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 UNPAID ;   create summary report of unpaid purchase card orders
- N P,PRC,ARR,XXZ,EX,I,CP,HDATE,ZP,TOT,AMT,ZTR,ZTR0,ZTR1,NOTASK
- ;PRC*5.3*149 insures NOTASK is set for tasked job to avoid undefined
- S NOTASK=0
+ N P,PRC,ARR,XXZ,EX,I,CP,HDATE,ZP,TOT,AMT,ZTR,ZTR0,ZTR1
  S PRCF("X")="S" D ^PRCFSITE Q:'$D(PRC("SITE"))  Q:$G(X)="^"
  W !,"Please select a device for display/print of this report.",!
  S %ZIS("B")="",%ZIS="MQ" D ^%ZIS Q:POP
  I $D(IO("Q")) S ZTRTN="REPORT^PRCHRP3",ZTSAVE("*")="" D ^%ZTLOAD,^%ZISC QUIT
- S NOTASK=1 W !,"COMPILING."
  D REPORT,^%ZISC QUIT
  ;
 REPORT ;
  K ^TMP($J) S (EX,P)=1
- F I=24,29,32,34,37,38,40,41,45,50,51 S ARR(I)=""
- S ZP="" F I=1:1 S ZP=$O(^PRC(442,"F",25,ZP)) Q:ZP=""  W:NOTASK=1&(I#5000=0) "." D
+ F I=24,29,32,34,37,38,40,41,50,51 S ARR(I)=""
+ S ZP="" F  S ZP=$O(^PRC(442,"F",25,ZP)) Q:ZP=""  D
  .S ZTR0=$G(^PRC(442,ZP,0))
  .I $D(PRC("SITE")) Q:$P(ZTR0,"-")'=PRC("SITE")
  .S ZTR1=+$P($G(^PRC(442,ZP,7)),"^") Q:ZTR1=""

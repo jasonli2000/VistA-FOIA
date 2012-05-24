@@ -1,8 +1,8 @@
 ECXFEKEY ;BIR/DMA,CML-Print Feeder Keys; [ 05/15/96  9:44 AM ] ; 8/15/06 9:10am
- ;;3.0;DSS EXTRACTS;**10,11,8,40,84,92,123,132**;Dec 22, 1997;Build 18
+ ;;3.0;DSS EXTRACTS;**10,11,8,40,84,92**;Dec 22, 1997;Build 30
 EN ;entry point from option
  W !!,"Print list of Feeder Keys:",!
- W !,"Select : 1. CLI",!,?9,"2. ECS",!,?9,"3. LAB",!,?9,"4. NUT",!,?9,"5. PHA",!,?9,"6. RAD",!,?9,"7. SUR",! S DIR(0)="L^1:7" D ^DIR Q:$D(DIRUT)
+ W !,"Select : 1. CLI",!,?9,"2. ECS",!,?9,"3. LAB",!,?9,"4. NUR",!,?9,"5. NUT",!,?9,"6. PHA",!,?9,"7. RAD",!,?9,"8. SUR",! S DIR(0)="L^1:8" D ^DIR Q:$D(DIRUT)
  S ECY=Y
  I ECY["2" D
  .W !!,"The Feeder Key List for the Feeder System ECS can be printed by:",!?5,"(O)ld Feeder Key sort by Category-Procedure",!?5,"(N)ew Feeder Key sort by Procedure-CPT Code"
@@ -21,7 +21,7 @@ EN ;entry point from option
 START ;queued entry point
  I '$D(DT) S DT=$$HTFM^XLFDT(+$H)
  K ^TMP($J)
- F ECLIST=1:1 S EC=$P(ECY,",",ECLIST) Q:EC=""  D:EC=1 CLI D:EC=2 ECS D:EC=3 LAB D:EC=4 NUT D:EC=5 PHA D:EC=6 RAD D:EC=7 SUR^ECXFEKE1
+ F ECLIST=1:1 S EC=$P(ECY,",",ECLIST) Q:EC=""  D:EC=1 CLI D:EC=2 ECS D:EC=3 LAB D:EC=4 NUR D:EC=5 NUT D:EC=6 PHA D:EC=7 RAD D:EC=8 SUR^ECXFEKE1
  U IO D PRINT^ECXFEKE1
  Q
 LAB S EC=0
@@ -45,8 +45,8 @@ ECS ;old ECS feeder key list for pre-FY97 data
  S EC=0 I $P($G(^EC(720.1,1,0)),U,2) D  G ECQ
  .F  S EC=$O(^ECJ(EC)) Q:'EC  I $D(^(EC,0)) D
  ..S EC1=$P($P(^(0),U),"-",3,4),EC2=$P(EC1,"-"),EC2=$S(+EC2:EC2,1:"***"),EC4=$S($P($G(^EC(726,+EC2,0)),U)]"":$P(^(0),U),1:"***")
- ..S EC3=$P(EC1,"-",2) Q:'+EC3  S EC3=$S(EC3["ICPT":$P($$CPT^ICPTCOD(+EC3),U,2),+EC3<90000:$P($G(^EC(725,+EC3,0)),U,2)_"N",1:$P($G(^EC(725,+EC3,0)),U,2)_"L")
- ..S EC5=$P(EC1,"-",2),EC5=$S(EC5["ICPT":$E($P($$CPT^ICPTCOD(+EC5),U,3),1,25),EC5["EC":$E($P($G(^EC(725,+EC5,0)),U),1,25),1:"UNKNOWN")
+ ..S EC3=$P(EC1,"-",2) Q:'+EC3  S EC3=$S(EC3["ICPT":$P($G(^ICPT(+EC3,0)),U),+EC3<90000:$P($G(^EC(725,+EC3,0)),U,2)_"N",1:$P($G(^EC(725,+EC3,0)),U,2)_"L")
+ ..S EC5=$P(EC1,"-",2),EC5=$S(EC5["ICPT":$E($P($G(^ICPT(+EC5,0)),U,2),1,25),EC5["EC":$E($P($G(^EC(725,+EC5,0)),U),1,25),1:"UNKNOWN")
  ..S ^TMP($J,"ECS",EC2_" - "_EC3,EC3)=EC4_" - "_EC5
  F  S EC=$O(^ECK(EC)) Q:'EC  I $D(^(EC,0)) S EC1=$P($P(^(0),U),"-",3,4),EC2=$E($P($G(^ECP(+EC1,0)),U),1,25),EC3=$E($P($G(^ECP(+$P(EC1,"-",2),0)),U),1,25),^TMP($J,"ECS",EC1,EC1)=EC2_" - "_EC3
 ECQ K EC1,EC2,EC3,EC4,EC5,EC6,EC7,EC8,EC9,EC10 Q
@@ -59,14 +59,14 @@ ECS2 ;new ECS feeder key list for FY97 data
  S EC=0 I $P($G(^EC(720.1,1,0)),U,2) D  G ECQ
  .F  S EC=$O(^ECJ(EC)) Q:'EC  I $D(^ECJ(EC,0)) D
  ..S EC1=$P($P(^ECJ(EC,0),U),"-",3,4)
- ..S EC3=$P(EC1,"-",2) Q:'+EC3  S EC3=$S(EC3["ICPT":$P($$CPT^ICPTCOD(+EC3),U,2),+EC3<90000:$P($G(^EC(725,+EC3,0)),U,2)_"N",1:$P($G(^EC(725,+EC3,0)),U,2)_"L")
- ..S EC5=$P(EC1,"-",2),EC5=$S(EC5["ICPT":$E($P($$CPT^ICPTCOD(+EC5),U,3),1,25),EC5["EC":$E($P($G(^EC(725,+EC5,0)),U),1,25),1:"UNKNOWN")
+ ..S EC3=$P(EC1,"-",2) Q:'+EC3  S EC3=$S(EC3["ICPT":$P($G(^ICPT(+EC3,0)),U),+EC3<90000:$P($G(^EC(725,+EC3,0)),U,2)_"N",1:$P($G(^EC(725,+EC3,0)),U,2)_"L")
+ ..S EC5=$P(EC1,"-",2),EC5=$S(EC5["ICPT":$E($P($G(^ICPT(+EC5,0)),U,2),1,25),EC5["EC":$E($P($G(^EC(725,+EC5,0)),U),1,25),1:"UNKNOWN")
  ..S EC5=$$LOW(EC5)
  ..I EC1["ICPT" S EC5=$$UPP(EC5),EC3="A;"_EC3
  ..S EC6=$P(EC1,"-",2),EC7="",EC8=""
  ..I EC6["EC(725," D
- ...S EC6=$S(+EC6>0:$P($G(^EC(725,+EC6,0)),U,5),1:"") S EC7=$S(+EC6>0:$P($$CPT^ICPTCOD(+EC6),U,2),1:"")
- ...S EC8=$S(+EC6>0:$E($P($$CPT^ICPTCOD(+EC6),U,3),1,25),1:"")
+ ...S EC6=$S(+EC6>0:$P($G(^EC(725,+EC6,0)),U,5),1:"") S EC7=$S(+EC6>0:$P($G(^ICPT(+EC6,0)),U),1:"")
+ ...S EC8=$S(+EC6>0:$E($P($G(^ICPT(+EC6,0)),U,2),1,25),1:"")
  ...S EC8=$$UPP(EC8),EC3="B;"_EC3
  ..S EC9=$S(EC7'="":EC3_"-"_EC7,1:EC3),EC10=$S(EC8'="":EC5_" - "_EC8,1:EC5)
  ..S ^TMP($J,"ECS",EC9,EC3)=EC10
@@ -116,6 +116,19 @@ CLI S SC=0 F  S SC=$O(^SC(SC)) Q:'SC  I $D(^(SC,0)) S EC=^(0),ECD=$P(EC,U) I $P(
  K ECLEN Q
 RAD S EC=0 F  S EC=$O(^RAMIS(71,EC)) Q:'EC  I $D(^(EC,0)) S EC1=^(0),ECD=$P(EC1,U),EC2=$P($G(^ICPT(+$P(EC1,U,9),0)),U) S:EC2="" EC2="Unknown" S ^TMP($J,"RAD",EC2,EC)=ECD
  S ^TMP($J,"RAD",88888,88888)="Portable procedure",^TMP($J,"RAD",99999,99999)="OR procedure"
+ Q
+NUR F EC=1:1:11 S EC1=$P($T(@EC),";",3) F EC2=0:1:5 S ^TMP($J,"NUR",$P(EC1,U)_"-"_EC2,EC2)=$P(EC1,U,2)_" LEVEL "_EC2
+1 ;;PSI^PSYCHIATRIC
+2 ;;SUR^SURGICAL
+3 ;;MED^MEDICAL (EXCLUDE SCI)
+4 ;;SCI^MEDICAL (SCI)
+5 ;;NUR^NURSING HOME CARE UNIT
+6 ;;REC^RECOVERY ROOM
+7 ;;ITN^INTENSIVE CARE
+8 ;;HEM^HEMODIALYSIS
+9 ;;INT^INTERMEDIATE CARE
+10 ;;DOM^DOMICILIARY
+11 ;;ALC^ALCOHOL AND DRUG TREATMENT
  Q
 NUT ;Feeder keys for Nutrition and Food Service extract
  N TYP,TIEN,DIET,IN,PRODUCT,KEY,NUMBER,IENS

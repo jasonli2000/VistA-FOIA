@@ -1,6 +1,6 @@
-IBCNSM31 ;ALB/AAS - INSURANCE MANAGEMENT - OUTPUTS ;28-MAY-93
- ;;2.0;INTEGRATED BILLING;**6,28,68,413**;21-MAR-94;Build 9
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNSM31 ;ALB/AAS - INSURANCE MANAGEMENT - OUTPUTS ; 28-MAY-93
+ ;;Version 2.0 ; INTEGRATED BILLING ;**6,28,68**; 21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 % G EN^IBCNSM
  ;
@@ -87,7 +87,8 @@ COVERED(DFN,IBCOVP) ; -- update covered by insurance in background
  ;
  I IBCOV'=IBNCOV D
  .S DIE="^DPT(",DR=".3192////"_IBNCOV,DA=DFN D ^DIE
- .I '$D(ZTQUEUED)&($G(IBSUPRES)'>0) W !!,"COVERED BY HEALTH INSURANCE changed to '"_$S(IBNCOV="Y":"YES",IBNCOV="N":"NO",1:"UNKNOWN"),"'.",! H 3
+ .I '$D(ZTQUEUED) W !!,"COVERED BY HEALTH INSURANCE changed to '"_$S(IBNCOV="Y":"YES",IBNCOV="N":"NO",1:"UNKNOWN"),"'.",!
+ .H 3
  .Q
  Q
  ;

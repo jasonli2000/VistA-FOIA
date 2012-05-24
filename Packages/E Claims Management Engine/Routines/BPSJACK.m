@@ -1,5 +1,5 @@
-BPSJACK ;BHAM ISC/LJF - HL7 Acknowledgement Messages ;3/13/08  16:08
- ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5,7**;JUN 2004;Build 46
+BPSJACK ;BHAM ISC/LJF - HL7 Acknowledgement Messages ;21-NOV-2003
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ; This routine examines an Acknowledgement Message. If the message is
@@ -30,7 +30,6 @@ EN(HL) N ACK,AREG,BPSJSEG,ERR,HCT,SEG
  . I SEG="MFI",ACK="AA",$P($G(BPSJSEG(2)),$E($G(HL("ECH"))))="Pharmacy Table" D
  . . I '$G(MSGID) Q
  . . N BPSJNPI,BPSJPIX,BPSJNDT,BPSJ,HLMAID,HLID
- . . ; back track AA/ACK to message sent out to find NPI sent out
  . . S HLMAID=$O(^HLMA("C",MSGID,"")) I '$G(HLMAID) Q
  . . S HLID=$P(^HLMA(HLMAID,0),U) I '$G(HLID) Q
  . . S BPSJNPI=$P($G(^HL(772,HLID,"IN",22,0)),"|") I '$G(BPSJNPI) Q
@@ -45,7 +44,6 @@ EN(HL) N ACK,AREG,BPSJSEG,ERR,HCT,SEG
  ;
  ; Pharmacy Registrations
  I AREG S AREG=0 D
- . S $P(^BPS(9002313.99,1,0),"^",7)=$$NOW^XLFDT
  . F  S AREG=$O(^BPS(9002313.56,AREG)) Q:'AREG  D REG^BPSJPREG(AREG)
  ;
  I $D(ERR) D ERRORM D MSG^BPSJUTL(.ERR,"BPSJACK")

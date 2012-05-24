@@ -1,12 +1,12 @@
-IBCNERP7 ;DAOU/BHS - eIV STATISTICAL REPORT ;10-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERP7 ;DAOU/BHS - IIV STATISTICAL REPORT ;10-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification Interface
+ ; IIV - Insurance Identification and Verification Interface
  ;
  ; Input parameter: N/A
  ; Other relevant variables:
- ;   IBCNERTN = "IBCNERP7" (current routine name for queueing the 
+ ;   IBCNERTN = "IBCNERP7" (current routine name for queueing the
  ;                          COMPILE process)
  ;   IBCNESPC("BEGDTM") = start date/time for date/time range
  ;   IBCNESPC("ENDDTM") = end date/time for date/time range
@@ -14,13 +14,13 @@ IBCNERP7 ;DAOU/BHS - eIV STATISTICAL REPORT ;10-JUN-2002
  ;                       1 = All (Outgoing, Incoming and General),
  ;                       2 = Outgoing - Inquiry Response data,
  ;                       3 = Incoming - Inquiry Transmission data,
- ;                       4 = General - Ins Buffer data, Outstanding 
+ ;                       4 = General - Ins Buffer data, Outstanding
  ;                           Inquiries, Communication Failures, Retries
  ;                       may equal a list of values if '1' is not the
  ;                       the only value
  ;   IBCNESPC("MM") = "", not for MailMan message OR
  ;                    MAILGROUP, generate as MailMan message for this
- ;                               MAILGROUP as defined in IB site 
+ ;                               MAILGROUP as defined in IB site
  ;                               parameters
  ;
  ; Only enter routine from EN or MAILMSG tags
@@ -28,15 +28,15 @@ IBCNERP7 ;DAOU/BHS - eIV STATISTICAL REPORT ;10-JUN-2002
  ;
  ; Entry pt
 EN ;
- ; Init vars 
+ ; Init vars
  N STOP,IBCNERTN,POP,IBCNESPC
  ;
  S STOP=0
  S IBCNERTN="IBCNERP7"
  W @IOF
- W !,"eIV Statistical Report",!
- W !,"Please select the timeframe for which to view the Insurance"
- W !,"Verification statistics and current status."
+ W !,"IIV Statistical Report",!
+ W !,"Please select the timeframe for which to view the Insurance Identification"
+ W !,"and Verification statistics and current status."
  ;
  ; Default to MailMan flag to No from the EN tag
  S IBCNESPC("MM")=""

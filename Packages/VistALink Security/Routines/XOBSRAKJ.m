@@ -1,6 +1,7 @@
 XOBSRAKJ ;kc/oak - VistALink Reauthentication Code, SSO/UC KAAJEE ; 03/02/2004  07:00
- ;;1.6;VistALink Security;;May 08, 2009;Build 15
- ;Per VHA directive 2004-038, this routine should not be modified.
+ ;;1.5;VistALink Security;;Sep 09, 2005
+ ;;Foundations Toolbox Release v1.5 [Build: 1.5.0.026]
+ ;
  QUIT
  ;
  ; ------------------------------------------------------------------------
@@ -20,7 +21,7 @@ CCOW(XOBID,XOBERR) ; -- CCOW connection type
  . SET XOBID=0
  ;
  ; TODO: need IP address, then need to do $$IPLOCKED(IP)?
- ; 
+ ;
  ; since bypassing CHKCCOW^XUSRB4, need to extract true handle, expiry here
  SET HDL=$$UP^XLFSTR($EXTRACT(HDL,3,99)),T=$PIECE($GET(^XTV(8989.3,1,30),5400),U)
  ; call Kernel to resolve CCOW handle into user ID
@@ -28,7 +29,7 @@ CCOW(XOBID,XOBERR) ; -- CCOW connection type
  IF (+XOBOUT)<1 DO  QUIT
  . SET XOBERR=182301_U_"CCOW"_U_"["_$PIECE(XOBOUT,U,2)_"]"
  . SET XOBID=0
- ; 
+ ;
  ; need to get set XOBID=DUZ, save off DUZ(2) and anything else held in the token for XOBSRA
  SET XOBID=+XOBOUT
  ;
@@ -42,7 +43,7 @@ CCOW(XOBID,XOBERR) ; -- CCOW connection type
  ;
  ; probably can run MORECHKS as is?
  ; SET XOBERR=$$MORECHKS(XOBID)
- ; 
+ ;
  IF XOBERR SET XOBID=0 QUIT
  ;
  ; TODO: POST(IP)
@@ -106,7 +107,7 @@ IPLOCKED(XOBCLIP) ; -- check if IP address is locked, increment if not
  ;
  ; Implements the script-inhibiting lock-by-IP-address Kernel function.
  ; Does not lock user out for long, but does slow down scripts.
- ; 
+ ;
  ; Return:
  ;   182306^XOBID : if too many invalid login attempts
  ;   0 : not too many login attempts

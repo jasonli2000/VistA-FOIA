@@ -1,12 +1,12 @@
-GMRVED2 ;HIOFO/RM,YH,FT-VITAL SIGNS EDIT SHORT FORM ;11/15/04  10:30
- ;;5.0;GEN. MED. REC. - VITALS;**2**;Oct 31, 2002
+GMRVED2 ;HIOFO/RM,YH,FT-VITAL SIGNS EDIT SHORT FORM ;7/20/07  13:43
+ ;;5.0;GEN. MED. REC. - VITALS;**2**;Oct 31, 2002;Build 11
  ;
  ; This routine uses the following IAs:
  ; #10035 - ^DPT( references       (supported)
  ; #10061 - ^VADPT calls           (supported)
  ; #10103 - ^XLFDT calls           (supported)
  ; #10104 - ^XLFSTR calls          (supported)
- ; 
+ ;
 EN1 ; SORT PATIENTS ON WARD
  K ^TMP($J)
 WSA1 ; SET ^TMP($J, FOR SORT
@@ -74,6 +74,8 @@ ADDNODE ; add data to the 120.5 file
  S DA=+GMVIEN(1)
  I GMREDB="P1" S GMRVIEN(GMRVITY)=DA_"^"_GMRDAT(GMRVITY)_"^"_$G(GMRSITE(GMRVITY))
  S:GMRENTY>4 GLAST=GMRVIDT,GLAST(1)=$G(GLAST(1))+1
+ ; for VOE Pediatric Growth Charts
+ I "8920"[(+GMRVIT(1)) D EN^GMRVPGC(DFN) ; 8=Height 9=Weight 20=Circumference
  Q
 XREF(DA) ; Set cross-references for FILE 120.5 entry
  ; Execute SET logic only.  Set's all cross-references for this entry.

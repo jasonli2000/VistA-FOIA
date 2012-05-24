@@ -1,6 +1,6 @@
 IBCNBLA1 ;ALB/ARH - Ins Buffer: LM action calls (cont) ;1 Jun 97
- ;;2.0;INTEGRATED BILLING;**82,133,149,184,252,271,416,438**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**82,133,149,184,252,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 ADDBUF ; add a new buffer entry protocol
  N DIC,DIR,DIRUT,DUOUT,X,Y,IBIN,DFN,IBBUFDA,IBDATA,AMLIST,IBHELP
@@ -113,9 +113,6 @@ CEPOL W @IOF
  D ^DIR K DIR I Y'="",$D(DIRUT) G CMPQ
  I Y'="","EEee"[Y D POLHELP^IBCNBEE,POLICY^IBCNBEE(IBBUFDA) G CEPOL
  ;
-CELIG W @IOF
- W ! D ELIG^IBCNBCD(IBBUFDA,IBPOLDA)
- ;
 CMPQ D CLEAN^VALM10,INIT^IBCNBLP,HDR^IBCNBLP S VALMBCK="R" D UPDLN^IBCNBLL(IBBUFDA,"EDITED")
  Q
  ;
@@ -192,7 +189,7 @@ RESP(BUFF) ; List Response Report for Trace # associated with this entry
  I $G(BUFF)="" S NG=1
  I 'NG S IBRSP=$O(^IBCN(365,"AF",BUFF,"")) I IBRSP="" S NG=1
  I 'NG S IBSTR=$G(^IBCN(365,IBRSP,0)),IBTRC=$P(IBSTR,U,9) I IBTRC="" S NG=1
- I NG W !!,"This entry does not have an associated eIV response." D PAUSE^VALM1 G RESPX
+ I NG W !!,"This entry does not have an associated IIV response." D PAUSE^VALM1 G RESPX
  S STOP=0,IBCNERTN="IBCNERP1",IBCNESPC("TRCN")=IBTRC_U_IBRSP
  D R100^IBCNERP1
 RESPX S VALMBCK="R"
@@ -202,20 +199,3 @@ INPTTR(FILE,FLD,X) ; Does value X pass input transform for file, field?
  S XCUTE=$$GET1^DID(FILE,FLD,,"INPUT TRANSFORM")
  X XCUTE
  Q $D(X)
- ;
-ICB(IBBUFDA) ;called by ICB to update eIV status flag (symbol) in the insurance buffer entry
- ;
- N SYM,ERR
- S SYM=$$GET1^DIQ(355.33,IBBUFDA,.12,"I") Q:'SYM
- I $$SYMBOL^IBCNBLL(IBBUFDA)="*" Q  ;don't update if manually verified
- ; Determine if Expand Entry is allowed to update the eIV Status
- I '$P($G(^IBE(365.15,SYM,0)),U,3) Q
- ; If the current IIV Status allows updates by Expand Entry, then
- ; invoke the function that tries to find a valid payer
- S ERR=$$INSERROR^IBCNEUT3("B",IBBUFDA,1)
- ; If no errors, then remove the eIV Status
- I 'ERR S ERR=$$SIDERR^IBCNBLE1(IBBUFDA,$P(ERR,U,2))
- I 'ERR D CLEAR^IBCNEUT4(IBBUFDA)
- ; If errors found, then update with the new IIV Status
- I ERR D BUFF^IBCNEUT2(IBBUFDA,$P(ERR,U,1))
- Q

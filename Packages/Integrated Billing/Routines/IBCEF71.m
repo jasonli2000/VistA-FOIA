@@ -1,5 +1,5 @@
 IBCEF71 ;WOIFO/SS - FORMATTER AND EXTRACTOR SPECIFIC BILL FUNCTIONS ;31-JUL-03
- ;;2.0;INTEGRATED BILLING;**232,155,288,320,349,432**;21-MAR-94;Build 192
+ ;;2.0;INTEGRATED BILLING;**232,155,288,320,349**;21-MAR-94;Build 46
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ;---------
@@ -16,10 +16,9 @@ OTHPAYC(IBXIEN,IBSAVE,IBDATA,IBFUNC,IBVAL) ;
  N IB1,IB2,IBINS,IBFL
  S IBFL=$S(IBFUNC=3!(IBFUNC=4):1,1:0)
  F IB1=1,2 D
- . I $$ISINSUR($G(IBSAVE("PROVINF",IBXIEN,"O",IB1)),IBXIEN) D  Q  ;don't create anything if no such insurance
- .. ;*432/TAZ Attending/Rendering is no longer either/or so there can be both
- .. ;I IBFL S IBFUNC=$S($O(IBSAVE("PROVINF",IBXIEN,"O",IB1,3,0)):3,1:4)
- .. S:$O(IBSAVE("PROVINF",IBXIEN,"O",IB1,IBFUNC,0)) IBDATA(IB1)=IBVAL
+ . Q:'$$ISINSUR($G(IBSAVE("PROVINF",IBXIEN,"O",IB1)),IBXIEN)  ;don't create anything if no such insurance
+ . I IBFL S IBFUNC=$S($O(IBSAVE("PROVINF",IBXIEN,"O",IB1,3,0)):3,1:4)
+ . S:$O(IBSAVE("PROVINF",IBXIEN,"O",IB1,IBFUNC,0)) IBDATA(IB1)=IBVAL
  Q
  ;----
  ;OTHPAYV - called from FORMAT code for OP1,OP2 ...
@@ -38,10 +37,9 @@ OTHPAYV(IBXIEN,IBSAVE,IBDATA,IBFUNC,IBFLDTYP,IBSEQN) ;
  S IBFL=$S(IBFUNC=3!(IBFUNC=4):1,1:0)
  S IBPIECE=$S(IBFLDTYP="I":4,IBFLDTYP="Q":3,1:3)
  F IB1=1,2 D
- . I $$ISINSUR($G(IBSAVE("PROVINF",IBXIEN,"O",IB1)),IBXIEN) D  Q  ;don't create anything if there is no such insurance
- .. ;*432/TAZ Attending/Rendering is no longer either/or so there can be both
- .. ;I IBFL S IBFUNC=$S($O(IBSAVE("PROVINF",IBXIEN,"O",IB1,3,0)):3,1:4),IBFL=0
- .. S IBDATA(IB1)=$P($G(IBSAVE("PROVINF",IBXIEN,"O",IB1,IBFUNC,IBSEQN)),U,IBPIECE)
+ . Q:'$$ISINSUR($G(IBSAVE("PROVINF",IBXIEN,"O",IB1)),IBXIEN)  ;don't create anything if there is no such insurance
+ . I IBFL S IBFUNC=$S($O(IBSAVE("PROVINF",IBXIEN,"O",IB1,3,0)):3,1:4),IBFL=0
+ . S IBDATA(IB1)=$P($G(IBSAVE("PROVINF",IBXIEN,"O",IB1,IBFUNC,IBSEQN)),"^",IBPIECE)
  Q
  ;
  ;chk for ins
@@ -58,9 +56,9 @@ ISINSUR(IBINS,IBXIEN) ;
  ;
  ;---PRACT----
  ;Get list of all 355.9 or 355.93 records for prov
- ;Input: 
+ ;Input:
  ;IB399INS - ins co for bill to match PRACTIONER from 355.9
- ;IB399FRM - form type (0=unknwn/both,1=UB,2=1500) to 
+ ;IB399FRM - form type (0=unknwn/both,1=UB,2=1500) to
  ;   match PRACTIONER from 355.9
  ;IB399CAR - BILL CARE (0=unknwn or both inp/outp,1=inpatient,
  ;   2=outpatient/3=Rx) to match PROV from 355.9
@@ -163,7 +161,7 @@ OTHID(IBXSAVE,IBXDATA,IBXIEN,PRIDSEQ,PRTYP,IBQ,IBFAC) ; From data in IBXSAVE,
  ; PRTYP = provider type to check for data
  ; IBQ = 1 if qualifier needed, 0/null if id needed
  ; IBFAC = 1 if facility id, 0 for individual provider id
- ; 
+ ;
  N Z,Z0,Z1
  S Z0="PROVINF"_$S('$G(IBFAC):"",1:"_FAC"),Z1=$S($G(IBQ):3,1:4)
  S Z=0 F  S Z=$O(IBXSAVE("OSQ",Z)) Q:'Z  D

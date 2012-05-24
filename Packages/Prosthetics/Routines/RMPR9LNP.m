@@ -1,10 +1,9 @@
 RMPR9LNP ;Hines OIFO/HNC - REMOTE PROCEDURE, LIST NPPD DATA ;9/8/03  07:23
- ;;3.0;PROSTHETICS;**71,77,90,75,60,143,150**;Feb 09, 1996;Build 10
+ ;;3.0;PROSTHETICS;**71,77,90,75,60**;Feb 09, 1996;Build 18
  ;
  ;    HNC - Sept 2, 2003 - patch 77 remove the " for Excel CSV
  ;    HNC - Feb 14, 2005 - patch 90 add flex field to GUI display
  ;    HNC - Nov 15, 2005 - patch 75 add 2 additional flex field to gui
- ;    RRA - March 20, 2008 - patch 143 added " back for excel CSV
  ;
  ;RESULTS passed to broker in ^TMP($J,
  ;delimited by "^"
@@ -45,8 +44,8 @@ EN(RESULT,DATE1,DATE2,FLEXF,FLEX2,FLEX3) ;broker entry point
  ..Q:PHCPCS'>0
  ..S HDES=$P(^RMPR(661.1,PHCPCS,0),U,2)
  ..S TYPE=$P($G(^RMPR(660,RMPRB,0)),U,4)
- ..I "X5"'[TYPE S LINE=$P(^RMPR(661.1,PHCPCS,0),U,7)
- ..I "X5"[TYPE S LINE=$P(^RMPR(661.1,PHCPCS,0),U,6)
+ ..I TYPE'="X" S LINE=$P(^RMPR(661.1,PHCPCS,0),U,7)
+ ..I TYPE="X" S LINE=$P(^RMPR(661.1,PHCPCS,0),U,6)
  ..S CAL=$P(^RMPR(661.1,PHCPCS,0),U,8)
  ..I CAL'="" S CAL="*"
  ..S DFN=$P(^RMPR(660,RMPRB,0),U,2)
@@ -73,7 +72,8 @@ DATA ;
  S $P(^TMP($J,B),U,5)=$G(RMXM(660,B_",",7))
  S $P(^TMP($J,B),U,6)=$G(RMXM(660,B_",",8.3))
  S $P(^TMP($J,B),U,7)=$G(RMXM(660,B_",",14))
- S $P(^TMP($J,B),U,8)=$G(RMXM(660,B_",",24))
+ ;patch 77 remove the " for Excel CSV
+ S $P(^TMP($J,B),U,8)=$TR($G(RMXM(660,B_",",24)),"""","'")
  S $P(^TMP($J,B),U,9)=$G(RMXM(660,B_",",27))
  S $P(^TMP($J,B),U,10)=LINE
  S $P(^TMP($J,B),U,11)=$G(RMXM(660,B_",",8))

@@ -1,4 +1,4 @@
-PRCST7 ; GENERATED FROM 'PRCSMDS' PRINT TEMPLATE (#313) ; 10/27/00 ; (FILE 410, MARGIN=80)
+PRCST7 ; GENERATED FROM 'PRCSMDS' PRINT TEMPLATE (#313) ; 09/19/10 ; (FILE 410, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -21,8 +21,9 @@ A1 ;
  S X=$G(^PRCS(410,D0,"IT",D1,0)) D N:$X>29 Q:'DN  W ?29,$E($P(X,U,5),1,30)
  W ?61 S Y=$P(X,U,2) W:Y]"" $J(Y,10,2)
  S DICMX="D ^DIWP" D N:$X>2 Q:'DN  S DIWL=3,DIWR=78 X DXS(1,9.2):D1>0 S X="",DIP(1)=X S X=1,DIP(2)=X S X=10,X=$E(DIP(1),DIP(2),X) K DIP K:DN Y
- D 0^DIWW K DIP K:DN Y
- S I(2)=2,J(2)=410.212 F D2=0:0 Q:$O(^PRCS(410,D0,"IT",D1,2,D2))'>0  X:$D(DSC(410.212)) DSC(410.212) S D2=$O(^(D2)) Q:D2'>0  D:$X>2 NX^DIWW D A2
+ D 0^DIWW
+ D ^DIWW
+ S I(2)=2,J(2)=410.212 F D2=0:0 Q:$O(^PRCS(410,D0,"IT",D1,2,D2))'>0  X:$D(DSC(410.212)) DSC(410.212) S D2=$O(^(D2)) Q:D2'>0  D:$X>80 NX^DIWW D A2
  G A2R
 A2 ;
  S X=$G(^PRCS(410,D0,"IT",D1,2,D2,0)) D N:$X>5 Q:'DN  W ?5 S Y=$P(X,U,1) W:Y]"" $J(Y,3,0)
@@ -40,12 +41,12 @@ A3R ;
  K J(100),I(100) S:$D(I(0,0)) D0=I(0,0) S:$D(I(1,0)) D1=I(1,0) S:$D(I(2,0)) D2=I(2,0)
  Q
 A2R ;
- D ^DIWW
  Q
 A1R ;
  K Y K DIWF
  Q
 HEAD ;
  W !,?0,"TRANS#",?19,"ITEM#",?29,"PR#",?63,"ITEM QTY"
+ W !,?2,"$E(DESCRIPTION,1,10)"
  W !,?5,"SCH#",?13,"QTY",?18,"DATE DEL",?31,"QTY",?36,"DATE REC",?47,"SCP",?58,"LOCATION"
  W !,"--------------------------------------------------------------------------------",!!

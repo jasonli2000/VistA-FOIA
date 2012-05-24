@@ -1,7 +1,7 @@
-ONCPHC ;Hines OIFO/GWB - OTHER CANCER (165.5,148) ;05/31/02
- ;;2.11;ONCOLOGY;**33,36,50**;Mar 07, 1995;Build 29
+ONCPHC ;Hines OIFO/GWB - PREVIOUS HISTORY OF CANCER ;05/31/02
+ ;;2.11;ONCOLOGY;**33,36**;Mar 07, 1995
  ;
-PHCDEF ;OTHER CANCER (165.5,148) defaults
+PHCDEF ;PREVIOUS HISTORY OF CANCER defaults
  S SEQNO=+$P(^ONCO(165.5,D0,0),U,6)
  S PHCDEF="No"
  S PHCDEF(1)="NOT APPLICABLE"
@@ -23,21 +23,20 @@ PHCDEF ;OTHER CANCER (165.5,148) defaults
  S:PHCDEF(4)'="" DIE("PTRIX",165.5,148.4,164.2)="B"
  K SEQNO,PRIM,PRIMCNT,PHSEQNO,PHC Q
  ;
-PHCDSP ;OTHER CANCER (165.5,148) display
- N HDL
+PHCDSP ;PREVIOUS HISTORY OF CANCER display
  S HDL=$L("Patient Identification"),TAB=(80-HDL)\2,TAB=TAB-1
  W @IOF,DASHES
  W !,?1,PATNAM,?TAB,"Patient Identification",?SITTAB,SITEGP
  W !,?1,SSN,?TOPTAB,TOPNAM," ",TOPCOD
  W !,DASHES
- W !," OTHER CANCER"
- W !," ------------"
+ W !," PREVIOUS HISTORY OF CANCER"
+ W !," --------------------------"
  N DI,DIC,DR,DA,DIQ,ONC
  S DIC="^ONCO(165.5,"
  S DR="148:148.4"
  S DA=D0,DIQ="ONC" D EN^DIQ1
  S X=ONC(165.5,D0,148) D UCASE S ONC(165.5,D0,148)=X
- W !," Other Cancer...................: ",ONC(165.5,D0,148)
+ W !," Previous History of Cancer.....: ",ONC(165.5,D0,148)
  W !," Cancer #1......................: ",ONC(165.5,D0,148.1)
  W !," Cancer #2......................: ",ONC(165.5,D0,148.2)
  W !," Cancer #3......................: ",ONC(165.5,D0,148.3)

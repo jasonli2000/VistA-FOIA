@@ -1,5 +1,5 @@
 BPSRPT4 ;BHAM ISC/BEE - ECME REPORTS (CONT) ;14-FEB-05
- ;;1.0;E CLAIMS MGMT ENGINE;**1,5,7,8,10**;JUN 2004;Build 27
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q
@@ -9,7 +9,7 @@ BPSRPT4 ;BHAM ISC/BEE - ECME REPORTS (CONT) ;14-FEB-05
  ;    Input Variable -> DFLT = 3 NOT RELEASED
  ;                             2 RELEASED
  ;                             1 ALL
- ;                          
+ ;
  ;    Return Value ->   3 = NOT RELEASED
  ;                      2 = RELEASED
  ;                      1 = ALL
@@ -32,7 +32,7 @@ SELRLNRL(DFLT) N DIR,DIRUT,DTOUT,DUOUT,X,Y
  ;
  ; Input Variable -> DFLT = 1 Specific Reject Code
  ;                          0 All Reject Codes
- ;                          
+ ;
  ; Return Value ->   ptr = pointer to BPS NCPDP REJECT CODES (#9002313.93)
  ;                     0 = All Reject Codes
  ;                     ^ = Exit
@@ -65,10 +65,10 @@ SELREJCD(DFLT) N DIC,DIR,DIRUT,DUOUT,REJ,X,Y
  Q REJ
  ;
  ; Include Auto(R)eversed or (A)LL
- ; 
+ ;
  ;    Input Variable -> DFLT = 1 AutoReversed
  ;                             0 ALL
- ;                          
+ ;
  ;    Return Value ->   1 = AutoReversed
  ;                      0 = ALL
  ;                      ^ = Exit
@@ -88,11 +88,11 @@ SELAUREV(DFLT) N DIR,DIRUT,DTOUT,DUOUT,X,Y
  Q Y
  ;
  ; Include A(C)cepted or (R)ejected or (A)LL
- ; 
+ ;
  ;    Input Variable -> DFLT = 2 Accepted
  ;                             1 Rejected
  ;                             0 ALL
- ;                          
+ ;
  ;    Return Value ->   2 = Accepted
  ;                      1 = Rejected
  ;                      0 = ALL
@@ -116,7 +116,7 @@ SELACREJ(DFLT) N DIR,DIRUT,DTOUT,DUOUT,X,Y
  ;
  ; Input Variable -> DFLT = 1 Specific CLAIMS TRACKING NON-BILLABLE REASONS
  ;                          0 All Reasons
- ;                          
+ ;
  ; Return Value ->   ptr = pointer to CLAIMS TRACKING NON-BILLABLE REASONS (#356.8)
  ;                     0 = All Reasons
  ;                     ^ = Exit
@@ -150,12 +150,12 @@ SELCCRSN(DFLT) N DIC,DIR,DIRUT,DUOUT,RSN,X,Y
  ;
  ;Pull Selected BPS Pharmacies for Display
  ;
- ;  Input Variables: 
+ ;  Input Variables:
  ;  BPPHARM/BPPHARM(ptr) - Set to 0 for all pharmacies, if set to 1 array of internal
- ;                         pointers of selected pharmacies       
+ ;                         pointers of selected pharmacies
  ;                       - BPLEN = The length of the display field
- ;  Returned value -> List of selected BPS Pharmacies (possibly cut short)                 
- ; 
+ ;  Returned value -> List of selected BPS Pharmacies (possibly cut short)
+ ;
 GETDIVS(BPLEN,BPPHARM) N BPDIV,BPSTR,BPQUIT
  I $G(BPPHARM)=0 S BPSTR="ALL"
  E  D
@@ -171,7 +171,7 @@ GETDIVS(BPLEN,BPPHARM) N BPDIV,BPSTR,BPQUIT
  ; Input variable -> 0 for All Reject Codes or
  ;                   lookup to BPS NCPDP REJECT CODES (#9002313.93)
  ; Returned value -> ALL or the selected Reject Code
- ; 
+ ;
 GETREJ(REJ) ;
  I REJ="0" S REJ="ALL"
  E  S REJ=$P($G(^BPSF(9002313.93,+REJ,0)),U,2)
@@ -182,8 +182,8 @@ GETREJ(REJ) ;
  ; Input variable: BPRTYPE -> Report Type (1-7)
  ;
 HEADLN1(BPRTYPE) ;
- I (",1,2,3,4,5,7,8,")[BPRTYPE W !,"PATIENT NAME",?27,"Pt.ID",?35,"RX#",?47,"REF/ECME#"
- I (BPRTYPE=1)!(BPRTYPE=4)!(BPRTYPE=8) D  Q
+ I (",1,2,3,4,5,7,")[BPRTYPE W !,"PATIENT NAME",?27,"Pt.ID",?35,"RX#",?47,"REF/ECME#"
+ I (BPRTYPE=1)!(BPRTYPE=4) D  Q
  . W ?68,"DATE"
  . W ?78,$J("$BILLED",10)
  . W ?97,$J("$INS RESPONSE",13)
@@ -193,9 +193,6 @@ HEADLN1(BPRTYPE) ;
  . W ?68,"DATE"
  . W ?78,"RELEASED ON"
  . W ?91,"RX INFO"
- . W ?109,"RX COB"
- . W ?116,"OPEN/CLOSED"
- . W ?128,"ELIG"
  ;
  I BPRTYPE=3 D  Q
  . W ?68,"DATE"
@@ -203,10 +200,9 @@ HEADLN1(BPRTYPE) ;
  . W ?119,$J("$INS RESPONSE",13)
  ;
  I BPRTYPE=5 D  Q
- . W ?65,"COMPLETED"
- . W ?83,"TRANS TYPE"
- . W ?100,"PAYER RESPONSE"
- . W ?125,"RX COB"
+ . W ?60,"COMPLETED"
+ . W ?78,"TRANS TYPE"
+ . W ?95,"PAYER RESPONSE"
  ;
  I BPRTYPE=6 D  Q
  . W !,?33,$J("AMOUNT",17)
@@ -223,15 +219,14 @@ HEADLN1(BPRTYPE) ;
  ;Print Header 2 Line 2
  ;
  ; Input variable: BPRTYPE -> Report Type (1-7)
- ; 
+ ;
 HEADLN2(BPRTYPE) ;
  I (BPRTYPE=1)!(BPRTYPE=4) D  Q
  . W !,?4,"DRUG"
  . W ?36,"NDC"
  . I BPRTYPE=1 W ?47,"RELEASED ON"
  . W ?68,"RX INFO"
- . I BPRTYPE=4 W ?92,"RX COB"
- . I BPRTYPE=1 W ?115,$J("BILL# RX COB",17)
+ . I BPRTYPE=1 W ?122,$J("BILL#",10)
  ;
  I BPRTYPE=2 D  Q
  . W !,?3,"CARDHOLD.ID"
@@ -245,7 +240,6 @@ HEADLN2(BPRTYPE) ;
  . W !,?4,"DRUG"
  . W ?43,"NDC"
  . W ?68,"RX INFO"
- . W ?88,"RX COB"
  ;
  I BPRTYPE=5 D  Q
  . W !,?4,"DRUG"
@@ -269,33 +263,16 @@ HEADLN2(BPRTYPE) ;
  . W ?41,"CLOSE DATE/TIME"
  . W ?59,"CLOSED BY"
  . W ?87,"CLOSE REASON"
- . W ?121,"RX COB"
- ;
- I BPRTYPE=8 D  Q
- . W !,?2,"DRUG"
- . W ?38,"RX INFO"
- . W ?54,"INS GROUP#"
- . W ?79,"INS GROUP NAME"
- . W ?121,"BILL#"
  Q
  ;
  ;Print Header 2 Line 3
  ;
  ; Input variable: BPRTYPE -> Report Type (1-7)
- ; 
+ ;
 HEADLN3(BPTYP) ;
- I BPTYP=4 D  Q
+ D:BPTYP=4
  . W !,?6,"RELEASED ON"
  . W ?22,"REVERSAL METHOD/RETURN STATUS/REASON"
- ;
- I BPTYP=8 D  Q
- . W !,?4,"$PROVIDER NETWORK"
- . W ?23,"$BRAND DRUG"
- . W ?38,"$NON-PREF FORM"
- . W ?56,"$BRAND NON-PREF FORM"
- . W ?81,"$COVERAGE GAP"
- . W ?96,"$HEALTH ASST"
- . W ?111,"$SPEND ACCT REMAINING"
  Q
  ;
 SELEXCEL() ; - Returns whether to capture data for Excel report.
@@ -323,7 +300,7 @@ HEXC ; - 'Do you want to capture data...' prompt
  Q
  ;
  ;Display the message about capturing to an Excel file format
- ; 
+ ;
 EXMSG ;
  W !!?5,"Before continuing, please set up your terminal to capture the"
  W !?5,"detail report data. On some terminals, this can  be  done  by"

@@ -1,5 +1,5 @@
 SDM1 ;SF/GFT - MAKE APPOINTMENT ; 3/29/05 12:35pm [5/5/05 9:41am]  ; Compiled March 8, 2007 14:55:24  ; Compiled May 9, 2007 13:19:18  ; Compiled August 28, 2007 12:19:08
- ;;5.3;Scheduling;**32,167,168,80,223,263,273,408,327,478,490,446,547**;Aug 13, 1993;Build 17
+ ;;5.3;Scheduling;**32,167,168,80,223,263,273,408,327,478,490,446**;Aug 13, 1993;Build 77
 1 L  Q:$D(SDXXX)  S CCXN=0 K MXOK,COV,SDPROT Q:DFN<0  S SC=+SC
  S X1=DT,SDEDT=365 S:$D(^SC(SC,"SDP")) SDEDT=$P(^SC(SC,"SDP"),"^",2)
  S X2=SDEDT D C^%DTC S SDEDT=X D WRT
@@ -29,13 +29,13 @@ ADT S:'$D(SDW) SDW=""
  ..Q
  .Q
  ;
- S X=$S(SDONCE<2:$G(SDSDATE),1:"")  ;Use default date/time if specified as 'desired date'  
+ S X=$S(SDONCE<2:$G(SDSDATE),1:"")  ;Use default date/time if specified as 'desired date'
  I 'X R !,"DATE/TIME: ",X:DTIME Q:X="^"!'$$WLCL120A^SDM2A(X,SDDATE1,SC)  ;sd/327,446
  I X="" D WL(SC) Q  ;sd/446
  G:X="M"!(X="m") MORDIS^SDM0
  I X="D"!(X="d") S X=$$REDDT() G:X>0 MORD2^SDM0 S X="" W "  ??",! G ADT
  I X?1"?".E D  G ADT
- .W !,"Enter a date/time for the appointment - PAST dates must include the YEAR"  ;SD*547 added note about past dates
+ .W !,"Enter a date/time for the appointment"
  .W:$D(SD) " or a space to choose the same date/time as the patient you have just previously scheduled into this clinic"
  .W ".",!,"You may also select 'M' to display the next month's availability or"
  .W !,"'D' to specify an earlier or later date to begin the availability display."
@@ -57,22 +57,14 @@ EN1 S (TMPD,X,SD)=Y,SM=0 D DOW  ;SD/478
 PRECAN I $D(^DPT(DFN,"S",SD,0)),$P(^(0),U,2)["P" S %=1 W !,"THIS TIME WAS PREVIOUSLY CANCELLED BY THE PATIENT",!,"ARE YOU SURE THAT YOU WANT TO PROCEED" D YN^DICN W:'% !,"ANSWER WITH (Y)ES OR (N)O" I (%-1) K SDSDATE G ADT
  W !
  ;SD*5.3*490 - AVCHK/AVCHK1 to check against pat DOB and clinic avail dt
-S S POP=0 D AVCHK G:POP 1
- S POP=0 D AVCHK1 G:POP 1
- ;SD*5.3*547 if selected date is prior to the date the day of the week was added to clinic, do not set the date into availability pattern
- I '$D(^SC(SC,"ST",$P(SD,"."),1)) D
- .S XDT=X,POP=0
- .D DOWCHK^SDM0
- .K XDT
- .K:POP SDSDATE
- G:POP 1
- K POP
+S N POP S POP=0 D AVCHK G:POP 1
+ N POP S POP=0 D AVCHK1 G:POP 1
  I '$D(^SC(SC,"ST",$P(SD,"."),1)) S SS=+$O(^SC(+SC,"T"_Y,SD)) G XW:SS'>0,XW:^(SS,1)="" S ^SC(+SC,"ST",$P(SD,"."),1)=$E($P($T(DAY),U,Y+2),1,2)_" "_$E(SD,6,7)_$J("",SI+SI-6)_^(1),^(0)=$P(SD,".")
  ;
 LEN I $P(SL,U,2)]"" W !,"LENGTH OF APPOINTMENT (IN MINUTES): ",+SL,"// " R S:DTIME I S]"" G:$L(S)>3 LEN Q:U[S  S POP=0 D L G LEN:POP,S:S\5*5'=S,S:S>360,S:S<5 S SL=S_U_$P(SL,U,2,99)
  ;
 SC S SDLOCK=$S('$D(SDLOCK):1,1:SDLOCK+1) G:SDLOCK>9 LOCK
- L +^SC(SC,"ST",$P(SD,"."),1):$S($G(DILOCKTM)>0:DILOCKTM,1:5) G:'$T SC  ;SD*53.*547 new required lock functionality
+ L ^SC(SC,"ST",$P(SD,"."),1):5 G:'$T SC
  S SDLOCK=0,S=^SC(SC,"ST",$P(SD,"."),1)
  S I=SD#1-SB*100,ST=I#1*SI\.6+($P(I,".")*SI),SS=SL*HSI/60*SDDIF+ST+ST
  G X:(I<1!'$F(S,"["))&(S'["CAN")

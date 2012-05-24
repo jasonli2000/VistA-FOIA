@@ -1,31 +1,25 @@
 PRCPLO4 ;WOIFO/DAP- Option to allow users to set CLRS parameters ; 10/19/06 8:44am
- ;;5.1;IFCAP;**83,98,130**;Oct 20, 2000;Build 25
+V ;;5.1;IFCAP;**83,98**;Oct 20, 2000;Build 37
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
-ENT ;This allows users to enter new values for the parameters associated 
- ;with the Clinical Logistics Report Server by prompting them for 
- ;a new value for each parameter after presenting the current value.  
- ;Values are screened for validity and errors in setting the parameters 
- ;are returned to the screen. IA #2263 can be referenced for further 
+ENT ;This allows users to enter new values for the parameters associated
+ ;with the Clinical Logistics Report Server by prompting them for
+ ;a new value for each parameter after presenting the current value.
+ ;Values are screened for validity and errors in setting the parameters
+ ;are returned to the screen. IA #2263 can be referenced for further
  ;information on the ^XPAR calls utilized here.
- ;  
+ ;
  N PRCP1,PRCP2,PRCP3,PRCP4,PRCP5,PRCP6,PRCPW,PRCPU,PRCPV,PRCPX,PRCPY,PRCPZ,ERR
  D PRR I ERR Q
  D PGR I ERR Q
  D PIR I ERR Q
  D PED I ERR Q
  ;
- ;*98 Added logic for modification of PRC CLRS ADDRESS and 
+ ;*98 Added logic for modification of PRC CLRS ADDRESS and
  ;PRC CLRS OUTLOOK MAILGROUP parameters
  ;
  D PAD I ERR Q
  D POG I ERR Q
- ; PRC*5.1*130 begin
- ; Added user name, password, and Regional Acquisition Center
- D USN I ERR Q
- D PSW I ERR Q
- D RAC I ERR Q
- ; PRC*5.1*130 end
  Q
  ;
 PRR ;Provide current value of and then prompt to modify the PRCPLO REPORT RANGE parameter
@@ -140,63 +134,3 @@ POG ;Provide current value of and then prompt to modify the PRC CLRS OUTLOOK MAI
  I PRCPU'=0 W ! D EN^DDIOL("Error while trying to edit the CLRS Outlook Mail Group:") W ! D EN^DDIOL($P(PRCPU,"^",2))
  ;
  Q
- ; PRC*5.1*130 begin
-USN ;Enter User Name for CLRS Report Server Login
- ;
- N DIR,DIROUT,DIRUT,DUOUT,DTOUT,X,Y
- S ERR=0
- S DIR(0)="FOA^1:30",DIR("A")="User Name for CLRS Report Server Login: "
- S PRCP6=$$GET^XPAR("SYS","PRCPLO USER NAME",1,"Q")
- S PRCP6=$$DECRYP^XUSRB1(PRCP6)    ; Decrypted value
- I PRCP6'="" S DIR("B")=PRCP6
- S DIR("?")="Please enter free text character string between 1 and 30 characters"
- D ^DIR I $D(DUOUT)!$D(DTOUT) S ERR=1 Q
- I PRCP6=X Q
- S (PRCP6,PRCP5)=X
- K DIR,DIROUT,DIRUT,DUOUT,DTOUT,X,Y
- I PRCP6'="@" S PRCP6=$$ENCRYP^XUSRB1(PRCP6)
- D EN^XPAR("SYS","PRCPLO USER NAME",1,PRCP6,.PRCPU)
- I PRCP6="@" D EN^DDIOL("  <PRCPLO USER NAME deleted>") Q
- I PRCPU=0 W ! D EN^DDIOL("PRCPLO USER NAME successfully set to "_PRCP5)
- I PRCPU'=0 W ! D EN^DDIOL("Error while trying to edit the PRCPLO USER NAME:") W ! D EN^DDIOL($P(PRCPU,"^",2))
- ;
- Q
-PSW ; Enter Password for CLRS Report Server Login
- ;
- N DIR,DIROUT,DIRUT,DUOUT,DTOUT,X,Y
- S ERR=0
- S DIR(0)="FOA^1:30",DIR("A")="Password for CLRS Report Server Login: "
- S PRCP6=$$GET^XPAR("SYS","PRCPLO PASSWORD",1,"Q")
- S PRCP6=$$DECRYP^XUSRB1(PRCP6)    ; Decrypted value
- I PRCP6'="" S DIR("B")=PRCP6
- S DIR("?")="Please enter free text character string between 1 and 30 characters"
- D ^DIR I $D(DUOUT)!$D(DTOUT) S ERR=1 Q
- I PRCP6=X Q
- S (PRCP6,PRCP5)=X
- K DIR,DIROUT,DIRUT,DUOUT,DTOUT,X,Y
- I PRCP6'="@" S PRCP6=$$ENCRYP^XUSRB1(PRCP6)
- D EN^XPAR("SYS","PRCPLO PASSWORD",1,PRCP6,.PRCPU)
- I PRCP6="@" D EN^DDIOL("  <PRCPLO PASSWORD deleted>") Q
- I PRCPU=0 W ! D EN^DDIOL("PRCPLO PASSWORD successfully set to "_PRCP5)
- I PRCPU'=0 W ! D EN^DDIOL("Error while trying to edit the PRCPLO PASSWORD:") W ! D EN^DDIOL($P(PRCPU,"^",2))
- ;
- Q
-RAC ; Enter CLRS Regional Acquisition Center
- ;
- N DIR,DIROUT,DIRUT,DUOUT,DTOUT,X,Y
- S ERR=0
- S DIR(0)="FOA^1:30",DIR("A")="CLRS Regional Acquisition Center: "
- S PRCP6=$$GET^XPAR("SYS","PRCPLO REGIONAL ACQ CENTER",1,"Q")
- I PRCP6'="" S DIR("B")=PRCP6
- S DIR("?")="Please enter free text character string between 1 and 30 characters"
- D ^DIR I $D(DUOUT)!$D(DTOUT) S ERR=1 Q
- I PRCP6=X Q
- S PRCP6=X
- K DIR,DIROUT,DIRUT,DUOUT,DTOUT,X,Y
- D EN^XPAR("SYS","PRCPLO REGIONAL ACQ CENTER",1,PRCP6,.PRCPU)
- I PRCP6="@" D EN^DDIOL("  <PRCPLO REGIONAL ACQ CENTER deleted>") Q
- I PRCPU=0 W ! D EN^DDIOL("PRCPLO REGIONAL ACQ CENTER successfully set to "_PRCP6)
- I PRCPU'=0 W ! D EN^DDIOL("Error while trying to edit the PRCPLO REGIONAL ACQ CENTER:") W ! D EN^DDIOL($P(PRCPU,"^",2))
- ;
- Q
- ; PRC*5.1*130 end

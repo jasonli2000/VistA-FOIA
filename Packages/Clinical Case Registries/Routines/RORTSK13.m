@@ -1,13 +1,11 @@
-RORTSK13 ;HIOFO/SG,VAC - PARSER FOR REPORT PARAMETERS ;4/7/09 2:05pm
- ;;1.5;CLINICAL CASE REGISTRIES;**1,8**;Feb 17, 2006;Build 8
- ;
- ; Modified March 2009 to support ICD9FILT parameter passed in
+RORTSK13 ;HCIOFO/SG - PARSER FOR REPORT PARAMETERS ; 6/23/06 1:45pm
+ ;;1.5;CLINICAL CASE REGISTRIES;**1**;Feb 17, 2006;Build 24
  ;
  ; This routine uses the following IAs:
  ;
  ; #1995         $$CODEN^ICPTCOD (supported)
  ; #3990         $$CODEN^ICDCODE (supported)
- ; #4149         EN^MXMLPRSE (supported)
+ ; #4543         IEN^PSN50P65 (supported)
  ;
  ; RORXML -------------- DESCRIPTOR FOR THE XML PARSING
  ;
@@ -43,7 +41,6 @@ ELEND(ELMT) ;
  K:RORXML("PATH")="PARAMS,DRUGS,GROUP" RORXML("RXGRP")
  ;--- Reset the ICD-9 group name in the end of the group
  K:RORXML("PATH")="PARAMS,ICD9LST,GROUP" RORXML("ICD9GRP")
- K:RORXML("PATH")="PARAMS,ICD9FILT,GROUP" RORXML("ICD9GRP")
  ;--- Update the current element path
  S RORXML("PATH")=$P(RORXML("PATH"),",",1,$L(RORXML("PATH"),",")-1)
  Q
@@ -75,19 +72,13 @@ ELSTART(ELMT,ATTR) ;
  ;=== Store 2-level lists
  I LVL=4  D  Q
  . S LIST=$P(RORXML("PATH"),",",LVL-2,LVL-1)
- . ;--- ICD-9 diagnosis or procedure codes
+ . ;--- ICD-9 codes
  . I LIST="ICD9LST,GROUP"  D  Q
  . . S GROUP=$G(RORXML("ICD9GRP"))  Q:GROUP=""
  . . S ID=$G(ATTR("ID"))            Q:ID=""
  . . S TMP=$S($G(RORTSK("PARAMS","ICD9LST","A","PROCMODE")):80.1,1:80)
  . . S IEN=+$$CODEN^ICDCODE(ID,TMP)
  . . S:IEN>0 RORTSK("PARAMS","ICD9LST","G",GROUP,"C",IEN)=ID
- .;--- ICD9 codes
- . I LIST="ICD9FILT,GROUP" D  Q
- . . S GROUP=$G(RORXML("ICD9GRP"))  Q:GROUP=""
- . . S ID=$G(ATTR("ID"))            Q:ID=""
- . . S IEN=+$$CODEN^ICDCODE(ID,80)
- . . S:IEN>0 RORTSK("PARAMS","ICD9FILT","G",GROUP,"C",IEN)=ID
  ;
  ;=== Store the lists
  I LVL=3  D  Q
@@ -103,7 +94,7 @@ ELSTART(ELMT,ATTR) ;
  . . M RORTSK("PARAMS","DRUGS","G",ID,"A")=ATTR
  . . K RORTSK("PARAMS","DRUGS","G",ID,"A","ID")
  . ;--- Name of the current ICD-9 group
- . I (LIST="ICD9LST")!(LIST="ICD9FILT")  D:ELMT="GROUP"  Q
+ . I LIST="ICD9LST"  D:ELMT="GROUP"  Q
  . . S RORXML("ICD9GRP")=$G(ATTR("ID"))
  . ;--- List of ICD-9 codes
  . ;I LIST="ICD9LST"  D:ELMT="ICD9"  Q

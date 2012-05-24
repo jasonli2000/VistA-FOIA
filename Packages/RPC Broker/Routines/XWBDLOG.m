@@ -1,10 +1,9 @@
-XWBDLOG ;ISF/RWF - Debug Logging for Broker ;12/08/2004  08:54
+XWBDLOG ;ISF/RWF - Debug Logging for Broker ;08/04/2004  13:56
  ;;1.1;RPC BROKER;**35**;Mar 28, 1997
  Q
  ;
  ;Setup the log, Clear the log location.
 LOGSTART(RTN) ;Clear the debug log
- Q:'$G(XWBDEBUG)
  K ^XTMP("XWBLOG"_$J)
  S ^XTMP("XWBLOG"_$J,0)=$$HTFM^XLFDT($$HADD^XLFDT($H,7))_"^"_$$DT^XLFDT
  S ^XTMP("XWBLOG"_$J,.1)=0

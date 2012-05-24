@@ -1,6 +1,6 @@
-DIU0 ;SFISC/XAK-EDIT/DELETE A FILE ;12NOV2008
- ;;22.0;VA FileMan;**82,116,76,160**;Mar 30, 1999;Build 21
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DIU0 ;SFISC/XAK-EDIT/DELETE A FILE ;1:41 PM  12 Nov 2002
+ ;;22.0;VA FileMan;**82,116,76**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 DIPZ ;
  D PZ,DIEZ Q
 PZ ;Recompile PRINT Template routines
@@ -29,7 +29,7 @@ EN ;
  D ^DIK G 61
 6 ;
  N DIKLGLBL
- S DA=DI,%=$$SCREEN^DIBT("^D SCREENQ^DICATT") Q:%=U  G SCROLL:'%
+ S DA=DI I $S($T(SCREEN^DIBT)["HELP":'$$SCREEN^DIBT("^D SCREENQ^DICATT"),1:1) G SCROLL
  G ^DIU20
  ;
 SCROLL S DR=".01:10;"_$P(20,U,$S($D(^DIC(200,0)):^(0)["NEW PERSON",$D(^DIC(3,0)):^(0)["USER"!(^(0)["EMPLOY"),1:0))

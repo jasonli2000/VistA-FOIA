@@ -1,6 +1,6 @@
-FBUCEN ;ALBISC/TET - ENTER UNAUTHORIZED CLAIM ; 4/9/10 11:25am
- ;;3.5;FEE BASIS;**32,61,114**;JAN 30, 1995;Build 7
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+FBUCEN ;ALBISC/TET - ENTER UNAUTHORIZED CLAIM ;7/17/03
+ ;;3.5;FEE BASIS;**32,61**;JAN 30, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;FBUC - unauthorized claims site parameter node
  ;FBTRACK - 1 to track incomplete claims, 0 to track complete claims only
  ;FBUCP - 0 to not automatically print letters, otherwise default device
@@ -11,10 +11,10 @@ FBUCEN ;ALBISC/TET - ENTER UNAUTHORIZED CLAIM ; 4/9/10 11:25am
 GET ;get info on new claim entry
  K FBVEN,FBVET
 VET ;get vet info
- N DIR,DA W !! S DIR(0)="162.7,2O",DIR("A")="Select VETERAN" D ^DIR K DIR,DA G END:$D(DIRUT),VET:+Y'>0 S FBVET=+Y
+ K DIR W !! S DIR(0)="162.7,2O",DIR("A")="Select VETERAN" D ^DIR K DIR G END:$D(DIRUT),VET:+Y'>0 S FBVET=+Y
 VEN ;get vendor info
- N DIR,DA S DIR(0)="162.7,1O",DIR("A")="Select FEE VENDOR" D ^DIR K DIR,DA G VET:$D(DUOUT)!($D(DTOUT)),VEN:+Y<0,VEN:+Y=0&('FBINENT) S FBVEN=+Y
-PROG N DIC,DA S DIC="^FBAA(161.8,",DIC(0)="AEQMZ",DIC("S")="I +$P(^(0),U,3)" D ^DIC K DIC,DA S:$D(DTOUT)!($D(DUOUT)) FBOUT=1 G END:FBOUT,GET:Y<0 S FBPR=+Y D  S:FBOUT FBOUT=0 G VET
+ S DIR(0)="162.7,1O",DIR("A")="Select FEE VENDOR" D ^DIR K DIR G VET:$D(DUOUT)!($D(DTOUT)),VEN:+Y<0,VEN:+Y=0&('FBINENT) S FBVEN=+Y
+PROG S DIC="^FBAA(161.8,",DIC(0)="AEQMZ",DIC("S")="I +$P(^(0),U,3)" D ^DIC K DIC S:$D(DTOUT)!($D(DUOUT)) FBOUT=1 G END:FBOUT,GET:Y<0 S FBPR=+Y D  S:FBOUT FBOUT=0 G VET
  .N FBDA,FBMASTER,FBORDER,FBTFROM,FBTTO,FB1725,FBFPPSC
  .; ask if claim is an EDI claim (patch *61)
  .S FBFPPSC=$$FPPSC^FBUTL5() I FBFPPSC=-1 S FBFPPSC="",FBOUT=1 Q

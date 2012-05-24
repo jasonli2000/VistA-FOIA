@@ -1,8 +1,5 @@
-PSOSULB1 ;BHAM ISC/RTR,SAB-Print suspended labels  cont. ;10/10/96
- ;;7.0;OUTPATIENT PHARMACY;**10,200,264,289**;DEC 1997;Build 107
- ;Reference to $$INSUR^IBBAPI supported by IA 4419
- ;Reference to $$DEA^IBNCPDP controlled subscription by IA 4299
- ;
+PSOSULB1 ;BHAM ISC/RTR,SAB-Print suspended labels  cont. ; 10/10/96
+ ;;7.0;OUTPATIENT PHARMACY;**10,200,264**;DEC 1997;Build 19
 DEV D:'$D(PSOPAR) ^PSOLSET G:'$D(PSOPAR) DEV S PSOION=ION
  N X S X="PSXRSUS" X ^%ZOSF("TEST") G:($T)&($G(PSXSYS))&($D(^XUSEC("PSXCMOPMGR",DUZ)))&($D(^XUSEC("PSX XMIT",DUZ))) ^PSXRSUS
 DEV1 I '$P(PSOPAR,"^",8) G START
@@ -58,76 +55,4 @@ BAIMAIL     ;Send mail message
  S ^TMP("PSOM",$J,SEQ+1)=""
  S XMTEXT="^TMP(""PSOM"",$J," N DIFROM D ^XMD K XMSUB,XMTEXT,XMY,XMDUZ
  Q
- ;Description: 
- ;This function determines whether the RX SUSPENSE has a DAYS SUPPLY HOLD
- ;condition.
- ;Input: REC = Pointer to Suspense file (#52.5)
- ;Returns: 1 or 0
- ;1 (one) if ¾ of days supply has elapsed.
- ;0 (zero) is returned if ¾ of days supply has not elapsed. 
  ;
-DSH(REC) ; ePharmacy - verify that 3/4 days supply has elapsed before printing from suspense
- N PSINSUR,PSARR,SHDT,DSHOLD,DSHDT,PS0,COMM,DIE,DA,DR,RXIEN,RFL,DAYSSUP,LSTFIL,PTDFN,IBINS,DRG
- N DEA,DEAOK,ICD,SFN,SDT
- S DSHOLD=1,PS0=^PS(52.5,REC,0),RXIEN=$P(PS0,U,1),RFL=$P(PS0,U,13)
- S LSTFIL=$$LSTRFL^PSOBPSU1(RXIEN),PTDFN=$$GET1^DIQ(52,RXIEN,"2","I")
- S IBSTAT=$$INSUR^IBBAPI(PTDFN,,"E",.IBINS,"1"),DRG=$$GET1^DIQ(52,RXIEN,"6","I")
- S (DEA,ICD)="",DEA=$$GET1^DIQ(50,DRG,3)
- I $D(^PSRX(RXIEN,"ICD",1,0)) S ICD=^PSRX(RXIEN,"ICD",1,0)
- ;
- ; Don't hold Rx where the previous fill was not ebillable
- I $$STATUS^BPSOSRX(RXIEN,LSTFIL-1)="" Q DSHOLD
- ; Don't hold when the Rx has SC/EI flagged
- I ICD[1 Q DSHOLD
- ; Don't hold rx if DEA special Handling code is non billable (i.e. has M or 0 (zero) or (I, S, N, and/or 9)) without an E
- S DEAOK=$$DEA^IBNCPDP(DEA) I 'DEAOK Q DSHOLD
- ; Don't hold for zero fill renewals
- I 'LSTFIL,$$GET1^DIQ(52,RXIEN_",","PRIOR FILL DATE",,,)="" Q DSHOLD
- ; Don't hold if no insurance
- I 'IBSTAT!(IBSTAT=-1) Q DSHOLD
- ;
- S DSHDT=$$DSHDT(RXIEN) ; 3/4 of days supply date
- I DSHDT>DT S DSHOLD=0 D
- . I DSHDT'=$P(PS0,U,14) D  ; Update Suspense Hold Date and Activity Log
- . . S COMM="3/4 of Days Supply SUSPENSE HOLD until "_$$FMTE^XLFDT(DSHDT,"2D")_"."
- . . S DAYSSUP=$$LFDS(RXIEN)
- . . D RXACT^PSOBPSU2(RXIEN,RFL,COMM,"S",+$G(DUZ)) ; Update Activity Log
- . . S DR="10///^S X=DSHDT",DIE="^PS(52.5,",DA=REC D ^DIE ; File Suspense Hold Date
- . . N DA,DIE,DR,PSOX,SFN,INDT,DEAD,SUB,XOK,OLD,X,II
- . . S DA=REC,DIE="^PS(52.5,",DR=".02///"_DSHDT D ^DIE
- . . S SFN=REC,DEAD=0,INDT=DSHDT D CHANGE^PSOSUCH1(RXIEN,RFL)
- Q DSHOLD
- ;
- ;Description:
- ;This function determines the date that 3/4 of the days supply for the
- ;last refill will occur.
- ;Input: RXIEN = Prescription file #52 IEN
- ;Returns: DATE/TIME value
-DSHDT(RXIEN) ;
- N RXFIL,FILLDT,DAYSSUP,DSH34
- I '$D(^PSRX(RXIEN,0)) Q -1
- ;S RXFIL=$$LSTRFL^PSOBPSU1(RXIEN) ; Last Refill
- S FILLDT=$$LDPFDT(RXIEN) ; Last Dispensed Date or Prior Fill Date for renewal
- S DAYSSUP=$$LFDS(RXIEN) ; Days Supply of Last Refill
- S DSH34=DAYSSUP*.75 ; 3/4 of Days Supply
- Q $$FMADD^XLFDT(FILLDT,DSH34) ; Return today plus 3/4 of Days Supply date
- ;
- ; Description: This function returns the DAYS SUPPLY for the Latest Fill
- ; for a Prescription
- ; Input: RXIEN = Prescription file #52 IEN
- ; Returns: DAYS SUPPLY for the latest fill
- ;          -1 if RXIEN is not valid
-LFDS(RXIEN) ;
- N RXFIL
- Q:'$D(^PSRX(RXIEN)) -1
- S RXFIL=$$LSTRFL^PSOBPSU1(RXIEN)
- Q $S(RXFIL=0:$P(^PSRX(RXIEN,0),U,8),1:$P(^PSRX(RXIEN,1,RXFIL,0),U,10))
- ;
-LDPFDT(RXIEN) ; Returns PRIOR FILL DATE if renewal otherwise LAST DISPENSED DATE or -1 if not valid
- Q $S('$D(^PSRX(RXIEN)):-1,$$PRFDT(RXIEN):$$PRFDT(RXIEN),1:$$LDT(RXIEN))
- ;
-PRFDT(RXIEN) ; Returns PRIOR FILL DATE in internal format
- Q $$GET1^DIQ(52,RXIEN_",","PRIOR FILL DATE","I",,)
- ;
-LDT(RXIEN) ; Returns LAST DISPENSED DATE in internal format
- Q $$GET1^DIQ(52,RXIEN_",","LAST DISPENSED DATE","I",,)

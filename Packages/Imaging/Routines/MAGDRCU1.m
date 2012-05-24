@@ -1,6 +1,5 @@
-MAGDRCU1 ;WOIFO/PMK - List entries in ^MAG(2006.5839) ; 05/18/2007 11:23
- ;;3.0;IMAGING;**10,30,54**;03-July-2009;;Build 1424
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGDRCU1 ;WOIFO/PMK - List entries in ^MAG(2006.5839) ; 05/06/2004  06:32
+ ;;3.0;IMAGING;**10,30**;16-September-2004
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGDRCU1 ;WOIFO/PMK - List entries in ^MAG(2006.5839) ; 05/18/2007 11:23
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -99,7 +99,7 @@ ENTRY ; read the entries in file ^MAG(2006.5839)
  . E  W " ???"
  . Q
  I DONE=-1 Q  ; cancelled by user
- S CUTOFF=$$HTFM^XLFDT($H+1-DAYS,0)
+ S %H=($H+1)-DAYS D YMD^%DTC S CUTOFF=X
  ;
  S DONE=0 F  D  Q:DONE
  . W !!,"Sort by patient name or examination date? (N or D) D// "
@@ -127,7 +127,7 @@ ENTRY ; read the entries in file ^MAG(2006.5839)
  ;
  W ! S %ZIS="Q" D ^%ZIS I POP Q  ; select the output device, quit if none
  ;
- ; setup for queueing the report to print in the background via Taskman 
+ ; setup for queueing the report to print in the background via Taskman
  I $D(IO("Q")) D  ; queued
  . S ZTSAVE("CUTOFF")=""
  . S ZTSAVE("SELECT")=""

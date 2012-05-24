@@ -1,4 +1,4 @@
-YSCPAO ; GENERATED FROM 'YSSR REVIEW ACTION PRINT' PRINT TEMPLATE (#562) ; 08/21/96 ; (FILE 615.2, MARGIN=80)
+YSCPAO ; GENERATED FROM 'YSSR REVIEW ACTION PRINT' PRINT TEMPLATE (#562) ; 09/19/10 ; (FILE 615.2, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,10 +11,11 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(562,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 M DXS=^DIPT(562,"DXS")
+ S I(0)="^YS(615.2,",J(0)=615.2
  W ?0 D PARSE^YSSRU K DIP K:DN Y
  D N:$X>0 Q:'DN  W ?0 S DIP(1)=$S($D(^YS(615.2,D0,50)):^(50),1:"") S X=$P(DIP(1),U,3) S:X X=$E(X,4,5)_"/"_$E(X,6,7)_"/"_$E(X,2,3) K DIP K:DN Y W X
- S X=$G(^YS(615.2,D0,0)) D N:$X>10 Q:'DN  W ?10 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^DPT(Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,17)
+ S X=$G(^YS(615.2,D0,0)) D N:$X>10 Q:'DN  W ?10 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^DPT(Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,17)
  D N:$X>29 Q:'DN  W ?29 S X="YSAT",X=$S(X=""!(X'?.ANP):"",$D(YSDIPA($E(X,1,30))):YSDIPA($E(X,1,30)),1:"") S X=X S:X X=$E(X,4,5)_"/"_$E(X,6,7)_"/"_$E(X,2,3) K DIP K:DN Y W X
  D N:$X>39 Q:'DN  W ?39 S X="YSAT1",X=$S(X=""!(X'?.ANP):"",$D(YSDIPA($E(X,1,30))):YSDIPA($E(X,1,30)),1:"") K DIP K:DN Y W X
  S I(1)=10,J(1)=615.21 F D1=0:0 Q:$O(^YS(615.2,D0,10,D1))'>0  X:$D(DSC(615.21)) DSC(615.21) S D1=$O(^(D1)) Q:D1'>0  D:$X>50 T Q:'DN  D A1
@@ -43,7 +44,8 @@ D1 ;
  S X=$G(^YS(615.2,D0,30,D1,0)) S DIWL=1,DIWR=78 D ^DIWP
  Q
 D1R ;
- D A^DIWW
+ D 0^DIWW
+ D ^DIWW
  D T Q:'DN  D N D N:$X>0 Q:'DN  W ?0 W " "
  K Y K DIWF
  Q
@@ -59,7 +61,6 @@ HEAD ;
  W !,?46,"S/R:REASON"
  W !,?63,"TYPE OF"
  W !,?63,"SECLUSION/RESTRAINT:.01"
- W !
  W !,?0,"DESCRIBE CIRCUMSTANCES"
  W !,?0,"GENERAL COMMENTS"
  W !,"--------------------------------------------------------------------------------",!!

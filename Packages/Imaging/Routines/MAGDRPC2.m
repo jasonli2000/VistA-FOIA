@@ -1,6 +1,5 @@
-MAGDRPC2 ;WOIFO/EdM - Imaging RPCs ; 05/18/2007 11:23
- ;;3.0;IMAGING;**11,30,51,50,54**;03-July-2009;;Build 1424
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGDRPC2 ;WOIFO/EdM - Imaging RPCs ; 11/10/2005  08:19
+ ;;3.0;IMAGING;**11,30,51,50**;26-May-2006
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGDRPC2 ;WOIFO/EdM - Imaging RPCs ; 05/18/2007 11:23
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -112,6 +112,7 @@ ROUTEDAY ; Scan for Routing Activity
  N DEST ;--- Destination
  N FIRST ;-- First date for scan
  N FSTX ;--- First transmission for current study
+ N %H ;----- $Horolog timestamp
  N IMAGE ;-- Image Pointer for current image
  N LAST ;--- Last date for scan
  N LSTQ ;--- Timestamp for last queue entry in current study
@@ -125,8 +126,8 @@ ROUTEDAY ; Scan for Routing Activity
  K ^TMP("MAG",$J,"RTD1")
  K ^TMP("MAG",$J,"RTD2")
  K ^TMP("MAG",$J,"RTD3")
- S FIRST=$$HTFM^XLFDT($H-4)
- S LAST=$$HTFM^XLFDT($H+2)
+ S %H=$H-4 D YMD^%DTC S FIRST=X
+ S %H=$H+2 D YMD^%DTC S LAST=X
  ;
  S DEST="" F  S DEST=$O(^MAG(2005,"ROUTE",DEST)) Q:DEST=""  D
  . S NAME(DEST)=$P($G(^MAG(2005.2,DEST,0)," ? "_DEST),"^",1)
@@ -186,7 +187,7 @@ ROUTEDAY ; Scan for Routing Activity
  . Q
  ; Purge old entries
  S R=$G(^MAGDICOM(2006.563,1,"RETAIN ROUTING STATISTICS")) S:R<1 R=30
- S DAY=$$HTFM^XLFDT($H-R)
+ S %H=$H-R D YMD^%DTC S DAY=X
  S D0=0 F  S D0=$O(^TMP("MAG",$J,"RTD2",D0)) Q:'D0  Q:D0'<DAY  D
  . K ^TMP("MAG",$J,"RTD2",D0) S P4=P4-1
  . Q
@@ -215,6 +216,11 @@ DELTA(START,STOP) N D,D1,D2,T1,T2
  S T1=START*1E6#1E6,T2=STOP*1E6#1E6
  S T1=T1\10000*60+(T1\100#100)*60+(T1#100)
  S T2=T2\10000*60+(T2\100#100)*60+(T2#100)
- S D=0 S:D1'=D2 D=$$FMTH^XLFDT(D2)-$$FMTH^XLFDT(D1)
+ S D=0 D:D1'=D2
+ . N %H,%T,%Y,X
+ . S X=D1 D H^%DTC S D1=%H
+ . S X=D2 D H^%DTC S D2=%H
+ . S D=D2-D1
+ . Q
  Q D*86400+T2-T1
  ;

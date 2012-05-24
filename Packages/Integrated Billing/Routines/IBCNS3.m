@@ -1,23 +1,20 @@
 IBCNS3 ;ALB/ARH - DISPLAY EXTENDED INSURANCE ; 01-DEC-04
- ;;2.0;INTEGRATED BILLING;**287,399,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**287**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 DISP(DFN,DATE,DISPLAY) ;  Display all insurance company information
  ;    input: DFN     = pointer to patient
  ;           DATE    = date to check for coverage and riders
- ;           DISPLAY = contain indicators of data to display (1234)
- ;                     1 : first line of display ins company and plan data
- ;                     2 : extended data (Plan Filing Timeframe, Plan Coverage, Conditional Coverage Comments, and Riders)
- ;                     3 : ins. policy comments and plan comments
- ;                     4 : eIV eligibility/benefit information (IB*2*416)
+ ;           DISPLAY = contain indicators of data to display (123)
  ;
  Q:'$G(DFN)  D:'$D(IOF) HOME^%ZIS
  N IBINS,IBPOLFN,IBPOL0,IBPLNFN S DISPLAY=$G(DISPLAY) I '$G(DATE) S DATE=DT
  K ^TMP($J,"IBCNS3")
  ;
- D ALL^IBCNS1(DFN,"IBINS",3,DATE)
+ D ALL^IBCNS1(DFN,"IBINS")
  ;
  I '$D(IBINS) D SETLN(" "),SETLN("No Insurance Information")
+ ;
  ;
  S IBPOLFN=0 F  S IBPOLFN=$O(IBINS(IBPOLFN)) Q:'IBPOLFN  D
  . S IBPOL0=IBINS(IBPOLFN,0),IBPLNFN=$P(IBPOL0,U,18)
@@ -26,10 +23,8 @@ DISP(DFN,DATE,DISPLAY) ;  Display all insurance company information
  . D GETLN(IBPOL0,DATE)
  . I DISPLAY[2 D GETEXT(DFN,IBPOLFN,IBPOL0,DATE) ; display extended
  . I DISPLAY[3 D GETCOM(IBPLNFN,$G(IBINS(IBPOLFN,1))) ; display extended 3, comments
- . I DISPLAY[4 D EB(DFN,IBPOLFN)    ; display eIV elig/ben data
- . Q
  ;
- S ^TMP($J,"IBCNS3")="" D GETNOTES(DFN)   ; display final notes/warning messages
+ S ^TMP($J,"IBCNS3")="" D GETNOTES(DFN)
  ;
  D PRINT
  ;
@@ -83,7 +78,7 @@ GETLN(IBPOL0,IBDATE) ; get single line of primary data on insurance policy
  S IBX=$P(IBPOL0,U,6),IBX=$S(IBX="v":"SELF",IBX="s":"SPOUSE",1:"OTHER") S IBLINE=$$FRMLN(IBX,IBLINE,7,47)
  S IBX=$$DAT1^IBOUTL($P(IBPOL0,U,8)) S IBLINE=$$FRMLN(IBX,IBLINE,8,55)
  S IBX=$$DAT1^IBOUTL($P(IBPOL0,U,4)) S IBLINE=$$FRMLN(IBX,IBLINE,8,65)
- S IBX=$$FNDCOV(+IBPOL0,+$P(IBPOL0,U,18),$G(IBDATE)) S IBLINE=$$FRMLN(IBX,IBLINE,6,74)
+ S IBX=$$FNDCOV(+IBPOL0,+$P(IBPOL0,U,18),$G(IBDATE)) S IBLINE=$$FRMLN(IBX,IBLINE,5,75)
  ;
  D SETLN(IBLINE)
 GETLNQ Q
@@ -98,24 +93,23 @@ GETEXT(DFN,IBPOLFN,IBPOL0,DATE) ; display extended insurance information
  ;              DISPARR = array to pass data back in, pass by reference
  ;    output:   array of extended data in TMP($J,"IBCNS")
  ;
- N IBX,IBY,IBZ,IBC,IBINSFN,IBPLNFN,IBPLN0,IBLINE,IBCAT,IBCATFN,IBCOVRD,IBU,ARR,ARR1 S:'$G(DATE) DATE=DT
+ N IBX,IBY,IBZ,IBC,IBINSFN,IBPLNFN,IBPLN0,IBLINE,IBCAT,IBCATFN,IBCOVRD,ARR,ARR1 S:'$G(DATE) DATE=DT
  S IBINSFN=+$G(IBPOL0) Q:'IBINSFN  S IBPLNFN=+$P(IBPOL0,U,18),IBPLN0=$G(^IBA(355.3,IBPLNFN,0)) Q:IBPLN0=""
  ;
  S IBLINE="Last Verified:   ",(IBY,IBX)=""
  S IBY=$P($G(^DPT(DFN,.312,IBPOLFN,1)),U,3) I IBY'="" S IBX=$$DAT1^IBOUTL(IBY) S IBLINE=IBLINE_IBX D SETLN(" "),SETLN(IBLINE)
  ;
  S IBLINE="Plan Filing Time Frame: "
- S IBY=$P(IBPLN0,U,13) S:IBY'="" IBY=IBY_"  " I +$P(IBPLN0,U,16) S IBY=IBY_"("_$$FTFN^IBCNSU31(IBPLNFN)_")"
- I IBY'="" S IBLINE=IBLINE_IBY D:IBX="" SETLN(" ") D SETLN(IBLINE)
+ S IBY=$P(IBPLN0,U,13) I IBY'="" S IBLINE=IBLINE_IBY D:IBX="" SETLN(" ") D SETLN(IBLINE)
  ;
  S IBLINE="Insurance Comp:  "
  I $P($G(^DIC(36,IBINSFN,0)),U,2)="N" S IBLINE=IBLINE_"Will Not Reimburse" D SETLN(" "),SETLN(IBLINE)
  ;
- S IBLINE="Conditional: ",IBCOVRD="",IBU=""
- K ARR F IBCAT="INPATIENT","OUTPATIENT","PHARMACY","MENTAL HEALTH","DENTAL","LONG TERM CARE" D
+ S IBLINE="Conditional: ",IBCOVRD=""
+ K ARR F IBCAT="INPATIENT","OUTPATIENT","PHARMACY","MENTAL HEALTH","DENTAL" D
  . S IBCATFN=+$O(^IBE(355.31,"B",IBCAT,"")) Q:'IBCATFN
  . S IBY=$$PLCOV^IBCNSU3(+IBPLNFN,DATE,IBCATFN,.ARR) Q:IBY'>0
- . I IBY=1 S IBCOVRD=$G(IBCOVRD)_IBU_$S(IBCAT["PATIENT":$P(IBCAT,"IENT",1),1:IBCAT),IBU=", " Q
+ . I IBY=1 S IBCOVRD=$G(IBCOVRD)_IBCAT_", " Q
  . S IBX=IBCAT_": ",IBC=$G(IBC)+100 S IBLINE=$$FRMLN(IBX,IBLINE,15,17)
  . S IBZ=0 F  S IBZ=$O(ARR(IBZ)) Q:'IBZ  S IBX=ARR(IBZ) D  S IBLINE=""
  .. S IBLINE=$$FRMLN(IBX,IBLINE,46,33) S ARR1(IBC+IBZ)=IBLINE
@@ -150,22 +144,6 @@ GETNOTES(DFN) ; get final notes/warnings in TMP($J,"IBCNS")
  Q
  ;
  ;
-EB(DFN,IBCDFN) ; Build eIV elig/benefit display for ?INX screen display
- NEW IBX,IBY
- D INIT^IBCNES(2.322,IBCDFN_","_DFN_",","A",,"?INX")
- D SETLN(" ")
- D SETLN("eIV Eligibility/Benefit Information:")
- S IBX=0
- F  S IBX=$O(^TMP("?INX",$J,"DISP",IBX)) Q:'IBX  D
- . S IBY=$G(^TMP("?INX",$J,"DISP",IBX,0))
- . D SETLN(IBY)
- . Q
- ;
- ; clean up scratch global
- K ^TMP("?INX",$J)
- ;
-EBX ;
- Q
  ;
  ;
 FRMLN(FIELD,IBLINE,FLNG,COL) ; format line data fields, returns IBLINE with FIELD of length FLNG at column COL
@@ -184,15 +162,15 @@ FNDCOV(IBINSFN,IBPLNFN,IBDATE) ; -- return group/plan coverage limitations indic
  ;              IBDATE  = date to check coverage, default today
  ;    output:   if insurance company will not reimburse = WNR, if all covered then returns null
  ;              otherwise list of first characters of types covered, if conditional then character in lower case
- ;              
+ ;
  N IBOUT,IBX,IBY,IBCAT,IBCATFN S IBOUT="" S:'$G(IBDATE) IBDATE=DT I '$G(IBINSFN)!'$G(IBPLNFN) G FNDCOVQ
  ;
  I $P($G(^DIC(36,+IBINSFN,0)),U,2)="N" S IBOUT="*WNR*" G FNDCOVQ
- F IBCAT="INPATIENT","OUTPATIENT","PHARMACY","MENTAL HEALTH","DENTAL","LONG TERM CARE" D
+ F IBCAT="INPATIENT","OUTPATIENT","PHARMACY","MENTAL HEALTH","DENTAL" D
  . S IBCATFN=+$O(^IBE(355.31,"B",IBCAT,"")) Q:'IBCATFN
  . S IBY=$$PLCOV^IBCNSU3(+IBPLNFN,IBDATE,+IBCATFN) Q:'IBY
  . S IBX=$S(IBCAT="PHARMACY":"R",1:$E(IBCAT)) S:IBY>1 IBX=$C($A(IBX)+32) S IBOUT=IBOUT_IBX
- S:IBOUT="" IBOUT="no CV" I IBOUT?6U S IBOUT=""
+ S:IBOUT="" IBOUT="no CV" I IBOUT?5U S IBOUT=""
 FNDCOVQ Q IBOUT
  ;
  ;

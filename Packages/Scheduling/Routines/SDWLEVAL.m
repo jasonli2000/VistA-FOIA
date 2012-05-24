@@ -1,5 +1,5 @@
-SDWLEVAL ;;IOFO BAY PINES/ESW - WAIT LIST - DISPOSITION AFTER APPOINTMENT(S) ENTRY;12/11/08 5:11pm  ; Compiled March 6, 2009 11:11:50
- ;;5.3;Scheduling;**327,471,446,538**;AUG 13 1993;Build 5
+SDWLEVAL ;;IOFO BAY PINES/ESW - WAIT LIST - DISPOSITION AFTER APPOINTMENT(S) ENTRY;06/12/2002 ; 5/23/05 4:47pm  ; Compiled April 20, 2006 17:36:31  ; Compiled May 2, 2006 10:03:55  ; Compiled May 1, 2007 15:18:38
+ ;;5.3;Scheduling;**327,471,446**;AUG 13 1993;Build 77
  ;Evaluate appt for optional disposition
  ;called from SDMM, SDMM1, SDM1A, SDAM2 ; replaced SDWLR
  ;
@@ -37,16 +37,15 @@ ASKREM ;prompt user for record for dispositioning
 ANSW(SDDIS,SDR) ;
  ;SDDIS=0 - select entries not to disposition
  ;SDDIS=1 - select entries to disposition
- N DIR,X I '$D(SDR) S SDR=1
+ N DIR,X I '$D(SDR) S SDR=0
  W !
  N STR,SS,SDCB S SDC=$O(^TMP($J,"SDWLPL",""),-1),SDCB=$O(^TMP($J,"SDWLPL",""))
  ;I SDC=SDCB S DIR("B")=SDC
  ;E  S DIR("B")=SDCB_"-"_SDC
- S DIR(0)="LO^"_SDCB_":"_SDC_"^"_"K:X=""^"" X" S DIR("A")="Select EWL entry to enter a non-removal reason or press 'Enter' key to accept the current one(s): "
- S DIR("?")="Enter number(s) or range of displayed Wait List entries or press 'Enter' key to accept the present non-removal reason."
- I SDDIS S DIR("A")="Select one of the above open EWL entries to close with an appointment or press 'Enter' key to continue>"
+ S DIR(0)="L^"_SDCB_":"_SDC S DIR("A")="You must select one of the above EWL entries and then enter a non-removal reason: ",DIR("?")="Enter number(s) or range of displayed Wait List entries."
+ I SDDIS S DIR("A")="Select one of the above open EWL entries to close with an appointment or enter '^' to continue>"
  D ^DIR
- N SDAN S SDAN=X I SDAN="^" W " YOU CANNOT EXIT HERE" Q
+ N SDAN S SDAN=X I SDAN="^" Q
  I SDAN["-" D
  .N SXB,SXE
  .S SXB=$P(SDAN,"-"),SXE=$P(SDAN,"-",2) N SDC F SDC=SXB:1:SXE I $D(^TMP($J,"SDWLPL",SDC)) S SDWLDA=+^TMP($J,"SDWLPL",SDC) D
@@ -55,12 +54,6 @@ ANSW(SDDIS,SDR) ;
  ..I 'SDDIS N SDR F  D DISPO(SDWLDA,SDC,.SDR) Q:SDR
  ..I SDDIS D GETDATA(SDWLDA) D DISEND(SDWLDA,SDC) S SDR=1
  ..L
- I 'SDDIS I SDAN=""&(SDCB=SDC) I $P($G(REC),U,13)="" S SDAN=SDC ;;;;;
- I SDAN="" D
- .I SDDIS S SDR=0 Q
- .N SDC,SDRN,SDWLDA,SDWLDS S SDC="",SDR=0 F  S SDC=$O(^TMP($J,"SDWLPL",SDC)) Q:SDC=""  S SDWLDS=^TMP($J,"SDWLPL",SDC),SDWLDA=+SDWLDS D
- ..I $P(SDWLDS,U,13)'="" K ^TMP($J,"SDWLPL",SDC)
- .I '$D(^TMP($J,"SDWLPL")) S SDR=1
  I SDAN[","!(SDAN?1N) D
  .N FF S FF=SDAN N GG,SDC F GG=1:1 S SDC=$P(FF,",",GG) Q:SDC=""  I $D(^TMP($J,"SDWLPL",SDC)) S SDWLDA=+^TMP($J,"SDWLPL",SDC) D
  ..;LOCK
@@ -70,7 +63,7 @@ ANSW(SDDIS,SDR) ;
  ..L
  Q
 DISEND(SDWLDA,SDC) ;display and disposition
- ;SDWLDA - IEN of 409.3  
+ ;SDWLDA - IEN of 409.3
  N DUOUT D EDIT(SDWLDA,SDC,.SDWLERR) Q:$G(DUOUT)  I SDWLERR Q
  W !!,"*** Patient has been removed from Wait List ***",!
  K ^TMP($J,"SDWLPL",SDC)
@@ -92,10 +85,10 @@ EDIT(SDWLDA,SDC,SDWLERR) ;ENTER/EDIT DISPOSITION
  S SDWLDUZ=DUZ,SDWLERR=0 S SDWLDISP="SA" D EDITSA Q  ;N DIR,DR,DIE,DIC
 EDITSA I SDWLDISP="SA" D
  .I $O(^TMP($J,"APPT",""))=$O(^TMP($J,"APPT",""),-1) S SDAP=$O(^TMP($J,"APPT","")) Q
- .I $O(^TMP($J,"APPT",""))'=$O(^TMP($J,"APPT",""),-1) D APPTD D  I SDAP="C" W !,"Disposition canceled by user",! Q
+ .I $O(^TMP($J,"APPT",""))'=$O(^TMP($J,"APPT",""),-1) D APPTD D  I SDAP="^" W !,"Disposition canceled by user",! Q
  ..W ! K DIR,X
  ..N STR,SS,SDA S SDA=$O(^TMP($J,"APPT",""),-1) I SDA=1 S DIR("B")=1
- ..S DIR(0)="N^1:"_SDA S DIR("A")="Select appt for Removal Reason or 'C' to Quit>",DIR("?")="Select Appointment to close with the open EWL."
+ ..S DIR(0)="N^1:"_SDA S DIR("A")="Select appt for Removal Reason or '^' to Quit>",DIR("?")="Select Appointment to close with the open EWL."
  ..D ^DIR
  ..S SDAP=X
  S DIE="^SDWL(409.3,",DA=SDWLDA,DR="21////^S X=SDWLDISP" D ^DIE

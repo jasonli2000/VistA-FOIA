@@ -1,23 +1,16 @@
-FBAASCB0 ;AISC/DMK-POST 1358 FOR INPATIENT 7078'S ; 11/24/10 9:59am
- ;;3.5;FEE BASIS;**116**;JAN 30, 1995;Build 30
+FBAASCB0 ;AISC/DMK-POST 1358 FOR INPATIENT 7078'S ;03MAY91
+ ;;3.5;FEE BASIS;;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  K FBERR,^TMP($J) S FBRJC=0,FBINTOT=$P(FZ,U,10)
  I '$O(^FBAAI("AC",FBN,0)) W !,*7,"No invoices found for this batch. Unable to release.",! S FBERR=1 Q
  ;
- S FBII=0 F  S FBII=$O(^FBAAI("AC",FBN,FBII)) Q:'FBII!($D(FBERR))  S FBII78=$P($G(^FBAAI(FBII,0)),"^",5),FBAAMT=$P($G(^(0)),"^",9),FBMM=$E($P(^(0),U,6),4,5) D GETAP,GET78:FBII78["FB7078(",POST^FBAASCB:FBII78["FB583("
+ S FBII=0 F  S FBII=$O(^FBAAI("AC",FBN,FBII)) Q:'FBII!($D(FBERR))  S FBII78=$P($G(^FBAAI(FBII,0)),"^",5),FBAAMT=$P($G(^(0)),"^",9),FBMM=$E($P(^(0),U,6),4,5) D GET78:FBII78["FB7078(",POST^FBAASCB:FBII78["FB583("
  I $G(FBRJC),FBRJC=FBINTOT S FBERR=1 D KILL Q
  I $G(FBRJC) K FBERR S (FBRJC,FBII)=0 F  S FBII=$O(^TMP($J,FBII)) Q:'FBII  S X=$G(^FBAAI(FBII,0)),FBII78=$P(X,U,5),FBAAMT=$P(X,U,9),FBMM=$E($P(X,U,6),4,5) K X,^TMP($J,FBII) D GET78
  I $G(FBRJC) S (FBAAMT,FBINTOT)=0 D NEWBT S FBII=0 F  S FBII=$O(^TMP($J,FBII)) Q:'FBII  D
  .S DA=FBII,DIE="^FBAAI(",DR="20////^S X=FBBN" D ^DIE K DR,DA,DIE
  .S FBAAMT=FBAAMT+$P(^FBAAI(FBII,0),U,9),FBINTOT=FBINTOT+1
  D:$G(FBRJC) RESETBT
- ; FB*3.5*116  ; report zero dollar invoices
- I $D(FBINV) D
- . S FBII=0 F  S FBII=$O(FBINV(FBII)) Q:'FBII  W !!,"Invoice #: "_FBII_" totals $0.00"
- . W $C(7),!!?2,"Batch cannot be released when zero dollar invoices exist."
- . W !?2,"Invoices must be corrected or removed from the batch."
- . S FBERR=1
- Q
  ;
 KILL K FBII,FBII78,FBAAMT,FBI78,FBMM,PRCSX,FBRJC,FBSTN,FBBN,FBINTOT,FBCNH,^TMP($J) Q
  ;
@@ -63,10 +56,4 @@ RESETBT ;reset original batch total $ set new batch totals
  S X=$G(^FBAA(161.7,FBBN,0)),$P(X,U,9)=FBAAMT,$P(X,U,10)=FBINTOT,$P(X,U,11)=FBINTOT,^(0)=X K X
  S $P(FZ,U,9)=$P(FZ,U,9)-FBAAMT,$P(FZ,U,10)=$P(FZ,U,10)-FBINTOT,$P(FZ,U,11)=$P(FZ,U,11)-FBINTOT,^FBAA(161.7,FBN,0)=FZ
  W !!,*7,"A new batch, number ",$P(^FBAA(161.7,FBBN,0),U),", was opened for invoices unable to post to 1358.",!,"Adjust 1358 and take action on new batch.",!
- Q
- ;
-GETAP ; FB*3.5*116 build array of invoices in batch
- Q:$D(FBCNH)  ; do not build array if CNH batch
- Q:FBAAMT>0  ; do not place invoice reference in array if the amount paid is greater than 0.00
- S FBINV(FBII)=""
  Q

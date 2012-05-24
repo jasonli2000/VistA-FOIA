@@ -1,23 +1,6 @@
-RORX012A ;HOIFO/SG,VAC - COMBINED MEDS AND LABS (QUERY & STORE) ;4/7/09 2:09pm
- ;;1.5;CLINICAL CASE REGISTRIES;**8,13**;Feb 17, 2006;Build 27
+RORX012A ;HCIOFO/SG - COMBINED MEDS AND LABS (QUERY & STORE) ; 12/8/05 10:39am
+ ;;1.5;CLINICAL CASE REGISTRIES;;Feb 17, 2006
  ;
- ; This routine uses the following IAs:
- ;
- ; #10103 FMADD^XLFDT (supported)
- ;   
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*8    MAR  2010   V CARR       Modified to handle ICD9 filter for
- ;                                      'include' or 'exclude'.
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can select specific patients,
- ;                                      clinics, or divisions for the report.
- ;                                      
- ;******************************************************************************
- ;******************************************************************************
  Q
  ;
  ;***** LAB SEARCH CALLBACK
@@ -68,12 +51,8 @@ QUERY(FLAGS,NSPT) ;
  N RORLDST       ; Descriptor for Lab search API
  N RORPTN        ; Number of patients in the registry
  N RORXDST       ; Descriptor for pharmacy search API
- N RORCDLIST     ; Flag to indicate whether a clinic or division list exists
- N RORCDSTDT     ; Start date for clinic/division utilization search
- N RORCDENDT     ; End date for clinic/division utilization search
  ;
  N CNT,ECNT,IEN,IENS,LTEDT,LTSDT,PATIEN,RC,RXEDT,SKIP,SKIPEDT,SKIPSDT,TMP,UTEDT,UTIL,UTSDT,VA,VADM,XREFNODE
- N RCC,FLAG
  S XREFNODE=$NA(^RORDATA(798,"AC",+RORREG))
  S (CNT,ECNT,NSPT,RC)=0,(SKIPEDT,SKIPSDT)=0
  ;--- Utilization date range
@@ -109,32 +88,18 @@ QUERY(FLAGS,NSPT) ;
  . S RXEDT=$$FMADD^XLFDT(RORXEDT\1,1)
  Q:'(RORLAB!RORPHARM) 0
  ;
- ;=== Set up Clinic/Division list parameters
- S RORCDLIST=$$CDPARMS^RORXU001(.RORTSK,.RORCDSTDT,.RORCDENDT,1)
- ;
  ;--- Browse through the registry records
  S IEN=0
- S FLAG=$G(RORTSK("PARAMS","ICD9FILT","A","FILTER"))
  F  S IEN=$O(@XREFNODE@(IEN))  Q:IEN'>0  D  Q:RC<0
  . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . S IENS=IEN_",",CNT=CNT+1
- . ;--- Get patient DFN
- . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
- . ;check for patient list and quit if not on list
- . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",PATIEN)) Q
  . ;--- Check if the patient should be skipped
  . Q:$$SKIP^RORXU005(IEN,FLAGS,SKIPSDT,SKIPEDT)
  . S SKIP=1,UTIL=0
- . ;--- Check if patient should be filtered because of ICD9 codes
- . S RCC=0
- . I FLAG'="ALL" D
- . . S RCC=$$ICD^RORXU010(PATIEN,RORREG)
- . I (FLAG="INCLUDE")&(RCC=0) Q
- . I (FLAG="EXCLUDE")&(RCC=1) Q
  . ;
- . ;--- Check for Clinic or Division list and quit if not in list
- . I RORCDLIST,'$$CDUTIL^RORXU001(.RORTSK,PATIEN,RORCDSTDT,RORCDENDT) Q
+ . ;--- Get the patient IEN (DFN)
+ . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
  . ;
  . D  I RC<0  S ECNT=ECNT+1,RC=0  Q
  . . ;--- Search for pharmacy data

@@ -1,5 +1,5 @@
 RGRPDAT ;BAY/ALS-ROUTINE TO CALL REMOTE PDAT ;09/14/01
- ;;1.0;CLINICAL INFO RESOURCE NETWORK;**23,27,31,55**;30 Apr 99;Build 11
+ ;;1.0;CLINICAL INFO RESOURCE NETWORK;**23,27,31**;30 Apr 99
  ;Reference to ^DGCN(391.91 supported by IA #2911
  ;Reference to EN1^XWB2HL7 supported by IA #3144
  ;Reference to RPCCHK^XWB2HL7 supported by IA #3144
@@ -94,7 +94,7 @@ DISP    ;display returned PDAT queries
  . W !?3,"  ",$P(TFL(SL),"^"),"  status: (",STATUS,")",!
  . D DISPLAY(ICN,$P(TFL(SL),"^",2))
  I '$D(TFL(0)) W !?3,"There are no remote treating facilities listed for this patient.",!?3,"No remote query exists for this patient."
- K ICNARR,L,SL,TFARR,TFL,STATUS,RESULT,RETURN
+ K ICNARR,L,SL,TFARR,TFL
  Q
 DISP2 ;
  N REXIT S REXIT=0
@@ -118,7 +118,7 @@ GETTFL(ICN,TFL) ;Check for existing Treating Facilities
  S HOME=$$SITE^VASITE()
  S TF=0 F  S TF=$O(^DGCN(391.91,"APAT",DFN,TF)) Q:'TF  D
  . S LOC=$$NNT^XUAF4(TF)
- . I $P(LOC,"^",2)'=$E($P(HOME,"^",3),1,3)&($P(LOC,"^",3)'="OTHER") D
+ . I $P(LOC,"^",2)'=$E($P(HOME,"^",3),1,3) D
  .. S TFL($P(LOC,"^",2))=LOC
  .. S LOC=$P(LOC,"^",2)
  .. D MONITOR(ICN,LOC,.RESULT)

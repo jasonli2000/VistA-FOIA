@@ -1,5 +1,5 @@
 RCWROFF1 ;WISC/RFJ-partial waiver ;1 Feb 2000
- ;;4.5;Accounts Receivable;**168,204,233**;Mar 20, 1995;Build 4
+ ;;4.5;Accounts Receivable;**168,204**;Mar 20, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
@@ -103,18 +103,18 @@ SHOWTRAN(RCTRANDA) ;  show data for transaction
 SHOWBILL(RCBILLDA) ;  show data for bill
  N DATA7,DATA20,FYDA
  S DATA7=$G(^PRCA(430,RCBILLDA,7))
- W !?8,"Principal Balance: ",$J($P(DATA7,"^"),11,2)
+ W !?8,"Principal Balance: ",$J($P(DATA7,"^"),9,2)
  ;
  ;  show fy data
  S FYDA=$O(^PRCA(430,RCBILLDA,2,0)),DATA20=$G(^PRCA(430,RCBILLDA,2,FYDA,0))
- W ?40,"FY: ",$P(DATA20,"^"),?48,"Principal Balance: ",$J($P(DATA20,"^",2),0,2)
+ W ?40,"FY: ",$P(DATA20,"^"),?50,"Principal Balance: ",$J($P(DATA20,"^",2),0,2)
  ;  if multiple fiscal years, show them here
  F  S FYDA=$O(^PRCA(430,RCBILLDA,2,FYDA)) Q:'FYDA  D
  .   S DATA20=$G(^PRCA(430,RCBILLDA,2,FYDA,0))
- .   W !?40,"FY: ",$P(DATA20,"^"),?48,"Principal Balance: ",$J($P(DATA20,"^",2),0,2)
+ .   W !?40,"FY: ",$P(DATA20,"^"),?50,"Principal Balance: ",$J($P(DATA20,"^",2),0,2)
  ;
- W !?8," Interest Balance: ",$J($P(DATA7,"^",2),11,2)
- W !?8,"    Admin Balance: ",$J($P(DATA7,"^",3)+$P(DATA7,"^",4)+$P(DATA7,"^",5),11,2)
- W !?27,"-----------"
- W !?8,"    TOTAL Balance: ",$J($P(DATA7,"^")+$P(DATA7,"^",2)+$P(DATA7,"^",3)+$P(DATA7,"^",4)+$P(DATA7,"^",5),11,2)
+ W !?8," Interest Balance: ",$J($P(DATA7,"^",2),9,2)
+ W !?8,"    Admin Balance: ",$J($P(DATA7,"^",3)+$P(DATA7,"^",4)+$P(DATA7,"^",5),9,2)
+ W !?27,"---------"
+ W !?8,"    TOTAL Balance: ",$J($P(DATA7,"^")+$P(DATA7,"^",2)+$P(DATA7,"^",3)+$P(DATA7,"^",4)+$P(DATA7,"^",5),9,2)
  Q

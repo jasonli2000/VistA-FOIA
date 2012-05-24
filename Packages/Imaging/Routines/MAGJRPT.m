@@ -1,6 +1,5 @@
 MAGJRPT ;WIRMFO/JHC-Display Rad reports ; 15 OCT 2004  10:02 AM
- ;;3.0;IMAGING;**18,101**;Nov 06, 2009;Build 50
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;3.0;IMAGING;**18**;Mar 07, 2006
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -24,11 +23,11 @@ MAGJRPT ;WIRMFO/JHC-Display Rad reports ; 15 OCT 2004  10:02 AM
 ORD(MAGRPTY,DATA) ; Radiology Order Display
  ; RPC Call: MAGJ RADORDERDISP
  ; MAGRPTY holds indirect reference to returned data
- ; 
+ ;
  S MAGRPTY=$NA(^TMP($J,"WSDAT")) K @MAGRPTY
  N $ETRAP,$ESTACK S $ETRAP="D ERR^MAGJRPT"
  N RARPT,RADFN,RADTI,RACNI,RAPGE,RAX,RAOIFN
- N REPLY,POP,DFN,COMPLIC,XX,HDR,MAGRET,REQONLY,TMPDATA
+ N REPLY,POP,DFN,COMPLIC,XX,HDR,MAGRET,REQONLY
  S REPLY="0^4~Attempting to display order info"
  D OPENDEV
  I POP S REPLY="0^4~Unable to open device 'IMAGING WORKSTATION'" G ORDZ
@@ -46,9 +45,7 @@ ORD(MAGRPTY,DATA) ; Radiology Order Display
  S COMPLIC=$P(XX,U,4)      ;  Complications text
  F I=4,12,9 S HDR=HDR_$P(RADATA,U,I)_"   " ; PtName, Case #, Procedure
  I REQONLY D CKINTEG(.REPLY,RADFN,RADTI,RACNI,RARPT,RADATA) I REPLY]"" S REPLY="0^7~"_REPLY G ORDZ  ; Database integrity problems
- S TMPDATA=MAGRPTY_"~"_RADTI_"~"_RACNI
  S RAX="",RAPGE=0 D ^RAORD5
- S MAGRPTY=$P(TMPDATA,"~"),RADTI=$P(TMPDATA,"~",2),RACNI=$P(TMPDATA,"~",3)
  D:IO'=IO(0) ^%ZISC
  S @MAGRPTY@(1)="REQ: "_HDR
  D COMMENTS(RADFN,RADTI,RACNI,MAGRPTY,2,COMPLIC)
@@ -82,7 +79,7 @@ COMMENTS(RADFN,RADTI,RACNI,MAGRPTY,DNODE,COMPLIC) ; add Complications & Tech Com
  Q
  ;
 OPENDEV ;
- N IOP,%ZIS
+ N IOP
  S IOP="IMAGING WORKSTATION",%ZIS=0 D ^%ZIS
  I POP
  E  U IO

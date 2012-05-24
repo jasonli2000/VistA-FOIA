@@ -1,5 +1,5 @@
 FBAAV0 ;AISC/GRR-ELECTRONICALLY TRANSMIT FEE DATA ;11 Apr 2006  2:51 PM
- ;;3.5;FEE BASIS;**3,4,55,89,98,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**3,4,55,89,98**;JAN 30, 1995;Build 54
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  K ^TMP($J,"FBAABATCH"),^TMP($J,"FBVADAT") D DT^DICRW
  I '$D(^FBAA(161.7,"AC","S")),'$D(^FBAA(161.7,"AC","R")),'$D(^FBAA(161.25,"AE")),$S('$D(^FBAA(161.26,"AC","P")):1,$O(^FBAA(161.26,"AC","P",0))'>0:1,1:0) W !,*7,"There are no transactions requiring transmission",*7 Q
@@ -38,9 +38,7 @@ DET ;entry point to process B3 (outpatient/ancillary) batch
  ;   FBAASN - station number (formatted)
  S FBTXT=0
  D CKB3V^FBAAV01 I $G(FBERR) K FBERR Q
- ; HIPAA 5010 - line items that have 0.00 amount paid are now required to go to Central Fee
- ;F K=0:0 S K=$O(^FBAAC("AC",J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAAC("AC",J,K,L)) Q:L'>0  F M=0:0 S M=$O(^FBAAC("AC",J,K,L,M)) Q:M'>0  F N=0:0 S N=$O(^FBAAC("AC",J,K,L,M,N)) Q:N'>0  S Y(0)=$G(^FBAAC(K,1,L,1,M,1,N,0)) I Y(0)]"",+$P(Y(0),U,3) D
- F K=0:0 S K=$O(^FBAAC("AC",J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAAC("AC",J,K,L)) Q:L'>0  F M=0:0 S M=$O(^FBAAC("AC",J,K,L,M)) Q:M'>0  F N=0:0 S N=$O(^FBAAC("AC",J,K,L,M,N)) Q:N'>0  S Y(0)=$G(^FBAAC(K,1,L,1,M,1,N,0)) I Y(0)]"" D
+ F K=0:0 S K=$O(^FBAAC("AC",J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAAC("AC",J,K,L)) Q:L'>0  F M=0:0 S M=$O(^FBAAC("AC",J,K,L,M)) Q:M'>0  F N=0:0 S N=$O(^FBAAC("AC",J,K,L,M,N)) Q:N'>0  S Y(0)=$G(^FBAAC(K,1,L,1,M,1,N,0)) I Y(0)]"",+$P(Y(0),U,3) D
  .N FBDTSR1,FBPICN
  .S FBDTSR1=+$G(^FBAAC(K,1,L,1,M,0))
  .S FBPICN=K_U_L_U_M_U_N
@@ -103,7 +101,7 @@ GOT ; process a B3 line item
  ;      - after this point Y(0) will be the 0 node of file #2
  S Y(0)=$G(^DPT(+K,0)) Q:Y(0)']""
  D PAT^FBAAUTL2
- ; obtain date of birth, must follow call to PAT^FBAAUTL2 to overwrite 
+ ; obtain date of birth, must follow call to PAT^FBAAUTL2 to overwrite
  ; the value returned from it
  S FBDOB=$$AUSDT^FBAAV3($P(Y(0),"^",3)) ; date of birth
  D ADD^VADPT

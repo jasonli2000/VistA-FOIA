@@ -1,5 +1,5 @@
 RMPRPIYN ;HINCIO/ODJ - EL - Edit Location ;3/8/01
- ;;3.0;PROSTHETICS;**61,154**;Feb 09, 1996;Build 6
+ ;;3.0;PROSTHETICS;**61**;Feb 09, 1996
  Q
  ;
  ;***** EL - Edit Inventory LOCATION
@@ -39,12 +39,11 @@ EDLOC(RMPR5,RMPREXC) ;
  S DIR("A")="LOCATION: "
  S DIR("B")=RMPR5("NAME")
  S DIR("?")="Answer must be 3-30 characters in length."
- S DIR("??")="^D ELQQM^RMPRPIYN"
+ S DIR("??")="^D ELQQM^RMPRPIY6"
 EDLOC1 D ^DIR
  I $D(DTOUT) S RMPREXC="T" G EDLOCX
  I $D(DIROUT) S RMPREXC="P" G EDLOCX
  I X=""!(X["^") S RMPREXC="^" G EDLOCX
- I $E(X)="@" W !,"Cannot delete location, only deactivate" K X G EDLOC1
  I X=RMPR5("NAME") G EDLOCX
  L +^RMPR(661.5,RMPR5("IEN")):0 E  D  G EDLOCX
  . W !,"Location being edited by another user, cannot continue."

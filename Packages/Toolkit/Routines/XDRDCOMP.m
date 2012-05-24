@@ -1,18 +1,13 @@
-XDRDCOMP ;SF-IRMFO/IHS/OHPRD/JCM - COMPARE TWO PATIENTS VIA DUP CHECKER ;8/28/08  17:58
- ;;7.3;TOOLKIT;**23,113**;Apr 25, 1995;Build 5
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+XDRDCOMP ;SF-IRMFO/IHS/OHPRD/JCM - COMPARE TWO PATIENTS VIA DUP CHECKER ;12/1/97  16:34
+ ;;7.3;TOOLKIT;**23**;Apr 25, 1995
  ;;
  ; This routine will compare two records (patients), and will result with
  ; a score (0 - 100%) as to how they match up.  You can not compare the
  ; same record.
  ;
- ; *** NOTE *** As of patch XT*7.3*113, this routine is no longer
- ; available for use on the PATIENT file. *****
- ;
 START ;
  S XDRQFLG=0
- ; XT*7.3*113 - Input param to FILE^XDRDPICK makes PATIENT file unselectable.
- S XDRFL=$$FILE^XDRDPICK(1) Q:XDRFL'>0
+ S XDRFL=$$FILE^XDRDPICK() Q:XDRFL'>0
  G:XDRQFLG END
  S XDRGL=^DIC(XDRFL,0,"GL")
  S XDRDTYPE="BASIC" ; ADDED 4/11/96  JLI

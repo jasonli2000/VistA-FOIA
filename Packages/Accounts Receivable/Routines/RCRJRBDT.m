@@ -1,6 +1,6 @@
-RCRJRBDT ;WISC/RFJ-bad debt retransmit ; 9/2/10 8:47am
- ;;4.5;Accounts Receivable;**101,170,191,138,239,273**;Mar 20, 1995;Build 3
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+RCRJRBDT ;WISC/RFJ-bad debt retransmit ;1 Feb 98
+ ;;4.5;Accounts Receivable;**101,170,191,138,239**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;
  ; - deactivate this option with patch PRCA*4.5*239
@@ -77,20 +77,20 @@ FOOTNOTE ;  report footnotes (from rcrjrbdr)
  ;;    for SGL 1339 are based on bills created prior to the activation of the
  ;;    Medicare Remittance Advice software.  Over time, there will no longer be
  ;;    any bills in this category.
- ;; 
+ ;;
  ;;(2) Calculated Percentages and the Allowance for Contract Adj - Third Party
  ;;    for SGL 133N are based on non-Medicare WNR bills created after the
  ;;    activation of the Medicare Remittance Advice software.
- ;; 
+ ;;
  ;;(3) The "Allowance Estimate for DATEREPT" is the dollar value estimated
  ;;    as the Allowance for Bad Debt or Contract Adjustment for the month.
- ;; 
+ ;;
  ;;(4) The "Bad Debt Write-Off (Plus)" is the actual write-offs or contract
  ;;    adjustments accomplished from FEB 1,1998 thru ENDDATE.
- ;; 
+ ;;
  ;;(5) The "Transmitted Amount to FMS for Month" is the sum of (3) and (4).
  ;;    The transmitted dollar value is normally a credit value.
- ;; 
+ ;;
  ;;(6) Facilities are responsible for reporting monthly accrued unbilled
  ;;    amounts.  When such amounts are identified and reported, a portion of
  ;;    those dollars should be reported as uncollectable.  The estimated
@@ -101,7 +101,7 @@ FOOTNOTE ;  report footnotes (from rcrjrbdr)
  ;;    month.  Facilities may wish to consider using the allowance percentages
  ;;    provided with this report, if no other means of determining the
  ;;    estimated allowance for the accrued unbilled amount is acceptable.
- ;; 
+ ;;
  ;;(7) Only members in the facility's local RC AR DATA COLLECTOR mail group
  ;;    will receive this report.
  ;
@@ -131,7 +131,7 @@ BDR ; Compile new Bad Debt Report.
  ;  show mccf
  D SETLINE(" ")
  D SETLINE($E(SPACE,1,26)_"Medical Care Collection Fund")
- D SETLINE($E(SPACE,1,20)_" Funds 528701; 528703; 528704; 528709; and 528711")
+ D SETLINE($E(SPACE,1,20)_" Funds 528701; 528703; 528704; and 528709")
  D SETLINE($E(SPACE,1,26)_"----------------------------")
  D SETLINE(" ")
  D SETLINE(" ")
@@ -149,9 +149,6 @@ BDR ; Compile new Bad Debt Report.
  ;     5              133N             528704 - 133N
  ;     6              1338             528704 - 1338
  ;     7            1319.2             528709 - 1319
- ;     8            1319.5             528711 - 1319
- ;     9            133N.2             528711 - 133N
- ;    10            1338.2             528711 - 1338
  ;
  S RCARR(1)="1319.3^528701 - 1319"
  S RCARR(2)="1319^528703 - 1319"
@@ -160,9 +157,6 @@ BDR ; Compile new Bad Debt Report.
  S RCARR(5)="133N^528704 - 133N"
  S RCARR(6)="1338^528704 - 1338"
  S RCARR(7)="1319.2^528709 - 1319"
- S RCARR(8)="1319.5^528711 - 1319"
- S RCARR(9)="133N.2^528711 - 133N"
- S RCARR(10)="1338.2^528711 - 1338"
  ;
  S RCX="" F  S RCX=$O(RCARR(RCX)) Q:RCX=""  S RCD=RCARR(RCX) D
  .S RCDATA=$G(^RC(348.1,+$O(^RC(348.1,"B",$P(RCD,"^"),0)),0))

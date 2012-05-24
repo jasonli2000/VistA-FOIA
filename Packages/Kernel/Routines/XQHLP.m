@@ -1,5 +1,5 @@
-XQHLP ;SEA/MJM - Menu Helper  ;07/21/09  11:37
- ;;8.0;KERNEL;**46,514**;Jul 10, 1995;Build 8
+XQHLP ;SEA/MJM - Menu Helper  ;04/13/98  13:59
+ ;;8.0;KERNEL;**46**;Jul 10, 1995
  ;
 PAUSE R !!,"  **> Press 'RETURN' to continue, '^' to stop, or '?[option text]' for more",!?25,"help: ",XQL:DTIME D:XQL?1"?"1AN.ANP HELP S XQL=$S(XQL[U:-1,1:XQLN) W @IOF Q
  ;
@@ -39,7 +39,7 @@ EN ;Show descriptions from Option File Entry point from EN^XQ2
 OUT ;Exit here
  W !!
  ;S:$D(XQSAV) XQDIC=XQSAV
- K DIR,DIROUT,DIRUT,DTOUT,DUOUT,X,XQA,XQHSV,XQHY,XQHY0,XQNXTOP,XQL,XQLN,XQN,XQSAV,XQX,Y
+ K DIR,DIROUT,DIRUT,DTOUT,DUOUT,X,XQA,XQHLP,XQHSV,XQHY,XQHY0,XQNXTOP,XQL,XQLN,XQN,XQSAV,XQX,Y
  I $D(XQHLP) K XQHLP Q
  G M2^XQ
  ;

@@ -1,5 +1,5 @@
 IBCSC1 ;ALB/MJB - MCCR SCREEN 1 (DEMOGRAPHICS) ;27 MAY 88 10:13
- ;;2.0;INTEGRATED BILLING;**51,161,349,400**;21-MAR-94;Build 52
+ ;;2.0;INTEGRATED BILLING;**51,161,349**;21-MAR-94;Build 46
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ; DBIA for reference to DG ELIGIBILITY key: DBIA3109
  ;
@@ -12,19 +12,6 @@ BEN S IBSR=1,IBSR1="",IBV1=$S($D(^XUSEC("DG ELIGIBILITY",DUZ)):"000000",1:101100
  ;
  ; Add/Update to ClaimsManager file (#351.9) if running ClaimsManager
  I $$CM^IBCIUT1(IBIFN) D ST1^IBCIST
- ;
- ; coming into the billing screens, default the service facility taxonomy code if blank
- N IBU3,BPZ
- S IBU3=$G(^DGCR(399,IBIFN,"U3"))
- S BPZ=$$B^IBCEF79(IBIFN)
- I '$P(IBU3,U,2),$P(BPZ,U,3)'="" D      ; if no svc fac taxonomy code and a svc fac exists
- . N SFTAX,DIE,DA,DR,D,D0,DI
- . S SFTAX=""
- . I $P(BPZ,U,3)=0,+$P(BPZ,U,4) S SFTAX=+$P($$TAXORG^XUSTAX(+$P(BPZ,U,4)),U,2)     ; ien to file 8932.1 for VA svc fac
- . I $P(BPZ,U,3)=1,+$P(BPZ,U,4) S SFTAX=+$P($$TAXGET^IBCEP81(+$P(BPZ,U,4)),U,2)    ; ien to file 8932.1 for non-VA svc fac
- . I 'SFTAX Q
- . S DIE=399,DA=IBIFN,DR="243////"_SFTAX D ^DIE
- . Q
  ;
 1 S Z=1,IBW=1 X IBWW W " DOB    : ",$P(VADM(3),"^",2) I $G(VADM(6)) W ?42,"Date of Death: ",$P(VADM(6),U,2)," (uneditable)"
  ;

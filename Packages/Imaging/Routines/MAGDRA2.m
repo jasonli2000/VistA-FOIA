@@ -1,6 +1,5 @@
-MAGDRA2 ;WOIFO/LB - Routine for DICOM fix ; 08 Feb 2011 10:22 AM
- ;;3.0;IMAGING;**10,11,51,54,49**;Mar 19, 2002;Build 2033;Apr 07, 2011
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGDRA2 ;WOIFO/LB -Routine for DICOM fix  [ 06/20/2001 08:56 ] ; 06/06/2005  09:28
+ ;;3.0;IMAGING;**10,11,51**;26-August-2005
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGDRA2 ;WOIFO/LB - Routine for DICOM fix ; 08 Feb 2011 10:22 AM
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -55,18 +55,8 @@ PTINFO() ;
  . Q
  Q ""
  ;
-LCASE(MAGDT,MAGCASE) ; return the accession number
- N ACNUMB,ARESULT
- S ACNUMB=$TR($TR($$FMTE^XLFDT(MAGDT,"2FD")," ","0"),"/","")_"-"_MAGCASE
- I $$USESSAN^RAHLRU1(),$$ACCFIND^RAAPI(ACNUMB,.ARESULT)>0 D  ; ICR 5600
- . ; lookup site-specific accession number
- . N ACNUMB1,RADFN,RADTI,RACNI
- . S RADFN=$P(ARESULT(1),"^",1),RADTI=$P(ARESULT(1),"^",2)
- . S RACNI=$P(ARESULT(1),"^",3)
- . S ACNUMB1=$$GET1^DIQ(70.03,(RACNI_","_RADTI_","_RADFN),31)
- . I ACNUMB1'="" S ACNUMB=ACNUMB1
- . Q
- Q ACNUMB
+LCASE(MAGDT,MAGCASE) ;
+ Q $TR($TR($$FMTE^XLFDT(MAGDT,"2FD")," ","0"),"/","")_"-"_MAGCASE
  ;
 IMG(MAGRPT) ;
  N INFO,MAGOUT,MAGERR
@@ -90,7 +80,8 @@ ONE ;
  S MAGDFN=$P(MAGX,"~"),INFO=$$PTINFO
  S MAGNME=$P(INFO,"^"),MAGSSN=$P(INFO,"^",2)
  S RIEN=$P(MAGX,"~",2)_","_$P(MAGX,"~",1)
- S BEG=9999999.9999-$P(MAGX,"~",2),END=$$FMADD^XLFDT(BEG,2)
+ S X1=9999999.9999-$P(MAGX,"~",2),X2=+2 D C^%DTC
+ S END=X,BEG=9999999.9999-$P(MAGX,"~",2)
  K ^TMP($J,"RAE1")
  D EN1^RAO7PC1(MAGDFN,BEG,END,20)
  S RAENTRY=$P(MAGX,"~",2)_"-"_$P(MAGX,"~",3)
@@ -105,7 +96,7 @@ ONE ;
  S (MAGDTI,RADTI)=$P(RAENTRY,"-")
  S (MAGCNI,RACNI)=$P(RAENTRY,"-",2),RADFN=MAGDFN
  S MAGCASE=$$LCASE(CDATE,CASE),MAGPIEN=$$PROC(MAGPRC)
- ; RADTI, RADFN, RACNI variables needed for EN1^RAUTL20
+ ; RADTI, RADFN, RACNI variables needed for EN1^RAULT20
  D EN1^RAUTL20
  S (PSET,MAGPSET)=""
  S PSET=$S(RAMEMLOW:"+",RAPRTSET:".",1:"")
@@ -134,4 +125,3 @@ MAGDY ;
  S MAGDY=MAGDY_"^"_MAGCNI_"^"_MAGPIEN_"^"_$G(MAGPST)_"^"
  K MAGNME,MAGSSN,MAGCASE,MAGPRC,MAGDTI,MAGCNI,MAGPIEN,MAPST
  Q
- ;

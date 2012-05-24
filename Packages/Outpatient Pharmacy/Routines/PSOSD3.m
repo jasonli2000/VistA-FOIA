@@ -1,5 +1,5 @@
 PSOSD3 ;BHAM ISC/RTR - Prints pending orders on action profile ;11/20/95
- ;;7.0;OUTPATIENT PHARMACY;**2,19,107,110,132,233,258,326**;DEC 1997;Build 11
+ ;;7.0;OUTPATIENT PHARMACY;**2,19,107,110,132,233,258**;DEC 1997;Build 4
  ;External reference ^PS(50.7 - 2223
  ;External reference ^PS(50.606 - 2174
  ;External reference ^PSDRUG( - 221
@@ -38,7 +38,7 @@ HD1 S FN=DFN
  W @$S(PSORM:"?70",1:"!"),"Site: VAMC "_$P(X,"^",2)_" ("_$P(X,"^",3)_")",!,$E(LINE,1,$S('PSORM:80,1:IOM)-1)
  I $P(VAIN(4),"^",2)]"",+$P($G(^PS(59.7,1,40.1)),"^") W !,"Outpatient prescriptions are discontinued 72 hours after admission.",!
  I $D(CLINICX) W !?1,"Clinic: "_$E(CLINICX,1,28),?45,"Date/Time: " S Y=CLDT D DT^DIO2
- W !?1,"Name  : ",PSNAME W:PSTYPE ?58,"Action Date: ________" W !?1,"DOB   : "_PSDOB
+ W !?1,"Name  : ",PSNAME,?30,"ID#: "_VA("BID") W:PSTYPE ?58,"Action Date: ________" W !?1,"DOB   : "_PSDOB
  W:ADDRFL]"" ?30,ADDRFL,! W ?30,"Address  :"
  I $G(ADDRFL)="" D CHECKBAI^PSOSD1
  W ?41,VAPA(1) W:VAPA(2)]"" !?41,VAPA(2) W:VAPA(3)]"" !?41,VAPA(3)

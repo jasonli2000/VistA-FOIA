@@ -1,11 +1,5 @@
-RORX012 ;HOIFO/SG,VAC - COMBINED MEDS AND LABS REPORT ;4/9/09 9:40am
- ;;1.5;CLINICAL CASE REGISTRIES;**8**;Feb 17, 2006;Build 8
- ;
- ;Modified Feb 2009, to permit only the most recent test to be
- ;    displayed on the report - a call to ^RORXU009
- ;
- ;Modified March 2009 to filter patients on Include or Exclude ICD9
- ;    codes.  Call to ^RORXU010
+RORX012 ;HOIFO/SG - COMBINED MEDS AND LABS REPORT ; 11/8/05 8:48am
+ ;;1.5;CLINICAL CASE REGISTRIES;;Feb 17, 2006
  ;
  Q
  ;
@@ -107,10 +101,6 @@ RXANDLAB(RORTSK) ;
  N RORXSDT       ; Pharmacy start date
  ;
  N ECNT,NSPT,RC,REPORT,SFLAGS,TMP
- N RORDEL        ; Flag to determine if Most Recent is set
- N RORDELTSK     ; Task number passed to delete tests
- S RORDEL=$G(RORTSK("PARAMS","LABTESTS","A","MOST_RECENT"))
- S RORDELTSK=RORTSK
  S (RORXL,RORLTST)="",(ECNT,RC)=0
  K ^TMP("RORX012",$J)
  ;--- Root node of the report
@@ -135,10 +125,6 @@ RXANDLAB(RORTSK) ;
  . I RC  Q:RC<0  S ECNT=ECNT+RC
  ;
  ;--- Cleanup
- ;--- Modify the report if only the latest test is required
- ;    Inputs are Task number for File 798.8 and the flag
- I RORDEL=1 D DEL^RORXU009(RORDELTSK)
  K ^TMP("RORX012",$J)
  D FREE^RORTMP(RORXL),FREE^RORTMP(RORLTST)
- ;
  Q $S(RC<0:RC,ECNT>0:-43,1:0)

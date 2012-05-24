@@ -1,12 +1,13 @@
 XOBVRM ;; mjk/alb - VistaLink Request Manager ; 07/27/2002  13:00
- ;;1.6;VistALink;;May 08, 2009;Build 15
- ;Per VHA directive 2004-038, this routine should not be modified.
+ ;;1.5;VistALink;;Sep 09, 2005
+ ;;Foundations Toolbox Release v1.5 [Build: 1.5.0.026]
+ ;
  QUIT
  ;
  ; --------------------------------------------------------------------------------
  ;                                Request Manager
  ; --------------------------------------------------------------------------------
- ;                   
+ ;
 EN(XOBROOT,XOBDATA,XOBHDLR) ; -- main entry point for Request Manager
  NEW XOBOK,XOBOPT
  SET XOBOK=0
@@ -21,11 +22,10 @@ EN(XOBROOT,XOBDATA,XOBHDLR) ; -- main entry point for Request Manager
  ; -- check if request handler info was successfully initialized / if not, throw exception
  SET XOBHDLR=+$GET(XOBHDLR)
  IF '$GET(XOBHDLR(XOBHDLR)) DO  GOTO ENQ
- . SET XWBTIP=$$GETPEER^%ZOSV ; try get client IP for error trap. Use of GETPEER^%ZOSV: DBIA #4056
  . DO RMERR(184001,$GET(XOBHDLR(XOBHDLR,"ERROR"),"Request Manager not defined"))
  . SET XOBOK=0
  ;
- ; -- do authentication check for message type?
+ ; -- do authtentication check for message type?
  IF $GET(XOBHDLR(XOBHDLR,"AUTHENTICATE")) DO
  . SET XOBOK=$$LOGGEDON^XOBSCAV()
  ELSE  DO

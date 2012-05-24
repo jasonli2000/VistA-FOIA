@@ -1,6 +1,5 @@
-XDRDFPD ;IHS/OHPRD/LAB - find all potential duplicates for an entry in a file ;6/9/08  11:26
- ;;7.3;TOOLKIT;**113**;Apr 25, 1995;Build 5
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+XDRDFPD ;IHS/OHPRD/LAB - find all potential duplicates for an entry in a file ;09/13/93  08:42
+ ;;7.3;TOOLKIT;;Apr 25, 1995
 START ;
 INIT ;Initialization
  W !,"This option will collect all Potential Duplicates for an entry in a file.",!,"It will then add any pairs found to the Duplicate Record file.",!
@@ -11,8 +10,6 @@ END D EOJ
  Q
 PROCESS ;
  K XDRD
- ; Flag XDRNOPT makes FILE^XDRDQUE not allow selection of PATIENT file - XT*7.3*113
- N XDRNOPT S XDRNOPT=1
  S XDRQFLG=0,XDRDTYPE="b"
  S DIC("A")="Find Potential Duplicates for entry in what file: " D FILE^XDRDQUE
  G:XDRQFLG PROCESSX

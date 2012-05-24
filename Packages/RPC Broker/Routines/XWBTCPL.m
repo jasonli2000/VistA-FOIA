@@ -1,4 +1,4 @@
-XWBTCPL ;SLC/KCM - Listener for TCP connects ;12/09/2004  07:33
+XWBTCPL ;SLC/KCM - Listener for TCP connects ;08/25/2004  12:08
  ;;1.1;RPC BROKER;**1,7,9,15,16,35**;Mar 28, 1997
  ;ISC-SF/EG - DHCP Broker
  ;
@@ -135,7 +135,6 @@ ETRAP ; -- on trapped error, send error info to client
  . S %=$$SEMAPHOR(XWBTSKT,"UNLOCK") ; destroy 'running flag'
  . D UPDTREC(XWBTSKT,6) ;updt RPC BROKER SITE PARAMETER record as STOPPED
  . Q
- S XWBDEBUG=$G(XWBDEBUG)
  ;Set new trap
  S $ETRAP="Q:($ESTACK&'$QUIT)  Q:$ESTACK -9 S $ECODE="""" G RESTART^XWBTCPL"
  ;
@@ -145,7 +144,7 @@ ETRAP ; -- on trapped error, send error info to client
  IF XWBOS="OpenM",XWBERC'["<WRITE>" D QSND(XWBERR) ;(*p7,35*)
  IF XWBOS="MSM" D QSND(XWBERR) ;(*p7,35*)
 ETRAPX D RELEASE(1) ;Now close the connection. (*p7*)
- I XWBOS="DSM" H 15 ;Wait for device to close 
+ I XWBOS="DSM" H 15 ;Wait for device to close
  S $ECODE=",U1," Q  ;Pass error up to pop stack.
  ;
 FLUSH ;Flush the input buffer

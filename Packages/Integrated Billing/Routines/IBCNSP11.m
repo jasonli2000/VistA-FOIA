@@ -1,6 +1,6 @@
 IBCNSP11 ;ALB/AAS - INSURANCE MANAGEMENT - EDIT PLAN ;23-JAN-95
- ;;2.0;INTEGRATED BILLING;**28,43,85,103,137,251,399**;21-MAR-94;Build 8
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**28,43,85,103,137,251**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 PI ; -- edit plan information from policy edit
  D FULL^VALM1
@@ -53,9 +53,8 @@ CHG ; - change the plan type
 PIC ; - edit name/number/type
  S IBTL=$S($P($G(^IBA(355.3,IBCPOL,0)),"^",2):"GROUP",1:"INDIVIDUAL")_" PLAN"
  S DIE="^IBA(355.3,",DA=IBCPOL
- ;
- S DR=".03"_IBTL_" NAME;.04"_IBTL_" NUMBER;6.02;6.03;.09;.15;S Y=$S($$CATOK^IBCEMRA($P(^IBA(355.3,IBCPOL,0),U,14)):""@1"",1:""@10"");@1;.14;@10;.16;I '$$FTFV^IBCNSU31(X) S Y=""@13"";.17;@13;.13"
- ;
+ ;;Daou/EEN - adding BIN (#355.3,6.02) and PCN (#355.3,6.03)
+ S DR=".03"_IBTL_" NAME;.04"_IBTL_" NUMBER;6.02;6.03;.09;.15;S Y=$S($$CATOK^IBCEMRA($P(^IBA(355.3,IBCPOL,0),U,14)):""@1"",1:""@10"");@1;.14;@10;.13"
  D ^DIE K DIC,DIE,DA,DR
  D COMP^IBCNSP3(IBCPOL)
  I IBDIF D UPDATE^IBCNSP3(IBCPOL) D:$G(IBDFN) UPDATPT^IBCNSP3(IBDFN,IBCDFN),BLD^IBCNSP D:'$G(IBDFN) INIT^IBCNSC4

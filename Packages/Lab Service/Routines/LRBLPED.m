@@ -1,10 +1,10 @@
 LRBLPED ;AVAMC/REG/CRT - PEDIATRIC UNIT PREPARATION ;7/30/95  15:36 ; 12/18/00 2:19pm
- ;;5.2;LAB SERVICE;**72,247,267,408**;Sep 27, 1994;Build 8
+ ;;5.2;LAB SERVICE;**72,247,267**;Sep 27, 1994
  ;Per VHA Directive 97-033 this routine should not be modified.  Medical Device # BK970021
  ;
  ; References to ^DD(65, and ^DD(66, are supported in DBIA3261
  ;
- Q  D END S LR("M")=1,X="BLOOD BANK" D ^LRUTL G:Y=-1 END S %DT="T",X="N" D ^%DT S LRN=Y,LRM=$P(Y,".") W !?15,"Division: ",LRAA(4)
+ D END S LR("M")=1,X="BLOOD BANK" D ^LRUTL G:Y=-1 END S %DT="T",X="N" D ^%DT S LRN=Y,LRM=$P(Y,".") W !?15,"Division: ",LRAA(4)
  I LRCAPA S X="PEDIATRIC UNIT PREPARATION",X("NOCODES")=1 D X^LRUWK G:'$D(X) END K X
  S LR(3)="" D BAR^LRBLB
 P W !! S X=$$READ^LRBLB("Blood component for pediatric prep: ") G:X=""!(X["^") END I X=" " W $C(7),"  SPACE BAR not allowed." G P
@@ -91,7 +91,7 @@ LRP(DA) ; Find & return Product Code to be used for next child
  ;
  S B=0
  ;
- Q:'$$GET1^DIQ(65,DA,".04:.29","I") $$GET1^DIQ(65,+DA,".04:.22","I") ; not ISBT-128, return the IEN of 
+ Q:'$$GET1^DIQ(65,DA,".04:.29","I") $$GET1^DIQ(65,+DA,".04:.22","I") ; not ISBT-128, return the IEN of
  ;                                                                   ; the pediatric type for the product
  S LRBLPC=$$GET1^DIQ(65,+DA,".04:.05") ; Parent Product Code
  ;

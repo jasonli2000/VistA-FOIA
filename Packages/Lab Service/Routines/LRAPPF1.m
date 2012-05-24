@@ -1,5 +1,5 @@
 LRAPPF1 ;AVAMC/REG/WTY - ANAT PATH FILE PRINT BY PT ;10/16/01
- ;;5.2;LAB SERVICE;**72,173,201,259,362,392**;Sep 27, 1994;Build 6
+ ;;5.2;LAB SERVICE;**72,173,201,259,362**;Sep 27, 1994;Build 11
  ;
  ;Reference to ^DIC supported by IA #916
  ;
@@ -21,8 +21,7 @@ NM S X=^LR(LRDFN,0),LRDPF=$P(X,U,2),N=$P(X,"^",3),N=@(F(2)_N_",0)")
  S LRI=0 F  S LRI=$O(^TMP($J,F,W,LRDFN,LRI)) Q:'LRI!(LR("Q"))  D
  .D @($S("CYEMSP"[LRSS:"EN",1:"AUT"))
  Q
-AUT S LRSF515=+$G(LRSF515)
- D:$Y>(IOSL-12) H1 Q:LR("Q")
+AUT D:$Y>(IOSL-12) H1 Q:LR("Q")
  S X=^LR(LRDFN,"AU"),N=$P(X,"^",6),Y=+X D D^LRU S LRH(3)=Y,DA=LRDFN
  D D^LRAUAW S Y=LR(63,12) D D^LRU S E=Y,H(2)=$E(H(1),1,3)
  W !,"AUTOPSY #: ",N," AUTOPSY DATE: ",LRH(3),?51,"DIED: ",E

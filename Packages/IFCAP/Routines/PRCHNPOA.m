@@ -1,15 +1,15 @@
 PRCHNPOA ;WISC/RL/DXH - CHANGE TRANS. NUMBER FOR PCO INITIATED 2237 ;8.2.99
-V ;;5.1;IFCAP;**135**;Oct 20, 2000;Build 7
+V ;;5.1;IFCAP;;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ; This code is called after a user electronically signs a purchase
- ; card order.  If the FCP on the 2237 does not match the one in the 
+ ; card order.  If the FCP on the 2237 does not match the one in the
  ; the transaction number for the 2237 entry, this code will change
  ; the existing transaction number for the 2237.   To do this, a new
  ; ien is created and populated with info from the existing transaction,
  ; then canceled.  The original transaction is updated with the new
  ; transaction number.
  ; (This code is a simplified of ANTN^PRCSUT2, which is called by the
- ; IFCAP option "Change Existing Transaction Number" 
+ ; IFCAP option "Change Existing Transaction Number"
  ;
  ;Inputs: param PCODA is the IEN of the Purchase Card Order in 442 file.
  ;Return Values: none
@@ -17,15 +17,12 @@ V ;;5.1;IFCAP;**135**;Oct 20, 2000;Build 7
  ;
 CHECKFCP(PCODA) ;Check FCP in 2237 entry of the 410 file to see if it matches Trans #
  ;
- N CURFCP,ODA,OTNUM,OCP,OLDFYQ,CURFYQ,TDATE,SDATE
+ N CURFCP,ODA,OTNUM,OCP
  S ODA=+$P($G(^PRC(442,PCODA,23)),U,23) ; ODA is the IEN for the old 410 entry
  S OTNUM=$P($G(^PRCS(410,ODA,0)),U,1) ; OTNUM is transaction # for old 410 entry
- S OCP=$P(OTNUM,"-",4) ;               OCP is the original FCP for trans.
+ S OCP=+$P(OTNUM,"-",4) ;               OCP is the original FCP for trans.
  S CURFCP=$P($G(^PRCS(410,ODA,3)),U,1) ;  CURFCP is the current (valid) FCP for trans.
- ;Patch prc*5.1*135 now checks order date change, besides FCP
- S OLDFYQ=$P(OTNUM,"-",2,3),CURFYQ=PRC("FY")_"-"_PRC("QTR")
- Q:CURFCP=""&(OCP="") 
- I (+CURFCP'=+OCP)!(CURFYQ'=OLDFYQ) D MODTXN
+ I (+CURFCP'=+OCP) D MODTXN
  Q
  ;
 MODTXN ;Modify the transaction number for the 2237 entry in the 410 file
@@ -37,14 +34,16 @@ MODTXN ;Modify the transaction number for the 2237 entry in the 410 file
  S T2=OTNUM ;T2 is needed in PRCSUT call later
  S T5=$P(ONODE0,"^",10) ; substation
  S T4=$P(ONODE0,"^",2) ; txn type of transaction to be replaced
- S PRC("SITE")=$P(OTNUM,"-"),PRC("CP")=CURFCP
+ S PRC("SITE")=$P(OTNUM,"-"),PRC("FY")=$P(OTNUM,"-",2)
+ S PRC("QTR")=$P(OTNUM,"-",3),PRC("CP")=CURFCP
  S PRC("BBFY")=$$BBFY^PRCSUT(PRC("SITE"),PRC("FY"),+PRC("CP"),1)
- S X=PRC("SITE")_"-"_PRC("FY")_"-"_$P(CURFCP," ")
- S Z=PRC("SITE")_"-"_PRC("FY")_"-"_PRC("QTR")_"-"_$P(CURFCP," ")
+ S X=PRC("SITE")_"-"_PRC("FY")_"-" S:(+CURFCP<100) X=X_"0" S X=X_+CURFCP
+ S Z=PRC("SITE")_"-"_PRC("FY")_"-"_PRC("QTR")_"-"
+ S:(+CURFCP<100) Z=Z_"0" S Z=Z_+CURFCP
  D EN1^PRCSUT3 ; generate new name for txn and put in X
+ D IP^PRCSUT ; get prcsip (prc*5*197)
  G:'$G(X) EXIT
- S TX1=X
- S (DIC,DIE)="^PRCS(410,"
+ S TX1=X,(DIC,DIE)="^PRCS(410,"
 CK K DA
  S DLAYGO=410,DIC="^PRCS(410,",DIC(0)="LXZ"
  D ^DIC
@@ -64,7 +63,6 @@ CK K DA
  K ^PRCS(410,"B2",$P(OTNUM,"-",5),ODA)
  K ^PRCS(410,"B3",$P(OTNUM,"-",2)_"-"_$P(OTNUM,"-",5),ODA)
  K ^PRCS(410,"AE",$P(OTNUM,"-",1,4),ODA)
- K ^PRCS(410,"RB",$P(ONODE0,U,11)_"-"_$P(OTNUM,"-")_"-"_$P(OTNUM,"-",4)_"-"_$P(OTNUM,"-",2)_"-"_$P(OTNUM,"-",5),ODA)
  S ^PRCS(410,"B",OTNUM,DA)=""
  S ^PRCS(410,"B2",$P(OTNUM,"-",5),DA)=""
  S ^PRCS(410,"B3",$P(OTNUM,"-",2)_"-"_$P(OTNUM,"-",5),DA)=""
@@ -82,7 +80,7 @@ CK1 ; set old txn name into new ien, new txn nam into old (original) ien
  ; cancel txn at new ien; force old site & CP info into new ien
  S DIE="^PRCS(410,",DR=".5///"_+OTNUM_";S X=X;15///"_$$EXPANDCP(+OTNUM,OCP)
  S DR=DR_";60///Transaction "_OTNUM_" replaced by trans. "_TX1
- S DR=DR_";450///C" ;put cancel flag in Running Bal status 
+ S DR=DR_";450///C" ;put cancel flag in Running Bal status
  D ^DIE
  I T5'="" S $P(^PRCS(410,DA,0),U,10)=T5 ; save substation in new ien
  S $P(^PRCS(410,DA,0),U,2)="CA" ; cancel txn at new ien

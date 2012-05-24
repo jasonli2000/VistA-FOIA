@@ -1,6 +1,6 @@
-PRCAACC ;WASH-ISC@ALTOONA,PA/CMS-AR ACCRUAL TOTALS ; 10/19/10 1:36pm
- ;;4.5;Accounts Receivable;**60,74,90,101,157,203,220,273**;Mar 20, 1995;Build 3
- ;;Per VHA Directive 2004-38, this routine should not be modified.
+PRCAACC ;WASH-ISC@ALTOONA,PA/CMS-AR ACCRUAL TOTALS ;2/6/95  11:17 AM
+ ;;4.5;Accounts Receivable;**60,74,90,101,157,203,220**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  NEW PRCAQUE,PRCADEV,PRCA,ZTSK
  S PRCA("MESS")="Do you wish to queue this report" D QUE^PRCAQUE G:'$D(PRCAQUE) Q
  I $D(IO("Q")) S ZTRTN="DQ^PRCAACC",ZTDESC="AR Accrual Totals" D ^%ZTLOAD G Q
@@ -36,7 +36,7 @@ ACCK(BN) ;Check BILLN to see if Accrual
  .   .   I DB[";DPT"!($P($G(^PRCA(430,BN,0)),U,7)'="") S ACC=1
  ;
  ;  public law states that bills in the category ineligible (1),
- ;  emerg/human (2), torts (10), or medicare (21) which are older 
+ ;  emerg/human (2), torts (10), or medicare (21) which are older
  ;  than oct 1, 1992 should be treated as non-accrued.
  I CAT=1!(CAT=2)!(CAT=10)!(CAT=21) D
  .   S ACTDATE=$P($G(^PRCA(430,BN,6)),"^",21) I 'ACTDATE S ACTDATE=DT
@@ -53,12 +53,12 @@ COM ;Find Accrual common numbering series
  F  S COM=$O(^PRCA(430.4,COM)) Q:'COM  I $P(^PRCA(430.4,COM,0),"^",6) S COM($P(^PRCA(430.4,COM,0),"^"))=$P($G(^DIC(49,$P(^(0),"^",5),0)),"^",1)
  Q
 PTACCT(FUND) ;Determines whether Point Accounts are accrued
- ;returns 1 for accrued funds 528701,528702,528703,528704,528709,528711
+ ;returns 1 for accrued funds 528701,528702,528703,528709
  ;returns 0 for any other fund
  I FUND'[5287 Q 0
- S X=$E(FUND,5,6),X=$S(X="09"!(X="11"):1,X<"05":1,1:0)
+ S X=$E(FUND,5,6),X=$S(X="09":1,X<"05":1,1:0)
  Q X
-ADDPTEDT() ;Effective date of additional point accounts 
+ADDPTEDT() ;Effective date of additional point accounts
  ;       (528705 - 528708 and 528710)
  ;Effective date of switch from 4032 to 528709
  Q 3040928

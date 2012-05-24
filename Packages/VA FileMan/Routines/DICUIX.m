@@ -1,6 +1,6 @@
-DICUIX ;SEA/TOAD,SF/TKW-FileMan: Lookup Tools, Indexes ;19APR2011
- ;;22.0;VA FileMan;**20,28,67,164,165**;Mar 30, 1999;Build 32
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DICUIX ;SEA/TOAD,SF/TKW-FileMan: Lookup Tools, Indexes ;11:18 AM  7 Nov 2000
+ ;;22.0;VA FileMan;**20,28,67**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 INDEX(DIFILE,DIFLAGS,DINDEX,DIFROM,DIPART,DINUMBER,DISCREEN,DILIST,DIOUT) ;
  ;
@@ -39,7 +39,7 @@ I2 ; in Index file, build list of subscript data
  . . . S DINDEX(DISUB,"TRANOUT")=^DD("IX",DIXIEN,11.1,S,3),DIGET=3 Q
  . . I "KSMU"[DINDEX("IXTYPE") S DIGET=2
  . . Q
- . S DILENGTH=$P(DINODE,U,5) I 'DILENGTH S DILENGTH=30 ;GFT
+ . S DILENGTH=$P(DINODE,U,5) I 'DILENGTH!(DILENGTH>100) S DILENGTH=30
  . S DIWAY=$S($P(DINODE,U,7)="B":-1,1:1)
  . D COMMON1^DICUIX2
  . Q
@@ -87,7 +87,7 @@ X2 ; Build DINDEX for index in IX nodes.
  . . S DINDEX("IXTYPE")=$S(X="":"R",X="KW":"K",X="SO":"S",(X="TR")!(X="BU"):"*",X]"":X,1:"R")
  . . I "KSMU"[DINDEX("IXTYPE") S DIGET=2
  . . S DILENGTH=+$P(Y,"$E(X,1,",2)
- . . S:'DILENGTH DILENGTH=30 Q  ;!(DILENGTH>100)
+ . . S:'DILENGTH!(DILENGTH>100) DILENGTH=30 Q
  . Q
  I $G(DIFROM(2)) S DIFROM("IEN")=DIFROM(2)
  S DISUB=1,DIWAY=1,DIOUT=0

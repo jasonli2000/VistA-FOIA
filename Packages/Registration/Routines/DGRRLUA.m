@@ -1,5 +1,5 @@
-DGRRLUA ;alb/aas - Person Service Lookup gather patient data;2/15/2005 ; 9/2/08 12:09pm
- ;;5.3;Registration;**538,786**;Aug 13, 1993;Build 21
+DGRRLUA ;alb/aas - Person Service Lookup gather patient data;2/15/2005
+ ;;5.3;Registration;**538**;Aug 13, 1993
  ;
  ;DGRRLUA created when DGRRLU exceeded maximum routine size
  ;
@@ -29,8 +29,8 @@ PTDATA(DFN,DGRRPCNT)    ;
  ;. IF DONE=0 SET PTNAME="(Unknown Alias)  "_PTNAME
  ;
  ; -- REQUIRED COMPONENTS
- ;SENSITIV will be set to true to block the display of the SSN and DOB 
- ;if patient is marked as sensitive in DG Security Log (#38.1) file or 
+ ;SENSITIV will be set to true to block the display of the SSN and DOB
+ ;if patient is marked as sensitive in DG Security Log (#38.1) file or
  ;has an employee eligibility code
  SET SENSITIV=$S($P($G(^DGSL(38.1,DFN,0)),"^",2)=1:"true",1:"false")
  I SENSITIV="false" D
@@ -69,7 +69,7 @@ PTDATA(DFN,DGRRPCNT)    ;
  ; get the PCP's IEN and convert to VPID (primary care physician)  sgg 06/17/04
  SET PATSPCP=$$NMPCPR^SCAPMCU2(DFN,DT,1)
  SET PCPIEN=$P(PATSPCP,"^",1)
- SET PCPNAME=$$CHARCHK^DGRRUTL($P(PATSPCP,"^",2))
+ SET PCPNAME=$P(PATSPCP,"^",2)
  SET PCPVPID=$$VPID^XUPS(+PCPIEN)
  ;
  SET LINE=LINE_" type='"_TYPE_"' primaryeligibility='"_PRIM_"' serviceconnected='"_SC_"' scpercent='"_SCPER_"'"

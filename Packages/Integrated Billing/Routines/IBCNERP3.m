@@ -1,8 +1,8 @@
-IBCNERP3 ;DAOU/BHS - IBCNE eIV RESPONSE REPORT PRINT ;03-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNERP3 ;DAOU/BHS - IBCNE IIV RESPONSE REPORT PRINT ;03-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification
+ ; IIV - Insurance Identification and Verification
  ;
  ; Called by IBCNERPA
  ; Input from IBCNERP1/2:
@@ -19,7 +19,7 @@ IBCNERP3 ;DAOU/BHS - IBCNE eIV RESPONSE REPORT PRINT ;03-JUN-2002
  ;   Report (2).
  ;  IBCNESPC("DTEXP")=Expiration date used in the inactive policy report
  ;
- ;  Based on structure of eIV Response File (#365)
+ ;  Based on structure of IIV Response File (#365)
  ;  ^TMP($J,IBCNERTN,S1,S2,CT,0) based on ^IBCN(365,DA,0)
  ;    IBCNERTN="IBCNERP1", S1=PyrName(SORT=1) or PatNm(SORT=2),
  ;    S2=PatName(SORT=1) or PyrName(SORT=2), CT=Seq ct
@@ -41,7 +41,7 @@ PRINT(RTN,BDT,EDT,PYR,PAT,TYP,SRT,PGC,PXT,MAX,CRT,TRC,EXP,IPRF) ; Print data
  ; Input: RTN="IBCENRP1", BDT=start dt, EDT=end dt, PYR=pyr ien,
  ;  PAT= pat ien, TYP=A/M, SRT=1/2, PGC=page ct, PXT=exit flg,
  ; MAX=max line ct/pg, CRT=1/0, TRC=trc#, EXP=earliest expiration date
- N EORMSG,NONEMSG,SORT1,SORT2,CNT,CNFLG,ERFLG,PRT1,PRT2  ;,DISPDATA
+ N EORMSG,NONEMSG,SORT1,SORT2,CNT,EBFLG,CNFLG,ERFLG,PRT1,PRT2  ;,DISPDATA
  N OPRT1,OPRT2 ; Original values for PRT1 and PRT2, respectively
  S EORMSG="*** END OF REPORT ***"
  S NONEMSG="* * * N O  D A T A  F O U N D * * *"
@@ -59,7 +59,7 @@ PRINT(RTN,BDT,EDT,PYR,PAT,TYP,SRT,PGC,PXT,MAX,CRT,TRC,EXP,IPRF) ; Print data
  . . . D DATA^IBCNERPE(.DISPDATA),LINE(.DISPDATA)  ; build/display data
  ;
  I $G(ZTSTOP)!PXT G PRINTX
- S (CNFLG,ERFLG)=0
+ S (EBFLG,CNFLG,ERFLG)=0
  I $Y+1>MAX!('PGC) D HEADER I $G(ZTSTOP)!PXT G PRINTX
  W !,?(80-$L(EORMSG)\2),EORMSG
 PRINTX ;
@@ -73,7 +73,7 @@ HEADER ; Print hdr info
  . I $D(DTOUT)!($D(DUOUT)) S PXT=1 Q
  I $D(ZTQUEUED),$$S^%ZTLOAD() S ZTSTOP=1 G HEADERX
  S PGC=PGC+1
- W @IOF,!,?1,$S($G(IPRF)=1:"eIV Inactive Policy Report",$G(IPRF)=2:"eIV Ambiguous Policy Report",1:"eIV Response Report") I TRC'="" W " by Trace #"
+ W @IOF,!,?1,$S($G(IPRF)=1:"IIV Inactive Policy Report",$G(IPRF)=2:"IIV Ambiguous Policy Report",1:"IIV Response Report") I TRC'="" W " by Trace #"
  S HDR=$$FMTE^XLFDT($$NOW^XLFDT,1)_"  Page: "_PGC,OFFSET=79-$L(HDR)
  W ?OFFSET,HDR
  I TRC'="" S HDR="Trace #: "_TRC,OFFSET=80-$L(HDR)\2 W !,?OFFSET,HDR
@@ -116,20 +116,23 @@ HEADERX ;
 LINE(DISPDATA) ;  Print data
  N LNCT,LNTOT,NWPG
  S LNTOT=+$O(DISPDATA(""),-1)
- S (CNFLG,ERFLG,NWPG)=0
+ S (EBFLG,CNFLG,ERFLG,NWPG)=0
  F LNCT=1:1:LNTOT D  Q:$G(ZTSTOP)!PXT
  . I $Y+1>MAX!('PGC) D HEADER S NWPG=1 I $G(ZTSTOP)!PXT Q
- . I DISPDATA(LNCT)="Contact Information:"!(DISPDATA(LNCT)="Error Information:"),$Y+3>MAX S (CNFLG,ERFLG)=0 D HEADER S NWPG=1 I $G(ZTSTOP)!PXT Q
+ . I DISPDATA(LNCT)="Eligibility/Benefit Information:"!(DISPDATA(LNCT)="Contact Information:")!(DISPDATA(LNCT)="Error Information:"),$Y+3>MAX S (EBFLG,CNFLG,ERFLG)=0 D HEADER S NWPG=1 I $G(ZTSTOP)!PXT Q
+ . I EBFLG,DISPDATA(LNCT)="",($G(DISPDATA(LNCT+1))="Contact Information:")!($G(DISPDATA(LNCT+1))="Error Information") S EBFLG=0
  . I CNFLG,DISPDATA(LNCT)="",$G(DISPDATA(LNCT+1))="Error Information:" S CNFLG=0
+ . I NWPG,EBFLG W !,?1,"Eligibility/Benefit Information: (cont'd)",!
  . I NWPG,CNFLG W !,?1,"Contact Information: (cont'd)",!
  . I NWPG,ERFLG W !,?1,"Error Information: (cont'd)",!
  . I 'NWPG!(NWPG&(DISPDATA(LNCT)'="")) W !,?1,DISPDATA(LNCT)
  . I NWPG S NWPG=0
- . I DISPDATA(LNCT)["Contact Information:" S ERFLG=0,CNFLG=1
- . I DISPDATA(LNCT)["Error Information:" S CNFLG=0,ERFLG=1
+ . I DISPDATA(LNCT)["Eligibility/Benefit Information:" S EBFLG=1,(CNFLG,ERFLG)=0
+ . I DISPDATA(LNCT)["Contact Information:" S (EBFLG,ERFLG)=0,CNFLG=1
+ . I DISPDATA(LNCT)["Error Information:" S (EBFLG,CNFLG)=0,ERFLG=1
  . Q
- S (CNFLG,ERFLG)=0
-LINEX ; 
+ S (EBFLG,CNFLG,ERFLG)=0
+LINEX ;
  Q
  ;
 SSDB ; Display last 4 digits of SSN and DOB to facilitate pt. identification

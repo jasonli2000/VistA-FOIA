@@ -1,7 +1,7 @@
 ECUERPC1 ;ALB/JAM;Event Capture Data Entry Broker Util ; 5/21/01 7:30pm
- ;;2.0; EVENT CAPTURE ;**25,33,42,46,47,54,72,76,110**;8 May 96;Build 4
+ ;;2.0; EVENT CAPTURE ;**25,33,42,46,47,54,72**;8 May 96
 PATINF(RESULTS,ECARY) ;
- ;Broker entry point to get various types of data from EVENT CAPTURE 
+ ;Broker entry point to get various types of data from EVENT CAPTURE
  ;PATIENT FILE #721
  ;        RPC: EC GETPATINFO
  ;INPUTS   ECARY  - Contains the following subscripted elements
@@ -21,7 +21,7 @@ PATINF(RESULTS,ECARY) ;
  I ECTYP="PRV" D PATPRV^ECUERPC2(ECIEN) Q
  Q
 PATDXS(ECIEN) ;
- ;Returns to broker a patient secondary DXs entries from EVENT 
+ ;Returns to broker a patient secondary DXs entries from EVENT
  ;CAPTURE PATIENT FILE #721
  ;INPUTS   ECIEN - Event Capture Patient ien
  ;
@@ -62,18 +62,18 @@ PATCLASS(ECIEN) ;
  ; INPUTS   ECIEN - Event Capture Patient ien
  ; OUTPUTS  RESULTS - Array of procedure modifiers
  ;  721 IEN^agent orange^radiation exposure^service connect^environmental
- ;  contaminants/SWAC^military sexual trauma^eligibility code #8^
- ;  eligibility description^head/neck cancer^combat veteran^P112/SHAD
+ ;  contaminants^military sexual trauma^eligibility code #8^eligibility
+ ;  description^head/neck cancer^combat veteran
  ;
- N CLA,ELIG,ELCOD,ECAO,ECIR,ECEC,ECSC,ECMST,STR,ECHNC,ECCV,ECSHAD
+ N CLA,ELIG,ELCOD,ECAO,ECIR,ECEC,ECSC,ECMST,STR,ECHNC,ECCV
  I '$D(^ECH(ECIEN,"P")),'$D(^ECH(ECIEN,"PCE")) Q
  K ^TMP($J,"ECLASS")
  S ELIG=$P($G(^ECH(ECIEN,"PCE")),"~",17),ELCOD="",CLA=$G(^ECH(ECIEN,"P"))
  S:ELIG'="" ELCOD=$P($G(^DIC(8,ELIG,0)),U)
  S ECAO=$P(CLA,U,3),ECIR=$P(CLA,U,4),ECEC=$P(CLA,U,5),ECSC=$P(CLA,U,6)
- S ECMST=$P(CLA,U,9),ECHNC=$P(CLA,U,10),ECCV=$P(CLA,U,11),ECSHAD=$P(CLA,U,12)
+ S ECMST=$P(CLA,U,9),ECHNC=$P(CLA,U,10),ECCV=$P(CLA,U,11)
  S STR=ECIEN_U_ECAO_U_ECIR_U_ECSC_U_ECEC_U_ECMST
- S STR=STR_U_ELIG_U_ELCOD_U_ECHNC_U_ECCV_U_ECSHAD,^TMP($J,"ECLASS",1)=STR
+ S STR=STR_U_ELIG_U_ELCOD_U_ECHNC_U_ECCV,^TMP($J,"ECLASS",1)=STR
  S RESULTS=$NA(^TMP($J,"ECLASS"))
  Q
 PATOTH(ECIEN) ;
@@ -81,7 +81,7 @@ PATOTH(ECIEN) ;
  ;PATIENT FILE #721
  ;INPUTS   ECIEN - Event Capture Patient ien
  ;
- ;OUTPUTS  RESULTS - Array of procedure modifiers
+ ;OUTPUTS  RESULTS -
  ;          721 IEN^procedure reason
  ;
  N REAS,ECX
@@ -94,33 +94,28 @@ PATOTH(ECIEN) ;
 PATCLAST(RESULTS,ECARY) ;
  ;Returns to broker a patient status (in/out) and classification
  ;     RPC: EC GETPATCLASTAT
- ;INPUTS  ECARY  - Contains the following subscripted elements  
+ ;INPUTS  ECARY  - Contains the following subscripted elements
  ;         ECDFN - Patient ien (#2)
  ;         ECD   - DSS Unit ien (#724)
  ;         ECDT  - Procedure date and time (fileman format)
  ;OUTPUTS  RESULTS - Patient status and classifications delimited by (^)
  ;         Patient Status: I for inpatient or O for outpatient
  ;         Classification: 2- Agent Orange, 3- Ionizing Radiation
- ;          4- SC Condition, 5- Environment Contaminants/SWAC 6- Military
+ ;          4- SC Condition, 5- Environmental Contaminants 6- Military
  ;          Sexual Trauma    7- Head/Neck Cancer 8- Combat Veteran
- ;          9- Project 112/SHAD
- ;         Data after the '~' refers to those class. that must be asked 
+ ;         Data after the '~' refers to those class. that must be asked
  ;         by Delphi appl. when the answer to SC=No.
- ;         Data after "~"  1- Agent Orange  2- Ionizing Radi. 3- Env Cont/SWAC
+ ;         Data after "~"  1- Agent Orange  2- Ionizing Radi. 3- Env Cont
  N ECDFN,ECDT,ECX,I,ECCLARY,SCDAT,PATSTAT
  D SETENV^ECUMRPC
  S ECDFN=$P(ECARY,U),ECD=$P(ECARY,U,2),ECDT=$P(ECARY,U,3) Q:ECDFN=""
  I ECDT="" D NOW^%DTC S ECDT=%
  S PATSTAT=$$INOUTPT^ECUTL0(ECDFN,ECDT),RESULTS="^^^^^^",SCDAT=";;;"
- ;
- ; Removed in EC*110 so inpatient data can be answered for transmission to Austin
- ; This was to be consistant with VHA Directive 2009-002
- ;
- ; I PATSTAT="I" D  Q
- ; .S RESULTS=PATSTAT_"^"_RESULTS_$S(SCDAT'="":"~"_SCDAT,1:"") 
+ I PATSTAT="I" D  Q  ;added to be consistent w roll-n-scroll 11/25/03 JAM
+ .S RESULTS=PATSTAT_"^"_RESULTS_$S(SCDAT'="":"~"_SCDAT,1:"")
  I '$$CHKDSS^ECUTL0(+$G(ECD),PATSTAT) D  Q
  .S RESULTS=PATSTAT_"^"_RESULTS_$S(SCDAT'="":"~"_SCDAT,1:"")
- D CL^SDCO21(ECDFN,ECDT,"",.ECCLARY) F ECX=3,1,2,4,5,6,7,8 D
+ D CL^SDCO21(ECDFN,ECDT,"",.ECCLARY) F ECX=3,1,2,4,5,6,7 D
  .I ECX=1,$P($G(^DPT(ECDFN,.321)),"^",2)'="Y" Q
  .I ECX=2,$P($G(^DPT(ECDFN,.321)),"^",3)'="Y" Q
  .I ECX=4,$P($G(^DPT(ECDFN,.322)),"^",13)'="Y",'$$EC^SDCO22(ECDFN,"") Q
@@ -173,7 +168,6 @@ PROCBAT(RESULTS,ECARY) ;
  ;          721 IEN^Patient name^Procedure Date/Time^Primary Dx
  ;          ^Ordering Section^Associated Clinic
  ;^SSN^DOB^Procedure Date and Time
- ;
  N IEN,CNT,ECLOC,ECUNT,NODE,DATA,PXDT,ECV,ECC,ECP,ECSD,ECED,DATE,DFN
  N CAT,ECI,VADM,ORC,ASC,ECDX
  S ECV="ECLOC^ECUNT^ECC^ECP^ECSD^ECED"

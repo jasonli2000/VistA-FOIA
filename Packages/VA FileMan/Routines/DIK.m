@@ -1,6 +1,6 @@
-DIK ;SFISC/GFT,YJK,XAK-GATHER A FILE'S XREFS TO EXECUTE ;02/25/2009
- ;;22.0;VA FileMan;**41,109,160**;Mar 30, 1999;Build 21
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DIK ;SFISC/GFT,YJK,XAK-GATHER A FILE'S XREFS TO EXECUTE ;11:57 AM  6 May 2002
+ ;;22.0;VA FileMan;**41,109**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q:"(,"'[$E($RE(DIK))  Q:'$D(@(DIK_"DA)"))  Q:$P($G(^DD($$GLO^DILIBF(DIK),0,"DI")),U,2)["Y"&'$D(DIOVRD)&'$G(DIFROM)  Q:DA'>0
  N DIKJ,DIKS,DIKZ1,DIN,DH,DU,DV,DW,DIKDA,DIAU,DIKALLR
  D CHKS I $D(DIKZ1) N DIKIL S DIKIL=1 G @DIKGP
@@ -42,7 +42,7 @@ A F DV=0:0 S DV=$O(^DD(DH,"AUDIT",DV)) Q:DV'>0  D A1
 A1 D 0 S ^UTILITY("DIK",DIKJ,DH,DV,99)="S DIIX="_(4-X)_" D:$G(DIK(0))'[""A"" AUDIT" D CHK(DH,.DU,.DIKCHK) Q
 0 ;
  S DW=$P(^DD(DH,DV,0),U,4),^UTILITY("DIK",DIKJ,DH,DV)=$P(DW,";",1),DW=$P(DW,";",2)
- S ^UTILITY("DIK",DIKJ,DH,DV,0)=$S(DW:"S X=$P($G(^(X)),U,"_DW_")",1:"S X=$E($G(^(X)),"_+$E(DW,2,9)_","_$P(DW,",",2)_")"),DW=0 Q
+ S ^UTILITY("DIK",DIKJ,DH,DV,0)=$S(DW:"S X=$P(^(X),U,"_DW_")",1:"S X=$E(^(X),"_+$E(DW,2,9)_","_$P(DW,",",2)_")"),DW=0 Q
  ;
 IX ;
  N DIKJ,DIKS,DIKZ1,DIN,DH,DU,DV,DW,DIKDA,DIKALLR

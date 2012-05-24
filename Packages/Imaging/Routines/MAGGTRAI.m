@@ -1,6 +1,5 @@
 MAGGTRAI ;WOIFO/GEK - list images for Radiology report ; [ 11/08/2001 17:18 ]
- ;;3.0;IMAGING;**8,93**;Dec 02, 2009;Build 163
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+ ;;3.0;IMAGING;**8**;Sep 15, 2004
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -22,7 +21,7 @@ IMAGE(MAGZRY,DATA) ;RPC [MAGGRADIMAGE]
  ;  INPUT is DATA, which is just what we sent in the list of Rad
  ;     Exams for the patient.
  ;DATA is the Radiology values stored in ^TMP($J,"RAEX",x)
- ;  that the radiology procedure RAPTLU sets during the search 
+ ;  that the radiology procedure RAPTLU sets during the search
  ;  for patient exams.  (see routine RAPTLU )
  ;      ^TMP($J,"RAEX",RACNT)=
  ;     RADFN_"^"_RADTI_"^"_RACNI_"^"_RANME_"^"_RASSN_"^"
@@ -45,7 +44,7 @@ IMAGE(MAGZRY,DATA) ;RPC [MAGGRADIMAGE]
  D GETLIST
  Q
 IMAGEC(MAGZRY,DATA) ;RPC [MAGG CPRS RAD EXAM]
- ; Call to list Images for a Rad Exam that was selected from CPRS 
+ ; Call to list Images for a Rad Exam that was selected from CPRS
  ; and Imaging Window was notified via windows messaging
  ;   INPUT :  DATA is in format of Windows message received from CPRS
  ;    example   'RPT^CPRS^29027^RA^i79029185.9998-1'
@@ -78,7 +77,7 @@ IMAGEC(MAGZRY,DATA) ;RPC [MAGG CPRS RAD EXAM]
  S $P(@MAGZRY@(0),U,4)=XINFO
  Q
 GETLIST ; Private call. From other points in this routine, when RARPT is defined
- ; and returns a list in MAGZRY(1..n). 
+ ; and returns a list in MAGZRY(1..n).
  ; We'll make a tmp list of just the image IEN's
  ;  splitting groups into individual image entries.
  ; If more than 1 Image group points to this report, we
@@ -87,13 +86,13 @@ GETLIST ; Private call. From other points in this routine, when RARPT is defined
  ;  sorts the images in Dicom Series, Dicom Image number order.
  ;
  K ^TMP("MAGGX",$J)
- N OI,IGCT,MAGIEN1,ORDCT,GCT,MAGQI,MAGX,SINGCT
+ N OI,IGCT,MAGIEN1,ORDCT,GCT,MAGQI,MAGX
  S (ORDCT,GCT,SINGCT)=0
  S IGCT=+$P($G(^RARPT(RARPT,2005,0)),U,4)
  ; Quit if no images for RARPT
- I IGCT=0 S @MAGZRY@(0)="0^0 Images for Radiology Report." Q 
+ I IGCT=0 S @MAGZRY@(0)="0^0 Images for Radiology Report." Q
  ;
- ; Check all Image entries in RARPT 2005 NODE. for Patient match Pointer match, from both 
+ ; Check all Image entries in RARPT 2005 NODE. for Patient match Pointer match, from both
  ;   RARPT end, and Imaging end.
  S MAGQI=1
  S OI=0,CT=1 F  S OI=$O(^RARPT(RARPT,2005,OI)) Q:'OI  D  Q:(MAGQI<1)
@@ -128,7 +127,7 @@ GETLIST ; Private call. From other points in this routine, when RARPT is defined
  K MAGQUIET
  S @MAGZRY@(0)=CT_"^Images for the selected Radiology Exam"
  ; Redesign needed for Multiple Image Groups pointing to an exam or note.
- ; we now put all images from all groups in one list. 
+ ; we now put all images from all groups in one list.
  S $P(@MAGZRY@(0),U,5)=$G(MAGIEN1) ; this was last ien from multiple Image Groups.
  ;
  Q
@@ -137,8 +136,7 @@ ONELIST ;        Private Call from other parts of this routine.
  Q:'$D(^MAG(2005,MAGIEN1,0))
  ; if a single image just get record for that IEN
  I '$O(^MAG(2005,MAGIEN1,1,0)) D  Q
- . ;S MAGXX=MAGIEN1 D INFO^MAGGTII
- . S MAGFILE=$$INFO^MAGGAII(MAGIEN1,"E")
+ . S MAGXX=MAGIEN1 D INFO^MAGGTII
  . S ORDCT=ORDCT+1,SINGCT=SINGCT+1
  . S ^TMP("MAGGX",$J,ORDCT,"S",SINGCT)="B2^"_MAGFILE
  D GROUP^MAGGTIG(.MAGTMP,MAGIEN1) I $P(@MAGTMP@(0),U,2)>0 D

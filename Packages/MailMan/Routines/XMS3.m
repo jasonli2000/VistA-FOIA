@@ -21,6 +21,22 @@ HEADER(XMZ,XMZREC,XMFROM,XMNETNAM) ; RFC 822 - Header Records
  I $P(XMZREC,U,4)'="" D  Q:ER
  . S XMSG="Sender: "_$$FROM^XMS1($P(XMZREC,U,4),XMNETNAM) X XMSEN
  S XMSG="From: "_XMFROM X XMSEN Q:ER
+ ;
+ ; BEGIN ADDITIONS FOR MIME SUPPORT BY WORLDVISTA GPL
+ ;
+ D  ;
+ . N C0CBNDRY ; MIME BOUNDARY IF ONE EXISTS IN THE MESSAGE
+ . S C0CBNDRY=$P($G(^XMB(3.9,XMZ,2,1,0)),"--",2) ; BOUNDARY IS IN FIRST LINE
+ . I C0CBNDRY="" Q  ; NOT A MIME MESSAGE
+ . S XMSG="MIME-Version: 1.0" ; Identifies the message as MIME in header
+ . X XMSEN ; insert into header
+ . S XMSG="Content-type: multipart/mixed; boundary="_C0CBNDRY ; content type
+ . X XMSEN ; insert into header
+ . S XMSG=" " ; need a blank line after MIME Header
+ . X XMSEN ; send the blank line
+ ;
+ ; end WorldVistA additions for MIME support .. gpl
+ ;
  I $P(XMZREC,U,6)'="" D  Q:ER
  . S XMSG="Expiry-Date: "_$$INDT^XMXUTIL1($P(XMZREC,U,6)) X XMSEN
  I $P(XMZREC,U,7)["P" D  Q:ER

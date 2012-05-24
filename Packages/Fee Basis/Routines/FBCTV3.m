@@ -1,4 +1,4 @@
-FBCTV3 ; ;06/29/07
+FBCTV3 ; ;12/27/07
  D DE G BEGIN
 DE S DIE="^FBAAV(",DIC=DIE,DP=161.2,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^FBAAV(DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,17) S:%]"" DE(1)=% S %=$P(%Z,U,18) S:%]"" DE(2)=%

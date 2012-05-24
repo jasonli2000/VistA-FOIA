@@ -1,34 +1,44 @@
-ONCACDU2 ;Hines OIFO/GWB - Utility routine ;03/09/11
- ;;2.11;Oncology;**12,18,20,21,22,24,26,27,29,30,31,32,34,36,37,38,39,41,46,47,49,50,51,52,53**;Mar 07, 1995;Build 31
+ONCACDU2 ;Hines OIFO/GWB - UTILITY ROUTINE #1 ;09/20/2000
+ ;;2.11;Oncology;**12,18,20,21,22,24,26,27,29,30,31,32,34,36,37,38,39,41,46,47**;Mar 07, 1995;Build 19
  ;
-VAFLD(ACDANS) ;Convert data to NAACCR format
+HOSP1(PROC,IEN) ;Check to see if the site is breast or prostate
+ ;Inputs: PROC = Process Number to be processed
+ ;         IEN = Record within File 160.16
+ ;Output; X data for field.
+ ;
+ N PTR,X,SITE
+ S X=0
+ S SITE=$$GET1^DIQ(165.5,IEN,.01,"I")
+ S SITE=$$GET1^DIQ(164.2,SITE,.01,"I")
+ I SITE="BREAST" D
+ .I PROC=1 S PTR=$$GET1^DIQ(165.5,IEN,141,"I") S:PTR'="" X=$P($G(^ONCO(164,67500,"BP5",PTR,0)),U,2) Q
+ .I PROC=2 S PTR=$$GET1^DIQ(165.5,IEN,142,"I") S:PTR'="" X=$P($G(^ONCO(164,67500,"GU5",PTR,0)),U,2) Q
+ .I PROC=3 S X=$$GET1^DIQ(165.5,IEN,143,"I") Q
+ .I PROC=4 S X=$$GET1^DIQ(165.5,IEN,144,"I")
+ ;
+ I SITE="PROSTATE" D
+ .I PROC=1 S PTR=$$GET1^DIQ(165.5,IEN,141,"I") S:PTR'="" X=$P($G(^ONCO(164,67619,"BP5",PTR,0)),U,2) Q
+ .I PROC=2 S PTR=$$GET1^DIQ(165.5,IEN,142,"I") S:PTR'="" X=$P($G(^ONCO(164,67619,"GU5",PTR,0)),U,2) Q
+ .I PROC=3 S X=$$GET1^DIQ(165.5,IEN,145,"I") Q
+ .I PROC=4 S X=$$GET1^DIQ(165.5,IEN,146,"I")
+ Q X
+ ;
+VAFLD(ACDANS) ;Convert data to valid external format
+ ;Input: ACDANS
+ ;       Y=1
+ ;       N=0
+ ;       U=9
  I ACDANS="N" S ACDANS=0
  I ACDANS="Y" S ACDANS=1
  I ACDANS="U" S ACDANS=9
  Q ACDANS
  ;
-VASIT() ;VISN (160.1,7) [2340-2341]
+VASIT() ;VISN 1452-1453
+ ;Output: X = VISN
  N X
  S OSPIEN=$O(^ONCO(160.1,0))
  S X=$P($G(^ONCO(160.1,OSPIEN,1)),U,7)
  K OSPIEN
- Q X
- ;
-COCACC() ;COC ACCREDITATION (160.1,68) [2547-2548]
- N X
- S OSPIEN=$O(^ONCO(160.1,0))
- S X=$P($G(^ONCO(160.1,OSPIEN,7)),U,2)
- K OSPIEN
- Q X
- ;
-SNCNT(IEN) ;Sequence Number--Central [380] 281-282
- N BEHAV,DATEDX,HIST,PRIMST,X
- S DATEDX=$E($$GET1^DIQ(165.5,IEN,3,"I"),1,3)
- S PRIMST=$$GET1^DIQ(165.5,IEN,20,"I")
- S HIST=$E($$GET1^DIQ(165.5,IEN,22.3,"I"),1,4)
- S BEHAV=$E($$GET1^DIQ(165.5,IEN,22.3,"I"),5)
- S X=""
- I DATEDX>295,DATEDX<303,$E(PRIMST,3,4)=53,HIST<9590,BEHAV=2 S X=98
  Q X
  ;
 COCO(IEN) ;COC Coding Sys--Original [2150] 1202-1203
@@ -45,6 +55,13 @@ VENDOR() ;Vendor Name [2170] 1204-1213
  S X="VA"_VERSION_$E($T(LOGO+3^ONCODIS),62,64)_SUFFIX
  Q X
  ;
+BDATE(ACD160) ;Birth Date [240] 122-129
+ N D0,X
+ S D0=ACD160
+ D DOB^ONCOES
+ S X=$G(X)
+ Q X
+ ;
 WORD(IEN,NODE,LEN) ;Get word processing data
  N X
  S X=""
@@ -56,38 +73,40 @@ WORD(IEN,NODE,LEN) ;Get word processing data
  ..Q:'$D(^ONCO(165.5,IEN,NODE,CNT,0))
  ..S LINE=LINE_^ONCO(165.5,IEN,NODE,CNT,0)_" "
  .S X=LINE
- S X=$TR(X,$C(10,12,13),"   ")
  Q X
  ;
 STAGE(IEN,TYPE) ;TNM Descriptors
- ;TNM Path Descriptor [910] 956-956
- ;TNM Clin Descriptor [980] 974-974
- N CD,LOC,PD,X
+ ;TNM Path Descriptor [910] 571-571
+ ;TNM Clin Descriptor [980] 581-581
+ N LOC,X
  S X=""
- S CD=$$GET1^DIQ(165.5,IEN,241,"I")
- S PD=$$GET1^DIQ(165.5,IEN,242,"I")
- I TYPE="C",CD'="" S X=CD G STAGEEX
- I TYPE="P",PD'="" S X=PD G STAGEEX
  S LOC=$S(TYPE="P":89.1,TYPE="C":37,1:"")
  I TYPE'="" D
  .N STRING
  .S STRING=$$GET1^DIQ(165.5,IEN,LOC,"E")
  .I ($P(STRING," ")["m")&($P(STRING," ")["y") S X=6 Q
  .I $P(STRING," ")["m" S X=3 Q
- .I TYPE="P",$P(STRING," ")["y" S X=4 Q
-STAGEEX Q X
+ .I $P(STRING," ")["y" S X=4 Q
+ Q X
  ;
-CCOUNTY(ACD160) ;County--Current [1840] 2192-2194
- I $$DPTLRT^ONCOES(ACD160)="LRT" S X="" G CCEX
- N DPT,DPTPNT,X
- S DPT=$$GET1^DIQ(160,ACD160,.01,"I")
- S DPTPNT=$P(DPT,";",1)
- S X=$$GET1^DIQ(2,DPTPNT,.117)
-CCEX Q X
+CCOUNTY(ACD160) ;County--Current
+ N ZIP,X
+ S X=""
+ S ZIP=$$GET1^DIQ(160,ACD160,.116,"E")
+ I ZIP'="" D
+ .N ZIP1,CODE,COUNTY
+ .S ZIP1=$P($P(ZIP,",",2)," ",3) S:$L(ZIP1)>5 ZIP1=$E(ZIP1,1,5)
+ .Q:$L(ZIP1)<5
+ .S CODE=$O(^VIC(5.11,"C",ZIP1,""))
+ .Q:CODE<1
+ .S COUNTY=$$GET1^DIQ(5.11,CODE,2,"I")
+ .Q:COUNTY=""
+ .S X=$$GET1^DIQ(5.1,COUNTY,2,"I")
+ Q X
  ;
 SUB(IEN,CNT,FIELD) ;
  ;Subsq RX 2nd Course Date [1660] 988-995
- N HEMA,HEMAPT,I,X
+ N X
  S CNT=CNT-1
  S X=""
  I $O(^ONCO(165.5,IEN,4,0)) D
@@ -99,7 +118,7 @@ SUB(IEN,CNT,FIELD) ;
  .S HEMA=""
  .S HEMAPT=$$GET1^DIQ(165.51,IENS,.02,"I")
  .S:HEMAPT'="" HEMA=$P($G(^ONCO(167,HEMAPT,0)),U,1)
- .I $S(FIELD=".01":1,FIELD=".05":1,FIELD=".06":1,FIELD=".07":1,FIELD=".08":1,FIELD=".09":1,FIELD="37":1,FIELD=".041":1,FIELD=".051":1,FIELD=".061":1,FIELD=".071":1,FIELD=".081":1,FIELD=".091":1,1:0) D  Q
+ .I $S(FIELD=".01":1,FIELD=".05":1,FIELD=".06":1,FIELD=".07":1,FIELD=".08":1,FIELD=".09":1,FIELD="37":1,1:0) D  Q
  ..I FIELD=".06" S X=$S(ENTRY="01":1,ENTRY="02":2,ENTRY="03":3,$E(ENTRY,1)=8:0,1:ENTRY) Q
  ..I FIELD=".07" S X=$S(ENTRY="00":0,ENTRY="01":1,$E(ENTRY,1)=8:0,ENTRY=99:9,1:"") Q:X'=""  S X=$S(HEMA=30:2,HEMA=40:2,1:"") Q
  ..I FIELD=".08" S X=$S(ENTRY="01":1,ENTRY=87:7,ENTRY=88:8,$E(ENTRY,1)=8:0,ENTRY=99:9,1:ENTRY) Q:X'=""  S X=$S(HEMA=10:4,HEMA=11:2,HEMA=12:3,HEMA=20:5,1:"") Q
@@ -143,7 +162,14 @@ RXPRI(IEN,FIELD,SUBFLD) ;
  .S X=$$SUB164^ONCACDU2(IEN,SUBFLD,ENTRY)
  Q X
  ;
-FNODE(ACD160,FIELD) ;FOLLOW-UP (160,400)
+LAST(ACD160) ;Get last DATE OF LAST CONTACT OR DEATH (160.04,.01)
+ S X="",DLC=0
+ S DLC=$O(^ONCO(160,ACD160,"F","AA",DLC))
+ S:DLC'="" X=$O(^ONCO(160,ACD160,"F","AA",DLC,0))
+ I X'>0 S X=""
+ Q X
+ ;
+FNODE(ACD160,FIELD) ;
  ;Date of Last Contact     [1750] 1294-1301
  ;Vital Status             [1760] 1302-1302
  ;Quality of Survival      [1780] 1304-1304
@@ -157,31 +183,6 @@ FNODE(ACD160,FIELD) ;FOLLOW-UP (160,400)
  .N IENS
  .S IENS=FNODE_","_ACD160_","
  .S X=$$GET1^DIQ(160.04,IENS,FIELD,"I")
- Q X
- ;
-LAST(ACD160) ;Get last FOLLOW-UP(160,400)
- N DLC
- S X="",DLC=0
- S DLC=$O(^ONCO(160,ACD160,"F","AA",DLC))
- S:DLC'="" X=$O(^ONCO(160,ACD160,"F","AA",DLC,0))
- I X'>0 S X=""
- Q X
- ;
-FCNODE(ACD160,FIELD,IE) ;FOLLOW-UP CONTACT (160,420)
- ;Follow-Up Contact--City  [1842] 1357-1376
- ;Follow-Up Contact--State [1844] 1377-1378
- ;Follow-Up Contact--Postal[1846] 1379-1387
- ;Follow-Up Contact--Name  [2394] 2284-2313
- ;Follow-Up Contact--No&St [2392] 2314-2353
- ;Follow-Up Contact--Suppl [2393] 2354-2393
- N CONTACT,FCNODE,X
- S X=""
- S FCNODE=$O(^ONCO(160,ACD160,"C","B"),-1)
- I FCNODE'="" D
- .N IENS
- .S IENS=FCNODE_","_ACD160_","
- .S CONTACT=$$GET1^DIQ(160.03,IENS,1,"I")
- I $G(CONTACT) S X=$$GET1^DIQ(165,CONTACT,FIELD,IE)
  Q X
  ;
 CS(IEN) ;Cancer Status [1770] 1303-1303
@@ -201,18 +202,24 @@ CS(IEN) ;Cancer Status [1770] 1303-1303
  ;
 CCTST(ACD160) ;
  ;Addr Current--City      [1810] 1307-1326
- N D0,PT,X
+ ;Follow-Up Contact--City [1842] 1357-1376
+ N X,D0,ONCOX1,OIEN,INCOM,ONCON,ONCOX
+ S X=""
  S D0=ACD160
- S X="" S PT=$P($G(^ONCO(160,D0,0)),";",1)
- I $$DPTLRT^ONCOES(D0)="LRT" S X=$$GET1^DIQ(67,PT,.114,"E")
- I $$DPTLRT^ONCOES(D0)="DPT" S X=$$GET1^DIQ(2,PT,.114,"E")
+ I $D(^ONCO(160,D0,0)) D SETUP1^ONCOES
+ I $D(ONCOX1) S X=$S($D(@ONCOX1):$P(@ONCOX1,U,4),1:"")
  S X=$$STRIP^XLFSTR(X,"!""""#$%&'()*+,-./:;<=>?[>]^_\{|}~`")
  Q X
  ;
 CSTST(ACD160) ;
- ;Addr Current--State [1820] 1327-1328
- N X
- S X=$$GET1^DIQ(160,ACD160,.115,"E")
+ ;Addr Current--State      [1820] 1327-1328
+ ;Follow-Up Contact--State [1844] 1377-1378
+ N X,D0,ONCOX1,ONCON,ONCOX
+ S X=""
+ S D0=ACD160
+ I $D(^ONCO(160,D0,0)) D SETUP1^ONCOES
+ I $D(ONCOX1) S X=$S($D(@ONCOX1):$P(@ONCOX1,U,5),1:"")
+ S:X'="" X=$$GET1^DIQ(5,X,1,"I")
  S X=$S(X="CANAD":"CD",X="EU":"YY",X="MX":"XX",X="NF":"NL",X="PH":"XX",X="UN":"ZZ",1:X)
  Q X
  ;
@@ -233,6 +240,15 @@ ICDR(ICD) ;ICD Revision Number [1920] 1392-1392
  S:ICDR="" ICDR=0
  Q ICDR
  ;
+LINK(ACD160) ;Linkage Name
+ N NAME,X
+ S DFN=ACD160 D DEM^VADPT
+ S NAME=VADM(1)
+ D KVAR^VADPT
+ S X=($A($E(NAME,1)))+($A($E(NAME,2)))
+ S X=X-128 I X<1 S X=""
+ Q X
+ ;
 PPAY(IEN) ;PRIMARY PAYER AT DX (165.5,18)
  N X
  S X=$$GET1^DIQ(165.5,IEN,18,"I")
@@ -249,14 +265,3 @@ DS(IEN) ;RX Date--Surgery [1200] 755-762
  S X=$$DATE^ONCACDU1(SURGDT)
  K SURGDT
  Q X
-STRIP ;Replace punctuation marks with spaces
- S ACDANS=$TR(ACDANS,"!""""@#$%&'()*+,-./:;<=>?[>]^_\{|}~`","                                    ")
- S ACDANS=$$TRIM^XLFSTR(ACDANS)
- Q
- ;
-STRIP1 ;Strip out punctuation marks
- S ACDANS=$$STRIP^XLFSTR(ACDANS,"!""""#$%&'()*+,-./:;<=>?[>]^_\{|}~`")
- Q
- ;
-CLEANUP ;Cleanup
- K EXTRACT

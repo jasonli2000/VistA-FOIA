@@ -1,13 +1,13 @@
-PRCHLO ;WOIFO/RLL-EXTRACT ROUTINE CLO REPORT SERVER ;12/30/10  14:34
- ;;5.1;IFCAP;**83,104,130,154**;Oct 20, 2000;Build 5
- ; Per VHA Directive 2004-038, this routine should not be modified
- ; 
+PRCHLO ;WOIFO/RLL-EXTRACT ROUTINE CLO REPORT SERVER ; 7/31/06 12:33pm
+V ;;5.1;IFCAP;**83,104**; Oct 20, 2000
+ ; Per VHA Directive 10-93-142, this routine should not be modified
+ ;
  ; PRCHLO* routines are used to build the extract files from
- ; file 410, 424, and 442 for the clinical logistics report server.
- ; PRCHLO thru PRCHLO6 perform the following:
+ ; file 442 for the clinical logistics report server.
+ ; PRCHLO thru PRCHLO5 perform the following:
  ; 1. Initialize environment
  ; 2. Get parameters for the month being run
- ; 3. Pull data from file 410, 424, and 442 for month being run
+ ; 3. Pull data from file 442 for month being run
  ; 4. Create multiple "^" delimited flat files for report server
  ; 5. At the completion of extracts FTP files to report server
  ; 6. Clean up / remove any temp files
@@ -18,8 +18,7 @@ PRCHLO ;WOIFO/RLL-EXTRACT ROUTINE CLO REPORT SERVER ;12/30/10  14:34
  Q
 INIT ; Initialize environment
  ;
- K ^TMP($J)
- ; 
+ ;
  ; Get todays date
  N %
  S %=$P(($$NOW^XLFDT),".",1)
@@ -37,7 +36,7 @@ INIT ; Initialize environment
  ;
 CALC ;test entry point, set %I to FM date
  ;
- N CLO1,CLO2,CLO2B,CLO2E,CLO3,CLOBGN,CLOEND,CLO1A
+ N CLO1,CLO2,CLO2B,CLO2E,CLO3,CLOBGN,CLOEND,POND1,POND2,CLO1A
  N MTHRUN,YRRUN,PYRRUN
  S CLO1=$E(%,1,3)
  ;
@@ -91,7 +90,7 @@ FYRNOW ; Changes added 07/31/06 RLL for new extract date range.
  ; Oct 1st, 2006    | Oct 1, 2005 to Oct 1st 2006|      12
  ;
 STCLOBGN ; Set CLOBGN to Beginning of Fiscal Year (Oct. 1)
- ; 
+ ;
  I MTHRUN=12!(MTHRUN=11)  D
  . ; For Nov or Dec, CLOBGN set to Begin of FY(Oct 1st) in same year
  . S CLOBGN=+(YRRUN_"10"_"00")
@@ -104,6 +103,8 @@ STCLOBGN ; Set CLOBGN to Beginning of Fiscal Year (Oct. 1)
  ; (End new logic)
  ;
 DEBUGFY ; Debug Fiscal Year logic by uncommenting code below 7/31/06 RLL
+ ; W !,"CLOBGN is ",CLOBGN," CLOEND is ",CLOEND,!   ; Write date range
+ ; Q  ; Quit added here for debugging 7/31/06 RLL
  ;
  D GPARM
  ; Make sure ^TMP($J) is set with data, otherwise return error
@@ -132,16 +133,13 @@ GPARM ; Get parameters for monthly extract
  . . D GKEY
  . . Q
  . Q
- ;     PRC*5.1*130 begin
- D GET410^PRCHLO6
- D GET424^PRCHLO6
- ;     PRC*5.1*130 end
- D INVCOMPL^PRCHLO7 ;Compile Invoice Tracking
  Q
 EXTR ; Extract the data, create files
  ;
 GKEY ; get key for all tables
- N POID,POCRDAT
+ N POID,POND0,POND1,POCRDAT
+ S POND0=$G(^PRC(442,CLO2,0))
+ S POND1=$G(^PRC(442,CLO2,1))
  S POID=CLO2
  S POCRDAT=CLO1  ; PO Date from x-ref value
  D GPOMAST^PRCHLO1  ;

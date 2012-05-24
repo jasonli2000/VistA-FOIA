@@ -1,5 +1,5 @@
 PSIVORC2 ;BIR/MLM-PROCESS INCOMPLETE IV ORDER - CONT ;22 OCT 97 / 3:16 PM
- ;;5.0; INPATIENT MEDICATIONS ;**29,49,50,65,58,85,101,110,127,151,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**29,49,50,65,58,85,101,110,127,151**;16 DEC 97
  ;
  ; Reference to ^ORD(101 is supported by DBIA #872
  ; Reference to ^PS(51.2 is supported by DBIA #2178
@@ -31,26 +31,21 @@ ACTIVE ;
  ;
 CKORD ;Check if new order is to be created.
  I $G(PSIVCOPY) S PSIVCHG=0 Q
- N ND,PSJCHG S PSIVCHG=0,ND(0)=$G(^PS(53.1,+ON,0)),ND("PD")=$G(^PS(53.1,+ON,.2))_U_$P(ND(0),U,3)
+ N ND S PSIVCHG=0,ND(0)=$G(^PS(53.1,+ON,0)),ND("PD")=$G(^PS(53.1,+ON,.2))_U_$P(ND(0),U,3)
  N X S X=$P($G(^PS(53.1,+ON,8)),U,5),X=$S(P(8)["@":$P(X,"@"),1:X)
- ;S ND=$S($E(P("OT"))="I":P(8)_U_$P($G(^PS(53.1,+ON,2)),U)_U_$P(ND(0),U,3)_U_+$P(ND("PD"),U),1:X_U_$P($G(^PS(53.1,+ON,2)),U)_U_+P("MR")_U_+P("PD"))
- S ND=$S($E(P("OT"))="I":P(8)_U_$P(ND(0),U,3)_U_+$P(ND("PD"),U),1:X_U_+P("MR")_U_+P("PD"))
+ S ND=$S($E(P("OT"))="I":P(8)_U_$P($G(^PS(53.1,+ON,2)),U)_U_$P(ND(0),U,3)_U_+$P(ND("PD"),U),1:X_U_$P($G(^PS(53.1,+ON,2)),U)_U_+P("MR")_U_+P("PD"))
  S ND=ND_U_$S($P(ND(0),U,2)=+P("CLRK"):+$P(ND(0),U,2),1:+P(6))
- ;I ND'=($S($E(P("OT"))="I":P(8),P(8)["@":$P(P(8),"@"),1:P(8))_U_P(9)_U_+P("MR")_U_+P("PD")_U_+P(6)) S PSIVCHG=1  Q
- I ND'=($S($E(P("OT"))="I":P(8),P(8)["@":$P(P(8),"@"),1:P(8))_U_+P("MR")_U_+P("PD")_U_+P(6)) S PSIVCHG=1
- I 'PSIVCHG I $P($G(^PS(53.1,+ON,2)),U)'=P(9) S:($G(P("DTYP"))'=1) PSIVDSFG=1 S PSIVCHG=1
- ;Q:P(17)="P"
- N ND,TDRG,TMPDRG
+ I ND'=($S($E(P("OT"))="I":P(8),P(8)["@":$P(P(8),"@"),1:P(8))_U_P(9)_U_+P("MR")_U_+P("PD")_U_+P(6)) S PSIVCHG=1  Q
+ Q:P(17)="P"
+ N DNE,ND,TDRG S (DRG("DRGC"),DNE)=0
+ Q:PSIVCHG  F DRGT="AD","SOL" F DRGI=0:0 S DRGI=$O(DRG(DRGT,DRGI)) Q:'DRGI  S TDRG(DRGT,+$P(DRG(DRGT,DRGI),U),DRGI)=$P(DRG(DRGT,DRGI),U,3) I $P(P("OT"),U)="F",'$P(DRG(DRGT,DRGI),U,5) S P("OT")="I"
+ F DRGT="AD","SOL" Q:DRGT="SOL"&(P("DTYP")=1)  F DRGI=0:0 S DRGI=$O(^PS(53.1,+ON,DRGT,DRGI)) Q:'DRGI!DNE  D
+ .S X=$G(^PS(53.1,+ON,DRGT,DRGI,0)),DRG("DRGC")=$G(DRG("DRGC"))+1
+ .I $D(TDRG(DRGT,+$P(X,U),DRGI)),$P(X,U,2)=$P(TDRG(DRGT,+$P(X,U),DRGI),U) Q
+ .S (PSIVCHG,DNE)=1
  Q:PSIVCHG
- D TMPDRG1^PSJMISC(DFN,$G(ON),.TMPDRG)
- I $$COMPARE^PSJMISC(.DRG,.TMPDRG,$S(P("DTYP")=1:0,1:1)) S PSIVCHG=1
- K TMPDRG
- Q:PSIVCHG
- ;F DRGT="AD","SOL" F DRGI=0:0 S DRGI=$O(DRG(DRGT,DRGI)) Q:'DRGI  I $P(P("OT"),U)="F",'$P(DRG(DRGT,DRGI),U,5) S P("OT")="I"
- Q
+ I $G(DRG("AD",0))+$S(P("DTYP")=1:0,1:DRG("SOL",0))'=DRG("DRGC") S PSIVCHG=1 Q
 CKPC ;
- ;PSJ*5*181 Note - No longer use by *181
- ;
  Q:PSIVCHG  I $E(P("OT"))'="I" D
  .;
  .; Check IV drugs for changes.
@@ -99,13 +94,12 @@ GTIVDRG ; Try to find an IV drug from the Orderable Item.
  Q
  ;
 EDIT ; Edit incomplete order
- K PSIVENO
  S PSIVAC="CE"
  I $E(P("OT"))="I",'$D(DRG("AD")),('$D(DRG("SOL"))) D GTIVDRG
  I P(4)="" D 53^PSIVORC1 Q:P(4)=""  D ^PSIVORV2
  D GSTRING^PSIVORE1,GTFLDS^PSIVORFE ;S (PSIVOK,EDIT)="57^58^59^3"_$S(P("DTYP")=1:"^26^39",1:"")_"^63^64^"_$S($E(P("OT"))="I":"101^109^",1:"")_"10^25"_$S(+P(6)'=+P("CLRK"):"^1",1:"") D GTFLDS^PSIVORFE
  Q:$G(DONE)
- ;I $G(^ORD(101,+$P($G(VALM("PROTOCOL")),";"),0))["PSJ PC IV AC/EDIT ACTION" S PSIVENO=1
+ I $G(^ORD(101,+$P($G(VALM("PROTOCOL")),";"),0))["PSJ PC IV AC/EDIT ACTION" S PSIVENO=1
  I '$G(PSIVENO) S PSIVENO=1 D EN^VALM("PSJ LM IV AC/EDIT") S VALMBCK="Q"
  ;;K ON55 D COMPLTE^PSIVORC1
  Q

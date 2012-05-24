@@ -1,6 +1,6 @@
 PRCB2A ;WISC/(SKR@LBVAMC),PLT,DGL-ROUTINE TO PRINT RECEIVING REPORT PENDING ACTION [7/20/98 2:18pm]
-V ;;5.1;IFCAP;**126**;Oct 20, 2000;Build 2
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  QUIT  ;invalid entry point
  ;
 EN ;pending fiscal action rpt
@@ -16,10 +16,10 @@ START ;Loop picks up only specific entries
  S PRCQ="" F ZSTAT=10,15,20 QUIT:PRCQ  S IEN="" F  S IEN=$O(^PRC(442,"AI",ZSTAT,IEN)) Q:IEN'>0  D PRINT QUIT:PRCQ
  I PRCQ=1 G EXIT
  ;Loop through 2237s & 1358s looking for GFP entries with status=10
- S IEN=0,IEN1=0,IEN2=0,B=0,C=" - 2237s & 1358s"
+ S IEN=0,IEN1=0,IEN2=0,B=0,C=" - General Post Fund 2237s & 1358s"
  D ASK G:PRCQ EXIT D HDR2
- F  S IEN1=$O(^PRC(420,IEN1)),IEN2=0 Q:IEN1'>0  D  G:PRCQ EXIT
-  . F  S IEN2=$O(^PRC(420,IEN1,1,IEN2)),IEN=0 Q:IEN2'>0  S D=$P($G(^PRC(420,IEN1,1,IEN2,0)),U,1) D:$G(D)'=""  Q:PRCQ
+ F  S IEN1=$O(^PRC(420,"AD",1,IEN1)),IEN2=0 Q:IEN1'>0  D  G:PRCQ EXIT
+  . F  S IEN2=$O(^PRC(420,"AD",1,IEN1,IEN2)),IEN=0 Q:IEN2'>0  S D=$P(^PRC(420,IEN1,1,IEN2,0),U,1) D  Q:PRCQ
   . . F  S IEN=$O(^PRCS(410,"AN",D,IEN)) Q:IEN'>0  D  Q:PRCQ
   . . . S A=$G(^PRCS(410,IEN,3)) Q:A=""
   . . . S A=$G(^PRCS(410,IEN,1)) Q:A=""  S A=$P(A,U,1) Q:A=""
@@ -28,13 +28,13 @@ START ;Loop picks up only specific entries
   . . . I $P(A0,U,4)=1&($P(A1,U,4)=10) D PRINT2(1) Q  ; form type 1358
   . . . S A2=$G(^PRC(443,IEN,0)) Q:A2=""
   . . . I $P(A1,U,3)=""&($P(A2,U,7)=10) D PRINT2(0) Q  ; No PO#
- I B=0 W !!,"NO 2237s or 1358s to print"
+ I B=0 W !!,"NO GPF 2237s or 1358s to print"
  E  W !!,"(Note:  '*' indicates transaction is a 1358.  All others are 2237s.)",!
  I PRCQ="" D EN^DDIOL("END OF REPORT")
 EXIT K ZSTAT,IEN,L1,POP,ZTDTH,ZTRTN,ZTSAVE,TRM,LINE,PAGE,PRCQ,A,A0,A1,A2,B,C,D
  D ^%ZISC
  Q
-HDR ; 
+HDR ;
  U IO W @IOF W !,?70,"Page ",PAGE S PAGE=PAGE+1
  W !,"IFCAP OBLIGATIONS PENDING ACTION REPORT",C
  W !,?47,"PRINTED ON " D ^%D W " AT " D ^%T
@@ -43,7 +43,7 @@ HDR1 ;Purchase orders
  W !,LINE,!,"P.O. NUMBER",?12,"FCP ",?18,"AMOUNT",?32,"DATE",?42,"STATUS",!,LINE,!
  Q
 HDR2 ;GPF 2237s
- W !,LINE,!,"TRANSACTION NUMBER",?22,"FCP ",?32,"AMOUNT",?45,"DATE",?55,"STATUS",?77,"SCP",!,LINE,!
+ W !,LINE,!,"TRANSACTION NUMBER",?22,"FCP ",?32,"AMOUNT",?45,"DATE",?55,"STATUS",!,LINE,!
  Q
 PRINT ;
  Q:'$D(^PRC(442,IEN,0))
@@ -58,7 +58,7 @@ PRINT2(X) ;
  W ?22,$P($P(^PRCS(410,IEN,3),U,1)," "),?28
  I $D(^PRCS(410,IEN,4))=0 W "Bad record"
  E  W "$"_$J($P(^(4),U,8),9,2),?42,$E(A,4,5),"-",$E(A,6,7),"-",$E(A,2,3)
- W ?52,$P(^PRCD(442.3,10,0),U,1),?77,$P("NON^GPF^SF^CON^CAN",U,($P(^PRC(420,IEN1,1,IEN2,0),U,12)+1))
+ W ?52,$P(^PRCD(442.3,10,0),U,1)
  S B=B+1
  Q
 ASK ;

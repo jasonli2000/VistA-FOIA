@@ -1,7 +1,7 @@
-RCDPEX3 ;ALB/TMK/PJH - ELECTRONIC EOB EXCEPTION PROCESSING - FILE 344.4 ; 3/30/11 7:19pm
- ;;4.5;Accounts Receivable;**173,208,258,269**;Mar 20, 1995;Build 113
- ;;Per VHA Directive 2004-038, this routine should not be modified.
- ; IA# 5286 for call to $$PRVPHONE^IBJPS3()
+RCDPEX3 ;ALB/TMK - ELECTRONIC EOB EXCEPTION PROCESSING - FILE 344.4 ;10-OCT-02
+ ;;4.5;Accounts Receivable;**173,208**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
+ ; IA REF TO ^IBE(350.9 = 4049
  Q
  ;
 VP ; View/Print ERA Msgs - File 344.4
@@ -104,12 +104,8 @@ XFR ; Transfer EOB(s) to other site
  I RCDOMAIN="" D  G XFRQ
  . S DIR("A",1)="THERE IS NO VALID DOMAIN SET UP FOR THIS SITE. YOU MUST CHOOSE ANOTHER ONE.",DIR("A")="PRESS RETURN TO CONTINUE",DIR(0)="EA" W ! D ^DIR K DIR
  ;
- S RCDEF=$$PRVPHONE^IBJPS3()                  ; IA 5286
- I RCDEF'="" S RCDEF="AGENT CASHIER-"_RCDEF
- ;
- S DIR("A",1)="ENTER THE CONTACT INFORMATION FOR THE PERSON AT YOUR SITE"
- S DIR("A",2)="   WHO MAY BE CONTACTED BY THE OTHER SITE REGARDING THIS EEOB"
- S DIR("A")="   (1-45 CHARACTERS): "_$S(RCDEF'="":RCDEF_"// ",1:"")
+ S RCDEF=$S($P($G(^IBE(350.9,1,2)),U,6)'="":$E("AGENT CASHIER-"_$P(^IBE(350.9,1,2),U,6),1,45),1:"")
+ S DIR("A",1)="ENTER THE CONTACT INFORMATION FOR THE PERSON AT YOUR SITE",DIR("A",2)="   WHO MAY BE CONTACTED BY THE OTHER SITE REGARDING THIS EEOB",DIR("A")="   (1-45 CHARACTERS): "_$S(RCDEF'="":RCDEF_"// ",1:"") ; IA 4049
  S DIR(0)="FA"_$S(RCDEF'="":"O",1:"")_"^1:45" W ! D ^DIR K DIR
  I $D(DUOUT)!$D(DTOUT) G XFRQ
  I Y="" S Y=RCDEF
@@ -161,8 +157,7 @@ XFR ; Transfer EOB(s) to other site
  . I $P(RCX,U)'["835ERA"!'$O(RCBODY(1)) D  Q
  .. S RCECT=RCECT+1,RCER(RCECT)="**Selection #"_RC_" format is not valid for transfer - "_RCBILL_" NOT transferred"
  . ;
- . S $P(RCX,U)="835XFR",$P(RCX,U,10,15)=(RCAMT_"^^^^^")
- . S $P(RCX,U,19)=RCCONT
+ . S $P(RCX,U)="835XFR",$P(RCX,U,10,16)=(RCAMT_"^^^^^^"_RCCONT)
  . S RCBODY(1,0)=RCX
  . S RCBODY(+$O(RCBODY(""),-1)+1,0)="99^$"
  . S RCBODY(+$O(RCBODY(""),-1)+1,0)="NNNN"

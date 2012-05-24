@@ -1,9 +1,6 @@
-YSPDR1 ;SLC/DKG,RWF-ICD9 DIAGNOSIS REPORT CONTINUED ;11/30/89  15:08 ; 9/25/09 11:22am
- ;;5.01;MENTAL HEALTH;**96**;Dec 30, 1994;Build 46
- ;Reference to ^ICD9( supported by DBIA #5388
- ;Reference to ICDCODE APIs supported by DBIA #3990
- ;Reference to ^DIC(3.1, supported by DBIA #1234
- ;Reference to ^VA(200, supported by DBIA #10060
+YSPDR1 ;SLC/DKG,RWF-ICD9 DIAGNOSIS REPORT CONTINUED ;11/30/89  15:08 ;
+ ;;5.01;MENTAL HEALTH;;Dec 30, 1994
+ ;
  ; Called by routine YSDXR1
  I $D(^MR(YSDFN,"PHDX",1)) W !!,"ICD9 DIAGNOSES:",!
  S (Y1,T1,T)=0 K W
@@ -16,8 +13,7 @@ PRT2 ;
  S D2=^MR(YSDFN,"PHDX",Y1,0) G PRT:D2<1 S Y2=^ICD9(+D2,0)
  I $D(A1),A1?1"Y".E G PRT1:$P(D2,U,2)="I"
  IF $Y+7>IOSL D ENFT^YSFORM,WAIT Q:$D(W)  D ENHD^YSFORM
- W !!,$P(Y2,U),?8
- N YSDXZZ S YSXDZZ=$$ICDD^ICDCODE($P(Y2,U),"YSDXZZ") S Y2=YSXDZZ(1) ;asf 4/22/09
+ W !!,$P(Y2,U),?8 S Y2=$P(Y2,U,3)
  F I=3:1:8 IF $L($P(Y2," ",I))>70 Q
  W $P(Y2," ",1,I-1) W:$L($P(Y2," ",I,99)) !?9,$P(Y2," ",I,99)
  S C=$P(^MR(YSDFN,"PHDX",Y1,0),U,2),C=$S(C="A":"A C T I V E",C="I":"** INACTIVE",1:"") W "  ",C
@@ -33,4 +29,4 @@ WAIT ;
 EN ;
  S DIC="^MR(YSDFN,""PHDX"",",DIC(0)="AEMNQZ"
  S DIC("W")="S C=$P(^(0),U,2) W ?70,$S(C=""A"":""ACTIVE"",C=""I"":""INACTIVE"",1:""UNKNOWN"")"
- D ^DIC Q:X=""!(X?1P)  G EN:Y'>0 S DIE=DIC,DR="2",DA=+Y L +^MR(YSDFN):30 D ^DIE L -^MR(YSDFN) S YSTOUT=$D(DTOUT) Q:YSTOUT  G EN ;asf 09/09
+ D ^DIC Q:X=""!(X?1P)  G EN:Y'>0 S DIE=DIC,DR="2",DA=+Y L +^MR(YSDFN) D ^DIE L -^MR(YSDFN) S YSTOUT=$D(DTOUT) Q:YSTOUT  G EN

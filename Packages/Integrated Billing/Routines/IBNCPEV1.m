@@ -1,5 +1,5 @@
 IBNCPEV1 ;DALOI/SS - NCPDP BILLING EVENTS REPORT ;21-MAR-2006
- ;;2.0;INTEGRATED BILLING;**342,339,363,411,435**;21-MAR-94;Build 27
+ ;;2.0;INTEGRATED BILLING;**342,339,363**;21-MAR-94;Build 35
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ;IA# 10155 is used to read ^DD(file,field,0) node
@@ -19,29 +19,23 @@ SETVARS ;
  Q
  ;
  ;/**
-GETRX(IBECMENO,IBST,IBEND,IBECME) ; get ien of file 52 from #366.14
- ; input - 
- ;   IBECMENO = ECME # input from the user (with or without leading zeros)
+ ; input -
+ ;   IBECMENO = ECME #
  ;   IBST = start date (FM format)
  ;   IBEND = end date (FM format)
- ; output - function value: returns internal entry number of file #52 for the earliest date within the date range
- ;   IBECME - output variable pass by reference. Returns the external version of the ECME# with leading zeros
- ;
- ;  This subroutine is called when the user enters an ECME# as part of the search criteria
- ;
- N IBDATE,IBNO,IBIEN,IBFOUND,IBRXIEN,ECMELEN,IBRXIEN
- S (IBFOUND,IBRXIEN)=0
- F ECMELEN=12,7 D  Q:IBFOUND
- . I $L(+IBECMENO)>ECMELEN Q
- . S IBECMENO=$$RJ^XLFSTR(+IBECMENO,ECMELEN,0)   ; build ECME# with leading zeros to proper length
- . S IBDATE=+$O(^IBCNR(366.14,"E",IBECMENO,IBST-1)) Q:'IBDATE
- . I IBDATE>IBEND Q
- . S IBNO=+$O(^IBCNR(366.14,"E",IBECMENO,IBDATE,0)) Q:'IBNO
- . S IBIEN=+$O(^IBCNR(366.14,"B",IBDATE,0)) Q:'IBIEN
- . S IBRXIEN=+$P($G(^IBCNR(366.14,IBIEN,1,IBNO,2)),U,1)
- . I IBRXIEN S IBFOUND=1,IBECME=IBECMENO Q
- . Q
- Q IBRXIEN
+ ; output - returns internal entry number of file #52 for the earliest date within the date range
+GETRX(IBECMENO,IBST,IBEND) ; get ien of file 52 from #366.14
+ ; array from where the ECME BILLING EVENTS report gets its data
+ ;  This subroutine is called when the user enters an ECME# as
+ ;  part of the search criteria
+ N IBDATE,IBNO,IBIEN
+ S IBDATE=+$O(^IBCNR(366.14,"E",IBECMENO,IBST-1))
+ I IBDATE=0 Q 0
+ I IBDATE>IBEND Q 0
+ S IBNO=+$O(^IBCNR(366.14,"E",IBECMENO,IBDATE,0))
+ I IBNO=0 Q 0
+ S IBIEN=$O(^IBCNR(366.14,"B",IBDATE,0))
+ Q +$P($G(^IBCNR(366.14,IBIEN,1,IBNO,2)),U)
  ;
  ;/**
  ;finish
@@ -50,8 +44,7 @@ GETRX(IBECMENO,IBST,IBEND,IBECME) ; get ien of file 52 from #366.14
  ;IBD3 - node ^IBCNR(366.14,D0,1,D1,3)
  ;IBD4 - node ^IBCNR(366.14,D0,1,D1,4)
  ;IBINS - multiple of ^IBCNR(366.14,D0,1,D1,5)
- ;IBD7 - node ^IBCNR(366.14,D0,1,D1,7)
-DSTAT(IBD2,IBD3,IBD4,IBINS,IBD7) ;
+DSTAT(IBD2,IBD3,IBD4,IBINS) ;
  N IBX,IBT,IBSC,IB1ST,IBNXT,IBEXMPV
  S IB1ST=1
  D CHKP^IBNCPEV Q:IBQ
@@ -71,7 +64,6 @@ DSTAT(IBD2,IBD3,IBD4,IBINS,IBD7) ;
  .D CHKP^IBNCPEV Q:IBQ  W !?10
  .W "PLAN:",$P($G(^IBA(355.3,+Y,0)),U,3),"  "
  .W "INSURANCE: ",$P($G(^DIC(36,+$G(^IBA(355.3,+Y,0)),0)),U)
- .I +IBD7>0 W " COB: ",$S(+IBD7=2:"S",1:"P")
  .D CHKP^IBNCPEV Q:IBQ  W !?10 S IB1ST=1
  .I $P(Y,U,2)]"" W "BIN:",$P(Y,U,2) S IB1ST=0
  .I $P(Y,U,3)]"" W:'IB1ST ", " W "PCN:",$P(Y,U,3) S IB1ST=0
@@ -80,14 +72,15 @@ DSTAT(IBD2,IBD3,IBD4,IBINS,IBD7) ;
  .S Y=IBINS(IBX,1)
  .I $P(Y,U,4)]"" W "PAYER SHEET B2:",$P(Y,U,4) S IB1ST=0
  .I $P(Y,U,5)]"" W:'IB1ST ", " W "PAYER SHEET B3:",$P(Y,U,5)
- .S Y=IBINS(IBX,2)
- .D CHKP^IBNCPEV Q:IBQ
- .W !?10,"DISPENSING FEE:",$S($L($P(Y,U,1)):$J($P(Y,U,1),0,2),1:"N/A")
- .W ", BASIS OF COST DETERM:",$S($L($P(Y,U,2)):$$BOCD^IBNCPEV($P(Y,U,2)),1:"N/A")
- .D CHKP^IBNCPEV Q:IBQ
- .W !?10,"COST:",$S($L($P(Y,U,3)):$J($P(Y,U,3),0,2),1:"N/A")
- .W ", GROSS AMT DUE:",$S($L($P(Y,U,4)):$J($P(Y,U,4),0,2),1:"N/A")
- .W ", ADMIN FEE:",$S($L($P(Y,U,5)):$J($P(Y,U,5),0,2),1:"N/A")
+ .;S Y=$G(Z1("INS",IBX,2)) Q:Y=""
+ .S Y=IBINS(IBX,2) Q:Y=""
+ .D CHKP^IBNCPEV Q:IBQ  W !?10 S IB1ST=1
+ .I $P(Y,U)]"" W "DISPENSING FEE:",$P(Y,U) S IB1ST=0
+ .I $P(Y,U,2)]"" W:'IB1ST ", " W "BASIS OF COST DETERM:",$$BOCD^IBNCPEV($P(Y,U,2)) S IB1ST=0
+ .D CHKP^IBNCPEV Q:IBQ  W !?10 S IB1ST=1
+ .I $P(Y,U,3)]"" W "COST:",$J($P(Y,U,3),0,2) S IB1ST=0
+ .I $P(Y,U,4)]"" W:'IB1ST ", " W "GROSS AMT DUE:",$J($P(Y,U,4),0,2) S IB1ST=0
+ .I $P(Y,U,5)]"" W:'IB1ST ", " W "ADMIN FEE:",$J($P(Y,U,5),0,2)
  Q:IBQ
  ;
  D CHKP^IBNCPEV Q:IBQ
@@ -149,20 +142,20 @@ REOPEN ;
  D DISPUSR^IBNCPEV
  Q
  ;
- ;Prompts user to select multiple divisions (BPS PHARMACIES)
+ ;Prompts user to select miltiple divisions (BPS PHARMACIES)
  ; in order to filter the report by division(s) or for ALL divisions
- ; 
+ ;
  ;returns composite value:
  ;1st piece
- ; 1 - divisions were selected 
- ; 0 - divisions were NOT selected 
- ; -1 if up arrow entered or timeout
+ ; 1 - divisions were selected
+ ; 0 - divisions were NOT selected
+ ; -1 if upparrow entered or timeout
  ;2nd piece
- ; A-all or D - division(s) in the BPS PHARMACIES file #9002313.56)
+ ; A-all or D - division(s) in the
  ;
  ;and by reference:
- ;IBPSPHAR (only if the user selects "D") - a local array with iens and names 
- ;  of BPS PHARMACIES (file #9002313.56) selected by the user
+ ;IBPSPHAR (only if the user selects "D") - a local array with iens and names
+ ;  of BPS PHARMACY(is) (file #9002313.56) selected by the user
  ;  IBPSPHAR(ien of file #9002313.56) = ien of file #9002313.56 ^ name of the BPS PHARMACY
  ;
 MULTIDIV(IBPSPHAR) ;
@@ -182,7 +175,7 @@ CHECKDIV(IB36614,IBDIVS) ;
  ;Compile the string for divisions
  ;input:
  ;IBDVS - division local array by reference
- ;output: 
+ ;output:
  ; return value with the resulting string
 DISPLDIV(IBDVS) ;
  I ('$D(IBDVS))!($G(IBDVS)="") Q ""  ;invalid parameters
@@ -203,7 +196,7 @@ DISPLDIV(IBDVS) ;
  ;IBEDT - end date
  ;IBDTL - summary/detail mode
  ;IBDIVS - division local array by reference
- ;output: 
+ ;output:
  ; return value with the resulting string
 DISPTITL(IBBDT,IBEDT,IBDTL,IBDIVS) ;
  I ('$D(IBDIVS))!($G(IBDIVS)="")!($G(IBBDT)="")!($G(IBEDT)="")!($G(IBDTL)="") Q ""  ;invalid parameters
@@ -219,7 +212,7 @@ DISPTITL(IBBDT,IBEDT,IBDTL,IBDIVS) ;
  ;input:
  ;IBSTR - input string
  ;IBMAXLEN - max len
- ;output: 
+ ;output:
  ; return value with the resulting string
 CENTERIT(IBSTR,IBMAXLEN) ;
  I ($G(IBSTR)="")!(+$G(IBMAXLEN)=0) Q ""

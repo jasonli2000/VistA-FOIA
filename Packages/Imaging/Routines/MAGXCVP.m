@@ -1,6 +1,5 @@
-MAGXCVP ;WOIFO/SEB,MLH - Image Index Conversion Generate & Commit ; 05/18/2007 11:23
- ;;3.0;IMAGING;**17,25,31,54**;03-July-2009;;Build 1424
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGXCVP ;WOIFO/SEB,MLH - Image Index Conversion Generate & Commit ; 29 Nov 2003  2:18 PM
+ ;;3.0;IMAGING;**17,25,31**;Mar 31, 2005
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGXCVP ;WOIFO/SEB,MLH - Image Index Conversion Generate & Commit ; 05/18/2007 1
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -80,7 +80,7 @@ DONE W !!,"Done!"
  ; Generate a notification message and send it to group MAG SERVER
 NOTIFY(RESULT,SUBJECT,STARTDT,ENDDT,STARTIEN,ENDIEN,RECR) N Y,LOC,XMSUB,DIS,CAP,CNT,I,VR,DM,SUMMARY
  K ^TMP($J,"MAGQ")
- S Y=$$HTE^XLFDT($H,1) ; EdM: is Y used anywhere?
+ D NOW^%DTC S Y=% D DD^%DT
  S U="^",LOC=$$KSP^XUPARAM("WHERE")
  S SUBJECT=$G(SUBJECT)
  I +SUBJECT=SUBJECT S SUBJECT=$P("Generate^Commit",U,SUBJECT)
@@ -104,7 +104,7 @@ NOTIFY(RESULT,SUBJECT,STARTDT,ENDDT,STARTIEN,ENDIEN,RECR) N Y,LOC,XMSUB,DIS,CAP,
  S RESULT="1"
  K ^TMP($J,"MAGQ")
  Q
- ; 
+ ;
  ; Convert a string to all uppercase.
 UCASE(STRING) N OUTPUT
  S OUTPUT=$TR(STRING,"abcdefghijklmnopqrstuvwxyz","ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -128,4 +128,3 @@ SCRUBTKN(XSTRING) ; FUNCTION - Create standard token delimiters for parsing
  ; compress multiple spaces to single space
  F  Q:STRING'["  "  S STRING=$P(STRING,"  ",1)_" "_$P(STRING,"  ",2,999)
  Q STRING
- ;

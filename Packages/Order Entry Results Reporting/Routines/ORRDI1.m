@@ -1,8 +1,7 @@
-ORRDI1 ;SLC/JMH - RDI routines for API supporting CDS data; 3/24/05 2:31 [8/11/05 6:25am] ;11/02/10  05:11
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**232,294**;Dec 17, 1997;Build 27
+ORRDI1 ;SLC/JMH - RDI routines for API supporting CDS data; 3/24/05 2:31 [8/11/05 6:25am] ; 1/11/07 8:33am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**232**;Dec 17, 1997;Build 19
  ;
 GET(DFN,DOMAIN) ;API for packages to call in order to get data from HDR for
- I '$L($G(DOMAIN)) S DOMAIN="ART"
  ; check if in OUTAGE state and quit if so
  I $$DOWNXVAL^ORRDI2 D  Q -1
  .K ^XTMP("ORRDI",DOMAIN,DFN)
@@ -10,7 +9,7 @@ GET(DFN,DOMAIN) ;API for packages to call in order to get data from HDR for
  ;  order checking purposes
  N I,ORCACHE,ORRET,ORRECDT
  ;check if data was just retrieved a short time ago and if so return
- S ORRECDT=$P($G(^XTMP("ORRDI",DOMAIN,DFN,0)),U) I 'ORRECDT S ORRECDT=3000101
+ S ORRECDT=$P($G(^XTMP("ORRDI",DOMAIN,DFN,0)),U)
  S ORCACHE=$$GET^XPAR("SYS","OR RDI CACHE TIME")
  I $$FMDIFF^XLFDT($$NOW^XLFDT,ORRECDT,2)<(60*ORCACHE),$P(^XTMP("ORRDI",DOMAIN,DFN,0),U,3)>-1 S ORRET=$P(^XTMP("ORRDI",DOMAIN,DFN,0),U,3)
  ;check if there has been an HDR down condition within last minute
@@ -22,141 +21,117 @@ GET(DFN,DOMAIN) ;API for packages to call in order to get data from HDR for
  .I ORRET>-1 S ^XTMP("ORRDI","OUTAGE INFO","FAILURES")=0
  .I ORRET'>-1 D
  ..Q:$P(ORRET,U,2)="PATIENT ICN NOT FOUND"
- ..I ORRET=-9 S ORRET="-1^PROCESSING ERROR" Q
  ..S ^XTMP("ORRDI","OUTAGE INFO","FAILURES")=$$FAILXVAL^ORRDI2+1
  ..I $$FAILXVAL^ORRDI2'<$$FAILPVAL^ORRDI2 D
  ...S ^XTMP("ORRDI","OUTAGE INFO","DOWN")=1
  ...D SPAWN^ORRDI2
- S $P(^XTMP("ORRDI",DOMAIN,DFN,0),U,3,4)=ORRET
+ S $P(^XTMP("ORRDI",DOMAIN,DFN,0),U,3)=ORRET
  I ORRET<1 D
  .N TEMP S TEMP=^XTMP("ORRDI",DOMAIN,DFN,0)
  .K ^XTMP("ORRDI",DOMAIN,DFN)
  .S ^XTMP("ORRDI",DOMAIN,DFN,0)=TEMP
  Q ORRET
- ;
-RETRIEVE(DFN,DOMAIN) ;GET DATA
- N $ES,$ET
- S $ET="D ERRHNDL^ORRDI1(DFN) Q -1"
- N Y,ORCSTART,ORPSTART,ORCDIF,ORPDIF,ORALNUM,ORPSNUM,ORREQ,ORXML,ORERR,ORRET,ORY,START,FACIL
- K ^TMP($J,"ORRDI")
- S ORY=-1
- I '$L($G(DOMAIN)) S DOMAIN="ART"
- ;GET ICN
- D SELECT^ORWPT(.Y,DFN)
- N ICN
- S ICN=$P($G(Y),U,14)
- ;S ICN=1012121837; 1011232216; 1012121837 ;1011232216 ;1011226464 ;1011230043 ;1011220270 ;1011218227 ;1003979135 ;1011186582 ;1011117226 ;REMOVE OR COMMENT WHEN DONE
- I 'ICN Q -1_"^PATIENT ICN NOT FOUND"
- S START=$$FMADD^XLFDT($P($$NOW^XLFDT,"."),-30)
- S START=$$FMTHL7^XLFDT(START)
- S START=$E(START,1,4)_"-"_$E(START,5,6)_"-"_$E(START,7,8)
- S FACIL=$P($$SITE^VASITE,U,3)
- ;format request XML
- S ORREQ="/readClinicalData1?&templateId=RDIIntoleranceConditionPharmacyRead40010&"
- S ORREQ=ORREQ_"filterRequest=<?xml version=""1.0"" encoding=""UTF-8""?><filter:filter vhimVersion=""Vhim_4_00"" xmlns:f"
- S ORREQ=ORREQ_"ilter=""Filter"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""><filterId>RDI_IC_RX_SINGLE_PATIENT_FILTER</fil"
- S ORREQ=ORREQ_"terId><patients><NationalId>"_ICN_"</NationalId><excludeIdentifiers><assigningAuthority"
- S ORREQ=ORREQ_">USVHA</assigningAuthority><assigningFacility>"_FACIL_"</assigningFacility></excludeIdentifiers></patien"
- S ORREQ=ORREQ_"ts><entryPointFilter queryName=""IC-Standardized""><domainEntryPoint>IntoleranceCondition</domainEnt"
- S ORREQ=ORREQ_"ryPoint><xpathQuery><xpath>intoleranceConditions[((gmrAllergyAgent[(code!='') and (codingSystem = '99"
- S ORREQ=ORREQ_"VHA_ERT' or contains(.,'99VA'))]) or (drugClass/code[(code!='') and (codingSystem = '99VHA_ERT' or co"
- S ORREQ=ORREQ_"ntains(.,'99VA'))]) or (drugIngredient/code[(code!='') and (codingSystem = '99VHA_ERT' or contain"
- S ORREQ=ORREQ_"s(.,'99VA'))])) and (status = 'F')]</xpath></xpathQuery></entryPointFilter><entryPointFilter queryNa"
- S ORREQ=ORREQ_"me=""OMP-Standardized""><domainEntryPoint>OutpatientMedicationPromise</domainEntryPoint>"
- S ORREQ=ORREQ_"<startDate>"_START_"</startDate><xpathQuery><xpath>outpatientMedicationPromises[pharmacyRe"
- S ORREQ=ORREQ_"quest/orderedMedication/medicationCode[(code!='') and (codingSystem = '99VHA_ERT' or contain"
- S ORREQ=ORREQ_"s(.,'99VA'))]]</xpath></xpathQuery></entryPointFilter></filter:filter>&filterId=RDI_IC_RX_SINGLE_PATIENT_FILTER&re"
- S ORCSTART=$ZH
- S ORREQ=ORREQ_"questId="_FACIL_"RDI"_$$NOW^XLFDT_";"_ORCSTART
- ;make call to HDR
- ;ZW ORREQ
- S ORXML=$$GETREST^XOBWLIB("CDS WEB SERVICE","CDS SERVER")
- S ORRET=$$GET^XOBWLIB(ORXML,ORREQ,.ORERR,0)
- S ORCDIF=$ZH-ORCSTART
- I ORRET D  Q ORY
- .;parse out xml into temp global
- .S ORPSTART=$ZH
- .D PARSE(ORXML.HttpResponse.Data)
- .S ORPDIF=$ZH-ORCSTART-ORCDIF
- .;I $D(^TMP($J,"ORRDI","ClinicalData",0,"errorSection")) S ORY="-1^CDS ERROR" D  Q
- .;.S ^XTMP("ORRDI","METRICS",ORCSTART)=DFN_U_ORCDIF_U_ORPDIF_U
- .;move from temp global into ^XTMP("ORRDI" domain globals
- .S ORALNUM=$$AL(DFN)
- .S ORPSNUM=$$PS(DFN)
- .S ^XTMP("ORRDI","ART",DFN,0)=$$NOW^XLFDT_U_U_ORALNUM
- .S ^XTMP("ORRDI","PSOO",DFN,0)=$$NOW^XLFDT_U_U_ORPSNUM
- .S ^XTMP("ORRDI",0)=$$FMADD^XLFDT($$NOW^XLFDT,2)_U_$$NOW^XLFDT
- .I DOMAIN="ART" S ORY=ORALNUM
- .I DOMAIN="PSOO" S ORY=ORPSNUM
- .I +ORY>-1 S ^XTMP("ORRDI","TESTREQ")=ORREQ
- .;set metrics for data retrieval and parsing
- .S ^XTMP("ORRDI","METRICS",$$NOW^XLFDT,ORCSTART)=DFN_U_ORCDIF_U_ORPDIF_U_ORALNUM_U_ORPSNUM
- .;ZW ^TMP($J,"ORRDI") ;REMOVE OR COMMENT WHEN DONE
- .K ^TMP($J,"ORRDI")
- I 'ORRET!(ORERR) S ^XTMP("ORRDI","METRICS",$$NOW^XLFDT,ORCSTART)=DFN_U_"ERROR" D  Q "-1^"_ORERR
- .S ^XTMP("ORRDI","ART",DFN,0)=U_U_"-1^"_ORERR
- .S ^XTMP("ORRDI","PSOO",DFN,0)=U_U_"-1^"_ORERR
-RETQ Q -1
- ;
-PS(DFN) ;expects ^TMP($J,"ORRDI")
- K ^XTMP("ORRDI","PSOO",DFN)
- N ORQ S ORQ=$$MSGERR Q:($L(ORQ)>0) -1_U_ORQ
- N I,GL,CNT
- S CNT=0,GL=$NA(^TMP($J,"ORRDI","ClinicalData",0,"patient",0,"outpatientMedicationPromises"))
- S I="" F  S I=$O(@GL@(I)) Q:'$L(I)  D
- .S CNT=CNT+1
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,1,0)=$G(@GL@(I,"pharmacyRequest",0,"orderingInstitutionIdentifier",0,"name",0))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,2,0)=$G(@GL@(I,"pharmacyRequest",0,"orderedMedication",0,"medicationCode",0,"displayText",0))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,3,0)=$G(@GL@(I,"pharmacyRequest",0,"orderedMedication",0,"medicationCode",0,"code",0))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,4,0)=$G(@GL@(I,"prescriptionId",0))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,5,0)=$G(@GL@(I,"pharmacyRequest",0,"statusModifier",0,"displayText",0))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,6,0)=$G(@GL@(I,"originalDispense",0,"quantityDispensed",0,"value",0))_";"_$G(@GL@(I,"originalDispense",0,"daysSupply",0))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,7,0)=$$DTCONV($G(@GL@(I,"expirationDate",0,"literal",0)))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,8,0)=$$DTCONV($G(@GL@(I,"pharmacyRequest",0,"orderDate",0,"literal",0)))
- .N K S K="" F  S K=$O(@GL@(I,"refillDispense",K)) Q:'$L(K)  D
- ..I $G(@GL@(I,"refillDispense",K,"fillDate",0,"literal",0)) D
- ...S ^XTMP("ORRDI","PSOO",DFN,I+1,9,0)=$$DTCONV($G(@GL@(I,"refillDispense",K,"fillDate",0,"literal",0)))
- .I '$G(^XTMP("ORRDI","PSOO",DFN,I+1,9,0)) S ^XTMP("ORRDI","PSOO",DFN,I+1,9,0)=$$DTCONV($G(@GL@(I,"originalDispense",0,"fillDate",0,"literal",0)))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,10,0)=$G(@GL@(I,"numberOfRefillsAuthorized",0))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,11,0)=$G(@GL@(I,"originalDispense",0,"currentProvider",0,"name",0,"family",0))_","_$G(@GL@(I,"originalDispense",0,"currentProvider",0,"name",0,"given",0))
- .S ^XTMP("ORRDI","PSOO",DFN,I+1,12,0)=$G(@GL@(I,"originalDispense",0,"dispensedDrug",0,"drugUnitPrice",0,"value",0))
- .N L S L="" F  S L=$O(@GL@(I,"sig",L)) Q:'$L(L)  S ^XTMP("ORRDI","PSOO",DFN,I+1,14,0)=$G(^XTMP("ORRDI","PSOO",DFN,I+1,14,0))_" "_$G(@GL@(I,"sig",L))
- .I '$D(^XTMP("ORRDI","PSOO",DFN,I+1,14,0)) S ^XTMP("ORRDI","PSOO",DFN,I+1,14,0)=""
- .;S ^XTMP("ORRDI","PSOO",DFN,I+1,14,0)=$G(@GL@(I,"sig",0))
- Q CNT
- ;
-AL(DFN) ;expects ^TMP($J,"ORRDI")
- K ^XTMP("ORRDI","ART",DFN)
- N ORQ S ORQ=$$MSGERR Q:($L(ORQ)>0) -1_U_ORQ
- N I,GL,CNT
- S CNT=0,GL=$NA(^TMP($J,"ORRDI","ClinicalData",0,"patient",0,"intoleranceConditions"))
- S I="" F  S I=$O(@GL@(I)) Q:'$L(I)  D
- .S CNT=CNT+1
- .S ^XTMP("ORRDI","ART",DFN,I+1,"FACILITY",0)=$G(@GL@(I,"facilityIdentifier",0,"name",0))
- .I $G(@GL@(I,"gmrAllergyAgent",0,"code",0)),$E($G(@GL@(I,"gmrAllergyAgent",0,"codingSystem",0)),1,4)="99VA" D
- ..S ^XTMP("ORRDI","ART",DFN,I+1,"REACTANT",0)=@GL@(I,"gmrAllergyAgent",0,"code",0)_U_@GL@(I,"gmrAllergyAgent",0,"displayText",0)_U_@GL@(I,"gmrAllergyAgent",0,"codingSystem",0)
- .I $D(@GL@(I,"drugIngredient")) D
- ..N J S J="" F  S J=$O(@GL@(I,"drugIngredient",J))  Q:'$L(J)  D
- ...I $G(@GL@(I,"drugIngredient",J,"code",0,"code",0)),$E($G(@GL@(I,"drugIngredient",J,"code",0,"codingSystem",0)),1,4)="99VA" D
- ....S ^XTMP("ORRDI","ART",DFN,I+1,"DRUG INGREDIENTS",J+1)=@GL@(I,"drugIngredient",J,"code",0,"code",0)_U_@GL@(I,"drugIngredient",J,"code",0,"displayText",0)_U_@GL@(I,"drugIngredient",J,"code",0,"codingSystem",0)
- .I $D(@GL@(I,"drugClass")) D
- ..N J S J="" F  S J=$O(@GL@(I,"drugClass",J))  Q:'$L(J)  D
- ...I $G(@GL@(I,"drugClass",0,"code",0,"code",0)),$E($G(@GL@(I,"drugClass",0,"code",0,"codingSystem",0)),1,10)="99VA50.605" D
- ....S ^XTMP("ORRDI","ART",DFN,I+1,"DRUG CLASSES",J+1)=@GL@(I,"drugClass",J,"code",0,"alternateCode",0)_U_@GL@(I,"drugClass",J,"code",0,"alternateCode",0)
- ....S ^XTMP("ORRDI","ART",DFN,I+1,"DRUG CLASSES",J+1)=^XTMP("ORRDI","ART",DFN,I+1,"DRUG CLASSES",J+1)_U_@GL@(I,"drugClass",J,"code",0,"codingSystem",0)_U_@GL@(I,"drugClass",J,"code",0,"displayText",0)
- Q CNT
- ;
 HAVEHDR() ;call to check if this system has an HDR to perform order checks
  ;  against
  ;check parameter to see if there is an HDR and returns positive if so
  I $$GET^XPAR("SYS","OR RDI HAVE HDR") Q 1
  ;returns negative because the parameter indicates there is no HDR
  Q 0
- ;
+RETRIEVE(DFN,DOMAIN) ;actually go get the data from CDS
+ K ^XTMP("ORRDI",DOMAIN,DFN)
+ N START,END,HLL,HLA,ORFS,ORCS,ORRS,ORES,ORSS
+ N Y,ORRSLT,ICN,WHATOUT,HLNEXT,HLNODE,HLQUIT,ORHLP,RET,HL,HLDOM,HLDONE1,HLECH,HLFS,HLINSTN,HLMTIEN,HLPARAM,HLQ,STATUS,PRE
+ S (ORFS,ORCS,ORRS,ORES,ORSS)=""
+ ;S START=$$FMADD^XLFDT($P($$NOW^XLFDT,"."),-120),END=$$FMADD^XLFDT($P($$NOW^XLFDT,"."),485)
+ ;set up what codes for specific domains
+ I DOMAIN="ART" S WHATOUT="039OC_AL:ALLERGIES"
+ I DOMAIN="PSOO" S WHATOUT="055OC_RXOP:PHARMACY ALL OUTPATIENT",START=$$FMADD^XLFDT($P($$NOW^XLFDT,"."),-30)
+ ;get patient identifier (ICN)
+ D SELECT^ORWPT(.Y,DFN)
+ S ICN=$P($G(Y),U,14)
+ I 'ICN Q -1_"^PATIENT ICN NOT FOUND"
+ ;build HLA array with request HL7
+ S HLA("HLS",1)="SPR^XWBDRPC845-569716_0^T^ZREMOTE RPC^@SPR.4.2~003RPC017ORWRP REPORT TEXT&006RPCVER0010&007XWBPCNT0017&007XWBESSO066321214321\F\\F\\F\657\F"
+ S HLA("HLS",1,1)="\48102&007XWBDVER0011&006XWBSEC0043.14&002P10187369543;"_ICN_"&002P2"_WHATOUT_";1\S\RXOP;ORDV06;28;200&002P3000&002P4000&002P5000&002P600"_$L($G(START))_$G(START)_"&002P700"_$L($G(END))_$G(END)
+ S HLA("HLS",2)="RDF^1^@DSP.3~TX~300"
+ ;set HLL("LINKS") node to specify receiver location
+ S HLL("LINKS",1)="ORRDI SUBSCRIBER^ORHDR"
+ S ORHLP("OPEN TIMEOUT")=10
+ S ORHLP("SUBSCRIBER")="^OR RDI SENDER^"_$P($$SITE^VASITE,U,3)_"^OR RDI RECEIVER^^^"
+ ;call DIRECT^HLMA to send request
+ D DIRECT^HLMA("ORRDI EVENT","LM",1,.ORRSLT,,.ORHLP)
+ ;set time stamp of the data
+ I $G(ORRSLT) S ^XTMP("ORRDI",DOMAIN,DFN,0)=$$NOW^XLFDT
+ ;check if call failed
+ I $P($G(ORRSLT),U,2) Q "-1"_U_$G(ORRSLT)
+ ;get and parse the response HL7
+ S ORFS=$G(HL("FS")),ORCS=$E($G(HL("ECH")),1),ORRS=$E($G(HL("ECH")),2),ORES=$E($G(HL("ECH")),3),ORSS=$E($G(HL("ECH")),4)
+ N ORQUIT S ORQUIT=""
+ F  X HLNEXT Q:HLQUIT'>0!(ORQUIT'="")  D
+ .I $E(HLNODE,1,3)="MSA"&($P(HLNODE,ORFS,2)'="AA") S ORQUIT=$P(HLNODE,ORFS,2)
+ .I $E(HLNODE,1,3)="ERR" S ORQUIT=$P(HLNODE,ORFS,2)
+ .I $E(HLNODE,1,3)="RDT"&($P(HLNODE,ORFS,2)="S") D
+ ..S ^XTMP("ORRDI",0)=$$FMADD^XLFDT($$NOW^XLFDT,2)_U_$$NOW^XLFDT
+ ..I DOMAIN="ART" D ALPARSE(DFN,.HLNODE)
+ ..I DOMAIN="PSOO" D PSPARSE(DFN,.HLNODE)
+ I $L(ORQUIT) Q "-2"_U_ORQUIT
+ S RET=$O(^XTMP("ORRDI",DOMAIN,DFN,""),-1)
+ Q $G(RET)
+ALPARSE(DFN,DATA) ;parse an individual ART record that comes from CDS
+ I '$D(DATA(0)) S DATA(0)=DATA
+ N Y,I,SEQ,TMPREACT,I,DCCOUNT,DICOUNT
+ S SEQ=$O(^XTMP("ORRDI","ART",DFN,""),-1)+1
+ D PIECEOUT^ORRDI2(.Y,.DATA,ORFS)
+ Q:Y(4)="EE"
+ ;Q:$$UP^XLFSTR($P(Y(5),ORCS,2))'["DRUG"
+ ;save the originating facility
+ S ^XTMP("ORRDI","ART",DFN,SEQ,"FACILITY",0)=Y(3)
+ ;save reactant to the XTMP if it is coded
+ S TMPREACT=$TR(Y(6),ORCS,ORFS)
+ N CODING S CODING=$P(TMPREACT,ORFS,6)
+ S:$E(CODING,1,4)="99VA" ^XTMP("ORRDI","ART",DFN,SEQ,"REACTANT",0)=$P(TMPREACT,ORFS,4,6)
+ ;save drug classes to the XTMP (only coded values)
+ S I=0,DCCOUNT=0 F I=1:1:$L(Y(9),ORRS) D
+ . N TMP
+ . S TMP=$TR($P(Y(9),ORRS,I),ORCS,ORFS)
+ . ;check if drug class is coded
+ . N CODING S CODING=$P(TMP,ORFS,3) Q:$E(CODING,1,9)'="99VHA_ERT"
+ . S DCCOUNT=DCCOUNT+1
+ . S $P(TMP,ORFS,6)="99VA"_$P($P(TMP,ORFS,6),"_",2)
+ . S ^XTMP("ORRDI","ART",DFN,SEQ,"DRUG CLASSES",DCCOUNT)=$P(TMP,ORFS,4)_U_$P(TMP,ORFS,4)_U_$P(TMP,ORFS,6)_U_$P(TMP,ORFS,5)
+ ;save drug ingredients to the XTMP (only coded values)
+ S I=0,DICOUNT=0 F I=1:1:$L(Y(10),ORRS) D
+ . N TMP
+ . S TMP=$TR($P(Y(10),ORRS,I),ORCS,ORFS)
+ . ;check if drug ingredient is coded
+ . N CODING S CODING=$P(TMP,ORFS,6) Q:$E(CODING,1,4)'="99VA"
+ . S DICOUNT=DICOUNT+1
+ . S ^XTMP("ORRDI","ART",DFN,SEQ,"DRUG INGREDIENTS",DICOUNT)=$P(TMP,ORFS,4,6)
+ S I="" F  S I=$O(^XTMP("ORRDI","ART",DFN,SEQ,"REACTANT",I)) Q:I=""  S ^XTMP("ORRDI","ART",DFN,SEQ,"REACTANT",I)=$$REMESC(^XTMP("ORRDI","ART",DFN,SEQ,"REACTANT",I))
+ S I="" F  S I=$O(^XTMP("ORRDI","ART",DFN,SEQ,"DRUG INGREDIENTS",I)) Q:I=""  S ^XTMP("ORRDI","ART",DFN,SEQ,"DRUG INGREDIENTS",I)=$$REMESC(^XTMP("ORRDI","ART",DFN,SEQ,"DRUG INGREDIENTS",I))
+ S I="" F  S I=$O(^XTMP("ORRDI","ART",DFN,SEQ,"DRUG CLASSES",I)) Q:I=""  S ^XTMP("ORRDI","ART",DFN,SEQ,"DRUG CLASSES",I)=$$REMESC(^XTMP("ORRDI","ART",DFN,SEQ,"DRUG CLASSES",I))
+ Q
+PSPARSE(DFN,DATA) ;parse an individual PSOO record from CDS
+ I '$D(DATA(0)) S DATA(0)=DATA
+ N Y,I,COUNT,MAP,PIECE,SEQ
+ D PIECEOUT^ORRDI2(.Y,.DATA,ORFS)
+ S SEQ=$O(^XTMP("ORRDI","PSOO",DFN,""),-1)+1
+ S I="",COUNT=0,MAP="1,2,4,5,6,7,8,9,10,11,12,14"
+ F I=18,4,6,7,8,10,11,12,13,14,15,16 S PIECE(I)=Y(I),COUNT=COUNT+1,^XTMP("ORRDI","PSOO",DFN,SEQ,$P(MAP,",",COUNT),0)=PIECE(I)
+ S ^XTMP("ORRDI","PSOO",DFN,SEQ,1,0)=$P(^XTMP("ORRDI","PSOO",DFN,SEQ,1,0),ORCS,1)
+ I '$L(^XTMP("ORRDI","PSOO",DFN,SEQ,1,0))!(Y(17)=200) S ^XTMP("ORRDI","PSOO",DFN,SEQ,1,0)=Y(3)
+ S ^XTMP("ORRDI","PSOO",DFN,SEQ,6,0)=^XTMP("ORRDI","PSOO",DFN,SEQ,6,0)_";"_Y(9)
+ S ^XTMP("ORRDI","PSOO",DFN,SEQ,5,0)=$P(^XTMP("ORRDI","PSOO",DFN,SEQ,5,0),ORCS,5)
+ S ^XTMP("ORRDI","PSOO",DFN,SEQ,3,0)=$P($P(^XTMP("ORRDI","PSOO",DFN,SEQ,2,0),ORCS,4),".")
+ S ^XTMP("ORRDI","PSOO",DFN,SEQ,2,0)=$P(^XTMP("ORRDI","PSOO",DFN,SEQ,2,0),ORCS,5)
+ S ^XTMP("ORRDI","PSOO",DFN,SEQ,7,0)=$$DTCONV(^XTMP("ORRDI","PSOO",DFN,SEQ,7,0))
+ S ^XTMP("ORRDI","PSOO",DFN,SEQ,8,0)=$$DTCONV(^XTMP("ORRDI","PSOO",DFN,SEQ,8,0))
+ S ^XTMP("ORRDI","PSOO",DFN,SEQ,9,0)=$$DTCONV(^XTMP("ORRDI","PSOO",DFN,SEQ,9,0))
+ S I="" F  S I=$O(^XTMP("ORRDI","PSOO",DFN,SEQ,I)) Q:I=""  S ^XTMP("ORRDI","PSOO",DFN,SEQ,I,0)=$$REMESC($G(^XTMP("ORRDI","PSOO",DFN,SEQ,I,0)))
+ Q
 DTCONV(DATE) ;convert date in hl7 format to mm/dd/yy
- I '$L(DATE) Q ""
  Q $E(DATE,5,6)_"/"_$E(DATE,7,8)_"/"_$E(DATE,3,4)
- ;
+ ;Q $E(DATE,1,6)_$E($P(DATE,"/",3),3,4)
 REMESC(ORSTR) ;
  ; Remove Escape Characters from HL7 Message Text
  ; Escape Sequence codes:
@@ -176,63 +151,3 @@ REMESC(ORSTR) ;
  .S K=$S(VALUE>255:"?",VALUE<32!(VALUE>127&(VALUE<160)):"",1:$C(VALUE))
  .S ORSTR=I1_K_J2
  Q ORSTR
- ;
-PARSE(STREAM) ;
- N %XML,GL
- S GL=$NA(^TMP($J,"ORRDI"))
- K @GL
- N STATUS,READER,XOBERR,S
- ;S STATUS=##class(%XML.TextReader).ParseStream(STREAM,.READER)
- S STATUS=##class(%XML.TextReader).ParseStream(STREAM,.READER,,,,,1)
- I $$STATCHK^XOBWLIB(STATUS,.XOBERR,1) D
- .N BREAK
- .S BREAK=0 F  Q:BREAK||READER.EOF||'READER.Read()  D
- ..N X
- ..I READER.NodeType="element" D SPUSH(.S,READER.LocalName)
- ..I READER.NodeType="endelement" D SPOP(.S,.X)
- ..I READER.NodeType="chars" D SPUT(.S,READER.Value)
- Q
- ;
-SPUSH(S,X) ;places X on the stack S and returns the current level of the stack
- N I S I=$O(S(""),-1)+1,S(I)=X
- Q I
- ;
-SPOP(S,X) ;removes the top item from the stack S and put it into the variable X and returns the level that X was at
- N I S I=$O(S(""),-1)
- I I S X=S(I) K S(I)
- N J S J=$O(S(I),-1) I J S S(J,X)=$G(S(J,X))+1
- Q I
- ;
-SPEEK(S,X) ;same as SPOP except the top item is not removed
- N I S I=$O(S(""),-1)
- I I S X=S(I)
- Q I
- ;
-SPUT(S,X) ;implementation specific, uses the stack to form a global node
- N I,STR
- S STR=$P(GL,")")
- S I=0 F  S I=$O(S(I)) Q:'I  D
- .S STR=STR_","_""""_S(I)_""""_","
- .N NUM S NUM=0
- .I $D(S(I-1,S(I))) S NUM=+$G(S(I-1,S(I)))
- .S STR=STR_NUM
- S STR=STR_")"
- I $D(@STR) S @STR=@STR_X
- I '$D(@STR) S @STR=X
- Q STR
- ;
-MSGERR() ;check errors from XML return
- ;returns empty string "" if there was no error
- ;returns empty string "" if the only error was "ALL_PATIENT_IDS_EXCLUDED"
- ;otherwise returns the exceptionMessage string from the errorSection
- N ORRET S ORRET=""
- I $D(^TMP($J,"ORRDI","ClinicalData",0,"errorSection")) D
- .N I F I="fatalErrors","errors","warnings" D
- ..N J S J="" F  S J=$O(^TMP($J,"ORRDI","ClinicalData",0,"errorSection",0,I,J)) Q:J=""  D
- ...N ORSTR S ORSTR=$G(^TMP($J,"ORRDI","ClinicalData",0,"errorSection",0,I,J,"errorCode",0))
- ...I ORSTR'="ALL_PATIENT_IDS_EXCLUDED" S ORRET=ORSTR
- Q ORRET
-ERRHNDL(DFN) ;handle any errors that may get thrown in call to GET^ORRDI1
- K ^TMP($J,"ORRDI"),^XTMP("ORRDI","PSOO",DFN),^XTMP("ORRDI","ART",DFN)
- D UNWIND^%ZTER
- Q

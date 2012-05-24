@@ -1,5 +1,5 @@
-LRX ;SLC/BA/DALISC/FHS - UTILITY ROUTINES -- PREVIOUSLY ^LAB("X","...") ;2/8/91  07:30
- ;;5.2;LAB SERVICE;**65,153,201,217,290,360**;Sep 27, 1994;Build 1
+LRX ;SLC/BA/DALISC/FHS - UTILITY ROUTINES -- PREVIOUSLY ^LAB("X","...") ;1/26/07  18:36
+ ;;5.2;LAB SERVICE;**65,153,201,217,290,360,350**;Sep 27, 1994;Build 10
 PT ;patient info
  ;
  N X,I,N,Y
@@ -22,7 +22,8 @@ PT ;patient info
  . . S PNM=VADM(1)
  . . S SEX=$P(VADM(5),U),DOB=$P(VADM(3),U),DOD=$P(VADM(6),U)
  . . S AGE=VADM(4),AGE(2)=$$AGE2(DOB,$G(LRCDT))
- . . S SSN=$P(VADM(2),U),LRWRD=$P(VAIN(4),U,2)
+ . . ; S SSN=$P(VADM(2),U),LRWRD=$P(VAIN(4),U,2)
+ . . S SSN=VA("PID"),LRWRD=$P(VAIN(4),U,2) ; for VOE
  . . S LRWRD(1)=+VAIN(4),LRRB=VAIN(5),LRPRAC=+VAIN(2)
  . . S:VAIN(3) LRTREA=+VAIN(3)
  D SSNFM^LRU
@@ -42,7 +43,8 @@ DEM ;Call DEM^VADPT instead of OERR used above
  I +$G(LRDPF)=2 N I,X,N,Y D
  . D DEM^VADPT D:'VAERR
  . . S PNM=VADM(1),SEX=$P(VADM(5),U)
- . . S DOB=$P(VADM(3),U),SSN=$P(VADM(2),U)
+ . . ; S DOB=$P(VADM(3),U),SSN=$P(VADM(2),U)
+ . . S DOB=$P(VADM(3),U),SSN=VA("PID") ; for VOE
  . . S AGE=VADM(4),AGE(2)=$$AGE2(DOB,$G(LRCDT))
  D SSNFM^LRU
  Q
@@ -111,9 +113,9 @@ LRGLIN ;
  W IOG0 D GKILL^%ZISS
  W !
  Q
-LRUID(LRAA,LRAD,LRAN) ;Extrinsic function call to create a unique 
+LRUID(LRAA,LRAD,LRAN) ;Extrinsic function call to create a unique
  ;accession identifier for an accession number.  See description
- ;of field .092 in file 68 for a full explanation of this number.   
+ ;of field .092 in file 68 for a full explanation of this number.
  ;This function returns a value equal to the unique ID generated.
  ;LRAA=ien in file 68, accession area
  ;LRAD=ien for accession date in field 68.01

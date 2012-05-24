@@ -1,5 +1,5 @@
 PSOADDR ;BIR/RTR-Print address changes from Audit file ;10/17/01
- ;;7.0;OUTPATIENT PHARMACY;**127,233,326**;DEC 1997;Build 11
+ ;;7.0;OUTPATIENT PHARMACY;**127,233**;DEC 1997;Build 8
  ;External reference to ^DIA supported by DBIA 2602
  ;
 EN ;
@@ -15,7 +15,7 @@ EN ;
  D ^DIR K DIR I Y["^"!($D(DTOUT))!($D(DUOUT)) D MESS Q
  S PSOFORM=$S(Y="S":1,1:0)
  I 'PSOFORM G DATE
- K DIC W ! S DIC(0)="QEAM",DIC("A")="Select PATIENT: " D EN^PSOPATLK S Y=PSOPTLK K DIC,PSOPTLK I Y<1!($D(DUOUT))!($D(DTOUT)) D MESS Q
+ K DIC W ! S DIC="^DPT(",DIC(0)="QEAM",DIC("A")="Select PATIENT: " D ^DIC K DIC I Y<1!($D(DUOUT))!($D(DTOUT)) D MESS Q
  S PSOAPAT=+Y
 DATE ;
  W !!

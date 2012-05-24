@@ -1,5 +1,5 @@
-SDWLPL ;IOFO BAY PINES/DMR,ESW - WAIT LIST PICK LIST ; December 10, 2008 10:46:16  ;   ; Compiled December 12, 2008 12:59:34
- ;;5.3;scheduling;**327,394,417,446,538**;AUG 13, 1993;Build 5
+SDWLPL ;IOFO BAY PINES/DMR,esw - WAIT LIST PICK LIST ; 6/1/05 1:05pm  ; Compiled May 1, 2007 14:32:52
+ ;;5.3;scheduling;**327,394,417,446**;AUG 13, 1993;Build 77
  ;
  ;
  ;09/23/2006 Patch SD*5.3*417 Upper/Lower case usage.
@@ -27,18 +27,15 @@ DISPLAY ;
  D LIST(ANS2,DFN)
  Q
  ;
-INIT(DFN,ANS2,FLG) ;
+INIT(DFN,ANS2) ;
  ; ANS2: A - ALL
  ;       S - All Specialties
  ;       C - All Clinics
  ;       M - Matches stop codes only
- ;  FLG: (optional) 
- ;       NR - do not diplay entries with NON REMOVAL REASON - in check out
  S (INST,SCODE,CLINIC,DENTER,REQBY,DESIRD,SCPRI,IEN,SSN)="" K ^TMP("SDWLPL",$J),^TMP($J,"SDWLPL")
  F  S IEN=$O(^SDWL(409.3,"B",DFN,IEN)) Q:IEN=""  D
  .Q:$$GET1^DIQ(409.3,IEN_",",23,"I")="C"
- .;I $G(FLG)="NR" Q:$$GET1^DIQ(409.3,IEN_",",18,"I")'=""    ; include non-removed for 'NR flag
- .;Q:$$GET1^DIQ(409.3,IEN_",",18,"I")'=""    ;
+ .Q:$$GET1^DIQ(409.3,IEN_",",18,"I")'=""
  .S ^TMP("SDWLPL",$J,IEN)=$G(^SDWL(409.3,IEN,0)) S DENTER="",DENTER=$P($G(^TMP("SDWLPL",$J,IEN)),"^",2)
  .S (WLTYPE,TYPE,WLTN,NUM)="",TYPE=$P($G(^TMP("SDWLPL",$J,IEN)),"^",5)
  .IF DENTER'=""&(TYPE'="") D
@@ -97,13 +94,11 @@ SAVE(TYPE,WLTNI,IEN) ;
  S SCPRI=$E($$GET1^DIQ(409.3,IEN_",",15)) ;SC priority
  N NAME,SSN S NAME=$$GET1^DIQ(2,DFN_",",.01),SSN=$$GET1^DIQ(2,DFN_",",.09)
  N SDBY S SDBY=$$GET1^DIQ(409.3,IEN_",",11),SDBY=$E(SDBY,1,3)
- N SDNR S SDNR=$$GET1^DIQ(409.3,IEN_",",18,"E") ; non removal reason
  S NN=$O(^TMP($J,"SDWLPL",""),-1)+1
  S ^TMP($J,"SDWLPL",NN)=IEN_U_WLTYPE_U_SCPRI_U_WLTN_U_INST_U_DENTER_U_SDBY_U_DESIRED
  ;
  N SPIEC S SPIEC=$S(TYPE=4:9,TYPE=3:10,TYPE=2:11,TYPE=1:12)
  S $P(^TMP($J,"SDWLPL",NN),U,SPIEC)=WLTNI
- S $P(^TMP($J,"SDWLPL",NN),U,13)=SDNR
  K ^TMP("SDWLPL",$J,IEN)
  Q
  ;
@@ -128,5 +123,4 @@ LIST(ANS2,DFN) ;
  .S SDUP="ABCDEFGHIJKLMNOPRSTUWQXYzv",SDLO="abcdefghijklmnoprstuwqxyzv"
  .N SMT S SMT=$$GET1^DIQ(409.3,IEN_",",25) I SMT'="" S SMT=$TR(SMT,SDUP,SDLO) W !?2,"Comment: ",SMT
  .N SMO S SMO=$$GET1^DIQ(409.3,IEN_",",30) I SMO'="" S SMO=$TR(SMO,SDUP,SDLO) W !?2,"Reopen: ",SMO
- .I $P(REC,U,13)'="" W !?2,"Non-Removal Reason: ",$P(REC,U,13)
  Q

@@ -1,8 +1,8 @@
-IBCNERPA ;DAOU/BHS - IBCNE eIV RESPONSE REPORT (cont'd) ;03-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,345,416**;21-MAR-94;Build 58
+IBCNERPA ;DAOU/BHS - IBCNE IIV RESPONSE REPORT (cont'd) ;03-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,271,345**;21-MAR-94;Build 28
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
- ; eIV - Insurance Verification Interface
+ ; IIV - Insurance Identification and Verification Interface
  ;
  ; Input from IBCNERP1/2:
  ;  IBCNERTN="IBCNERP1" - Driver rtn
@@ -18,7 +18,7 @@ IBCNERPA ;DAOU/BHS - IBCNE eIV RESPONSE REPORT (cont'd) ;03-JUN-2002
  ;   Report (2).
  ;  IBCNESPC("DTEXP")=Expiration date used in the inactive policy report
  ;
- ;  Based on structure of eIV Response File (#365)
+ ;  Based on structure of IIV Response File (#365)
  ;  ^TMP($J,IBCNERTN,S1,S2,CT,0) based on ^IBCN(365,DA,0)
  ;    IBCNERTN="IBCNERP1", S1=PyrName(SORT=1) or PatNm(SORT=2),
  ;    S2=PatName(SORT=1) or PyrName(SORT=2), CT=Seq ct
@@ -79,5 +79,60 @@ EN6(IBCNERTN,IBCNESPC) ; Entry pt.  Calls IBCNERP6
  . S DIR(0)="E" D ^DIR K DIR
  ;
 EXIT6 ; Exit pt
+ Q
+ ;
+EBDISP(RPTDATA,DISPDATA,LCT) ; Build sorted Elig/Ben notes for display
+ ; Called by IBCNERP3 - all inputs should be passed by reference
+ ; Init local variables
+ N EBCT,EBSEGS,CT,SRT1,SRT2,SRT3,SRT4,SRT5,SRT6,SEGCT,CT2,ITEM,NTCT
+ N STATFLG
+ ;
+ ; Only build more display lines if notes exist
+ S EBCT=+$O(RPTDATA(2,""),-1) I 'EBCT,'$D(RPTDATA(2,0)) G EBEXIT
+ S DISPDATA(LCT)="",LCT=LCT+1,DISPDATA(LCT)="Eligibility/Benefit Information:",LCT=LCT+1
+ S STATFLG=""
+ ; Build EB w/Notes
+ I $D(RPTDATA(2,0)) S STATFLG=RPTDATA(2,0)
+ F CT=1:1:EBCT D
+ . S (SRT1,SRT2,SRT3,SRT4,SRT5)="*"
+ . S SEGCT=$L($G(RPTDATA(2,CT)),U)
+ . F CT2=2:1:SEGCT S ITEM=$P(RPTDATA(2,CT),U,CT2) I $L(ITEM)>0 D
+ . . I CT2=3 S SRT4=ITEM Q
+ . . I CT2=4 S SRT2=ITEM Q
+ . . I CT2=5 S SRT3=ITEM Q
+ . . I CT2=13 S SRT1=ITEM Q
+ . S EBSEGS(SRT1,SRT2,SRT3,SRT4,SRT5,CT)=""
+ ; Display Active/Inactive/Undetermined message
+ S DISPDATA(LCT)="",LCT=LCT+1
+ I STATFLG]"" D
+ . I STATFLG="U" S DISPDATA(LCT)="IIV was unable to determine the status of this patient's policy.",LCT=LCT+1 Q
+ . S DISPDATA(LCT)="IIV has determined that this patient's policy is "_STATFLG_".",LCT=LCT+1
+ ; Loop thru sorted EB Notes
+ S SRT1="" F  S SRT1=$O(EBSEGS(SRT1)) Q:SRT1=""  D
+ . S DISPDATA(LCT)="",LCT=LCT+1
+ . I SRT1'="*" S DISPDATA(LCT)=" "_$$LBL^IBCNERP2(365.02,.13)_SRT1,LCT=LCT+1
+ . S SRT2="" F  S SRT2=$O(EBSEGS(SRT1,SRT2)) Q:SRT2=""  D
+ . . I SRT2'="*" S DISPDATA(LCT)="  "_$$LBL^IBCNERP2(365.02,.04)_SRT2,LCT=LCT+1
+ . . S SRT3="" F  S SRT3=$O(EBSEGS(SRT1,SRT2,SRT3)) Q:SRT3=""  D
+ . . . I SRT3'="*" S DISPDATA(LCT)="   "_$$LBL^IBCNERP2(365.02,.05)_SRT3,LCT=LCT+1
+ . . . S SRT4="" F  S SRT4=$O(EBSEGS(SRT1,SRT2,SRT3,SRT4)) Q:SRT4=""  D
+ . . . . I SRT4'="*" S DISPDATA(LCT)="    "_$$LBL^IBCNERP2(365.02,.03)_SRT4,LCT=LCT+1
+ . . . . S SRT5="" F  S SRT5=$O(EBSEGS(SRT1,SRT2,SRT3,SRT4,SRT5)) Q:SRT5=""  D
+ . . . . . I SRT5'="*" S DISPDATA(LCT)="     "_$$LBL^IBCNERP2(365.02,.02)_SRT5,LCT=LCT+1
+ . . . . . S SRT6="" F  S SRT6=$O(EBSEGS(SRT1,SRT2,SRT3,SRT4,SRT5,SRT6)) Q:SRT6=""  D
+ . . . . . . S DISPDATA(LCT)="       "
+ . . . . . . S SEGCT=$L($G(RPTDATA(2,CT)),U)
+ . . . . . . F CT2=2,6:1:$S(SEGCT>12:12,1:SEGCT) S ITEM=$P(RPTDATA(2,SRT6),U,CT2) I $L(ITEM)>0 D
+ . . . . . . . ; Display label for all but .09 field - Percentage
+ . . . . . . . S ITEM=$S(CT2'=9:$$LBL^IBCNERP2(365.02,(.01*CT2)),1:"")_ITEM
+ . . . . . . . I $L(ITEM)+$L(DISPDATA(LCT))>69 S LCT=LCT+1,DISPDATA(LCT)="       "_ITEM Q
+ . . . . . . . I DISPDATA(LCT)'="       " S DISPDATA(LCT)=DISPDATA(LCT)_",  "_ITEM Q
+ . . . . . . . S DISPDATA(LCT)="       "_ITEM
+ . . . . . . ; Notes
+ . . . . . . S NTCT=$O(RPTDATA(2,SRT6,""),-1),ITEM="" I NTCT>0 D
+ . . . . . . . F CT2=1:1:NTCT S LCT=LCT+1,DISPDATA(LCT)="        "_RPTDATA(2,SRT6,CT2)
+ . . . . . . . S LCT=LCT+1,DISPDATA(LCT)="       "
+ . . . . . . I $TR(DISPDATA(LCT)," ","")'="" S LCT=LCT+1
+EBEXIT ; EBDISP exit point
  Q
  ;

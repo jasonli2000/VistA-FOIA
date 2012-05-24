@@ -1,5 +1,5 @@
-RCDPEWL2 ;ALB/TMK/KML - ELECTRONIC EOB WORKLIST ACTIONS ; 7/7/10 6:43pm
- ;;4.5;Accounts Receivable;**173,208,269**;Mar 20, 1995;Build 113
+RCDPEWL2 ;ALB/TMK - ELECTRONIC EOB WORKLIST ACTIONS ;26-NOV-02
+ ;;4.5;Accounts Receivable;**173,208**;Mar 20, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ; IA for call to OPTION^IBJTLA = 4121
  ; IA for call to ASK^IBRREL = 306
@@ -198,9 +198,7 @@ RHDR(RCSCR,RCDT,RCPG) ;Prints EOB detail report heading
  I RCPG!($E(IOST,1,2)="C-") W @IOF,*13
  S RCPG=RCPG+1
  W !,?15,"EDI LOCKBOX EEOB DETAIL FROM WORKLIST",?55,$$FMTE^XLFDT(RCDT,2),?70,"Page: ",RCPG
- ; HIPAA 5010 - TRACE # increased in length from 30 to 50 characters therefore it needs to be displayed on its own line
- W !!,$E(" ERA NUMBER: "_RCSCR_$J("",25),1,25)_"ERA DATE: "_$$FMTE^XLFDT($P(Z,U,4)),!,"INS COMPANY: "_$P(Z,U,6)_"/"_$P(Z,U,3)
- W !,"ERA TRACE #: "_$P(Z,U,2)
+ W !!,$E(" ERA NUMBER: "_RCSCR_$J("",25),1,25)_$E("ERA TRACE #: "_$P(Z,U,2)_$J("",30),1,30)_"ERA DATE: "_$$FMTE^XLFDT($P(Z,U,4)),!,"INS COMPANY: "_$P(Z,U,6)_"/"_$P(Z,U,3)
  W !,$TR($J("",IOM)," ","=")
  Q
  ;
@@ -214,7 +212,7 @@ NOWAY ; Msg for unidentified bill
  S DIR(0)="EA",DIR("A",1)="THIS BILL IS NOT IDENTIFIED IN YOUR A/R",DIR("A")="THIS FUNCTION IS NOT AVAILABLE ... RETURN TO CONTINUE " W ! D ^DIR K DIR
  Q
  ;
-NOWAY1 ; Msg for ERA level Adjustment 
+NOWAY1 ; Msg for ERA level Adjustment
  N DIR,X,Y
  S DIR(0)="EA",DIR("A",1)="THIS IS AN ERA LEVEL ADJUSTMENT - NO DATA EXISTS FOR IT IN YOUR AR",DIR("A")="PRESS ENTER TO CONTINUE" W ! D ^DIR K DIR
  Q

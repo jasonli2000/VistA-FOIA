@@ -1,5 +1,5 @@
-IBCEMRAA ;ALB/DSM/PJH - MEDICARE REMITTANCE ADVICE DETAIL-PART A ; 8/2/10 9:12pm
- ;;2.0;INTEGRATED BILLING;**155,323,349,400,431**;21-MAR-94;Build 106
+IBCEMRAA ;ALB/DSM - MEDICARE REMITTANCE ADVICE DETAIL-PART A ; 12/29/05 9:57am
+ ;;2.0;INTEGRATED BILLING;**155,323,349**;21-MAR-94;Build 46
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q  ; must call an entry point
@@ -137,21 +137,29 @@ CLMHDR ; Print Claim Level Header
  ;
  ; Rows 1 to 3
  W !,?108,"Medicare-equivalent",!?110,"Remittance Advice",!
- N PRVDR
+ N PRVDR,LVL,STATE
+ ; Retrieve the Provider data from IB Site Parameters file - ^IBE(350.9)
+ S PRVDR=$G(^IBE(350.9,1,2))
+ ; ProviderName^AgentCashierAddress^City^State^Zip
  ;
- ; gather the pay-to provider information - IB*2*400
- S PRVDR=$$PRVDATA^IBJPS3($P(IBEOB(0),U,1))
+ F LVL=1:1:5 S PRVDR(LVL)=$P(PRVDR,U,LVL)
+ ; PRVDR(1)  Provider Name (Agent Cashier Mail Symbol)
+ ; PRVDR(2)  Agent Cashier Street Address
+ ; PRVDR(3)  Agent Cashier City
+ ; PRVDR(4)  Agent Cashier State
+ ; PRVDR(5)  Agent Cashier Zip
  ;
+ ; resolve the State File Pointer in PRVDR(4) & get State Abbreviation
+ S STATE=$S(PRVDR(4)'="":$P($G(^DIC(5,PRVDR(4),0)),U,2),1:"")
  ; Row 4 to 15
  W !!!,"DEPT OF VETERANS AFFAIRS"
- W !,$P(PRVDR,U,5),?103,"PROVIDER #:",?117,$P($G(^IBE(350.9,1,1)),U,5) ;Tax ID
- W !,$P(PRVDR,U,6),?103,"PAGE #:",?117,$J(IBPGN,3)
- W !,$P(PRVDR,U,7),", ",$P(PRVDR,U,8)," ",$P(PRVDR,U,9),?103,"DATE: ",?117,$$FMTE^XLFDT($P(IBEOB(0),U,6),5)
+ W !,PRVDR(2),?103,"PROVIDER #:",?117,$P($G(^IBE(350.9,1,1)),U,5) ;Tax ID
+ W !,PRVDR(1),?103,"PAGE #:",?117,$J(IBPGN,3)
+ W !,PRVDR(3),", ",STATE," ",PRVDR(5),?103,"DATE: ",?117,$$FMTE^XLFDT($P(IBEOB(0),U,6),5)
  W !!,"PATIENT NAME",?24,"PATIENT CNTRL NUMBER",?48,"RC",?52,"REM",?58,"DRG#",?72,"DRG OUT AMT"
  W ?86,"COINSURANCE",?100,"PAT REFUND",?115,"CONTRACT ADJ"
- W !,"HIC NUMBER",?48,"RC",?52,"REM",?58,"OUTCD CAPCD",?72,"DRG CAP AMT"
+ W !,"HIC NUMBER",?24,"ICN NUMBER",?48,"RC",?52,"REM",?58,"OUTCD CAPCD",?72,"DRG CAP AMT"
  W ?86,"COVD CHGS",?100,"ESRD NET ADJ",?115,"PER DIEM RTE"
- W !,"ICN NUMBER"
  W !,"FROM DT    THRU DT",?24,"NACHG  HICHG  TOB",?48,"RC",?52,"REM",?58,"PROF COMP",?72,"MSP PAYMT"
  W ?86,"NCOVD CHGS",?100,"INTEREST",?115,"PROC CD AMT"
  W !,"CLM STATUS",?24,"COST  COVDY  NCOVDY",?48,"RC",?52,"REM",?58,"DRG AMT",?72,"DEDUCTIBLES"
@@ -177,15 +185,13 @@ CLMPRNT ; - Print Claim Level part of the Report
  ; ROW 17
  ; HIC & ICN
  S HIC=$S($P(IBEOB(6),U,2)'="":$P(IBEOB(6),U,2),$$WNRBILL^IBEFUNC(IBIFN,1):$P($G(^DGCR(399,$P(IBEOB(0),U),"I1")),U,2),1:$P($G(^DGCR(399,$P(IBEOB(0),U),"I2")),U,2))
- W !,HIC
+ W !,HIC,?24,$P(IBEOB(0),U,14)
  ; Reason Code, Remarks Code 2
  W ?48,$G(RSNCD(2)),?52,$P(RMKS,U,2)
  ; covered charges
  W ?86,$J($P(IBEOB(1),U,3),11,2)
  ; Outpatient Reimbursement Rate
  I 'INPAT W ?115,$J($P(IBEOB(3),U,1),11,2)
- ;ICN moved with HIPAA 5010
- W !,$P(IBEOB(0),U,14)
  ; ROW 18
  W !,IBFD,?12,IBTD
  ; Type of Bill (=Location of Care_Bill Clasification_Frequency)

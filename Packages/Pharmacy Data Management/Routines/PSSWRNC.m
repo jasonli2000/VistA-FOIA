@@ -1,5 +1,5 @@
 PSSWRNC ;DAL/RJS-NEW WARNING SOURCE CUSTOM WARNING LIST BUILDER CONT;
- ;;1.0;PHARMACY DATA MANAGEMENT;**98,144**;10/12/05;Build 13
+ ;;1.0;PHARMACY DATA MANAGEMENT;**98**;10/12/05
  ;
  ;IA: 3735 ^PSNDF(50.68
  ;IA: 4445 ^PS(50.625
@@ -23,23 +23,20 @@ SEL2 ;
  ..I '$D(^PS(54,WARN)) Q
  ..S ^TMP("PSSWRNB",$J,$P(^PSDRUG(DR,0),"^"))=WARN54
  Q
-SEL3 ;; >> BEGIN *144 - RJS
- W ! K DIC S DIC("B")="",DIC="^PSDRUG(",DIC(0)="AEKQM",DIC("A")="Enter starting drug name: " D ^DIC K DIC I Y=-1 S QUIT=1 Q 
- S PSSDRG=$P(Y,"^",2),PSSDG(PSSDRG)=1
- W ! K Y S DIC("B")="",DIC="^PSDRUG(",DIC(0)="AEKQM",DIC("A")="Enter ending drug name: " D ^DIC K DIC I Y=-1 S QUIT=1 Q 
- S PSSEDRG=$P(Y,"^",2),PSSDG(PSSEDRG)=2 K Y
- S PSS1="",PSS1=$O(PSSDG(PSS1)) I $G(PSSDG(PSS1))>1 D  G SEL3  ;;<<END *144 - RJS
- .W !!,?10,"The Ending drug name must come alphabetically",!,?16,"after your Starting drug name.",! H 2
- .K PSSDG
- W !!,"WARNINGS FOR DRUGS FROM "_PSSDRG_" TO "_PSSEDRG
+SEL3 ;
+ W ! K DIR S DIR(0)="FO^1:30",DIR("A")="Enter starting drug name" D ^DIR K DIR I Y["^"!(Y="") S QUIT=1 Q
+ S X=$$ENLU^PSSGMI(Y)
+ S DRUG=X
+ W ! K DIR S DIR(0)="FO^1:30",DIR("A")="Enter ending drug name" D ^DIR K DIR I Y["^"!(Y="") S QUIT=1 Q
+ S EDRUG=Y
+ W !!,"WARNINGS FOR DRUGS FROM "_DRUG_" TO "_EDRUG
  W ! K DIR S DIR(0)="E" D ^DIR K DIR I 'Y S PSSOUT=1,QUIT=1 Q
- I $D(^PSDRUG("B",PSSDRG)) S I=$L(PSSDRG),PSSDRG=$E(PSSDRG,1,I-1)
- F  S PSSDRG=$O(^PSDRUG("B",PSSDRG)) Q:PSSDRG=""  Q:PSSDRG]PSSEDRG  D
- .S DR=$O(^PSDRUG("B",PSSDRG,0)) I DR="" Q
+ I $D(^PSDRUG("B",DRUG)) S I=$L(DRUG),DRUG=$E(DRUG,1,I-1)
+ F  S DRUG=$O(^PSDRUG("B",DRUG)) Q:DRUG=""  Q:DRUG]EDRUG  D
+ .S DR=$O(^PSDRUG("B",DRUG,0)) I DR="" Q
  .I SKIP,$P($G(^PSDRUG(DR,"WARN")),"^")'="" Q
  .D ACTIVE^PSSWRNB I 'ACTIVE Q
- .S ^TMP("PSSWRNB",$J,PSSDRG)=""
- K PSSDG,PSSDRG,PSSEDRG,PSS1  ;; CLEANUP << *144 - RJS
+ .S ^TMP("PSSWRNB",$J,DRUG)=""
  Q
 SEL4 ;
  S DR=0 F  S DR=$O(^PSDRUG(DR)) Q:'DR  D
@@ -76,16 +73,14 @@ SEL6 ;
  Q
 SEL7 ;
  W !! K DIR S DIR("A")="Select drugs containing New warning number"
- S DIR("?",1)="Answer with WARNING LABEL-ENGLISH NUMBER using the format #N."  ;;<<BEGIN *144 - RJS
- S DIR("?",2)="Where # is the numeric number of the warning label desired."
- S DIR("?")="Example:  for the warning label number 15 entry 15N."  ;; << END *144 - RJS
- S DIR("??")="^D HELP^PSSWRNC"
+ S DIR("?",1)="Answer using format # or #N"
+ S DIR("?")="Example: 15 or 15N"
  S DIR(0)="FO"
  D ^DIR S RXNUM=Y
  I Y="N"!(Y="n")!(Y="Y")!(Y="y") W !,$C(7),?5,RXNUM_" is not a valid entry" H 2 S QUIT=1 Q
  I RXNUM["N"!(RXNUM["n") S RXNUM=$TR(RXNUM,"Nn","")
  I RXNUM="^"!(RXNUM="")!(RXNUM=" ") S QUIT=1 Q
- I '$D(^PS(50.625,RXNUM)) W !,$C(7),?5,RXNUM_" is not in the New warning file" H 2 S QUIT=1 Q
+ I '$D(^PS(50.625,RXNUM)) W !,$C(7),RXNUM_" is not in the New warning file" H 1 S QUIT=1 Q
  W @IOF
  W "Searching for drugs that contain new warning number "_RXNUM
  S PSOWARN=RXNUM_"N",STAR="" D NEWWARN^PSSWRNE
@@ -106,22 +101,4 @@ SEL8 ;
  .D DRUG^PSSWRNB I PSSWRN="" Q
  .S WARN=0 F  S WARN=$O(GEND(WARN)) Q:'WARN  I ","_PSSWRN_","[(","_WARN_",") D
  ..S ^TMP("PSSWRNB",$J,$P(^PSDRUG(DR,0),"^"))=PSSWRN
- Q
-HELP ; WARNING LABEL-ENGLISH NUMBER DISPLAY LOGIC *144 - RJS
- N DIR,DIRUT,DUOUT,PSSCNTR,PSSIEN,PSSEND,X,Y
- W #,!,"Select drugs containing New warning number:",!!,?4,"Choose from:",!
- S (PSSCNTR,PSSIEN,PSSEND)=0,DIR(0)="FO",DIR("A")="   '^' to STOP"
- F  S PSSIEN=$O(^PS(50.625,PSSIEN)) Q:'PSSIEN!(PSSEND="^")  D
- .S PSSCNT=$P(^PS(50.625,PSSIEN,1,0),"^",4)
- .I PSSCNTR+PSSCNT>17 D EOP Q:PSSEND="^"
- .W !,?4,PSSIEN,"N"
- .F PSSCT=1:1:PSSCNT W:PSSCT>1 ! W ?12,$G(^PS(50.625,PSSIEN,1,PSSCT,0))
- .S PSSCNTR=PSSCNTR+PSSCNT
- K PSSCNT,PSSCT
- Q
-EOP ; END OF PAGE LOGIC *144 - RJS
- D ^DIR
- I $G(X)!(Y="^") S PSSEND="^" Q
- W #,!,"Select drugs containing New warning number:",!!,?4,"Choose from:",!
- S PSSCNTR=0
  Q

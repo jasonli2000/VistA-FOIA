@@ -1,5 +1,5 @@
 PSJLIUTL ;BIR/MV-IV LM utilities modules ;25 APR 00 / 4:28 PM
- ;;5.0;INPATIENT MEDICATIONS ;**39,50,58,81,85,110,180,263**;16 DEC 97;Build 51
+ ;;5.0; INPATIENT MEDICATIONS ;**39,50,58,81,85,110,180**;16 DEC 97;Build 5
  ;
  ; Reference to ^ORD(101 is supported by DBIA #872.
  ; Reference to ^PS(55 is supported by DBIA #2191.
@@ -40,12 +40,10 @@ LONG(Y,COL,LEN) ; Display long fields.
  Q
  ;
 WRTDRG(DRGT) ; Print AD/SOL drugs for "backdoor" view.
- NEW DRGX,PSJIVIEN,PSJX,PSJX1
+ NEW DRGX,PSJIVIEN,PSJX
  F DRGX=0:0 S DRGX=$O(DRG(DRGT,DRGX)) Q:'DRGX  D
  . S (PSJIVIEN,X)=$G(DRG(DRGT,DRGX)) I DRGT="SOL",$P($G(^PS(52.7,+X,0)),U,4)]"" S $P(X,U,2)=$P(X,U,2)_" "_$P(^(0),U,4)
- . S PSJX1=$S($P(X,U,4)]"":"("_$P(X,U,4)_")",1:$P(X,U,4))
- . S PSJL="",PSJX=$S($P(X,U,2)]"":$P(X,U,2)_" "_$P(X,U,3)_" "_PSJX1,1:"*** Undefined ***")
- . ;S PSJL="",PSJX=$S($P(X,U,2)]"":$P(X,U,2)_" "_$P(X,U,3)_" "_$P(X,U,4),1:"*** Undefined ***")
+ . S PSJL="",PSJX=$S($P(X,U,2)]"":$P(X,U,2)_" "_$P(X,U,3)_" "_$P(X,U,4),1:"*** Undefined ***")
  . NEW PSJNF D NFIV^PSJDIN($S(DRGT="AD":52.6,1:52.7),+PSJIVIEN,.PSJNF)
  . S PSJX=PSJX_PSJNF("NF")
  . S PSJL=$$SETSTR^VALM1(PSJX,PSJL,8,72)

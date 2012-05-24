@@ -66,4 +66,3 @@ HOLD ;Hold Screen at End of Display
  N DIR
  S DIR(0)="E" D ^DIR
  Q
- 

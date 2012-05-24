@@ -1,6 +1,6 @@
 IBCESRV ;ALB/TMP - Server interface to IB from Austin ;8/6/03 10:04am
- ;;2.0;INTEGRATED BILLING;**137,181,196,232,296,320,407**;21-MAR-94;Build 29
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**137,181,196,232,296,320**;21-MAR-94
+ ;
 SERVER ; Entry point for server option to process EDI msgs received from Austin
  ;
  N IBEFLG,IBERR,IBTDA,XMER,IBXMZ,IBHOLDCT
@@ -55,8 +55,7 @@ MSG(XMER,IBTDA,IBXMZ) ; Read/Store message lines
  .. S ^TMP("IBERR",$J,"MSG",1)=IBHD
  .. S ^TMP("IBERR",$J,"MSG",2)=$G(XMRG)
  . S IBTXN=XMRG
- . ;
- . S IBBTCH=+$O(^IBA(364.1,"MSG",+$P(IBTXN,"#",2)\1,""),-1)
+ . S IBBTCH=+$O(^IBA(364.1,"MSG",+$P(IBTXN,"#",2)\1,""))
  . I 'IBBTCH S IBERR=6 D REST(.IBTXN,IBGBL) Q  ;No msgs match conf recpt
  . S IBTXN("BATCH",IBBTCH,0)="837REC0^"_IBD("MSG#")_U_+$E($P(IBD("SUBJ")," "),4,14)_"^^"_IBBTCH_U_IBDATE
  . ;
@@ -201,7 +200,7 @@ LOADDET(IB1,IB2,IBTDA,IBGBL,IBERR,IBTNM) ; Load the rest of the message text int
  Q
  ;
 CKLABEL(Z,IBTXN,IBGBL) ;  Checks to be sure label in Z exists.
- ; If it doesn't exist, files an error and returns 0 
+ ; If it doesn't exist, files an error and returns 0
  ;  OR  returns 1 if it does exist
  N X,LAB
  S X=1,LAB=$P(Z,"(")

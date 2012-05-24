@@ -5,7 +5,7 @@ ZWR
 ^HLEV(776.1,1,50,0)="^776.101^2^2^3030610^^^^"
 ^HLEV(776.1,1,50,1,0)="This monitor monitors the Event Monitor system!  In other words, it"
 ^HLEV(776.1,1,50,2,0)="monitors itself."
-^HLEV(776.1,4,0)="LINK (870) CHECKS^I^File 870 entry w/stub status search^720^1^CHK870~HLEVX000"
+^HLEV(776.1,4,0)="LINK (870) CHECKS^A^File 870 entry w/stub status search^720^1^CHK870~HLEVX000"
 ^HLEV(776.1,4,41,0)="^776.1041^9^9^3030707^^^^"
 ^HLEV(776.1,4,41,1,0)="M code logic flow for this routine is:"
 ^HLEV(776.1,4,41,2,0)=" "

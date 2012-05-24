@@ -1,8 +1,8 @@
 IBJDB21 ;ALB/RB - REASONS NOT BILLABLE REPORT (COMPILE) ;19-JUN-00
- ;;2.0;INTEGRATED BILLING;**123,159,185,399,437**;21-MAR-94;Build 11
+ ;;2.0;INTEGRATED BILLING;**123,159,185**;21-MAR-94
  ;
 EN ; - Entry point from IBJDB2.
- K ^TMP("IBJDB2",$J),IB,IBE,ENCTYP,EPIEN,IBADMDT,RELBILL
+ K ^TMP("IBJDB2",$J),IB,IBE
  I '$G(IBXTRACT) D
  . F X=1:1:4 I IBSEL[X S IBE(X)=IBEPS(X) ; Set episodes for report.
  ;
@@ -42,12 +42,6 @@ EN ; - Entry point from IBJDB2.
  ..D DEM^VADPT S IBPT=$E(VADM(1),1,25),IBSSN=$P(VADM(2),U)
  ..S DIC="^VA(200,",DA=+$P(IBN1,U,4),DR=".01",DIQ="IBCLK" D EN^DIQ1
  ..S IBCLK=$E($G(IBCLK(200,DA,.01)),1,20)
- ..I ($P(IBN0,U,18)=2)&($$EXTERNAL^DILFD(356,.19,"",$P(IBN0,U,19))["72 HOUR RULE") D
- ...S IBADMDT=$$ADMDT^IBTUTL5(DFN,$P(IBN0,U,6))
- ..E  S IBADMDT=""
- ..S ENCTYP=$P(^IBE(356.6,$P(IBN0,U,18),0),U,3) S EPDT=$E($P(IBN0,U,6),1,7)
- ..S EPIEN=$S(ENCTYP=3:$P(IBN0,U,8),ENCTYP=4:$P(IBN0,U,9),1:"")
- ..S RELBILL=$$RELBIL^IBTUTL5(EPIEN,EPDT,DFN,ENCTYP)
  ..;
  ..; - Get totals for summary.
  ..I '$D(IB(IBDIV,IBEP,IBRNB)) S IB(IBDIV,IBEP,IBRNB)="0^0"
@@ -60,17 +54,13 @@ EN ; - Entry point from IBJDB2.
  ..;
  ..I $G(IBEXCEL) D  Q
  ...W !,$E($P($G(^DG(40.8,IBDIV,0)),U),1,25),U
- ...W $S(IBEP<4:$E(IBE(IBEP)),1:"H"),U,IBPT,U,$E(IBSSN,6,10),U
- ...W $E($$INS^IBJD1(+$P(IBN0,U,2),IBEPD),1,25),U
+ ...W $S(IBEP<4:$E(IBE(IBEP)),1:"H"),U,IBPT,U,IBSSN,U
  ...W $$DT^IBJD(IBEPD,1),U,$$DT^IBJD(IBDEN,1),U
- ...W $$DT^IBJD($P(IBN1,U,3),1),U,IBCLK,U,IBADMDT,U,$E(IBRNB1,1,25),U
- ...W $E(IBPRV,1,25),U,$E(IBSPC,1,25),U,IBAMT,U
- ...I RELBILL>0 F X=2:1:$P(RELBILL,";",1)+1 W $P(RELBILL,";",X)_" "
- ...I RELBILL<0 W ""
- ...W U,$P(IBN1,U,8)
+ ...W $$DT^IBJD($P(IBN1,U,3),1),U,IBCLK,U,$E(IBRNB1,1,25),U
+ ...W $E(IBPRV,1,25),U,$E(IBSPC,1,25),U,IBAMT,U,$P(IBN1,U,8)
  ..;
  ..S X=IBEPD_U_IBDEN_U_$P(IBN1,U,3)_U_IBCLK_U_IBRNB1
- ..S X=X_U_IBPRV_U_IBSPC_U_IBAMT_U_$E($P(IBN1,U,8),1,50)_U_IBADMDT_U_RELBILL
+ ..S X=X_U_IBPRV_U_IBSPC_U_IBAMT_U_$E($P(IBN1,U,8),1,70)
  ..S ^TMP("IBJDB2",$J,IBDIV,IBEP,IBSORT1,IBPT_"@@"_$E(IBSSN,6,10))=$$INS^IBJD1(+$P(IBN0,U,2),IBEPD)
  ..S ^TMP("IBJDB2",$J,IBDIV,IBEP,IBSORT1,IBPT_"@@"_$E(IBSSN,6,10),+IBN0)=X
  ;
@@ -82,20 +72,19 @@ ENQ K ^TMP("IBJDB2")
  K IBSSN,VADM,X1,X2
  Q
  ;
-AMOUNT(EPS,CLM) ; Return the Amount not billed 
+AMOUNT(EPS,CLM) ; Return the Amount not billed
  ; Input: EPS - Episode(1=Inpatient,2=Outpatient,3=Prosthet.,4=Prescr.)
  ;        CLM - Pointer to Claim Tracking File (#356)
  ;Output: AMOUNT not billed
  ;
  N ADM,ADMDT,AMOUNT,BLBS,BLDT,CPT,CPTLST,DA,DR,DCHD,DFN,DIC,DIQ,DIV,DRG
- N IBRX,ENC,ENCDT,EPDT,PFT,PRST,PTF,RIMB,VCPT,TTCST,X
+ N ENC,ENCDT,EPDT,PFT,PRST,PTF,RIMB,VCPT,TTCST,X
  ;
  S AMOUNT=0,X=$G(^IBT(356,CLM,0))
  S ENC=+$P(X,U,4)     ; Encounter    (Pointer to #409.68)
  S ADM=+$P(X,U,5)     ; Admission    (Pointer to #405)
  S PRST=+$P(X,U,9)    ; Prothetics   (Pointer to #660)
  S EPDT=$P(X,U,6)     ; Episode Date (FM format)
- S IBRX=+$P(X,U,8)
  ;
  ; - Assumes REIMBURSABLE INS. as the RATE TYPE
  S RIMB=$O(^DGCR(399.3,"B","REIMBURSABLE INS.",0)) I 'RIMB S RIMB=8
@@ -143,52 +132,23 @@ AMT2 ; - Outpatient Charges
  I ENCDT<2990901 D  G QAMT
  . S AMOUNT=+$$BICOST^IBCRCI(RIMB,3,ENCDT,"OUTPATIENT VISIT DATE")
  ;
- S AMOUNT=$$OPT^IBTUTL5(ENC,EPDT) G QAMT
+ D GETCPT^SDOE(ENC,"CPTLST") S VCPT=0
+ F  S VCPT=$O(CPTLST(VCPT)) Q:VCPT=""  D
+ .S CPT=+CPTLST(VCPT)
+ .S AMOUNT=AMOUNT+$$BICOST^IBCRCI(RIMB,3,ENCDT,"PROCEDURE",CPT,"",DIV,"")
+ ;
+ ; - Subtract the amount billed for this Episode
+ S AMOUNT=AMOUNT-$$CLAMT(DFN,EPDT,0)
+ G QAMT
  ;
 AMT3 ; Prosthetic Charges
- S AMOUNT=$$PRSAMT^IBTUTL5(EPDT,PRST) G:AMOUNT=0 QAMT
- ;
  S DIC="^RMPR(660,",DA=PRST,DR="14",DIQ="TTCST" D EN^DIQ1
  S AMOUNT=+$G(TTCST(660,DA,14))
  G QAMT
  ;
-AMT4 ; - Prescription Charges 
- ;
- ; Protect Rx internal entry # before RXAMT call switches to RX number
- N IBRXIEN S IBRXIEN=IBRX
- ;
+AMT4 ; - Prescription Charges
  ; - Tort Liable Charge & Reasonable Charge (same source)
- S AMOUNT=$$RXAMT^IBTUTL5(EPDT,IBRX) G:AMOUNT=0 QAMT
- ;
- ; Patch 437 update to call charge master with enough information
- ; to lookup actual cost of prescription 
- ;
- N IBBI,IBRSNEW
- ;
- ; check charge master for the type of billing--VA Cost or not
- S IBBI=$$EVNTITM^IBCRU3(+RIMB,3,"PRESCRIPTION FILL",EPDT,.IBRSNEW)
- ;
- S DFN=$$FILE^IBRXUTL(IBRXIEN,2)
- I $G(DFN)>0&(IBBI["VA COST") D
- .  N IBQTY,IBCOST,IBRFNUM,IBSUBND,IBFEE,IBRXNODE
- .;  if this is a refill look up the refill info for cost and quantity
- .  S IBRFNUM=$$RFLNUM^IBRXUTL(IBRXIEN,EPDT,"")
- .  I IBRFNUM>0 D
- ..    S IBSUBND=$$ZEROSUB^IBRXUTL(DFN,IBRXIEN,IBRFNUM)
- ..    S IBQTY=$P($G(IBSUBND),U,4)
- ..    S IBCOST=$P($G(IBSUBND),U,11)
- .;
- .;  if this was an original fill look up zero node for Rx info 
- .  E  D
- ..    S IBRXNODE=$$RXZERO^IBRXUTL(DFN,IBRXIEN)
- .     S IBQTY=$P($G(IBRXNODE),U,7)
- .     S IBCOST=$P($G(IBRXNODE),U,17)
- .;
- .  S IBRSNEW=+$O(IBRSNEW($P(IBBI,";"),0))
- .  S AMOUNT=$J(+$$RATECHG^IBCRCC(+IBRSNEW,IBQTY*IBCOST,EPDT,.IBFEE),0,2)
- E  D
- .  S AMOUNT=+$$BICOST^IBCRCI(RIMB,3,EPDT,"PRESCRIPTION FILL")
- ;
+ S AMOUNT=+$$BICOST^IBCRCI(RIMB,3,EPDT,"PRESCRIPTION FILL")
  ;
 QAMT I AMOUNT<0 S AMOUNT=0
  Q AMOUNT
@@ -249,7 +209,7 @@ QPS Q (PRV_U_SPC)
  ;
 PHDL ; - Print the header line for the Excel spreadsheet
  N X
- S X="Division^Svc^Patient^SSN^Insurance^Episode Dt^Dt Entered^Dt Lst Edit^"
- S X=X_"Lst Edited By^Next Admission^RNB Cat^Provider^Specialty^Entry Amt^Related Bills^Comments"
+ S X="Division^Svc^Patient^SSN^Episode Dt^Dt Entered^Dt Lst Edit^"
+ S X=X_"Lst Edited By^RNB Cat^Provider^Specialty^Entry Amt^Comments"
  W !,X
  Q

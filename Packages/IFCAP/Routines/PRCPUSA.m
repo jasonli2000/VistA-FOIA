@@ -1,6 +1,6 @@
 PRCPUSA ;WISC/RFJ-utility program for updating inventory point     ;30 Sep 92
- ;;5.1;IFCAP;**126**;Oct 20, 2000;Build 2
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  S X=$$UPDATE(.PRCP) I X'="" W !!,X Q
  K PRCP,X Q
  ;
@@ -27,9 +27,7 @@ UPDATE(PRCPZ) ;  start updating inventory point
  I (PRCPZ("TYP")="R"!(PRCPZ("TYP")="C"))&(PRCPZ("QTY")>0) Q "For distribution (Regular or Call-in), quantity must be less than zero"
  ;
  N ORDERNO,PRCPID,PRCPUSA,TOTCOST,VALUE,X,Y,Z
- S VALUE=$P(^PRCP(445,PRCPZ("I"),1,PRCPZ("ITEM"),0),"^",22)
- I VALUE=0,PRCPZ("TYP")="P" S VALUE=$P(^PRCP(445,PRCPZ("I"),1,PRCPZ("ITEM"),0),"^",15)
- S TOTCOST=$J(PRCPZ("QTY")*VALUE,0,2)
+ S VALUE=$P(^PRCP(445,PRCPZ("I"),1,PRCPZ("ITEM"),0),"^",22),TOTCOST=$J(PRCPZ("QTY")*VALUE,0,2)
  ;
  I $P(^PRCP(445,PRCPZ("I"),0),"^",6)="Y" S ORDERNO=$$ORDERNO^PRCPUTRX(PRCPZ("I"))
  K PRCPUSA S PRCPUSA("QTY")=PRCPZ("QTY"),PRCPUSA("INVVAL")=TOTCOST,PRCPUSA("SELVAL")=TOTCOST,PRCPUSA("REASON")="0:"_$G(PRCPZ("COM")),PRCPUSA("NODUEIN")=1,PRCPUSA("NODUEOUT")=1,PRCPUSA("OTHERPT")=""

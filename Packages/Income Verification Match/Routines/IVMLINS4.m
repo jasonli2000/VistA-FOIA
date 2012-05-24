@@ -1,6 +1,6 @@
-IVMLINS4 ;ALB/SEK - IVM INSURANCE UPLOAD ACCEPT - IB CALL ; 30 JAN 2009
- ;;2.0;INCOME VERIFICATION MATCH;**14,135**; 21-OCT-94;Build 1
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IVMLINS4 ;ALB/SEK - IVM INSURANCE UPLOAD ACCEPT - IB CALL ; 17-APR-98
+ ;;2.0;INCOME VERIFICATION MATCH;**14**; 21-OCT-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ; This routine is called by IB to update insurance segments sent
  ; from HEC and stored in the INCOMING SEGMENT multiple of the IVM
@@ -13,19 +13,15 @@ IVMLINS4 ;ALB/SEK - IVM INSURANCE UPLOAD ACCEPT - IB CALL ; 30 JAN 2009
  ; called.  If the policy is rejected, this routine allows the user
  ; to pick the reason for rejection.
  ;
-UPDATE(DFN,IVMINSST,IVMID,IVMREPTR,IVMSUPPR) ;
+UPDATE(DFN,IVMINSST,IVMID) ;
  ;
  ; Input:       DFN  --  internal entry number of PATIENT file
  ;         IVMINSST  --  upload status 1-accepted  0-rejected
  ;            IVMID  --  ins. co. name ^ street add[line 1] ^ group #
- ;         IVMREPTR  --  IVM REASONS FOR NOT UPLOADING (#301.91) IEN 
- ;                       (Optional)
- ;         IVMSUPPR  --  Suppress Write and Interactive Lookup when > 0
- ;                       (Optional)
  ;
  ; Output: returns 1 if updated or 0 followed by error if not updated
  ;
- N IVM1INSN,IVM2SA1,IVM3GNU,IVMI,IVMIBERR,IVMJ,IVMDA,IVMDAIN,IVMFOUND
+ N IVM1INSN,IVM2SA1,IVM3GNU,IVMI,IVMIBERR,IVMJ,IVMDA,IVMDAIN,IVMFOUND,IVMREPTR
  I '$G(DFN)!('$D(^DPT(+DFN,0))) S IVMIBERR="No patient defined" G EXIT
  I '$D(^IVM(301.5,"B",DFN)) S IVMIBERR="Patient not in IVM PATIENT file" G EXIT
  ;
@@ -77,18 +73,15 @@ PROCESS I 'IVMDAIN S IVMIBERR="Insurance data not found in IVM PATIENT file" G E
  .S DIE="^IVM(301.5,"_DA(1)_",""IN"","
  .S DR=".04////1;.05///NOW" D ^DIE
  ;
- ; - if the insurance data is rejected and writes/prompts not suppressed
- ;   then ask for reason why
+ ; - if the insurance data is rejected do
+ ; - ask for reason why
  ;
- D:$G(IVMSUPPR)'>0
- . W !!,"The 'Reject IVM Insurance Policy' action has been selected."
- . W !,"Please select a reason for rejecting the IVM insurance information."
- . S DIC="^IVM(301.91,",DIC("A")="Select reason for rejecting: ",DIC(0)="QEAMZ"
- . D ^DIC K DIC I Y<0!($D(DTOUT))!($D(DUOUT)) S IVMREPTR=0 Q
- . S IVMREPTR=+Y
+ W !!,"The 'Reject IVM Insurance Policy' action has been selected."
  ;
- ;If IVMREPTR hasn't been defined, give error message and exit
- I $G(IVMREPTR)'>0 S IVMIBERR="No reason selected" G EXIT
+ W !,"Please select a reason for rejecting the IVM insurance information."
+ S DIC="^IVM(301.91,",DIC("A")="Select reason for rejecting: ",DIC(0)="QEAMZ"
+ D ^DIC K DIC I Y<0!($D(DTOUT))!($D(DUOUT)) S IVMIBERR="No reason selected" G EXIT
+ S IVMREPTR=+Y
  ;
  ; stuff UPLOAD INSURANCE DATA(.04) and REASON NOT UPLOADING INSURANCE
  ; (.08)

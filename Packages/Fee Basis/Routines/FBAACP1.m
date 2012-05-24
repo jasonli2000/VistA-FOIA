@@ -1,5 +1,5 @@
 FBAACP1 ;AISC/CMR-C&P PAYMENT DRIVER ;7/17/2003
- ;;3.5;FEE BASIS;**4,61,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**4,61**;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 FILE ;files sp multiple entry
@@ -14,9 +14,7 @@ FILE ;files sp multiple entry
  L -^FBAAC(DFN)
  I '$G(FBTST),$G(DA) S DIR(0)="YA",DIR("A")="Entering an '^' will delete "_$S($G(FBDEN):"denial",1:"payment")_".  Are you sure you want to delete? ",DIR("B")="No" D ^DIR K DIR G FILE:'$D(DIRUT)&('Y) D KILL^FBAACO2 Q
  S FBINTOT=FBINTOT+FBAAAMT
- ; HIPAA 5010 - count line items that have 0.00 amount paid
- ;I FBAAAMT>0 S Z1=$P(^FBAA(161.7,FBAABE,0),"^",11)+1,$P(^(0),"^",11)=Z1
- S Z1=$P(^FBAA(161.7,FBAABE,0),"^",11)+1,$P(^(0),"^",11)=Z1
+ I FBAAAMT>0 S Z1=$P(^FBAA(161.7,FBAABE,0),"^",11)+1,$P(^(0),"^",11)=Z1
  W !,$S($G(FBDEN):"Denial",1:"Payment")," Data Entered for Patient"
  K FBDEN,FBAAMM1,FBTST,DIE,DR,DA
  Q

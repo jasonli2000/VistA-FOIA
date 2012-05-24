@@ -1,24 +1,13 @@
-DIP11 ;SFISC/XAK,TKW-GET SORT TEMPLATE ;29MAR2010
- ;;22.0;VA FileMan;**97,163*;Mar 30, 1999;Build 28
- ;Per VHA Directive 2004-038, this routine should not be modified.
-SCREENTM(Z,D2) ;Z=ZERO NODE OF SORT TEMPLATE;  D2 = THERE IS SORT-BY LOGIC
- I $P(Z,U,4)-DL Q 0 ;TEMPLATE MUST BE FOR THIS FILE
- I 'D2&'L D  Q $D(Z) ;IN SILENT MODE (L=0), DON'T PICK SEARCH OR INQUIRY TYPE IF THERE'S A SORT TYPE OF SAME NAME
- .N NAME,I S NAME=$P(Z,U) F I=0:0 S I=$O(^DIBT("B",NAME,I)) Q:'I  I I-Y,$P($G(^DIBT(I,0)),U,4)=DL,$D(^(2)) K Z Q
- I DUZ(0)="@" Q 1
- I D2 Q:'L 1 Q:$P(Z,U,3)="" 1 Q $TR($P(Z,U,3),DUZ(0))'=$P(Z,U,3) ;IF A SORT TEMPLATE, ACCESS CODES MUST MATCH
- I '$P(Z,U,5) Q 1
- I $P(Z,U,5)=DUZ Q 1 ;If a SEARCH or INQUIRY TEMPLATE, USER MUST MATCH
- Q 0
- ;
+DIP11 ;SFISC/XAK,TKW-GET SORT TEMPLATE ;01:30 PM  13 Feb 2002
+ ;;22.0;VA FileMan;**97**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 TEM ;
  G B^DIP:DJ-1 K DPP,DIC
  S X=$P($E(X,2,99),"]",1),DIC(0)="ZQS"_$E("E",'($D(BY)#2)!''L),DIC="^DIBT(",D="F"_DL
- S DIC("S")="I $$SCREENTM^DIP11(^(0),$D(^(2)))"
- ;I $P(^(0),U,4)=DL,$S(L=0!(DUZ(0)=""@""):1,'$D(^(1)):$TR(DUZ(0),$P(^(^(0),U,6)'=DUZ(0)&$L(DUZ(0),'$P(^(0),U,5):1,1:$P(^(0),U,5)=DUZ),$D(^(1))!'$D(^(""DIS""))"
+ S DIC("S")="I $P(^(0),U,4)=DL,$S(L=0:1,'$D(^(1)):1,'$P(^(0),U,5):1,1:$P(^(0),U,5)=DUZ)"
  I X?."?" S:X'?1"???" X="??" D IX^DIC S DJ=0 Q
  D ^DIC I Y<0 S DJ=0 Q
-EMPTY I '$D(^DIBT(+Y,2)),'$D(^(1)) W:'$G(DIQUIET) !,"This SEARCH template has no search results!" S DJ=0 Q
+ I $D(^DIBT(+Y,"DIS")),'$D(^(1)) W:'$G(DIQUIET) !,"This SEARCH template has no search results!" S DJ=0 Q
  S DPP(DJ)=DL_"^^'"_$P(Y,U,2)_"' NUMBER^@'"_P,(DIBT1,X)=+Y,DIBT2=$P(Y(0),U),D=DIC_X_C K DIC
  I '$D(FLDS),$G(^DIBT(X,"DIPT"))]"" S FLDS="["_^("DIPT")_"]" I L D
  . N %,A S %(1)=^("DIPT") D BLD^DIALOG(8030,.%,"","A") W ! F %=0:0 S %=$O(A(%)) Q:'%  W A(%),!
@@ -39,7 +28,7 @@ ENDIPT I $G(^DIBT(X,"BY0"))="",'$D(^DIBT(X,2)) Q
  . N X D EN^DIP10 Q
  ;S DJ=$O(DPP(999),-1)+1
  F D=0:0 S D=$O(^DIBT(X,2,D)) Q:'D  D
- .N A,B,C S DPP(DJ)=$G(^DIBT(X,2,D,0))
+ .N A,B,C S DPP(DJ)=^DIBT(X,2,D,0)
  .S A="A" F  S A=$O(^DIBT(X,2,D,A)) Q:A=""  I A'="SER" S DPP(DJ,A)=^(A)
  .F B=1,2,3 F A=0:0 S A=$O(^DIBT(X,2,D,B,A)) Q:'A  S C=$G(^(A,0)) D
  ..I B=1 S:$P(C,U)=+C DPP(DJ,+C)=$P(C,U,2) Q

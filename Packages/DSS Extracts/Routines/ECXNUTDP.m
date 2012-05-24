@@ -1,5 +1,5 @@
-ECXNUTDP ;ALB/JRC - Nut Division Worksheet Print ; 2/18/09 1:47pm
- ;;3.0;DSS EXTRACTS;**92,104,119**;Dec 22, 1997;Build 19
+ECXNUTDP ;ALB/JRC - Nut Division Worksheet Print ; 11/2/06 8:41am
+ ;;3.0;DSS EXTRACTS;**92,104**;Dec 22, 1997;Build 8
  ;
 EN ;entry point from option
  ;Queue Report
@@ -67,23 +67,13 @@ DETAIL ;Print detailed line
  ;                    LOCATION - File 119.71 or 119.72 NAME
  ;                    DIVISION - Assigned production division
  ;Output  : None
- N TYPE,FILE,NODE,PIEN,CNT,X1,X2
- S TYPE=$S(LTYPE=119.71:"PRODUCTION",1:"DELIVERY LOCATIONS")
+ N FILE,NODE,PIEN
  S FILE=0 F  S FILE=$O(^TMP($J,"ECX",FILE)) Q:'FILE!STOP  D
  .S PIEN=0 F  S PIEN=$O(^TMP($J,"ECX",FILE,PIEN)) Q:'PIEN!STOP  D
  ..S NODE=^TMP($J,"ECX",FILE,PIEN)
  ..W !?3,$$RJ^XLFSTR($P(NODE,U),U,6),?26,$P(NODE,U,2),?50,$$RJ^XLFSTR($P(NODE,U,3),U,6)
  ..I $Y>(IOSL-5) D WAIT Q:STOP  D HEADER
  ..Q
- S CNT=0
- W !!,"The following "_TYPE_" are missing in the DSS Worksheets"
- W !!?3,TYPE,?26,"INACTIVE FLAG",!?3,"----",?26,"-------------",!
- F IEN=0:0 S IEN=$O(^FH(LTYPE,IEN)) Q:'IEN  D
- . I '$D(^ECX(728.46,"B",IEN_";FH("_LTYPE_",")) D
- .. S X1=$$GET1^DIQ(LTYPE,""_IEN_","_"",.01,"E")
- .. S X2=$$GET1^DIQ(LTYPE,IEN,99,"E")
- .. W !?3,X1,?26,X2 S CNT=CNT+1
- I CNT=0 W !!?3,"NOTHING TO REPORT... YOUR FILES ARE CLEAN!"
  Q
  ;
 WAIT ;End of page logic

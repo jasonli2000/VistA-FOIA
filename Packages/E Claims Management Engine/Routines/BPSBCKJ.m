@@ -1,5 +1,5 @@
 BPSBCKJ ;BHAM ISC/AAT - BPS NIGHTLY BACKGROUND JOB ;02/27/2005
- ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5,7,8**;JUN 2004;Build 29
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,2,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q
@@ -43,7 +43,7 @@ AUTOREV ; The Auto-Reverse Procedure
  . I 'BDAYS W:BTEST "AUTO-REV DISABLED" Q  ;disabled
  . I $P(BTRAN4,U,1) Q  ;Reversal claim exist
  . S BCLAIM=$P(BTRAN0,U,4) I 'BCLAIM W:BTEST "NO BCLAIM" Q
- . I $P($G(^BPSC(BCLAIM,0)),U,7) W:BTEST "AUTO-REVERSE FLAG" Q 
+ . I $P($G(^BPSC(BCLAIM,0)),U,7) W:BTEST "AUTO-REVERSE FLAG" Q
  . S BDATE=$P($G(^BPSC(BCLAIM,0)),U,5)
  . I 'BDATE S BDATE=$P($G(^BPSC(BCLAIM,0)),U,6)
  . S BDATE=$P(BDATE,".")
@@ -105,22 +105,19 @@ FILDATE(BRX,BFIL) ;Get the Fill Date
  ;
 REVERSE(BRX,BFIL,BCLAIM,BTYPE) ;Auto-Reverse the claim
  ;PUBLIC BTEST
- N BDOS,BRES,BDAT,BMES,BRSN,BPSCOB,BP59
+ N BDOS,BRES,BDAT,BMES,BRSN
  I $G(BTEST) Q 0  ; Test mode
  ;
  ; Get Date of Service and set reversal reason
  S BDOS=$$DOSDATE^BPSSCRRS(BRX,BFIL)
  S BRSN=$S(BTYPE=2:"CURRENT INPATIENT",1:"PRESCRIPTION NOT RELEASED")
  ;
- S BP59=$$CLAIM59^BPSUTIL2(BCLAIM) ;get the BPS TRANSACTION IEN for the claim
- S BPSCOB=$$COB59^BPSUTIL2(BP59) ;get COB for the BPS TRANSACTION IEN
- ;
  ; Call ECME to process reversal
- S BRES=$$EN^BPSNCPDP(BRX,BFIL,BDOS,"AREV","",BRSN,"",,,,BPSCOB)
+ S BRES=$$EN^BPSNCPDP(BRX,BFIL,BDOS,"AREV","",BRSN,"")
  ;
  ; If successful, log message to the Prescription Activity Log
  ;  and set the auto-reversal flag
- S BRES=+BRES,BMES="ECME: AUTO REVERSAL JOB-"_$S(BPSCOB=1:"p",BPSCOB=2:"s",1:"")_$$INSNAME^BPSSCRU6(BP59)
+ S BRES=+BRES,BMES="Submitted to ECME: AUTO REVERSAL JOB"
  I BRES=0 D
  . D ECMEACT^PSOBPSU1(BRX,BFIL,BMES,.5)
  . S BDAT(9002313.02,BCLAIM_",",.07)=BTYPE D FILE^DIE("","BDAT")
@@ -131,7 +128,6 @@ BULL(REF) ;Bulletin to the OPECC
  ;PUBLIC BTEST,DUZ,DT
  N XMSUB,XMY,XMTEXT,XMDUZ,BLNUM
  ;
- I BCNT<1,'$G(BTEST),(+$G(@REF@(4)))=0 Q
  S BLNUM=0,BCNT=+$G(@REF@(0))
  S XMSUB="ECME AUTO-REVERSAL PROCESS"
  I $G(BTEST) D T("*** P L E A S E   D I S R E G A R D    T H I S    E M A I L ***"),T(),T("NOT ACTUALLY REVERSED - THIS IS A TEST"),T()
@@ -140,7 +136,7 @@ BULL(REF) ;Bulletin to the OPECC
  D T()
  D T("TOTAL CLAIMS SUBMITTED FOR AUTO-REVERSALS: "_BCNT)
  D T()
- D T("Claims Submitted for Auto-Reversals on "_$$DAT(DT)_":") D ARLIST(0,REF)
+ I BCNT D T("Claims Submitted for Auto-Reversals on "_$$DAT(DT)_":") D ARLIST(0,REF)
  D T()
  S BCNT=+$G(@REF@(4))
  I BCNT'=0 D
@@ -191,7 +187,7 @@ J(TXT,LEN) ;Left justify
  Q TXT_$J("",LEN-$L(TXT))
  ;
 DAT(X,Y) ; Convert FM date to displayable (mm/dd/yy) format.
- ; -- optional output of time, if $g(y) 
+ ; -- optional output of time, if $g(y)
  N DATE,T
  S DATE=$S(X:$E(X,4,5)_"/"_$E(X,6,7)_"/"_$E(X,2,3),1:"")
  I $G(Y) S T="."_$E($P(X,".",2)_"000000",1,7) I T>0 S DATE=DATE_" "_$S($E(T,2,3)>12:$E(T,2,3)-12,$E(T,2,3)="00":"00",1:+$E(T,2,3))_":"_$E(T,4,5)_$S($E(T,2,5)>1200:" pm",1:" am")

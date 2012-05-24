@@ -1,4 +1,4 @@
-IBXSC8H3 ; ;10/29/04
+IBXSC8H3 ; ;04/08/05
  D DE G BEGIN
 DE S DIE="^DGCR(399,",DIC=DIE,DP=399,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DGCR(399,DA,""))=""
  I $D(^("TX")) S %Z=^("TX") S %=$P(%Z,U,8) S:%]"" DE(20)=% S %=$P(%Z,U,9) S:%]"" DE(23)=%

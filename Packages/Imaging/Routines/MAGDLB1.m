@@ -1,6 +1,5 @@
-MAGDLB1 ;WOIFO/LB - Routine to fix failed DICOM entries ; 05/18/2007 11:23
- ;;3.0;IMAGING;**11,30,54**;03-July-2009;;Build 1424
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGDLB1 ;WOIFO/LB - Routine to fix failed DICOM entries ; 09/08/2004  07:32
+ ;;3.0;IMAGING;**11,30**;16-September-2004
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGDLB1 ;WOIFO/LB - Routine to fix failed DICOM entries ; 05/18/2007 11:23
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -27,16 +27,13 @@ DISPLAY ;
  W !?2,"Correcting file on Image gateway server ID: ",MACHID,!?5,FILE
  S MSG="Do you want to Correct this entry? "
  Q
- ;
 NEWCASE ;
  S NEWDFN=$P(MAGDY,"^"),NEWNME=$P(MAGDY,"^",2),NEWSSN=$P(MAGDY,"^",3)
  S NEWCAS=$P(MAGDY,"^",4),NEWPROC=$P(MAGDY,"^",5),NEWDTI=$P(MAGDY,"^",6)
  S NEWMUL=$P(MAGDY,"^",7),NEWPIEN=$P(MAGDY,"^",8),PP=$P(MAGDY,"^",9)
  Q
- ;
 ASK() ;
  N ANS,ASK
- ;
 ASK1 S ASK="Y/N/D/Q"
  I $G(PREV)'=$G(MAGIEN),MAGTYPE="RAD" S ASK=ASK_"/P"
  W !,$G(MSG),"("_ASK_")// " R ANS:600
@@ -47,7 +44,6 @@ ASK1 S ASK="Y/N/D/Q"
  . W !,"Legend: Y=yes, N=no, D=delete, P=Previous entry, and Q=quit",!
  S ANS=$TR(ANS,"yndpq","YNDPQ")
  Q $E(ANS)
- ;
 CHK ;remove any punctuation before doing comparison on SSN
  ;stop on 1st check.
  N OLD,I
@@ -60,7 +56,6 @@ CHK ;remove any punctuation before doing comparison on SSN
  ;xref or invalid number provided
  S MSG="Radiology case number different. Update? "
  Q
- ;
 NEWDIS ;
  W !?2,"****Please review the following: *****"
  W !?2,"Previous name: ",PAT,!?2,"     New name: ",NEWNME
@@ -69,7 +64,6 @@ NEWDIS ;
  I $L($G(PP)) W !?15,"Case number selected: ",PP
  ; Variable PP already has text message about being part of printset.
  Q
- ;
 UPDT ;
  N GWLOC ; -- gateway location
  W !,"Will change the following: " D NEWDIS
@@ -87,7 +81,6 @@ UPDT ;
  ;Xref to loop & process entries; processing will be minimal.
  S MAGFIX(MAGIEN)="F"
  Q
- ;
 SETDEL ;Entry to be deleted
  N GWLOC ; -- gateway location
  D LOGERR I ANS="^" S OUT=1 Q
@@ -98,12 +91,11 @@ SETDEL ;Entry to be deleted
  S ^MAGD(2006.575,MAGIEN,"FIXD")=1
  S MAGFIX(MAGIEN)="D"
  Q
- ;
 LOGERR ;Need to record error
- N DIR,DIRUT,DTOUT,ENTRY,I,MAGERR,MAGOUT,NOW,WHY,WHO,X,Y
+ N DIR,DIRUT,DTOUT,ENTRY,I,MAGERR,MAGOUT,X,Y,WHY,WHO
  W !! F I=1:1:80 W "*"
  W !,"*** Will log in error log (file 2006.599). ****"
- S NOW=$$NOW^XLFDT()
+ D NOW^%DTC
  S DIR(0)="F^3:30"
  S DIR("A")="Reason for deletion"
  S DIR("A",1)="Please enter a reason for deleting."
@@ -113,7 +105,7 @@ LOGERR ;Need to record error
  . W !,"Can not delete if a reason is not provided."
  . Q
  S WHY=Y,WHO=$G(DUZ)
- I WHO D 
+ I WHO D
  . D GETS^DIQ(200,DUZ,".01","E","MAGOUT","MAGERR")
  . Q:$D(MAGERR("DIERR"))
  . S WHO=$G(MAGOUT(200,DUZ_",",.01,"E"))
@@ -124,11 +116,10 @@ LOGERR ;Need to record error
  S ENTRY=$P(^MAGD(2006.599,0),"^",3)+1
  S $P(^MAGD(2006.599,0),"^",3)=ENTRY
  S $P(^MAGD(2006.599,0),"^",4)=$P(^MAGD(2006.599,0),"^",4)+1
- S ^MAGD(2006.599,ENTRY,0)=NOW_"^"_WHY_"^"_FILE_"^"_MODEL
+ S ^MAGD(2006.599,ENTRY,0)=%_"^"_WHY_"^"_FILE_"^"_MODEL
  S ^MAGD(2006.599,ENTRY,1)=WHO_"^"_PAT_"^"_PID_"^"_CASENO_"^"_MACHID
- S ^MAGD(2006.599,"B",NOW,ENTRY)=""
+ S ^MAGD(2006.599,"B",%,ENTRY)=""
  Q
- ;
 SET ;
  S MAGTYPE=$P(^MAGD(2006.575,MAGIEN,"TYPE"),"^")
  Q:$P($G(^MAGD(2006.575,MAGIEN,"FIXD")),"^")  ; Already fixed.
@@ -151,8 +142,6 @@ SET ;
  I ANS="D" D SETDEL,SETPREV Q
  Q:OUT
  K MAGDY W !," Lookup by case number or patient name"
- ;
- ; Fall Through intended
 LOOK ;
  ;D ^MAGDLB2 Q:'$D(MAGDY)  Q:MAGDY'[""
  D EN^MAGDRA2 Q:'$D(MAGDY)  Q:MAGDY'[""
@@ -166,7 +155,6 @@ LOOK ;
  I ANS="P" D CHKPREV Q
  D SETMAG
  Q
- ;
 DATELOOP(START,STOP) ;Loop thru the "AD" cross reference
  N MAGIEN,SUID,THEDT,FIRST,OOUT,MAGFIX,MDV
  S KFIXALL=$$SECKEY^MAGDLB12
@@ -185,16 +173,13 @@ DATELOOP(START,STOP) ;Loop thru the "AD" cross reference
  . . Q
  . Q
  Q
- ;
 SETPREV ;
  S PREV=MAGIEN,PREVS=$G(SUID)
  Q
- ;
 SETMAG ;
  S FIRST=MAGIEN,FIRSTS=$G(SUID),MAGIEN=PREV,SUID=$G(PREVS)
  S PREV=FIRST,PREVS=FIRSTS
  Q
- ;
 CHKPREV ;
  S OUT=1 N STATUS
  I '$D(MAGFIX(PREV)) D SETMAG G SET
@@ -202,7 +187,6 @@ CHKPREV ;
  W !,"Previous entry has been "_STATUS_".",$C(7)
  G SET
  Q
- ;
 NAME(ENTRY) ;SITE NAME
  N NAME,MAGOUT,MAGERR
  I '$G(ENTRY) Q ""
@@ -210,4 +194,3 @@ NAME(ENTRY) ;SITE NAME
  I $D(MAGERR("DIERR")) Q ""
  S NAME=$G(MAGOUT(4,ENTRY_",",.01,"E"))
  Q NAME
- ;

@@ -1,5 +1,5 @@
-PSOUTL ;BHAM ISC/SAB - pso utility routine ;4/28/09 4:14pm
- ;;7.0;OUTPATIENT PHARMACY;**1,21,126,174,218,259,324**;DEC 1997;Build 6
+PSOUTL ;BHAM ISC/SAB - pso utility routine ;10/20/06 3:44pm
+ ;;7.0;OUTPATIENT PHARMACY;**1,21,126,174,218,259**;DEC 1997;Build 5
  ;External reference SERV^IBARX1 supported by DBIA 2245
  ;External reference ^PS(55,     supported by DBIA 2228
  ;
@@ -166,74 +166,4 @@ CMOP1 N X
  .S CMOP($P($G(^PSRX(CRX,4,X,0)),"^",3))=$P($G(^(0)),"^",4)
  S X=$O(^PS(52.5,"B",CRX,0)) I X]"" S CMOP("S")=$P($G(^PS(52.5,X,0)),"^",7)
  K CRX,X
- Q
- ;
-CHKCMOP(RX,REA) ;Check if an RX is Transmitted/Retransmitted to CMOP and send alert mail
- ;
- ; Input:  RX - ien to file #52
- ;        REA - reason DC's "A" = admission, "D" = death
- ; Output: none
- ;
- N CMOP,PSOCMOP
- S REA=$G(REA)
- I $$TRANCMOP(RX),$G(PSOCMOP)]"" D MAILCMOP(RX,PSOCMOP,REA)
- Q
- ;
-TRANCMOP(RX) ;check if a fill is Transmitted or Retransmitted
- ;
- ; Input:          = RX number
- ; Function output:= RX number if CMOP status is Trans or Retrans
- ;                 = 0 if neither
- ; Global parm out:= PSOCMOP = string from call to ^PSOCMOPA
- ;
- N DA,PSOTRANS
- S DA=RX D ^PSOCMOPA
- S PSOTRANS=$P($G(PSOCMOP),"^")
- Q:PSOTRANS=0!(PSOTRANS=2) RX
- Q 0
- ;
-MAILCMOP(RX,STR,REA) ;Send mail message to mail group PSX EXTERNAL DISPENSE ALERTS
- ;
- ; Input:  RX  = ien of PSRX
- ;         STR = CMOP STATUS # ^ TRANSMIT DATE (FM) ^ LAST FILL #
- ;         REA = reason DC'd  "A" = admission, "D" = death
- ; Output: none
- ;
- N CMDT,CMST,DFN,VADM,PSOTEXT,PSOIEN,PSOKEYN,XMY,XMDUZ,XMSUB,XMTEXT
- N DIV,SSN,RXO,FILL,DRUG,DIVN,MAILGRP,NAME,PRV,RXSTS
- S RXO=$$GET1^DIQ(52,RX,.01)
- S CMDT=$P(STR,U,2)
- S CMDT=$E(CMDT,4,5)_"/"_$E(CMDT,6,7)_"/"_$E(CMDT,2,3)
- S FILL=$P(STR,U,3)
- S CMST=$P(STR,U),CMST=$S(CMST=2:"RETRANSMITTED",1:"TRANSMITTED")
- S DIV=$P(^PSRX(RX,2),"^",9),DIVN=$P($G(^PS(59,DIV,0)),"^")
- S MAILGRP="PSX EXTERNAL DISPENSE ALERTS"
- S XMY("G."_MAILGRP)=""
- ;if no members & no member groups & no remote members, then send to
- ; the default: PSXCMOPMGR key holders
- S PSOIEN=$O(^XMB(3.8,"B",MAILGRP,0))
- I '$O(^XMB(3.8,PSOIEN,1,0))&'$O(^XMB(3.8,PSOIEN,5,0))&'$O(^XMB(3.8,PSOIEN,6,0)) D
- . S PSOKEYN=0
- . F  S PSOKEYN=$O(^XUSEC("PSXCMOPMGR",PSOKEYN)) Q:'PSOKEYN  D
- . . S XMY(PSOKEYN)=""
- S DFN=$$GET1^DIQ(52,RX,2,"I") D DEM^VADPT
- S NAME=VADM(1)
- S SSN=$P($P(VADM(2),"^",2),"-",3)
- S RXSTS=$$GET1^DIQ(52,RX,100)
- S DRUG=$$GET1^DIQ(52,RX,6)
- S PRV=$$GET1^DIQ(52,RX,4)
- S XMDUZ=.5
- S XMSUB=DIVN_" - DC Alert on CMOP Rx "_RXO_" "_CMST
- S PSOTEXT(1)="             Rx #: "_RXO_"   Fill: "_FILL
- S PSOTEXT(2)="          Patient: "_NAME_" ("_SSN_")"
- S PSOTEXT(3)="             Drug: "_DRUG
- S PSOTEXT(4)="        Rx Status: "_RXSTS
- S:REA="A" PSOTEXT(4)=PSOTEXT(4)_" (due to Admission)"
- S:REA="D" PSOTEXT(4)=PSOTEXT(4)_" (due to Date of Death)"
- S PSOTEXT(5)="Processing Status: "_CMST_" to CMOP on "_CMDT
- S PSOTEXT(6)="         Provider: "_PRV
- S PSOTEXT(7)=""
- S PSOTEXT(8)="********    Please contact CMOP or take appropriate action    ********"
- S XMTEXT="PSOTEXT(" D ^XMD
- D KVA^VADPT
  Q

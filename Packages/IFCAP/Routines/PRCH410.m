@@ -1,6 +1,6 @@
 PRCH410 ;WISC/KMB/DXH/DGL - CREATE 2237 FROM PURCHASE CARD ORDER ; 4/4/00 7:56am
- ;;5.1;IFCAP;**123**;Oct 20, 2000;Build 6
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ; prcsip is package-wide variable for inv pt that may or may not be
  ; passed to this routine
@@ -26,7 +26,7 @@ IP D:'$G(PRCSIP) IP^PRCSUT
  . I $E(X)="^"!(Y=1) W !,"No inventory point was attached.",! Q
  . Q
  S PC=$P($G(^PRC(442,XDA,23)),"^",8)
- S COUNT=$P($G(^PRC(442,XDA,2,0)),"^",4) I +COUNT'=0 D ITEM I $G(X)="#",$G(PRCRMPR)=1 Q
+ S COUNT=$P($G(^PRC(442,XDA,2,0)),"^",4) I +COUNT'=0 D ITEM
  S CDA=$P($G(^PRC(442,XDA,23)),"^",23)
  S:$G(PRCHPC)=3 CDA=$P($G(^PRC(442,XDA,13,0)),U,3)
  I CDA="" D REC Q:CDA=""
@@ -70,7 +70,7 @@ REC ;create skeleton 410 record
  S T(2)="",Z=PRC("SITE")_"-"_PRC("FY")_"-"_PRC("QTR")_"-"_$P(PRC("CP")," ")
  S PRC("BBFY")=$$BBFY^PRCSUT(PRC("SITE"),PRC("FY"),$P(PRC("CP")," "),1)
  S X=$P(Z,"-",1,2)_"-"_$P(PRC("CP")," ")
- D EN1^PRCSUT3 Q:'$D(X)  Q:$G(X)="#"&($G(PRCRMPR)=1)  S X1=X D EN2^PRCSUT3 Q:$G(DA)=""  Q:'$D(X1)  S CDA=DA
+ D EN1^PRCSUT3 Q:'$D(X)  S X1=X D EN2^PRCSUT3 Q:$G(DA)=""  Q:'$D(X1)  S CDA=DA
  K X,T(2) QUIT
 ESIG ;put ESIG on record, update due-ins
  S NET=$P($G(^PRC(442,PODA,0)),"^",15) L +^PRCS(410,DA):15 Q:'$T  F I=1,8 S $P(^PRCS(410,DA,4),"^",I)=NET

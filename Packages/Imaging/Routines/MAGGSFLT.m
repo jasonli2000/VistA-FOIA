@@ -1,6 +1,5 @@
-MAGGSFLT ;WOIFO/GEK/SG - Image list Filters utilities ; 3/9/09 12:51pm
- ;;3.0;IMAGING;**7,8,93**;Dec 02, 2009;Build 163
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGGSFLT ;WOIFO/GEK - Image list Filters utilities ; [ 06/20/2001 08:57 ]
+ ;;3.0;IMAGING;**7,8**;Sep 15, 2004
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -17,7 +16,6 @@ MAGGSFLT ;WOIFO/GEK/SG - Image list Filters utilities ; 3/9/09 12:51pm
  ;; +---------------------------------------------------------------+
  ;;
  Q
- ;
 DEL(MAGRY,FLTIEN) ;RPC [MAG4 FILTER DELETE] DELETE A FILTER
  N DIK,DA
  S DIK="^MAG(2005.87,"
@@ -26,13 +24,11 @@ DEL(MAGRY,FLTIEN) ;RPC [MAG4 FILTER DELETE] DELETE A FILTER
  D CLEAN^DILF
  S MAGRY="1^Deleted"
  Q
- ;
 GETLIST(MAGRY,USER,GETALL) ;RPC [MAG4 FILTER GET LIST] Return a list of filters for a USER
  ; user = DUZ
  ; if user = "" send list of public filters
  ; if user > 0 and GETALL = 1 then send User Private and Public filters.
  N I,MAGADMIN,MAGCLIN
- K ^TMP($J,"MAGGSFLT","RES")
  S USER=$G(USER)
  S MAGRY(0)="0^Retrieving Filter list..."
  ; we'll get public if getall or no user
@@ -41,26 +37,19 @@ GETLIST(MAGRY,USER,GETALL) ;RPC [MAG4 FILTER GET LIST] Return a list of filters 
  . S I=""
  . F  S I=$O(^MAG(2005.87,"D",1,I)) Q:I=""  D
  . . I '$$HASKEY(I) Q  ; HERE HAVE TO USE DUZ, TO FILTER THE FILTERS BASED ON MAGDISP CLIN AND MAGDISP ADMIN
- . . S ^TMP($J,"MAGGSFLT","RES",$P(^MAG(2005.87,I,0),"^",1)_"-"_I)=I_"^"_$P(^MAG(2005.87,I,0),"^",1)_"^"_$P(^MAG(2005.87,I,1),"^")
- . . ;S MAGRY($O(MAGRY(""),-1)+1)=I_"^"_$P(^MAG(2005.87,I,0),"^",1)_"^"_$P(^MAG(2005.87,I,1),"^")
+ . . S MAGRY($O(MAGRY(""),-1)+1)=I_"^"_$P(^MAG(2005.87,I,0),"^",1)_"^"_$P(^MAG(2005.87,I,1),"^")
  . . Q
  I USER D
  . S I=""
  . F  S I=$O(^MAG(2005.87,"C",USER,I)) Q:I=""  D
  . . I '$$HASKEY(I) Q
- . . S ^TMP($J,"MAGGSFLT","RES",$P(^MAG(2005.87,I,0),"^",1)_"-"_I)=I_"^"_$P(^MAG(2005.87,I,0),"^",1)_"^"_$P(^MAG(2005.87,I,1),"^")
- . . ;S MAGRY($O(MAGRY(""),-1)+1)=I_"^"_$P(^MAG(2005.87,I,0),"^",1)_"^"_$P(^MAG(2005.87,I,1),"^")
+ . . S MAGRY($O(MAGRY(""),-1)+1)=I_"^"_$P(^MAG(2005.87,I,0),"^",1)_"^"_$P(^MAG(2005.87,I,1),"^")
  . . Q
- ;S MAGRY(0)=$S($G(MAGRY(1)):$O(MAGRY(""),-1),1:"0^ERROR Retrieving Filter list.")
- S MAGRY(0)=$S($D(^TMP($J,"MAGGSFLT","RES")):1,1:"0^ERROR Retrieving Filter list.")
+ S MAGRY(0)=$S($G(MAGRY(1)):$O(MAGRY(""),-1),1:"0^ERROR Retrieving Filter list.")
  I MAGRY(0) D
  . ; we have a list of filters, send the default as Piece 1 in 0 node.
  . S $P(MAGRY(0),"^",1)=$$DFTFLT(USER)
- S I=""
- F  S I=$O(^TMP($J,"MAGGSFLT","RES",I),-1) Q:I=""  D
- . S MAGRY($O(MAGRY(""),-1)+1)=^TMP($J,"MAGGSFLT","RES",I)
  Q
- ;
 HASKEY(IEN) ; True or False, Does user have Correct Key(s)(ADMIN and/or CLIN) to view this filter.
  N CLS
  S CLS=$P(^MAG(2005.87,IEN,0),"^",3)
@@ -69,7 +58,6 @@ HASKEY(IEN) ; True or False, Does user have Correct Key(s)(ADMIN and/or CLIN) to
  I (CLS["CLIN") Q MAGCLIN
  I (CLS["ADMIN") Q MAGADMIN
  Q 0
- ;
 CLSKEYS(ADM,CLIN) ;
  S (ADM,CLIN)=0
  N I,MAGKEY
@@ -79,30 +67,21 @@ CLSKEYS(ADM,CLIN) ;
  . I MAGKEY(I)="MAGDISP ADMIN" S ADM=1
  . Q
  Q
- ;
 GET(MAGRY,FLTIEN,FLTNAME,USER) ;RPC [MAG4 FILTER DETAILS] Return a filter
- N FLTC,I,MAGV,X
- K MAGRY
- ;--- Validate parameters
+ ; Return the full FLTIEN Node, the Delphi App will Parse it.
+ K MAGV,FLTC
  I '$G(FLTIEN) S FLTIEN=$$RSLVIEN($G(FLTNAME),$G(USER))
  I 'FLTIEN S MAGRY(0)="0^Can not resolve Filter name in VistA." Q
- I '$D(^MAG(2005.87,FLTIEN))  D  Q
- . S MAGRY(0)="0^Filter ID #"_FLTIEN_" Doesn't exist."
- . Q
- ;--- Load the filter data
+ I '$D(^MAG(2005.87,FLTIEN)) S MAGRY="0^Filter ID #"_FLTIEN_" Doesn't exist." Q
  S FLTC=FLTIEN_","
  S MAGRY(0)="1^Filter "_$P(^MAG(2005.87,FLTIEN,0),"^",1)_" # "_FLTIEN
- D GETS^DIQ(2005.87,FLTC,".01:16","EI","MAGV")
- ;--- Reformat the dates (FROM and UNTIL)
- F I=6,7  S X=$G(MAGV(2005.87,FLTC,I,"I"))  D:X'=""
- . S MAGV(2005.87,FLTC,I,"E")=$$FMTE^XLFDT(X,"2Z")
- . Q
- ;--- Add the filter data to the result array
+ ; S MAGRY(1)=FLTIEN_"^"_^MAG(2005.87,FLTIEN,0)
+ F I=1:1:9 D GETS^DIQ(2005.87,FLTC,".01:9","E","MAGV")
  S MAGRY(1)=FLTIEN
- F I=.01,1:1:9  S MAGRY(1)=MAGRY(1)_U_$G(MAGV(2005.87,FLTC,I,"E"))
- F I=10:1:16  S MAGRY(1)=MAGRY(1)_U_$G(MAGV(2005.87,FLTC,I,"I"))
+ S X=MAGV(2005.87,FLTC,6,"E") I X]"" S %DT="" D ^%DT S MAGV(2005.87,FLTC,6,"E")=$$FMTE^XLFDT(Y,"2Z")
+ S X=MAGV(2005.87,FLTC,7,"E") I X]"" S %DT="" D ^%DT S MAGV(2005.87,FLTC,7,"E")=$$FMTE^XLFDT(Y,"2Z")
+ S I="" F  S I=$O(MAGV(2005.87,FLTC,I)) Q:I=""  S MAGRY(1)=MAGRY(1)_"^"_MAGV(2005.87,FLTC,I,"E")
  Q
- ;
 RSLVIEN(NAME,USER) ; Return an IEN from the NAME and USER
  N I,IEN S I=""
  I NAME="" Q 0
@@ -110,7 +89,6 @@ RSLVIEN(NAME,USER) ; Return an IEN from the NAME and USER
  F  S I=$O(^MAG(2005.87,"B",NAME,I)) Q:'I  D
  . I $P(^MAG(2005.87,I,1),"^")=USER S IEN=I
  Q IEN
- ;
 DFTFLT(USER) ; Create a Default Filter for user. Or Return Existing.
  ;  Plus this call, makes sure the Default Filter is valid.
  ; USER is the IEN in the New Person file
@@ -127,8 +105,8 @@ DFTFLT(USER) ; Create a Default Filter for user. Or Return Existing.
  . I 'FLTIEN S FLTIEN=$O(^MAG(2005.87,"D",1,"")) ; return first public
  . S $P(^MAG(2006.18,XIEN,"LISTWIN1"),"^",3)=FLTIEN
  . Q
- ; 
- ;  Here we'll create Private filters for a user or send first existing 
+ ;
+ ;  Here we'll create Private filters for a user or send first existing
  ;  private filter as the default.
  N MAGADMIN,MAGCLIN,MAGY,MAGX
  S FLTIEN=$O(^MAG(2005.87,"C",USER,"")) ; get first private

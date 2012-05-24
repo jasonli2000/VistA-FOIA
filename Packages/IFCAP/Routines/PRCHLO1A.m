@@ -1,7 +1,6 @@
-PRCHLO1A ;WOIFO/RLL-EXTRACT ROUTINE (cont.)CLO REPORT SERVER ;5/22/09  14:11
- ;;5.1;IFCAP;**83,130**;Oct 20, 2000;Build 25
- ;Per VHA Directive 2004-038, this routine should not be modified.
- ; DBIA 10093 - Read file 49 via FileMan.
+PRCHLO1A ;WOIFO/RLL-EXTRACT ROUTINE (cont.)CLO REPORT SERVER ; 12/19/05 11:17am
+V ;;5.1;IFCAP;**83**;; Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ; Continuation of PRCHLO1. This program builds the extracts for
  ; the Master PO Table and the associated multiples
 POMAST ; PoMaster Table
@@ -95,49 +94,49 @@ PAMBCD ; PO Amount Breakout code
  Q
 POAMMD ; PO Amendment Table (multiple)
  N POAMD,POAMD1,POAMD2,POAMD3,POAMD3A,POAMD4,V1,V2,V3,V2E,V2E1,V2E2
- N V3E,V3E1,V3E2,V1E,V1E1,V1E2,VL6,VL7,VL8,VL9
+ N V3E,V3E1,V3E2,V1E,V1E1,V1E2
  S POAMD=$G(^PRC(442,POID,6,0))
  S POAMD1=$P(POAMD,U,3)
- S POAMD2=0
- F  S POAMD2=$O(^PRC(442,POID,6,POAMD2)) Q:+POAMD2'>0  D
- . S POAMD3=$G(^PRC(442,POID,6,POAMD2,0))
- . S POAMD3A=$G(^PRC(442,POID,6,POAMD2,1))
- . ; V1-V3, $Get the data, $P the values, pad with "^" delimiters
- . ; get external date for EffectiveDate
- . S V1E=$P(POAMD3,U,2),V1E1=$P(V1E,".",1)
- . I V1E'="" S V1E2=$$FMTE^XLFDT(V1E1)
- . I V1E="" S V1E2=""
- . S V1=$P(POAMD3,U,1)_U_V1E2_U_$P(POAMD3,U,3)_U
- . ; get external value for pAPPMaUthorizedBuyer
- . S V2E=$P(POAMD3A,U,1)
- . I V2E'="" S V2E1=$G(^VA(200,+V2E,0)),V2E2=$P(V2E1,U,1)
- . I V2E="" S V2E2=""
- . S VL8=$P($G(^VA(200,+V2E,5)),U)           ;SERVICE - pAPPMaUthorizedBuyer
- . S VL9=$S(VL8="":"",1:$$GET1^DIQ(49,+VL8_",",.01))  ;SVC ext - pAPPMaUthorizedBuyer
- . ; get external value for AmendmentAdjustment
- . S V3E=$P(POAMD3A,U,4)
- . I V3E'="" S V3E1=$G(^PRCD(442.3,+V3E,0)),V3E2=$P(V3E1,U,1)
- . I V3E="" S V3E2=""
- . S VL6=$P(POAMD3A,U,5),VL7=$P($G(^VA(200,+VL6,0)),U)  ;Fiscal Approv
- . S V2=V2E2_U_V3E2,V3=V1_V2_U_V2E_U_VL6_U_VL7
- . S V1=$P($G(^VA(200,+VL6,5)),U)  ;SERVICE - Fiscal Approv
- . S V2=$S(V1="":"",1:$$GET1^DIQ(49,+V1_",",.01))   ;SVC ext - Fiscal Approv
- . S POAMD4=PPOKEY_U_POAMD2_U_V3_U_VL8_U_VL9_U_V1_U_V2
- . S ^TMP($J,"POAMMD",POID,POAMD2,0)=POAMD4
- . D POAMCH  ; Check for Amendment Changes
- . D POAMDS  ; Check for Amendment Description
+ I +POAMD1>1  D
+ . S POAMD2=0
+ . F  S POAMD2=$O(^PRC(442,POID,6,POAMD2)) Q:POAMD2=""  D
+ . . Q:+POAMD<0
+ . . S POAMD3=$G(^PRC(442,POID,6,POAMD2,0))
+ . . S POAMD3A=$G(^PRC(442,POID,6,POAMD2,1))
+ . . ; V1-V3, $Get the data, $P the values, pad with "^" delimiters
+ . . ; get external date for EffectiveDate
+ . . S V1E=$P(POAMD3,U,2),V1E1=$P(V1E,".",1)
+ . . I V1E'="" S V1E2=$$FMTE^XLFDT(V1E1)
+ . . I V1E="" S V1E2=""
+ . . S V1=$P(POAMD3,U,1)_U_V1E2_U_$P(POAMD3,U,3)_U
+ . . ; get external value for pAPPMaUthorizedBuyer
+ . . S V2E=$P(POAMD3A,U,1)
+ . . I V2E'="" S V2E1=$G(^VA(200,+V2E,0)),V2E2=$P(V2E1,U,1)
+ . . I V2E="" S V2E2=""
+ . . ; get external value for AmendmentAdjustment
+ . . S V3E=$P(POAMD3A,U,4)
+ . . I V3E'="" S V3E1=$G(^PRCD(442.3,+V3E,0)),V3E2=$P(V3E1,U,1)
+ . . I V3E="" S V3E2=""
+ . . S V2=V2E2_U_V3E2,V3=V1_V2
+ . . S POAMD4=PPOKEY_U_POAMD2_U_V3
+ . . I +POAMD2>0 S ^TMP($J,"POAMMD",POID,POAMD2,0)=POAMD4
+ . . D POAMCH  ; Check for Amendment Changes
+ . . D POAMDS  ; Check for Amendment Description
+ . . Q
  . Q
  Q
 POAMCH ; PO Amendment Changes Table (mulitple)
  N POAMC,POAMC1,POAMC2,POAMC3,POAMC4,POAMC5,POAMC6
  S POAMC=$G(^PRC(442,POID,6,POAMD2,3,0))
  S POAMC1=$P(POAMC,U,3)
- S POAMC2=0
- F  S POAMC2=$O(^PRC(442,POID,6,POAMD2,3,POAMC2)) Q:+POAMC2'>0  D
- . S POAMC3=$G(^PRC(442,POID,6,POAMD2,3,POAMC2,0))
- . S POAMC4=$P(POAMC3,U,1),POAMC5=$P(POAMC3,U,2)
- . S POAMC6=PPOKEY_U_POAMD2_U_POAMC2_U_POAMC4_U_POAMC5
- . S ^TMP($J,"POAMMDCH",POID,POAMD2,POAMC2,0)=POAMC6
+ I +POAMC1>1  D
+ . S POAMC2=0
+ . F  S POAMC2=$O(^PRC(442,POID,6,POAMD2,3,POAMC2)) Q:POAMC2=""  D
+ . . S POAMC3=$G(^PRC(442,POID,6,POAMD2,3,POAMC2,0))
+ . . S POAMC4=$P(POAMC3,U,1),POAMC5=$P(POAMC3,U,2)
+ . . S POAMC6=PPOKEY_U_POAMD2_U_POAMC2_U_POAMC4_U_POAMC5
+ . . I +POAMC2>0 S ^TMP($J,"POAMMDCH",POID,POAMD2,POAMC2,0)=POAMC6
+ . . Q
  . Q
  Q
 POAMDS ; PO Amendment Description Table
@@ -185,7 +184,6 @@ LPPOBC ; Loop PoBoc Table
  . Q:PPO="B"  ; don't want B index
  . S PPOVAL=$G(^PRC(442,POID,22,PPO,0))
  . S PPOVAL1=$P(PPOVAL,U,1)_U_$P(PPOVAL,U,2)
- . S PPOVAL1=PPOVAL1_U_$P(PPOVAL,U,3)        ;FMS LINE
  . S PPOVAL2=PPOKEY_U_PPO_U_PPOVAL1
  . S ^TMP($J,"POBOC",POID,PPO)=PPOVAL2
  . Q
@@ -193,18 +191,16 @@ LPPOBC ; Loop PoBoc Table
 LP2237 ; Loop 2237
  N PPOVAL,PPV1,PPV2,PPV3,PPV4,PPV5,PPV6,PPV7,PPVALL,POKEY,PPOVAL2
  N PPV1E,PPV1E1,PPV2E,PPV2E1,PPV4E1,PPV4E2,PPV7E,PPV7E1,PPV7E2
- N PPV3E,PPV3E1,VL6,VL7,VL8,VL9
+ N PPV3E,PPV3E1
  F  S PPO=$O(^PRC(442,POID,13,PPO)) Q:PPO=""  D
  . S PPOVAL=$G(^PRC(442,POID,13,PPO,0))
  . S PPV1=$P(PPOVAL,U,1),PPV2=$P(PPOVAL,U,2),PPV3=$P(PPOVAL,U,4)
  . ; external value for 2237 PPV1
  . I PPV1'="" S PPV1E=$G(^PRCS(410,+PPV1,0)),PPV1E1=$P(PPV1E,U,1)
  . I PPV1="" S PPV1E1=""
- . ; external value for Accountable Officer PPV2
+ . ; exeternal value for AccountableOfficer PPV2
  . I PPV2'="" S PPV2E=$G(^VA(200,+PPV2,0)),PPV2E1=$P(PPV2E,U,1)
  . I PPV2="" S PPV2E1=""
- . S VL6=$P($G(^VA(200,+PPV2,5)),"^")      ;Service - Acc Office
- . S VL7=$S(VL6="":"",1:$$GET1^DIQ(49,+VL6_",",.01)) ;SVC ext - Acc Office
  . ; ext. date value for Date Signed
  . I PPV3'="" S PPV3E=$P(PPV3,".",1),PPV3E1=$$FMTE^XLFDT(PPV3E)
  . I PPV3="" S PPV3E1=""
@@ -213,17 +209,15 @@ LP2237 ; Loop 2237
  . ;
  . I PPV4'="" S PPV4E1=$G(^VA(200,+PPV4,0)),PPV4E2=$P(PPV4E1,U,1)
  . I PPV4="" S PPV4E2=""
- . S VL8=$P($G(^VA(200,+PPV4,5)),"^")      ;Service - Purchase Agent
- . S VL9=$S(VL8="":"",1:$$GET1^DIQ(49,+VL8_",",.01)) ;SVC ext - Purchase Agent
  . ; get external value for InvDistPoint
  . S PPV7E=$P(PPOVAL,U,11)
  . I PPV7E'="" S PPV7E1=$G(^PRCP(445,+PPV7E,0)),PPV7E2=$P(PPV7E1,U,1)
  . I PPV7E="" S PPV7E2=""
  . S PPV7=PPV7E2
- . S PPVALL=PPV1E1_U_PPV2E1_U_PPV3E1_U_PPV4E2_U_PPV5_U_PPV6_U_PPV7_U_$P(PPOVAL,U,5)_U_$P(PPOVAL,U,2)
+ . S PPVALL=PPV1E1_U_PPV2E1_U_PPV3E1_U_PPV4E2_U_PPV5_U_PPV6_U_PPV7
  . ;
  . S PPOVAL2=PPOKEY_U_PPO_U_PPVALL
- . S ^TMP($J,"PO2237",POID,PPO)=PPOVAL2_U_VL8_U_VL9_U_VL6_U_VL7
+ . S ^TMP($J,"PO2237",POID,PPO)=PPOVAL2
  . Q
  Q
 PODISCH ; PO Discount Header File

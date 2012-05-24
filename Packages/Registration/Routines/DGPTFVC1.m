@@ -1,5 +1,5 @@
 DGPTFVC1 ;ALB/AS/ADL - Expanded PTF Close-Out Edits ; 12/14/04 10:34am
- ;;5.3;Registration;**52,58,79,114,164,400,342,466,415,493,512,510,544,629,817**;Aug 13, 1993;Build 4
+ ;;5.3;Registration;**52,58,79,114,164,400,342,466,415,493,512,510,544,629**;Aug 13, 1993
  ;;ADL;Updated for CSV Project;;Mar 26, 2003
  ;Called from Q+2^DGPTFTR. Variable must be passed in: PTF
  ;Variable returned: DGERR.   DGERR <-- 1 if record fails to pass a check; DGERR <-- "" if record passes all checks
@@ -11,7 +11,7 @@ DGPTFVC1 ;ALB/AS/ADL - Expanded PTF Close-Out Edits ; 12/14/04 10:34am
  ;
  I DGRTY=1,DGV("FEE") D MT
  ;
- ; DG*512, sck/Remove 101-Means Test indicator = 'U' xmit block
+ ; DG*512, sck/Remove 101-Means Test indocator = 'U' xmit block
  ;I 'DGV("FEE"),$P(DGV(101),"^",10)="U",'DGV(701)!(+DGV(701)>2890700) S DGERR=1 W !,"101 MEANS TEST",?23," value 'U' - not valid for discharges as of 7/1/1989",!?42,"per MAS VACO policy"
  ;
  I $D(^DPT(DFN,57)),$P(^(57),"^",4)>0 S S0=$P(^(57),"^",4),DGDX=$S(S0=1!(S0=3):"344.1",1:"344.0"),DGSCI="" F DGX=0:0 S DGX=$O(^DGPT(PTF,"M",DGX)) Q:DGX'>0  S DGNODE=^(DGX,0),DGSCI="" D SCI
@@ -67,8 +67,7 @@ AS S DGZ=$S($D(^DPT(DFN,.321)):^(.321),1:0) I $P(DGZ,U,2)="Y"!($P(DGZ,U,3)="Y") 
  S DGZ=$$GETSTAT^DGMSTAPI(DFN) I $P(DGZ,U,2)="Y" S DGX="AS" G DGX
  I $P(DGZEC,U,5)="Y",$P(DGZEC,U,4)<4,"^2^15^"'[(U_$P(DGZEC,U,9)_U) S DGX="AS" G DGX
  S DGX="AN"
-DGX ;DG*5.3*817/Remove 101-Means Test indicator = 'U' xmit block for FEE BASIS PTF 
- I DGVMT'=DGX,DGVMT'="U" S DGERR=1 W !,"101 ","MEANS TEST",?23," value ",DGVMT,$S(DGVMT']"":"blank",DGVMT="X":" only for admissions prior to 7/1/86 or domicilliary use",1:" inconsistent with eligibility data")
+DGX I DGVMT'=DGX S DGERR=1 W !,"101 ","MEANS TEST",?23," value ",DGVMT,$S(DGVMT']"":"blank",DGVMT="X":" only for admissions prior to 7/1/86 or domicilliary use",1:" inconsistent with eligibility data")
  K DGZEC,DGZ,DGZ1,DGT,DGX,DGVMT Q
  ;
 DP I $P(DGV(701),"^",3)'=5 S DGERR=1 W !,"701 ",$E("TYPE OF DISPOSITION",1,18),?23," value inconsistent for discharge"

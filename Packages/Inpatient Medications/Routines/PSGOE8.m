@@ -1,5 +1,5 @@
-PSGOE8 ;BIR/CML3-EDIT ORDERS IN 53.1 ; 7/6/11 9:44am
- ;;5.0;INPATIENT MEDICATIONS ;**47,50,65,72,110,111,188,192,113,223**;16 DEC 97;Build 8
+PSGOE8 ;BIR/CML3-EDIT ORDERS IN 53.1 ;25 SEP 97 / 10:58 AM
+ ;;5.0; INPATIENT MEDICATIONS ;**47,50,65,72,110,111,188,192**;16 DEC 97;Build 1
  ;
  ; Reference to ^PS(50.7 is supported by DBIA# 2180
  ; Reference to ^PS(51.1 is supported by DBIA 2177
@@ -59,50 +59,35 @@ A3 I $$PNDREN($G(PSGORD)) D  Q
  K DIC S DIC="^PS(51.2,",DIC(0)="EMQZ",DIC("S")="I $P(^(0),""^"",4)" D ^DIC K DIC I Y'>0 G A3
  S PSGMR=+Y,PSGMRN=Y(0,0) G DONE
  ;
+7 ; schedule type
+ S MSG=0,F2=7 S:PSGOEEF(F2) BACK="7^PSGOE8"
+A7 W !,"SCHEDULE TYPE: "_$S(PSGSTN]"":PSGSTN_"// ",1:"") R X:DTIME S X=$TR(X,"coprocf","COPROCF") I X="^"!'$T S PSGOEE=0 W $C(7) G DONE
+ I X="" W:PSGSTN]"" "  ",PSGSTN G DONE
+ I X="@"!(X?1."?") W:X="@" $C(7),"  (Required)" S:X="@" X="?" D ENHLP^PSGOEM(53.1,7) G A7
+ I $E(X)="^" D ENFF^PSGOE82 G:Y>0 @Y G A7
+ ; I X="OC"!(X="R") S PSGST=X,$P(PSGNEDFD,"^",3)=X,PSGSTN=$S(X="R":"FILL on REQUEST",1:"ON CALL") W "  "_PSGSTN S PSGOEEF(7)="" G:X="R" 26 S PSGSCH=PSGSTN,(PSGS0Y,PSGS0XT)="" G 8^PSGOE41
+A7DEF ;BHW;PSJ*5*188;Added tag.  Called by A26 to set default Schedule type.
+ F Y="C^CONTINUOUS","O^ONE TIME","OC^ON CALL","P^PRN","R^FILL on REQUEST" I $S(X=$P(Y,"^"):1,1:$P($P(Y,"^",2),X)="") W $S(X=$P(Y,"^"):"  "_$P(Y,"^",2),1:$P($P(Y,"^",2),X,2)) S PSGST=$P(Y,"^"),PSGSTN=$P(Y,"^",2),$P(PSGNEDFD,"^",3)=PSGST Q
+ E  W $C(7),"  ??" S X="?" D ENHLP^PSGOEM(53.1,7) G A7
+ ; I PSGST="OC"!(PSGST="R") S PSGOEEF(7)="" G:PSGST="R" 26 S PSGSCH=PSGSTN,(PSGS0Y,PSGS0XT)="" G 8^PSGOE41
+ G DONE
+ ;
 26 ; schedule
  S MSG=0,F2=26 S:PSGOEEF(F2) BACK="26^PSGOE8"
 A26 I $$PNDREN($G(PSGORD)) D  Q
  . W !!?5,"Schedule may not be edited at this point." D PAUSE^VALM1
  W !,"SCHEDULE: ",$S(PSGSCH]"":PSGSCH_"// ",1:"") R X:DTIME I X="^"!'$T W:'$T $C(7) S PSGOEE=0 G DONE
  S:X="" X=PSGSCH,PSGSCH="" I "@"[X W $C(7),"  (Required)" S X="?" D ENHLP^PSGOEM(53.1,26) G A26
- S DOW=0 I $$DOW^PSIVUTL($$ENLU^PSGMI(X)) S DOW=1
  I X?1."?" D ENHLP^PSGOEM(53.1,26) G A26
  I $E(X)="^" D ENFF^PSGOE82 G:Y>0 @Y G A26
  ;BHW;PSJ*5*188;Add flag and IEN return variable for PSGS0 (PSJ*5*134), Highlight Admin Times if they changed.
- N PSGOES,PSJSLUP,PSGSFLG S PSJSLUP=1,PSGSFLG=1 D EN^PSGS0 I '$D(X) W $C(7),"  ??" S X="?" D ENHLP^PSGOEM(53.1,26) G A26
- I X'=PSGSCH D
- . N XX
- . S PSGSCH=X
- . I PSGS0Y'=PSGAT S PSGAT=PSGS0Y  ;Change so that any schedule change will adjust the type and default the admin times - DRF
- . D  ;Change schedule type to agree with schedule
- .. I $G(DOW) S PSGST="C",PSGSTN=$$ENSTN^PSGMI(PSGST) Q
- .. I (PSGSCH[" PRN")!(PSGSCH="PRN") I $$PRNOK^PSGS0(PSGSCH) S PSGOST=PSGST,PSGST="P",PSGSTN=$$ENSTN^PSGMI(PSGST) Q
- .. I PSGSCH]"" S XX=+$O(^PS(51.1,"AC","PSJ",PSGSCH,0))
- .. S PSGOST=$G(PSGST),PSGST=$P($G(^PS(51.1,XX,0)),"^",5) I PSGST="D" S PSGST="C"  ;DOW schedules are converted to Continuous
- .. S PSGSTN=$$ENSTN^PSGMI(PSGST)
- . W !!,"NOTE: This change in schedule also changes the ADMIN TIMES and SCHEDULE TYPE.",!
- . S MSG=1,PSGOEEF(39)=1
- . I $G(PSJNEWOE) D PAUSE^VALM1
- I PSGST="O" S PSGOEEF(7)=1
- G DONE
- ;
-7 ; schedule type
- S MSG=0,F2=7 S:PSGOEEF(F2) BACK="7^PSGOE8"
-A7 W !,"SCHEDULE TYPE: "_$S(PSGSTN]"":PSGSTN_"// ",1:"") R X:DTIME S X=$TR(X,"coprocf","COPROCF") I X="^"!'$T S PSGOEE=0 W $C(7) G DONE
- I X="" S X=PSGST,PSGSTN=$$ENSTN^PSGMI(X) W:PSGSTN]"" "  ",PSGSTN G DONE
- S:X="F" X="R"
- I ",?,??,C,O,OC,P,R,"'[(","_X_",") W " ??" G A7
- I $$PRNOK^PSGS0($G(PSGSCH)),X="C" W "  ??" G A7
- I X="@"!(X?1."?") W:X="@" $C(7),"  (Required)" S:X="@" X="?" D ENHLP^PSGOEM(53.1,7) G A7
- I $E(X)="^" D ENFF^PSGOE82 G:Y>0 @Y G A7
- ;*223 Don't allow O sched type on C orders
- I X="O",$$SCHTP(PSGSCH)'="O" W !,"  SCHEDULE ("_PSGSCH_") is not a ONE TIME Schedule." G A7
- S PSGOST=PSGST
- S PSGST=X,PSGSTN=$$ENSTN^PSGMI(X) W:PSGSTN]"" "  ",PSGSTN
- I X="P",$G(PSGAT)]"" S PSGOAT=PSGAT S PSGAT="" D
- .W !!,"NOTE: This change in schedule type also changes the ADMIN TIMES.",!
- .S MSG=1,PSGOEEF(39)=1
- .I $G(PSJNEWOE) D PAUSE^VALM1
+ N PSGOES,PSJSLUP,PSGSFLG,PSGSCIEN S PSJSLUP=1,PSGSFLG=1 D EN^PSGS0 I '$D(X) W $C(7),"  ??" S X="?" D ENHLP^PSGOEM(53.1,26) G A26
+ S PSGSCH=X I PSGS0Y'=PSGAT S PSGAT=PSGS0Y W !!,"NOTE: This change in schedule also changes the ADMIN TIMES.",! S MSG=1,PSGOEEF(39)=1 D:$G(PSJNEWOE) PAUSE^VALM1
+ ;BHW;PSJ*5*188;Get Schedule type of Selected Schedule, If One-Time type, set Highlighting ON (PSGOEEF(7)=1) and call existing Schedule type logic.
+ N X,Y,DIC
+ I '$G(PSGSCIEN) S PSGSCIEN=$O(^PS(51.1,"AC","PSJ",PSGSCH,""))  ;Get First schedule with PSJ Package Prefix as default for Lookup
+ S X=$S($G(PSGSCIEN):$G(PSGSCIEN),1:PSGSCH),DIC="51.1",DIC(0)="NZ" D ^DIC
+ I $P($G(Y(0)),"^",5)="O" S X="O" S PSGOEEF(7)=1 G A7DEF
  ;
 DONE ;
  I PSGOEE G:'PSGOEEF(F2) @BACK S PSGOEE=PSGOEEF(F2)
@@ -132,10 +117,3 @@ PNDREN(PNDON) ;
  I PNDON'["P" Q 0
  S RNWL="^PS(53.1,"_+PNDON_",0)" S RNWL=$G(@(RNWL)) S RNWL=$S($P(RNWL,"^",24)="R":1,1:0)
  Q RNWL
- ;
-SCHTP(SCH) ; *223 Return SCHedule type
- N X I SCH="" Q ""
- S X=$O(^PS(51.1,"APPSJ",SCH,0))
- Q:'$G(X) ""
- Q $P(^PS(51.1,X,0),"^",5)
- ;

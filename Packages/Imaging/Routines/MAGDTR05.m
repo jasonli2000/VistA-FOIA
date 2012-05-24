@@ -1,5 +1,5 @@
-MAGDTR05 ;WOIFO/PMK - Read a DICOM image file ; 25 Sep 2008 10:53 AM
- ;;3.0;IMAGING;**46,54**;03-July-2009;;Build 1424
+MAGDTR05 ;WOIFO/PMK - Read a DICOM image file ; 14 Nov 2006  6:24 AM
+ ;;3.0;IMAGING;**46**;16-February-2007;;Build 1023
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -15,11 +15,11 @@ MAGDTR05 ;WOIFO/PMK - Read a DICOM image file ; 25 Sep 2008 10:53 AM
  ;; | to be a violation of US Federal Statutes.                     |
  ;; +---------------------------------------------------------------+
  ;;
-LOOKUP(OUT,STATNUMB,ISPECIDX,IPROCS,STARTING,DUZREAD,DUZREAD2,LOCKTIME,STATLIST) ; RPC = MAG DICOM CON UNREADLIST GET
+LOOKUP(OUT,SITENUMB,ISPECIDX,IPROCS,STARTING,DUZREAD,DUZREAD2,LOCKTIME,STATLIST) ; RPC = MAG DICOM CON UNREADLIST GET
  ; entry point to lookup entries in file
- ; 
+ ;
  ; OUT ------- Return array
- ; STATNUMB -- Acquisition Station Number
+ ; SITENUMB -- Acquisition Site Number
  ; ISPECIDX -- Index to Specialties (2005.84)
  ; IPROCS ---- Indexes to Procedures (2005.85) - this is a comma-delimited list
  ; STARTING -- Fileman date/time to begin sequential search
@@ -27,7 +27,7 @@ LOOKUP(OUT,STATNUMB,ISPECIDX,IPROCS,STARTING,DUZREAD,DUZREAD2,LOCKTIME,STATLIST)
  ; DUZREAD2 -- DIC(4) pointer to Reading Site
  ; LOCKTIME -- timeout value for LOCKTIME
  ; STATLIST -- status of entry (C, L, R, U, or W, in any combination)
- ; 
+ ;
  N ACQSITE ;- site index in Unread List
  N ISTATUS ;-- counter to the status in STATLIST
  N IPROC ;---- counter to IPROCS
@@ -41,8 +41,8 @@ LOOKUP(OUT,STATNUMB,ISPECIDX,IPROCS,STARTING,DUZREAD,DUZREAD2,LOCKTIME,STATLIST)
  S STATLIST=$$UP^MAGDFCNV($G(STATLIST))
  I STATLIST="" S STATLIST="CDLRUW" ; default to all STATUS values
  ;
- S ACQSITE=$$ACQSITE^MAGDTR06(STATNUMB)
- I ACQSITE<0  S OUT="-1, ACQUISITION STATION NUMBER "_STATNUMB_" IS NOT DEFINED IN FILE 4" Q
+ S ACQSITE=$$ACQSITE^MAGDTR06(SITENUMB)
+ I ACQSITE<0  S OUT="-1, ACQUISITION SITE #"_SITENUMB_" IS NOT DEFINED IN FILE 4" Q
  S SITENAME=$P(ACQSITE,"^",2),ACQSITE=$P(ACQSITE,"^",1)
  ;
  I LOCKTIME,DUZREAD2 D UNLOCKER ; automatically unlock timed out studies
@@ -108,7 +108,7 @@ LOOKUP1(UNREAD) ; retrieve one entry from the unread list
  . Q
  ;
  ; acquisition site identification
- S Z=UNREAD_"|"_GMRCIEN_"|"_STATNUMB_"|"_SITENAME
+ S Z=UNREAD_"|"_GMRCIEN_"|"_SITENUMB_"|"_SITENAME
  ; patient information
  S DFN=$$GET1^DIQ(123,GMRCIEN,.02,"I")
  D DEM^VADPT,PTSEC^DGSEC4(.VIPSTS,DFN)
@@ -157,12 +157,12 @@ UNLOCKER ; automatically unlock any timed out studies
  N STATUS
  N UNLOCKTM ;- earliest date/time for a lock (FM format)
  N UNREAD ;--- pointer to entry in unread list
- N X
+ N %,%H,X
  ;
  ; calculate the earliest automatic unlock date/time
  S SECONDS=86400*$H+$P($H,",",2)-(60*LOCKTIME)
- ; convert to FM format
- S UNLOCKTM=$$HTFM^XLFDT((SECONDS\86400)_","_(SECONDS#86400),0)
+ S %H=(SECONDS\86400)_","_(SECONDS#86400)
+ D YMD^%DTC S UNLOCKTM=X_% ; convert to FM format
  ;
  ; traverse the "lock list" and unlock those that have timed out
  F IPROC=1:1:$L(IPROCS,",") S IPROCIDX=$P(IPROCS,",",IPROC) D

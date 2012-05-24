@@ -1,6 +1,6 @@
 XOBVRPCI ;; ld,mjk/alb - VistaLink Interface Implementation for RPCs; 07/27/2002  13:00
- ;;1.6;VistALink;;May 08, 2009;Build 15
- ;Per VHA directive 2004-038, this routine should not be modified.
+ ;;1.5;VistALink;;Sep 09, 2005
+ ;;Foundations Toolbox Release v1.5 [Build: 1.5.0.026]
  ;
 CALLBACK(CB) ; -- init callbacks implementation
  SET CB("STARTELEMENT")="ELEST^XOBVRPCI"
@@ -8,7 +8,7 @@ CALLBACK(CB) ; -- init callbacks implementation
  SET CB("CHARACTERS")="CHR^XOBVRPCI"
  QUIT
  ;
-READER(XOBUF,XOBDATA) ; -- proprietary format reader implementation
+READER(XOBUF,XOBDATA) ; -- propriatary format reader implementation
  DO START^XOBVRPCX(.XOBUF,.XOBDATA)
  QUIT
  ;
@@ -17,7 +17,7 @@ REQHDLR(XOBDATA) ; -- request handler implementation
  QUIT
  ;
  ; ------------------------------------------------------------------------
- ;             RPC Server: Request Message XML SAX Parser Callbacks         
+ ;             RPC Server: Request Message XML SAX Parser Callbacks
  ; ------------------------------------------------------------------------
 ELEST(ELE,ATR) ; -- element start event handler
  IF ELE="VistaLink" DO  QUIT
@@ -36,7 +36,7 @@ ELEST(ELE,ATR) ; -- element start event handler
  IF ELE="RpcContext" SET XOBCTXT="" QUIT
  ;
  ; --------------------  Param Node Start Event Processing  ---------------------------
- ; 
+ ;
  IF ELE="Param" DO  QUIT
  . SET XOBPARAM=""
  . SET XOBPN="XOBP"_ATR("position")
@@ -56,7 +56,7 @@ ELEST(ELE,ATR) ; -- element start event handler
  . SET XOBPARVL=""
  ;
  ; --------------------  Security Node Start Event Processing  ---------------------------
- ; 
+ ;
  IF ELE="Security" DO  QUIT
  . SET XOBDATA("XOB RPC","SECURITY","TYPE")=$GET(ATR("type"))
  . SET XOBDATA("XOB RPC","SECURITY","DIV")=$GET(ATR("division"))

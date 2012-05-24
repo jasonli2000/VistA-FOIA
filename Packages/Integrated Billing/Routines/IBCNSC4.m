@@ -1,6 +1,6 @@
 IBCNSC4 ;ALB/TMP - INSURANCE PLAN DETAIL SCREEN UTILITIES ; 09-AUG-94
- ;;2.0;INTEGRATED BILLING;**43,85,103,251,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**43,85,103,251**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 INIT ; -- Load the plan detail segments
  N IBLCNT
@@ -18,7 +18,7 @@ INIT ; -- Load the plan detail segments
  ;
 UR ; -- UR region
  N START,OFFSET
- S START=1,OFFSET=43,VALMCNT=+$O(@VALMAR@(""),-1)
+ S START=1,OFFSET=43,VALMCNT=6
  D SET(START,OFFSET," Utilization Review Info ",IORVON,IORVOFF)
  D SET(START+1,OFFSET,"         Require UR: "_$$EXPAND^IBTRE(355.3,.05,$P(IBCPOLD,"^",5)))
  D SET(START+2,OFFSET,"   Require Amb Cert: "_$$EXPAND^IBTRE(355.3,.12,$P(IBCPOLD,"^",12)))
@@ -29,14 +29,14 @@ UR ; -- UR region
  ;
 LIM ; Plan coverage limitations region
  N START,OFFSET
- S START=+$O(@VALMAR@(""),-1)+$S($P($G(IBCPOLD),U,14)]"":3,1:2),OFFSET=2
+ S START=10+$S($P($G(IBCPOLD),U,14)]"":1,1:0),OFFSET=2
  D BLANK(START-1) S VALMCNT=VALMCNT+1
  D LIMBLD^IBCNSC41(START,OFFSET,.IBLCNT)
  Q
  ;
 AB ; -- Annual benefit years region
  N OFFSET,START,ADT,Z
- S START=+$O(@VALMAR@(""),-1)+2,OFFSET=2
+ S START=14+$G(IBLCNT),OFFSET=2
  D BLANK(START-1) S VALMCNT=VALMCNT+1
  D SET(START,OFFSET," Annual Benefit Dates ",IORVON,IORVOFF)
  I $O(^IBA(355.4,"APY",IBCPOL,""))="" D SET(START+1,OFFSET+2,"No Annual Benefits Information") G ABQ
@@ -46,7 +46,7 @@ ABQ Q
  ;
 VER ; -- Plan detail User Information Region
  N OFFSET,START
- S START=+$O(@VALMAR@(""),-1)+2,OFFSET=2
+ S START=17+$G(IBLCNT),OFFSET=2
  D BLANK(START-1) S VALMCNT=VALMCNT+1
  D SET(START,OFFSET," User Information ",IORVON,IORVOFF)
  I IBCND1="" D SET(START+1,OFFSET,"No User Information") G VERQ
@@ -58,7 +58,7 @@ VERQ Q
  ;
 COMMENT ; -- Plan detail comment region
  N START,OFFSET,LINE
- S START=+$O(@VALMAR@(""),-1)+2,OFFSET=2,LINE=1
+ S START=23+$G(IBLCNT),OFFSET=2,LINE=1
  D BLANK(START-1) S VALMCNT=VALMCNT+1
  D SET(START,OFFSET," Plan Comments ",IORVON,IORVOFF)
  S IBI=0

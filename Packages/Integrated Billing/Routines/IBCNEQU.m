@@ -1,8 +1,8 @@
-IBCNEQU ;DAOU/BHS - eIV REQUEST ELECTRONIC INSURANCE INQUIRY ;24-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,416,438**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+IBCNEQU ;DAOU/BHS - IIV REQUEST ELECTRONIC INSURANCE INQUIRY ;24-JUN-2002
+ ;;2.0;INTEGRATED BILLING;**184,271**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
- ; eIV - Insurance Verification Interface
+ ; IIV - Insurance Identification and Verification Interface
  ;
  ; Must call from EN
  Q
@@ -21,7 +21,7 @@ ENX ; EN exit pt
  ;
 INIT ; -- set up initial variables
  S VALMCNT=0,VALMBG=1,IDUZ=DUZ
- K ^TMP("IBCNEQU",$J),^TMP("IBCNEQUX",$J),^TMP("IBCNEQUDTS",$J)
+ K ^TMP("IBCNEQU",$J),^TMP("IBCNEQUX",$J)
  D HDR
  D BLD(DFN)
  ;
@@ -42,16 +42,20 @@ HDR ; -- screen header for initial screen
 HELP ; -- help code
  D FULL^VALM1
  W @IOF
- W !,"This screen lists all eligible (non-Medicaid) Insurance policies"
+ W !,"This screen lists all eligible (non-Medicaid/non-Medicare) Insurance policies"
  W !,"for the patient.  Selecting an entry in this list creates an Insurance Buffer"
- W !,"entry with Source 'eIV' and Override Freshness Flag 'Yes'.  Setting this flag"
- W !,"is designed to force the eIV extract to attempt to create an insurance"
+ W !,"entry with Source 'eIIV' and Override Freshness Flag 'Yes'.  Setting this flag"
+ W !,"is designed to force the IIV extract to attempt to create an insurance"
  W !,"inquiry based on this entry."
  W !!,"Entries with an asterisk (*) preceding the Insurance Co name already exist in"
  W !,"the Insurance Buffer with the exact same name, the exact same Group Number,"
  W !,"and the Override Freshness Flag set to 'Yes'.  Selecting an entry with an"
  W !,"asterisk (*) will create a duplicate entry in the Insurance Buffer file for"
  W !,"the patient."
+ W !!,"An option is available to Search for All.  This creates a generalized"
+ W !,"electronic inquiry to search for any VA known insurance information for the"
+ W !,"selected patient.  The inquiry is transmitted as part of the nightly"
+ W !,"IIV batch extract process."
  D PAUSE^VALM1
  S VALMBCK="R"
  Q
@@ -68,6 +72,7 @@ PAT() ; Prompt user to select a patient
  ; Exclude non-Veterans
  S DIC(0)="AEQMN"
  S DIC("S")="I $G(^(""VET""))=""Y"",('$P($G(^(0)),U,21))",DIC="^DPT("
+ ;S DIC(0)="AEQMN",DIC("S")="I $G(^(""VET""))=""Y""",DIC="^DPT("
  D ^DIC
  I $D(DUOUT)!$D(DTOUT)!(Y<1) Q ""
  ;
@@ -85,8 +90,8 @@ BLD(DFN) ; Build list of all insurance for patient
  S IBIEN=0
  F  S IBIEN=$O(^IBA(355.33,"C",DFN,IBIEN)) Q:'IBIEN  D
  . S IBBUFDT=$G(^IBA(355.33,IBIEN,0))
- . ; Include E status only
- . I $P(IBBUFDT,U,4)'="E" Q
+ . ; Include E status and those with Override Freshness Flags = 1
+ . I $P(IBBUFDT,U,4)'="E"!('$P(IBBUFDT,U,13)) Q
  . S IBBUFNM=$$TRIM^XLFSTR($P($G(^IBA(355.33,IBIEN,20)),U))
  . I IBBUFNM="" Q
  . S GRPNUM=$$TRIM^XLFSTR($P($G(^IBA(355.33,IBIEN,40)),U,3))
@@ -104,7 +109,7 @@ BLD(DFN) ; Build list of all insurance for patient
  . Q:'IBINSIEN!'$D(^DIC(36,IBINSIEN,0))
  . S IBINAME=$P($G(^DIC(36,IBINSIEN,0)),U)
  . S TMPNM=$$TRIM^XLFSTR(IBINAME)
- . ; Filter Ins Co's by name - currently filter Medicaid
+ . ; Filter Ins Co's by name - currently filter Medicare/Medicaid
  . I $$EXCLUDE^IBCNEUT4(TMPNM) Q
  . S IBCT=IBCT+1
  . S STR=""
@@ -125,21 +130,18 @@ BLD(DFN) ; Build list of all insurance for patient
  . S STR=$$SETFLD^VALM1($$YN($P(IBDATA2,U,5)),STR,"UR")
  . S STR=$$SETFLD^VALM1($$YN($P(IBDATA0,U,20)),STR,"COB")
  . D SET(STR)
- . Q
  ;
- I 'IBCT D
- . S VALMCNT=VALMCNT+1
- . S ^TMP("IBCNEQU",$J,VALMCNT,0)=" "
- . S VALMCNT=VALMCNT+1
- . S ^TMP("IBCNEQU",$J,VALMCNT,0)="      No eligible insurance policies found."
- . Q
+ S IBCT=IBCT+1
+ S STR="",II=""
+ S STR=$$SETFLD^VALM1(IBCT,STR,"NUMBER")
+ S SFANAME=$S($$ADD():"*",1:"")_"Search for All"
+ S STR=$$SETFLD^VALM1(SFANAME,STR,"NAME")
+ S IBINAME="~NO PAYER",IBDATA0=""
+ D SET(STR)
  ;
- S VNODT=$P($G(^IBA(354,DFN,60)),U,1) I VNODT D
- . S VALMCNT=VALMCNT+1
- . S ^TMP("IBCNEQU",$J,VALMCNT,0)=" "
- . S VALMCNT=VALMCNT+1
- . S ^TMP("IBCNEQU",$J,VALMCNT,0)="      Verification of No Coverage "_$$FMTE^XLFDT(VNODT,"5Z")_"."
- . Q
+ S VNODT=$G(^IBA(354,DFN,50)) I VNODT D
+ . S IBCT=IBCT+1,VALMCNT=VALMCNT+1
+ . S ^TMP("IBCNEQU",$J,IBCT,0)="      Verification of No Coverage "_$$FMTE^XLFDT(VNODT,"5Z")
  ;
 BLDX ; BLD exit pt
  Q
@@ -150,7 +152,6 @@ SET(LINE) ; -- set arrays
  S ^TMP("IBCNEQU",$J,VALMCNT,0)=LINE
  S ^TMP("IBCNEQU",$J,"IDX",VALMCNT,IBCT)=""
  S ^TMP("IBCNEQUX",$J,IBCT)=VALMCNT_U_DFN_U_II_U_IBINAME_U_IBDATA0
- S ^TMP("IBCNEQUX",$J)=$G(^TMP("IBCNEQUX",$J))+1
  Q
  ;
 YN(X) ; -- convert 1 or 0 to yes/no/unknown
@@ -160,35 +161,28 @@ SELECT ; User selects insurance from list to be reconfirmed
  N IBDATA,IBDPT,IBDA,DIR,X,Y,D0,DG,DIC,DISYS,DIW,IENS,IBERROR,IBIEN,IBSYM
  ;
  D FULL^VALM1
- S VALMBCK="R"
- ;
- I '$O(^TMP("IBCNEQUX",$J,0)) D  G SELECTX
- . W !!,"No Insurance policies to select."
- . S DIR(0)="E" D ^DIR K DIR
- . Q
- ;
  S (IBDPT,IBDA,IBERROR)=""
- S IBDATA=$$SEL()
+ S IBDATA=$$SEL
  S IBDPT=+$P(IBDATA,U)       ; Patient DFN
  S IBDA=+$P(IBDATA,U,2)      ; 2.312 ptr
  I +IBDPT,+IBDA D
  . S IBIEN=+$P(IBDATA,U,4)     ; Ins Co IEN (#36)
- . S IBSYM=$P($$INSERROR^IBCNEUT3("I",IBIEN),"^",1)
- . S ^TMP("IBCNEQUDTS",$J)=1
+ . S IBSYM=+$$INSERROR^IBCNEUT3("I",IBIEN)
  . D PT^IBCNEBF(IBDPT,IBDA,IBSYM,1,1,.IBERROR)
  . ; Check for errors
  . I $G(IBERROR)'="" W !!,"Insurance Buffer entry could not be created due to error!  Please try again.",!
  . I $G(IBERROR)="" W !!,"Insurance Buffer entry created!",!
  . S DIR(0)="E" D ^DIR K DIR
- . K ^TMP("IBCNEQUDTS",$J)
  ;
  I $P(IBDATA,U,3)="~NO PAYER" D
- . W !!,"Payer missing. Identification inquiries not allowed."    ; IB*2*416
+ . N PTNAME
+ . S PTNAME=$P($G(^DPT(IBDPT,0)),U)
+ . W !!,"A request to search for all known insurance information for patient"
+ . W !,PTNAME," will be processed overnight."
  . S DIR(0)="E" D ^DIR K DIR
- . Q
- ;
-SELECTX ;
+ . D BLKTQ
  S VALMBCK="R"
+ ;
  Q
  ;
 SEL() ; User selects insurance from list
@@ -196,27 +190,19 @@ SEL() ; User selects insurance from list
  ;
  S IBSELN=""
  ; Select entry to reconfirm
- S DIR(0)="NO^1:"_$G(^TMP("IBCNEQUX",$J))_":0"
+ S DIR(0)="NO^1:"_VALMCNT_":0"
  S DIR("A")="Select entry to request electronic inquiry"
  S DIR("?",1)="  Select an entry to initiate an insurance inquiry."
  S DIR("?",2)="  If entry contains an Insurance Co name, an Insurance"
  S DIR("?",3)="  Buffer entry will be created for nightly batch extract."
+ S DIR("?",4)="  Select 'Search for All' entry to find all identified"
+ S DIR("?",5)="  insurances for this patient."
  S DIR("?")="  "
  D ^DIR K DIR
  I $D(DIRUT)!$D(DUOUT)!(Y<1) G SELX
  S IBSELN=$O(^TMP("IBCNEQU",$J,"IDX",Y,0))
  I IBSELN S IBSELN=$P($G(^TMP("IBCNEQUX",$J,IBSELN)),U,2,99)
- I $E($P(IBSELN,U,3))="*" W ! D  S IBSELN="" G SELX
- .S DIR(0)="EA"
- .S DIR("A",1)=""
- .S DIR("A",2)="Selected policy has an existing buffer entry."
- .S DIR("A",3)="You must first process the existing buffer entry."
- .S DIR("A")="Press RETURN to continue " D ^DIR K DIR W !
- .Q
- ;
- ; Get SERVICE TYPE CODE(s)
- D STC
- I X="^" S IBSELN="" G SELX  ; '^' entered thus backup a level & re-ask Insurance question
+ I $E($P(IBSELN,U,3))="*" W !!,"Selecting this entry will create a duplicate entry in the Insurance Buffer."
  ;
  W !
  S DIR(0)="Y"
@@ -227,22 +213,6 @@ SEL() ; User selects insurance from list
  I $D(DIRUT)!$D(DUOUT)!('Y) S IBSELN=""
  ;
 SELX Q IBSELN
- ;
-STC ; Ask for SERVICE TYPE CODE(s) to send
- N DIR,X,Y
- ; IBEISTC used as STC variable
- S IBEISTC=""
- S DIR(0)="PAO^365.013:EMZ",DIR("A")="Enter Service Type Code: "
- S DIR("??")="^D HELPSTC2^IBCNEQU"
-STCEN ; Intital and re-enterant tag upon error
- D ^DIR Q:X="^"
- ; Check to verify code is active, if not, display error and ask again
- I $P($G(Y(0)),U,3)'="" W !,"Code selected is not an active code - please select another code.",! G STCEN
- ; Single STC entered, set IBEISTC to be STC IEN
- I Y'=-1 S IBEISTC=$P(Y,U,1)
- ; No code entered, thus asterisk designates sending DEFAULT and SITE SELECTED SERVICE TYPE CODES
- I X="" S IBEISTC="*" W "..Default and Site Selected codes will be sent."
- Q
  ;
 FASTEXIT ; Sets flag to indicate a quick exit from the option
  N DIR,DIRUT,X,Y
@@ -268,7 +238,6 @@ ADD() ;
  Q 1
  ;
 BLKTQ ;  Create a ~NO PAYER request for 'Search for All'
- Q    ; no longer allowed  IB*2*416
  NEW PAYER,SRVICEDT,FRESHDT,DATA1,DATA2,TQIEN,FRESHDAY
  S PAYER=$$FIND1^DIC(365.12,,"X","~NO PAYER")
  D NPINIT ; Update service date and freshness
@@ -286,15 +255,4 @@ NPINIT ; Initialize variables for ~NO PAYER
  S FRESHDT=$$FMADD^XLFDT(SRVICEDT,-FRESHDAY)
  ;
  ; Update service date and freshness date based on payer allowed
- Q
- ;
-HELPSTC2 ; Text to display in response to '??' entry
- N DIR
- D FULL^VALM1
- W @IOF
- W !,"Enter the single SERVICE TYPE CODE to be sent with inquiry or press 'ENTER' to"
- W !,"send DEFAULT and SITE SELECTED codes. Utilizing a single SERVICE TYPE CODE will"
- W !,"only provide eligibility benefit data for the selected code. Utilizing the"
- W !,"DEFAULT and SITE SELECTED codes will provide standard eligibility benefit data."
- W !,"No response generated by this option will auto-update the patient file."
  Q

@@ -1,5 +1,5 @@
-LEXXFQ ;ISL/KER - Set Frequencies in 757.001 ;01/03/2011
- ;;2.0;LEXICON UTILITY;**4,25,73**;Sep 23, 1996;Build 10
+LEXXFQ ; ISL/FJF Set Frequencies in 757.001;04/08/03
+ ;;2.0;LEXICON UTILITY;**4,25**;Sep 23, 1996
  Q
 EN ; Update term frequencies when not found  (at site)
  S ZTRTN="UP^LEXXFQ",ZTDESC="Update Term Frequency in file 757.001"
@@ -7,7 +7,7 @@ EN ; Update term frequencies when not found  (at site)
  D ^%ZTLOAD,HOME^%ZIS
  K Y,ZTSK,ZTDESC,ZTDTH,ZTIO,ZTRTN
  Q
-EN2 ; Reset term frequencies to export values (at CIOFO)
+EN2 ; Reset term frequencies to export values (at IRMFO)
  S ZTRTN="RE^LEXXFQ",ZTDESC="Reset Term Frequencies in file 757.001"
  S ZTIO="",ZTDTH=$H
  D ^%ZTLOAD,HOME^%ZIS
@@ -65,15 +65,14 @@ FQ(LEXX) ; Frequency
  ; LEXDIA  Diagnostic Class
  ; LEXSA   IEN Source Code (ICD, CPT, DSM, etc)
  ; LEXMC   IEN Major Concept
- ; LEXSO   Code 
+ ; LEXSO   Code
  ;
  N LEXMC S LEXMC=+($G(LEXX)) Q:'$D(^LEX(757,LEXMC,0)) 0 Q:LEXMC<3 0
- N LEXSA,LEXSAB,LEXSMC,LEXNUR,LEXBEH,LEXPRO,LEXDIA,LEXSN,LEXSO,LEXSR
+ N LEXSA,LEXSAB,LEXSMC,LEXNUR,LEXBEH,LEXPRO,LEXDIA,LEXSO
  S (LEXSA,LEXNUR,LEXBEH,LEXPRO,LEXDIA)=0
  F  S LEXSA=$O(^LEX(757.02,"AMC",LEXMC,LEXSA)) Q:+LEXSA=0  D
- . S LEXSN=$G(^LEX(757.02,LEXSA,0))
- . S LEXSO=$P(LEXSN,"^",2),LEXSR=$P(LEXSN,"^",3)
- . Q:+$$STATCHK^LEXSRC2(LEXSO,,,LEXSR)=0
+ . S LEXSO=$P(^LEX(757.02,LEXSA,0),"^",2)
+ . Q:+$$STATCHK^LEXSRC2(LEXSO)=0
  . S LEXSAB=+($P($G(^LEX(757.02,LEXSA,0)),"^",3)) Q:LEXSAB=0
  . Q:LEXSAB>15  S:LEXSAB=1 LEXDIA=1
  . S:LEXSAB>1&(LEXSAB<5) LEXPRO=1

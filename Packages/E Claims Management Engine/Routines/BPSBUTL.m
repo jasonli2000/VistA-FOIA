@@ -1,16 +1,8 @@
 BPSBUTL ;BHAM ISC/MFR/VA/DLF - IB Communication Utilities ;06/01/2004
- ;;1.0;E CLAIMS MGMT ENGINE;**1,3,2,5,7,8,9,10**;JUN 2004;Build 27
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,3,2,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;Reference to STORESP^IBNCPDP supported by DBIA 4299
  Q
- ;
- ;CLAIM - pointer to #9002313.02
- ;TRNDX - ptr to #9002313.59
- ;REASON -  text name of the close reason
- ;PAPER - 1=drop to paper
- ;RELCOP - 1 (Yes) or 0 (No) release copay or not?
- ;COMMENT - comment
- ;ERROR - array by reference for error details
  ;
 CLOSE(CLAIM,TRNDX,REASON,PAPER,RELCOP,COMMENT,ERROR) ; Send IB an update on the CLAIM status for a Closed Claim
  N DFN,BPSARRY,BILLNUM,CLAIMNFO,FILLNUM,RXIEN,TRANINFO
@@ -34,7 +26,6 @@ CLOSE(CLAIM,TRNDX,REASON,PAPER,RELCOP,COMMENT,ERROR) ; Send IB an update on the 
  S BPSARRY("RELEASE DATE")=$S(FILLNUM=0:$$RXAPI1^BPSUTIL1(RXIEN,31,"I"),1:$$RXSUBF1^BPSUTIL1(RXIEN,52,52.1,FILLNUM,17,"I"))
  S BPSARRY("USER")=DUZ
  S BPSARRY("EPHARM")=$$GET1^DIQ(9002313.59,TRNDX,1.07,"I")
- S BPSARRY("RXCOB")=$$COB59^BPSUTIL2(TRNDX)
  I REASON'="" D
  . S BPSARRY("CLOSE REASON")=$O(^IBE(356.8,"B",REASON,0))
  . S BPSARRY("DROP TO PAPER")=+$G(PAPER)
@@ -83,7 +74,6 @@ CLOSE2(RXIEN,BFILL,BWHERE) ;
  S BPSARRY("RELEASE DATE")=$S(FILLNUM=0:$$RXAPI1^BPSUTIL1(RXIEN,31,"I"),1:$$RXSUBF1^BPSUTIL1(RXIEN,52,52.1,FILLNUM,17,"I"))
  S BPSARRY("USER")=.5
  S BPSARRY("EPHARM")=$$GET1^DIQ(9002313.59,IEN59,1.07,"I")
- S BPSARRY("RXCOB")=$$COB59^BPSUTIL2(IEN59)
  ;
  ; Determine the reversal reason based on the BWHERE value
  I BWHERE="RS" S REASON="PRESCRIPTION NOT RELEASED"
@@ -99,7 +89,7 @@ CLOSE2(RXIEN,BFILL,BWHERE) ;
  ;
  ; Update the claim file that the claim is closed and the reason why.
  S DIE="^BPSC(",DA=CLAIM
- S DR="901///1;902///"_$$NOW^XLFDT()_";903////.5;904///"_BPSARRY("CLOSE REASON")
+ S DR="901///1;902///"_$$NOW^XLFDT()_";903///.5;904///"_BPSARRY("CLOSE REASON")
  D ^DIE
  Q
  ;
@@ -107,20 +97,16 @@ CLOSE2(RXIEN,BFILL,BWHERE) ;
  ; Parameters:
  ;    RXI: Prescription IEN
  ;    RXR: Fill Number
- ;    COB: COB Indicator
  ; Returns:
- ;    IEN59^Claim IEN^Response IEN^Reversal Claim IEN^Reversal Response IEN^Prescription/Service Ref Number from BPS CLAIMS file
-CLAIM(RXI,RXR,COB) ;
- N IEN59,CLAIMIEN,RESPIEN,REVCLAIM,REVRESP,ECMENUM
- I '$G(RXI) Q ""
- ; Note that IEN59 will treat RXR="" as the original fill (0)
- ;   and COB="" as primary (1)
- S IEN59=$$IEN59^BPSOSRX(RXI,$G(RXR),$G(COB))
+ ;    IEN59^Claim IEN^Response IEN^Reversal Claim IEN^Reversal Response IEN
+CLAIM(RXI,RXR) ;
+ N IEN59,CLAIMIEN,RESPIEN,REVCLAIM,REVRESP
+ I '$G(RXI) Q
+ S IEN59=$$IEN59^BPSOSRX(RXI,RXR)
  I '$D(^BPST(IEN59,0)) Q ""
  S CLAIMIEN=$P(^BPST(IEN59,0),"^",4),RESPIEN=$P(^BPST(IEN59,0),"^",5)
  S REVCLAIM=$P($G(^BPST(IEN59,4)),"^",1),REVRESP=$P($G(^BPST(IEN59,4)),"^",2)
- S ECMENUM=$$ECMENUM^BPSSCRU2(IEN59)
- Q IEN59_U_CLAIMIEN_U_RESPIEN_U_REVCLAIM_U_REVRESP_U_ECMENUM
+ Q IEN59_U_CLAIMIEN_U_RESPIEN_U_REVCLAIM_U_REVRESP
  ;
  ; NABP - Return the value in the Service Provider ID (201-B1) field
  ;   of the claim.  Note that as of the NPI release (BPS*1*2), this
@@ -163,34 +149,30 @@ DIVNCPDP(BPSDIV) ;
  ;
  ;ADDCOMM - Add a comment to a ECME claim
  ;Input:
- ; BPRX - ien in file #52 
+ ; BPRX - ien in file #52
  ; BPREF - refill number (0,1,2,...)
  ; BPRCMNT - comment text
  ;Output:
  ;  1 - okay
  ; -1 - failed
 ADDCOMM(BPRX,BPREF,BPRCMNT) ;
- N IEN59,BPNOW,BPREC,BPDA,BPERR
- ; Check parameters
- I '$G(BPRX) Q -1
+ N BP59,BPNOW,BPLCK,BPREC,BPDA,BPERR
+ N %,%H,%I,X
+ I $L(BPRX)<1 Q -1
  I $G(BPRCMNT)="" Q -1
- ; Get BPS Transaction number, if needed, and check for existance
- S IEN59=$$IEN59^BPSOSRX(BPRX,$G(BPREF),1)
- I IEN59="" Q -1
- I '$D(^BPST(IEN59)) Q -1
- ; Lock record and quit if you cannot get the lock
- L +^BPST(9002313.59111,+IEN59):10
- I '$T Q -1
- ; Create record and file data
- S BPNOW=$$NOW^XLFDT
- D INSITEM^BPSCMT01(9002313.59111,+IEN59,BPNOW)
- S BPREC=$O(^BPST(IEN59,11,"B",BPNOW,99999999),-1)
+ S BP59=BPRX_$S($L(+BPREF)=1:".000",1:".00")_+BPREF_"1" ;borrowed from CLOSE2 above
+ D NOW^%DTC
+ S BPNOW=%
+ L +^BPST(9002313.59111,+BP59):10
+ S BPLCK=$T
+ I 'BPLCK Q -1  ;quit
+ D INSITEM^BPSCMT01(9002313.59111,+BP59,BPNOW)
+ S BPREC=$O(^BPST(BP59,11,"B",BPNOW,0))
  I BPREC>0 D
- . S BPDA(9002313.59111,BPREC_","_IEN59_",",.02)=+$G(DUZ)
- . S BPDA(9002313.59111,BPREC_","_IEN59_",",.03)=$E($G(BPRCMNT),1,63)
+ . S BPDA(9002313.59111,BPREC_","_BP59_",",.02)=+$G(DUZ)
+ . S BPDA(9002313.59111,BPREC_","_BP59_",",.03)=$E($G(BPRCMNT),1,63)
  . D FILE^DIE("","BPDA","BPERR")
- L -^BPST(9002313.59111,+IEN59)
- ; Quit with result
+ I BPLCK L -^BPST(9002313.59111,+BP59)
  I BPREC>0,'$D(BPERR) Q 1
  Q -1
  ;
@@ -198,7 +180,7 @@ ADDCOMM(BPRX,BPREF,BPRCMNT) ;
  ;Input:
  ; BP59 - ien in BPS TRANSACTION file
  ; BP02 - ien in BPS CLAIMS file
- ; BPREOPDT - reopen date/time 
+ ; BPREOPDT - reopen date/time
  ; BPDUZ - user DUZ (#200 ien)
  ; BPCOMM - reopen comment text
  ;Output:
@@ -235,7 +217,6 @@ REOPEN(BP59,BP02,BPREOPDT,BPDUZ,BPCOMM) ;
  S BPSARRY("USER")=BPDUZ
  S BPSARRY("REOPEN COMMENT")=BPCOMM
  S BPSARRY("EPHARM")=$$GET1^DIQ(9002313.59,BP59,1.07,"I")
- S BPSARRY("RXCOB")=$$COB59^BPSUTIL2(BP59)
  S BPRETVAL=$$STORESP^IBNCPDP(BPDFN,.BPSARRY)
  ;if successful
  I +BPRETVAL>0 Q "1^ReOpening Claim: "_$P($G(^BPSC(BP02,0)),U)_" ... OK"

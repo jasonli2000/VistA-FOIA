@@ -1,6 +1,6 @@
-BPSOSUE ;BHAM ISC/FCS/DRS/FLS - impossible errors ;03/07/08  10:42
- ;;1.0;E CLAIMS MGMT ENGINE;**1,7**;JUN 2004;Build 46
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+BPSOSUE ;BHAM ISC/FCS/DRS/FLS - impossible errors ;06/01/2004
+ ;;1.0;E CLAIMS MGMT ENGINE;**1**;JUN 2004
+ Q
  ;
  ; Deal with impossible errors (errors which should never occur,
  ; and which weren't already trapped by M).

@@ -1,6 +1,6 @@
 PRCBSTF ;WISC@ALTOONA/CLH-TRANSFER FUNDS TO ANOTHER FCP ; 05/01/94  10:40 AM
-V ;;5.1;IFCAP;**143**;Oct 20, 2000;Build 3
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 GETTRAN ;GET TEMP TRANS NUMBER
  S PRCF("X")="ABFS" D ^PRCFSITE Q:'%
  D WAIT^PRCFYN S DIC="^PRCF(421.6,",DLAYGO=421.6,DIC(0)="XOLM",X=PRC("SITE")_"-"_^%ZOSF("VOL")_"-"_($J#1000000000),PRCBT=0
@@ -28,8 +28,8 @@ SEQNUM2 ;GET SECOND SEQUENCE NUMBER FROM FILE 421
  S DIC="^PRCF(421,",DLAYGO=421,DIC(0)="LOX" D ^DIC I $P(Y,"^",3)'=1 G SEQNUM2
  S SEQ2DA=+Y K DLAYGO,DIC
  ; Corrected SACC violation on locks for PRC*5*242
- L +^PRCF(421,SEQ1DA):5 I '$T W !,$C(7),"Another user is editing this entry" K SEQ1DA Q 
- L +^PRCF(421,SEQ2DA):5 I '$T W !,$C(7),"Another user is editing this entry" K SEQ2DA L -^PRCF(421,SEQ1DA) Q 
+ L +^PRCF(421,SEQ1DA):5 I '$T W !,$C(7),"Another user is editing this entry" K SEQ1DA Q
+ L +^PRCF(421,SEQ2DA):5 I '$T W !,$C(7),"Another user is editing this entry" K SEQ2DA L -^PRCF(421,SEQ1DA) Q
  ;
  S TEMP=^PRCF(421,SEQ1DA,0)
  S $P(TEMP,"^",2)=PRCB("FRCP"),$P(TEMP,"^",6)=PRCB("TDT"),$P(TEMP,"^",PRCB("QTR")+6)="-"_PRCB("AMOUNT"),$P(TEMP,"^",20)=0
@@ -65,7 +65,7 @@ OUT K %F,COUNT,D0,DA,DIC,DIE,DIK,DR,PRCB("AMOUNT"),PRCB("FRCP"),PRCB("QTR"),PRCB
  Q
 KILL S %A="Then I will delete this entry",%A(1)="Are you sure you want this deleted",%B="",%=1 D ^PRCFYN G:%'=1 QPOST
  S DIK="^PRCF(421.6,",DA=TDA D ^DIK S X="  <Entry Deleted>*" D MSG^PRCFQ G OUT
-DISP S IOP=ION,DIC="^PRCF(421.6,",(TO,FR)=PRC("SITE")_"-"_^%ZOSF("VOL")_"-"_($J#1000000000),L=0,BY=".01",FLDS="[PRCB READER DISP]" D EN1^DIP
+DISP S IOP=ION,DIC="^PRCF(421.6,",(TO,FR)=PRC("SITE")_"-"_^%ZOSF("VOL")_"-"_$J,L=0,BY=".01",FLDS="[PRCB READER DISP]" D EN1^DIP
  S %A="Do you want to edit this entry",%B="",%=2 D ^PRCFYN Q:%'=1
  S DIE="^PRCF(421.6,",DR="[PRCB READER FILE EDIT]",DA=TDA D ^DIE K DIE
  Q

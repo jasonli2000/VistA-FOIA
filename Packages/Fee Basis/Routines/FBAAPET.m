@@ -1,5 +1,5 @@
 FBAAPET ;AISC/DMK-EDIT PAYMENT ;7/13/2003
- ;;3.5;FEE BASIS;**4,38,55,61,77,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**4,38,55,61,77**;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  S FBOT=1
 GETPT I $G(BAT) D
@@ -62,9 +62,7 @@ EDIT S DA=FBSV
  ; now edit remaining fields
  S DIE("NO^")=""
  S DR="48;47;S FBUNITS=X;42R;S FBZIP=X;S:$$ANES^FBAAFS($$CPT^FBAAUTL4(FBAACP)) Y=""@2"";43///@;S FBTIME=X;S Y=""@3"";@2;43R;S FBTIME=X;@3"
- ; fb*3.5*116 remove edit of interest indicator (162.03,34) to prevent different interest indicator values at line item level; interest indicator set at invoice level only; 
- ;S DR(1,162.03,1)="S FBAAMM=$S(FBAAPTC=""R"":"""",1:1);D PPT^FBAACO1(FBAAMM1);34///@;34////^S X=FBAAMM1;30R;S FBHCFA(30)=X;1;S J=X;Q"
- S DR(1,162.03,1)="30R;S FBHCFA(30)=X;1;S J=X;Q"
+ S DR(1,162.03,1)="S FBAAMM=$S(FBAAPTC=""R"":"""",1:1);D PPT^FBAACO1(FBAAMM1);34///@;34////^S X=FBAAMM1;30R;S FBHCFA(30)=X;1;S J=X;Q"
  S DR(1,162.03,2)="D FEEDT^FBAACO3;44///@;44///^S X=FBFSAMT;45///@;45///^S X=FBFSUSD;S:FBAMTPD'>0!(FBAMTPD=FBAMTPD(0)) Y=""@4"";2///^S X=FBAMTPD;@4;2//^S X=FBAMTPD;D CHKIT^FBAACO3;S K=X"
  ;S DR(1,162.03,3)="3////^S X=$S(J-K:J-K,1:"""");I X S Y=""@11"";4////@;S Y=""@5"";@11;3R;4R;S:X'=4 Y=""@5"";22"
  S DR(1,162.03,3)="K FBADJD;M FBADJD=FBADJ;S FBX=$$ADJ^FBUTL2(J-K,.FBADJ,2,,.FBADJD,1)"

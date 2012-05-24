@@ -1,15 +1,16 @@
 XOBSCAV ;; kec/oak - VistaLink Access/Verify Security ; 12/09/2002  17:00
- ;;1.6;VistALink Security;;May 08, 2009;Build 15
- ;Per VHA directive 2004-038, this routine should not be modified.
+ ;;1.5;VistALink Security;;Sep 09, 2005
+ ;;Foundations Toolbox Release v1.5 [Build: 1.5.0.026]
+ ;;
  QUIT
  ;
  ; ---------------------------------------------------------------------
  ;      Access/Verify Security: Security Message Request Handler
- ;             (main entry point; utilities; constants)   
+ ;             (main entry point; utilities; constants)
  ; ---------------------------------------------------------------------
- ; 
+ ;
  ; ==== main entry point ====
- ; 
+ ;
 EN(XOBDATA) ; -- handle parsed messages request
  ;
  IF XOBDATA("XOB SECAV","SECURITYTYPE")'=$$MSGTYP^XOBSCAV("request") DO  QUIT
@@ -31,7 +32,7 @@ EN(XOBDATA) ; -- handle parsed messages request
  QUIT
  ;
  ; ==== utilities ====
- ; 
+ ;
 SENDSEC(XOBR,XOBMSGTP,XOBRSTYP,XOBMSG,XOBSTAT,XOBSCHEM) ; -- stream XML security reply back
  ;
  ; XOBR: internal VistaLink variable
@@ -40,7 +41,7 @@ SENDSEC(XOBR,XOBMSGTP,XOBRSTYP,XOBMSG,XOBSTAT,XOBSCHEM) ; -- stream XML security
  ; XOBMSG: message lines to send inside standard wrapper
  ; XOBSTAT: type of result (e.g., success)
  ; XOBSCHEM: noNamespaceSchemaLocation
- ; 
+ ;
  NEW XOBFILL
  ; -- prepare socket for writing
  DO PRE^XOBVSKT
@@ -68,7 +69,7 @@ ERROR(XOBR,XOBFCODE,XOBFSTR,XOBCODE,XOBSTR) ; -- send security error back to cli
  ; XOBFSTRING: the fault string
  ; XOBCODE: error code
  ; XOBSTR: error message
- ; 
+ ;
  NEW XOBFILL
  ; -- prepare socket for writing
  DO PRE^XOBVSKT
@@ -91,10 +92,6 @@ ERROR(XOBR,XOBFCODE,XOBFSTR,XOBCODE,XOBSTR) ; -- send security error back to cli
  DO POST^XOBVSKT
  ; -- log the error/fault unless it's "too many invalid login attempts"
  IF XOBCODE'=183005 DO
- .SET:$DATA(XOBDATA("XOB SECAV","AVCODE")) XOBDATA("XOB SECAV","AVCODE")="<masked>"
- .SET:$DATA(XOBDATA("XOB SECAV","OLDVC")) XOBDATA("XOB SECAV","OLDVC")="<masked>"
- .SET:$DATA(XOBDATA("XOB SECAV","NEWVC")) XOBDATA("XOB SECAV","NEWVC")="<masked>"
- .SET:$DATA(XOBDATA("XOB SECAV","NEWVCCHECK")) XOBDATA("XOB SECAV","NEWVCCHECK")="<masked>"
  .DO ^%ZTER
  KILL XOBDATA("XOB SECAV")
  QUIT
@@ -131,13 +128,13 @@ LOGGEDON() ; -- checks if the environment was previously properly set up, e.g.,
  ; logon succeeded in some previous call
  QUIT +$GET(DUZ)
  ;
-CRCONTXT(XOBOPTNM) ; -- create the context if it doesn't already exist
+CRCONTXT(XOBOPTNM) ; -- create the contxt if it doesn't already exist
  ; INPUT VALUE: XOBOPTNM encoded with Kernel encoding algorithm
  ; RETURN VALUE: +result will be 1 if successful, or 0 if unsuccessful
  ; if unsuccessful, result may (or may not) also contain the textual reason for failure
- ; 
+ ;
  ; Accessing, Setting and Killing of XQY and XQY0: DBIA #4059
- ; 
+ ;
  NEW XOBRSLT,XOBOPTN1
  ;
  SET XOBOPTN1=$$DECRYP^XUSRB1(XOBOPTNM)
@@ -157,7 +154,7 @@ CHKCTXT(XOBRPCNM) ; -- does user have access to RPC?
  QUIT XWBSEC
  ;
  ; ==== Constants ====
- ; 
+ ;
 MSGTYP(XOBRQRS) ; return request message type
  IF XOBRQRS="request" QUIT $PIECE($TEXT(REQTYPE),";;",2)
  IF XOBRQRS="response" QUIT $PIECE($TEXT(RESTYPE),";;",2)

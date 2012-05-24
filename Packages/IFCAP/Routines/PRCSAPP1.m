@@ -1,6 +1,6 @@
-PRCSAPP1 ;WISC/KMB-CHECK 2237 BEFORE APPROVAL ;12/17/93
- ;;5.1;IFCAP;**148**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCSAPP1 ;WISC/KMB-CHECK 2237 BEFORE APPROVAL ;12/17/93  1:50 PM
+ ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 CHEC ;
  I +$P(^PRCS(410,DA,0),"-")'=PRC("SITE") S SPENDCP=1 G EVAL
  I +$P(^PRCS(410,DA,0),"-",4)'=PRC("CP") S SPENDCP=2 G EVAL
@@ -8,7 +8,6 @@ CHEC ;
  L -^PRCS(410,DA)
  I $D(^PRCS(410,DA,7)),$P(^(7),U,6)'="" S SPENDCP=3 D EVAL Q
  S:'$D(^PRCS(410,DA,11)) ^(11)="" I '$P(^(11),U,3) S SPENDCP=4 D EVAL Q
- ; PRC*5.1*148
  I $P(^PRCS(410,DA,0),"^",11)="" D ERS410^PRC0G(DA)
  S PRCSN=^PRCS(410,DA,0),PRCHQ=$P(PRCSN,"^",4),PRC("FY")=$P(PRCSN,"-",2),PRC("QTR")=$P(PRCSN,"-",3)
 T1 ;   this is the 'jump' entry point for the CP official
@@ -37,7 +36,6 @@ T2 ;
  I $P(PRCSN,"^",4)="" S SPENDCP=6 D EVAL Q
  I $P(PRCSN,"^",4)>1,'$D(^PRCS(410,DA,"IT",0)) S SPENDCP=7 D EVAL Q
  I +$P(^PRCS(410,DA,3),"^",3)=0 S SPENDCP=8 D EVAL Q
- I '$$CHECK^PRCEN(DA) S SPENDCP=11 D EVAL Q
  S OK=1 QUIT
 EVAL ;
  I SPENDCP'=0 W !,$P($T(MESSAGE+SPENDCP),";;",2) H 2 Q:$D(JUMP)  R !!,"Press return to continue: ",X:DTIME I X["^" D
@@ -56,4 +54,3 @@ MESSAGE ;
  ;;This transaction does not have a cost center
  ;;This request has a negative dollar amount
  ;;Committed Cost does not equal BOC $ Amount - Please re-edit.
- ;;Missing required data, request needs to be edited.

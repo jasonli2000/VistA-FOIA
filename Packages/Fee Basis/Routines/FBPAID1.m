@@ -1,32 +1,21 @@
-FBPAID1 ;WOIFO/SAB - SERVER ROUTINE TO UPDATE PAYMENTS CON'T ;2/10/2009
- ;;3.5;FEE BASIS;**19,107,121**;JAN 30, 1995;Build 4
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+FBPAID1 ;AISC - SERVER ROUTINE TO UPDATE PAYMENTS CON'T ;10/17/2000
+ ;;3.5;FEE BASIS;**19**;JAN 30, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
 PARSE ;set-up variables for payment record called from FBPAID
  ;  FBPROG = 3 for Outpatient (file 162)
  ;         = T for Travel (file 162)
  ;         = 5 for Pharmacy (file 162.1)
  ;         = 9 for Inpatient (file 162.5)
  ;         = $E(XMRG,7)      fee program and effected file
- ;  FBACT  = $E(XMRG,8)      type of activity                
+ ;  FBACT  = $E(XMRG,8)      type of activity
  ;  FBIEN(x)=$E(XMRG,9,38)   IEN for payment record to update
  ;  FBCKNUM= $E(XMRG,39,46)  check number
- ;  old format (when total length = 77)
  ;  FBCKDT = $E(XMRG,47,52)  check date
  ;  FBINAMT= $E(XMRG,53,60)  interest amount
  ;  FBXDT  = $E(XMRG,61,66)  cancel date
  ;  FBRCOD = $E(XMRG,67)     reason code
  ;  FBXCOD = $E(XMRG,68)     cancel code
  ;  FBDAMT = $E(XMRG,69,76)  disbursed amount
- ;  new format (when total length = 82)
- ;  FBCKDT = $E(XMRG,47,54)  check date
- ;  FBINAMT= $E(XMRG,55,62)  interest amount
- ;  FBXDT  = $E(XMRG,63,70)  cancel date
- ;  FBRCOD = $E(XMRG,71)     reason code
- ;  FBXCOD = $E(XMRG,72)     cancel code
- ;  FBDAMT = $E(XMRG,73,81)  disbursed amount
- ;  FBBRTG = $E(XMRG,82,90)  bank routing number ;HIPAA 5010 P121
- ;  FBBACC = $E(XMRG,91,107) bank account number ;HIPAA 5010 P121
- ;  FBBNAM = $E(XMRG,108,138)bank name           ;HIPAA 5010 P121
  ;  FBAMT  = Amount paid out of payment record
  Q:$G(FBERR)
  S FBPROG=$E(XMRG,7) I $S(FBPROG=3:0,FBPROG=5:0,FBPROG=9:0,FBPROG="T":0,1:1) S FBERR=1 Q
@@ -48,19 +37,14 @@ PARSE ;set-up variables for payment record called from FBPAID
  ..S FBIEN(1)=+$P(FBIEN,U),FBIEN=+$P(FBIEN,U,2)
  ..I '$D(^FBAAC(FBIEN(1),3,FBIEN,0)) D CHKMOVE
  ..I '$D(^FBAAC(FBIEN(1),3,FBIEN,0)) S FBERR=1,^TMP("FBERR",$J,3,I)=""
- S FBCKNUM=$$EXTRL^FBMRASVR($E(XMRG,39,46),1)
- S FBCKDT=$$DATE4^FBPAID1($E(XMRG,47,54))
- S FBINAMT=$S(+$E(XMRG,55,62):+$E(XMRG,55,60)_"."_$E(XMRG,61,62),1:0)
+ S FBCKNUM=$$EXTRL^FBMRASVR($E(XMRG,39,46),1),FBCKDT=$$DATE^FBPAID1($E(XMRG,47,52))
+ S FBINAMT=$S(+$E(XMRG,53,60):+$E(XMRG,53,58)_"."_$E(XMRG,59,60),1:0)
  S FBINAMT=$S(FBINAMT=0:0,$P(FBINAMT,".",2)'>0:$P(FBINAMT,"."),1:+FBINAMT)
- S FBXDT=$$DATE4^FBPAID1($E(XMRG,63,70))
- S FBRCOD=$E(XMRG,71),FBXCOD=$E(XMRG,72)
+ S FBXDT=$$DATE^FBPAID1($E(XMRG,61,66))
+ S FBRCOD=$E(XMRG,67),FBXCOD=$E(XMRG,68)
  S FBRCOD=$O(^FB(162.95,"C",FBRCOD,0))
- S FBDAMT=$S(+$E(XMRG,73,81):+$E(XMRG,73,79)_"."_$E(XMRG,80,81),1:0)
+ S FBDAMT=$S(+$E(XMRG,69,76):+$E(XMRG,69,74)_"."_$E(XMRG,75,76),1:0)
  S FBDAMT=$S(FBDAMT=0:0,$P(FBDAMT,".",2)'>0:$P(FBDAMT,"."),1:+FBDAMT)
- I $L(XMRG)=138 D  ; process new format with bank fields HIPAA 5010 P121
- . S FBBRTG=$$TRIM^XLFSTR($E(XMRG,82,90),"LR") ;bank routing number
- . S FBBACC=$$TRIM^XLFSTR($E(XMRG,91,107),"LR") ;bank account number
- . S FBBNAM=$$TRIM^XLFSTR($E(XMRG,108,137),"LR") ;bank name
  Q
  ;
 BUL ;create server bulletin message
@@ -70,11 +54,6 @@ DATE(X) ;pass in 'X'=date in yymmdd format and return date in
  ;fileman format.
  N Y I '$G(X) Q ""
  S %DT="",X=$E(X,3,7)_$E(X,1,2) D ^%DT K %DT
- Q $S(Y=-1:"",1:Y)
-DATE4(X) ;pass in 'X'=date in yyyymmdd format and return date in
- ;fileman format.
- N Y I '$G(X) Q ""
- S %DT="",X=$E(X,5,6)_"/"_$E(X,7,8)_"/"_$E(X,1,4) D ^%DT K %DT
  Q $S(Y=-1:"",1:Y)
 CHKMOVE ;check if payment moved
  ; input

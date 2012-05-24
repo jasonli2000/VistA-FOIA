@@ -1,6 +1,6 @@
-DDBR2 ;SFISC/DCL-VA FILEMAN BROWSER ;26AUG2009
- ;;22.0;VA FileMan;**162**;Mar 30, 1999;Build 19
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DDBR2 ;SFISC/DCL-VA FILEMAN BROWSER ;NOV 04, 1996@13:48
+ ;;22.0;VA FileMan;;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
 SWITCH(DDBLST,DDBRET) ;Switch to another document in list or FileMan Database
  I $E(DDBSA,1,11)="^DI(.84,920" D EXIT^DDBR0 Q  ;!(DDBSA="^XTMP(""DDBDOC"")") Q
@@ -23,8 +23,7 @@ BRMC D BRM
  .;S X=0 F  S X=$O(@DDBLST@(X)) Q:X'>0  W:X'=DDBZ !,$J(X,3),"  ",$E(@DDBLST@(X,0),1,75)
  .W !
  .K DIR0
- .;S DIR(0)="Y",DIR("A")="Do you wish to select from current list? ",DIR("B")="YES" D ^DIR,SFR("to Current List"):Y=0&(DDBFLG["R") Q:$D(DIRUT)!(Y'>0)
- .I DDBFLG'["R" S DIR(0)="Y",DIR("A")="Do you wish to select from current list",DIR("B")="YES" D ^DIR Q:$D(DIRUT)!(Y'>0)
+ .S DIR(0)="Y",DIR("A")="Do you wish to select from current list? ",DIR("B")="YES" D ^DIR,SFR("to Current List"):Y=0&(DDBFLG["R") Q:$D(DIRUT)!(Y'>0)
  .S DIC=$$OREF^DIQGU(DDBLST),DIC(0)="EMQ",DIC("S")="I +Y'=DDBZ",DIC("W")="W:$E(^(0))=U ^(0)",X="??" D ^DIC  ;K DIC("S") Q:Y'>0
  .S DIC(0)="AEMQ"
  .D ^DIC K DIC("S") Q:Y'>0

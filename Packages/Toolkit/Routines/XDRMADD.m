@@ -1,53 +1,30 @@
-XDRMADD ;SF-IRMFO/IHS/OHPRD/JCM,JLI,REM -  USER CREATED VERIFIED DUPLICATE PAIR ENTRY ;27 Jul 2010  6:18 PM
- ;;7.3;TOOLKIT;**23,113,124,125**;Apr 25, 1995;Build 1
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+XDRMADD ;SF-IRMFO/IHS/OHPRD/JCM,JLI,REM -  USER CREATED VERIFIED DUPLICATE PAIR ENTRY ;4/6/98  09:24
+ ;;7.3;TOOLKIT;**23**;Apr 25, 1995
  ;;
  N XDRFL,XDRCNTR
  S XDRCNTR=0
 START ;
- N XDRADFLG,XDRNOPT
+ N XDRADFLG
  K DIC
- ; XT*7.3*113 - Setting of XDRNOPT flag, and checking for XDRFL'=2
- ;   in this routine and in SCORE entry point, prevent option
- ;   from using the duplicate record checking code on the PATIENT file.
- ;   DUPLICATE RECORD entries can be added, but no checking is done.
- S (XDRQFLG,XDRADFLG,XDRNOPT)=0
- I '$D(XDRFL) D
- . S DIC("A")="Add entries from which File: " D FILE^XDRDQUE Q:XDRQFLG  ;XT*7.3*124 stop UNDEF if Y=-1
- . I XDRFL=2 W "* No potential duplicate threshold % check will be calculated for PATIENTS"
- . Q
+ S (XDRQFLG,XDRADFLG)=0
+ I '$D(XDRFL) S DIC("A")="Add entries from which File: " D FILE^XDRDQUE
  G:XDRQFLG END
- D:XDRFL'=2
- . S XDRDTYPE=$P(XDRD(0),U,5)
- . Q:XDRDTYPE]""
- . ;REM -8/20/96 when XDRDTYPE is null set it to basic.
- . S $P(^VA(15.1,XDRFL,0),U,5)="b",XDRDTYPE="b"
- . Q
+ S XDRDTYPE=$P(XDRD(0),U,5)
+ I XDRDTYPE="" D  ;REM -8/20/96 when XDRDTYPE is null set it to basic.
+ .S $P(^VA(15.1,XDRFL,0),U,5)="b",XDRDTYPE="b"
  S XDRGL=^DIC(XDRFL,0,"GL")
  D:XDRCNTR>0  G:XDRQFLG END
- . W ! K DIR S DIR(0)="Y",DIR("A")="Do you want to ADD another pair (Y/N)"
- . D ^DIR K DIR S:$D(DIRUT)!('Y) XDRQFLG=1
- . Q
+ .W ! K DIR S DIR(0)="Y",DIR("A")="Do you want to ADD another pair (Y/N)"
+ .D ^DIR K DIR S:$D(DIRUT)!('Y) XDRQFLG=1
  S XDRCNTR=XDRCNTR+1
- ; Skip duplicate record checking for patients
- I XDRFL=2 D
- . S (XDRDSCOR("MAX"),XDRDSCOR("PDT%"),XDRD("DUPSCORE"),XDRMADD("DUPSCORE%"))=0
- . S XDRADFLG=1
- I XDRFL'=2 D BYPASS G:XDRQFLG END
+ D BYPASS G:XDRQFLG END
  D LKUP G:XDRQFLG END
  D CHECK G:XDRQFLG<0 START
- ;
- ; Added the following line to check the MPI DO NOT LINK file
- ; (XT*7.3*125)
- I XDRDFLG'>0,XDRFL=2 G:'$$DNLCHECK START
- ;
- I XDRFL'=2 D
- . D ^XDRDSCOR S:XDRADFLG XDRDSCOR("PDT%")=0 ;REM -8/23/96 to bypass PDT%
- . S XDRD("NOADD")="" D ^XDRDUP
- . Q
+ D ^XDRDSCOR S:XDRADFLG XDRDSCOR("PDT%")=0 ;REM -8/23/96 to bypass PDT%
+ S XDRD("NOADD")="" D ^XDRDUP
  K XDRDTYPE
  D SCORE
- I XDRFL'=2,XDRMADD("DUPSCORE%")<XDRDSCOR("PDT%") D  G START ; JLI 4/11/96
+ I XDRMADD("DUPSCORE%")<XDRDSCOR("PDT%") D  G START ; JLI 4/11/96
  . W !!,$C(7),"This pair of patients has a duplicate percentage of only ",XDRMADD("DUPSCORE%"),"% which"
  . W !,"is less than the minimal percentage for potential duplicates (",XDRDSCOR("PDT%"),"%)."
  . W !!?30,"Patients not added!!!",!!
@@ -92,38 +69,10 @@ CHECK ;
  K XDRDI
  Q
  ;
-DNLCHECK() ; If patients are being selected for merge, check the MPI to
- ; determine whether the records are marked as DO NOT LINK and
- ; therefore should not be added to the DUPLICATE RECORD file.
- ; Returns 1 if OK.
- ; Created in XT*7.3*125
- Q:XDRFL'=2 1
- N X,XDRRES
- ;
- ; Quit if routine MPIFDNL or line tag DNLCHK does not exist
- S X="MPIFDNL" X ^%ZOSF("TEST") Q:'$T 1
- Q:$L($T(DNLCHK^MPIFDNL))=0 1
- ;
- ; Call $$DNLCHK^MPIFDNL to perform the check.
- ; Returns 0 if check passed; Returns -1^error message if not
- S XDRRES=$$DNLCHK^MPIFDNL(XDRCD,XDRCD2)
- ;
- ; If an error is returned, write the error message to the current
- ; device and return 0
- I $P(XDRRES,U)=-1 D  Q 0
- . N X,DIWL,DIWR,DIWF
- . K ^UTILITY($J,"W")
- . S X=$P(XDRRES,U,2,999),DIWL=1,DIWR=IOM-1,DIWF="W"
- . W !,$C(7)
- . D ^DIWP,^DIWW
- Q 1
- ;
 SCORE ;
- I XDRFL'=2 D
- . S XDRMADD("DUPSCORE%")=$S($G(XDRDSCOR("MAX"))=0:0,1:(XDRD("DUPSCORE")/XDRDSCOR("MAX")))
- . S XDRMADD("DUPSCORE%")=$J(XDRMADD("DUPSCORE%"),1,2)
- . S XDRMADD("DUPSCORE%")=$S(XDRMADD("DUPSCORE%")<0:0,XDRMADD("DUPSCORE%")<1:$E(XDRMADD("DUPSCORE%"),3,4),1:100)
- . Q
+ S XDRMADD("DUPSCORE%")=$S($G(XDRDSCOR("MAX"))=0:0,1:(XDRD("DUPSCORE")/XDRDSCOR("MAX")))
+ S XDRMADD("DUPSCORE%")=$J(XDRMADD("DUPSCORE%"),1,2)
+ S XDRMADD("DUPSCORE%")=$S(XDRMADD("DUPSCORE%")<0:0,XDRMADD("DUPSCORE%")<1:$E(XDRMADD("DUPSCORE%"),3,4),1:100)
  S XDRDFR=$S(XDRCD<XDRCD2:XDRCD,1:XDRCD2)
  S XDRDTO=$S(XDRDFR=XDRCD:XDRCD2,1:XDRCD)
  S XDRMADD("STATUS")="X"

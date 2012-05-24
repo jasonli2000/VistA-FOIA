@@ -1,12 +1,9 @@
-XDRDLIST ;SF-IRMFO/IHS/OHPRD/JCM - PRINT POTENTIAL AND VERIFIED DUPLICATES;    [ 08/13/92  09:50 AM ] ;8/28/08  18:13
- ;;7.3;TOOLKIT;**23,113**;Apr 25, 1995;Build 5
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+XDRDLIST ;SF-IRMFO/IHS/OHPRD/JCM - PRINT POTENTIAL AND VERIFIED DUPLICATES;    [ 08/13/92  09:50 AM ] ;4/8/98  10:21
+ ;;7.3;TOOLKIT;**23**;Apr 25, 1995
  ;;
  N XDRFL,XDRFLD
 START ;
  S XDRQFLG=0
- ; XT*7.3*113 input variable XDRNOPT to FILE^XDRDQUE-if UNDEF, allows PATIENT file to be selected
- N XDRNOPT
  ;W !!,"Choose type of list."
  S DIR("?")="BRIEF prints the fields: RECORD1, RECORD2 and the IEN for each entry.  CAPTIONED is FileMan's CAPTIONED format."
  S DIR("A")="Choose type of list",DIR(0)="SO^1:BRIEF;2:CAPTIONED" D ^DIR K DIR G:$D(DIRUT) END

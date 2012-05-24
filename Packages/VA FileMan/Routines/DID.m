@@ -1,6 +1,6 @@
-DID ;SFISC/XAK-LIST DD'S ;8SEP2004
- ;;22.0;VA FileMan;**24,105,157**;Mar 30, 1999;Build 7
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DID ;SFISC/XAK-LIST DD'S ;2:19 PM  5 Mar 2002
+ ;;22.0;VA FileMan;**24,105**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  D KL,L^DICRW1 I $D(DIC) S (DUB,DIB,DFF)=+Y G O:Y'=+DIB(1),SUB
 KL K DIS,DIJS,DHIT,DIB,DINM,DIDX,DIGR,DIDH,BY,DICMX,DIOEND,FLDS
  K DFF,DIFF,DID,DUB,DHD,DIC,DICS,POP,DA,DR,S,F,J,K,Z,W,X,Y,M,G,N,I
@@ -18,7 +18,7 @@ O1 K DIC S DIC="^DD(DFF,"
  .S DIOBEG="S L=0 I $G(DQI),$D(^UTILITY($J,2)) S ^(1.5)=""W $O(^DD(DIB,0,""""NM"""",0)),"""" """" W:'$D(^DIC(DIB)) """"SUB-"""" W """"FILE """""",^(2)=""X ^(1.5) ""_^(2)"
  I +Y=4,'$D(DIFORMAT) D MOD^DID2 G KL:X[U
  S L=0,FLDS="",BY="@.001" I +Y=5 S (FR,TO)=.01,DHIT="S F(1)=DUB",DHD="W """" D H1^DIDG",DIOEND="D T^DID" G G
- I +Y=8 D  G KL:DIDTYP="",KL:DIDFLD=-1,G
+ I +Y=8 D  G:DIDTYP=""!(DIDFLD=-1) KL G G
  . S DIDTYP=$$ASKTYP Q:DIDTYP=""
  . S DIDFLD=$$ASKFLD(DFF) Q:DIDFLD=-1
  . S (FR,TO)=.01,DHIT="S F(1)=DFF"

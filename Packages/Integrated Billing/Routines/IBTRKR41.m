@@ -1,9 +1,9 @@
 IBTRKR41 ;ALB/AAS - CLAIMS TRACKING - ADD/TRACK OUTPATIENT ENCOUNTERS ;13-AUG-93
- ;;2.0;INTEGRATED BILLING;**43,55,91,132,174,247,260,315,292,312,339,399**;21-MAR-94;Build 8
+ ;;2.0;INTEGRATED BILLING;**43,55,91,132,174,247,260,315,292,312,339**;21-MAR-94;Build 2
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
 OPCHK ; -- check and add rx
- N Y,Y0,IBSERV,IBAPPT
+ N Y,Y0
  N IBSWINFO S IBSWINFO=$$SWSTAT^IBBAPI()                   ;IB*2.0*312
  ; IBDT is set from IBTRKR4
  ; Do NOT PROCESS on VistA if IBDT>=Switch Eff Date        ;CCR-930
@@ -13,8 +13,6 @@ OPCHK ; -- check and add rx
  I '$D(ZTQUEUED),($G(IBTALK)) W "."
  ;
  S IBOEDATA=$$SCE^IBSDU(IBOE),IBOESTAT=$P(IBOEDATA,"^",15)
- S IBSERV=$S(+$P($G(^DIC(40.7,+$P(IBOEDATA,"^",3),0)),"^",2)=180:"DENTAL",1:"OUTPATIENT")
- S IBAPPT=$P($G(^SD(409.1,+$P(IBOEDATA,"^",10),0)),"^",1)
  S DFN=$P(IBOEDATA,"^",2)
  I 'DFN G OPCHKQ
  I $P(IBOEDATA,"^",5) S IBVSIT=$P(IBOEDATA,"^",5) I '$$BDSRC^IBEFUNC3(IBVSIT) G OPCHKQ ;non-billable data sources
@@ -24,13 +22,11 @@ OPCHK ; -- check and add rx
  ; -- see if tracking only insured and pt is insured/insured for outpt visits
  I $P(IBTRKR,"^",3)=1,'$$INSURED^IBCNS1(DFN,IBDT) G OPCHKQ ; patient not insured
  ;
- I '$$PTFTF^IBCNSU31(DFN,IBDT) S IBRMARK="FILING TIMEFRAME NOT MET"
- ;
  ; -- see if outpatient services are covered
- I '$$PTCOV^IBCNSU3(DFN,IBDT,IBSERV,.IBANY) S IBRMARK=$S($G(IBANY)&(IBSERV="DENTAL"):"NO DENTAL COVERAGE",$G(IBANY):"NO OUTPATIENT COVERAGE",1:"NOT INSURED")
+ I '$$PTCOV^IBCNSU3(DFN,IBDT,"OUTPATIENT",.IBANY) S IBRMARK=$S($G(IBANY):"SERVICE NOT COVERED",1:"NOT INSURED")
  ;
  ; -- see if appointment type is billable
- I '$$RPT^IBEFUNC($P(IBOEDATA,"^",10),+IBOEDATA) S IBRMARK=$S(IBAPPT="RESEARCH":"RESEARCH VISIT",1:"NON-BILLABLE APPOINTMENT TYPE")
+ I '$$RPT^IBEFUNC($P(IBOEDATA,"^",10),+IBOEDATA) S IBRMARK="NON-BILLABLE APPOINTMENT TYPE"
  ;
  ; -- check sc status, special conditions etc.
  I $G(IBRMARK)="" S IBRMARK=$$CL(IBOEDATA)

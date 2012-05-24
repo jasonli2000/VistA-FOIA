@@ -1,6 +1,6 @@
 IBCD2 ;ALB/ARH - AUTOMATED BILLER (CREATE - SETUP/GATHER DATA FIELDS) ; 8/6/93
- ;;2.0;INTEGRATED BILLING;**4,55,91,106,384**;21-MAR-94;Build 74
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**4,55,91,106**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 FIND ;
  S IBX=$$CHKSYS^IBCD4 I 'IBX D TERR(0,0,$P(IBX,U,2)) G EXIT
@@ -70,9 +70,6 @@ RXRF S IB(.04)=$S(+$P($G(^DG(40.8,+IBDIV,0)),U,3):7,1:1) ;division outpatient on
  S IBTRNX=0 F  S IBTRNX=$O(IBCT(IBTRNX)) Q:'IBTRNX  S IBRX=$G(^IBT(356,IBTRNX,0)) D
  . S IBX=$$RXRF^IBCD4(+$P(IBRX,U,8),+$P(IBRX,U,10)),IB(362.4,+$P(IBRX,U,8),+$P(IBRX,U,10))=IBX,IBX=$P(IBX,U,4)
  . S:IB(152)<IBX IB(152)=IBX F IBI=.03,151 I IB(IBI)>IBX S IB(IBI)=IBX
- . I $P(IBRX,U,31)>1 D  ;special consent roi
- .. S IB(155)=1,IB(157)=0 ; is dx sensitive
- .. I $P(IBRX,U,31)=2 S IB(157)=1 ; ROI obtained
  K IBI,IBX,IBTRNX,IBRX
  Q
  ;

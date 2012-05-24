@@ -1,13 +1,13 @@
-PRCPCSOR ;WISC/RFJ-surgery order supplies ; 06/23/2009  2:23 PM
- ;;5.1;IFCAP;**136**;Oct 20, 2000;Build 6
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCPCSOR ;WISC/RFJ-surgery order supplies                           ;01 Sep 93
+ ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  N X
  S X="SROPS" X:$D(^%ZOSF("TEST")) ^("TEST") I '$T D NO Q
  I '$$VERSION^XPDUTL("SURGERY") D NO Q
  ;
  D ^PRCPUSEL Q:'$G(PRCP("I"))
  I "S"'=PRCP("DPTYPE") W !,"THIS OPTION SHOULD ONLY BE USED BY A SECONDARY INVENTORY POINT." Q
- N DIPGM,DFN,OPCODE,OPDATEI,ORDERDA,PRCPDEV,PRCPFAUT,PRCPFLAG,PRCPFNEW,PRCPFONE,PRCPINNM,PRCPORD,PRCPPAT,PRCPPRIM,PRCPSDAT,PRCPSECO,PRCPSURG,SRTN,Y
+ N DIPGM,DFN,OPCODE,ORDERDA,PRCPDEV,PRCPFAUT,PRCPFLAG,PRCPFNEW,PRCPFONE,PRCPINNM,PRCPORD,PRCPPAT,PRCPPRIM,PRCPSDAT,PRCPSECO,PRCPSURG,SRTN,Y
  S PRCPPRIM=+$$SPD^PRCPUDPT(PRCP("I"),1) I 'PRCPPRIM Q
  S PRCPINNM=$$INVNAME^PRCPUX1(PRCPPRIM)
  S PRCPSECO=PRCP("I")
@@ -17,9 +17,9 @@ PRCPCSOR ;WISC/RFJ-surgery order supplies ; 06/23/2009  2:23 PM
  ;  srops returns ^dpt(dfn,0) and ^srf(srtn,0)
  F  W ! K SRTN D ^SROPS Q:'$G(DFN)!('$G(SRTN))  D
  .   S PRCPPAT=DFN,PRCPSURG=SRTN
- .   D SURGDATA^PRCPCRPL(PRCPSURG,".09;27")
- .   S OPCODE=+$G(PRCPSDAT(130,PRCPSURG,27,"I")),OPDATEI=$G(PRCPSDAT(130,PRCPSURG,.09,"I"))
- .   W !?2,"Operation: ",$S('OPCODE:"<< NONE SPECIFIED >>",1:$TR($$ICPT^PRCPCUT1(OPCODE,OPDATEI),"^"," "))
+ .   D SURGDATA^PRCPCRPL(PRCPSURG,27)
+ .   S OPCODE=+$G(PRCPSDAT(130,PRCPSURG,27,"I"))
+ .   W !?2,"Operation: ",$S('OPCODE:"<< NONE SPECIFIED >>",1:OPCODE),"  ",$P($$ICPT^PRCPCUT1(OPCODE),"^",2)
  .   W !!?2,"** Distribution from inventory point: ",PRCPINNM
  .   ;
  .   ;  if no orders placed, cc's linked to operation, ask for automatic
@@ -45,7 +45,7 @@ PRCPCSOR ;WISC/RFJ-surgery order supplies ; 06/23/2009  2:23 PM
  .   ;
  .   I 'PRCPFAUT D
  .   .   ;  show items which should be ordered for opcode
- .   .   D SHOWCC^PRCPCSOU(OPCODE,ORDERDA,OPDATEI)
+ .   .   D SHOWCC^PRCPCSOU(OPCODE,ORDERDA)
  .   .   D ITEMS^PRCPOPEE(ORDERDA)
  .   I '$O(^PRCP(445.3,ORDERDA,1,0)) D DELORDER^PRCPOPD(ORDERDA) D UNLOCK Q
  .   ;

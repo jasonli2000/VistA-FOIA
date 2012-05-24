@@ -1,6 +1,5 @@
-MAGDRCU2 ;WOIFO/PMK - List entries in ^MAG(2006.5839) ; 05/18/2007 11:23
- ;;3.0;IMAGING;**10,11,51,54**;03-July-2009;;Build 1424
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGDRCU2 ;WOIFO/PMK - List entries in ^MAG(2006.5839) ; 06/06/2005  09:29
+ ;;3.0;IMAGING;**10,11,51**;26-August-2005
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGDRCU2 ;WOIFO/PMK - List entries in ^MAG(2006.5839) ; 05/18/2007 11:23
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -18,6 +18,7 @@ MAGDRCU2 ;WOIFO/PMK - List entries in ^MAG(2006.5839) ; 05/18/2007 11:23
  ; This routine lists the entries in the temporary Imaging/CPRS Consult
  ; Request Tracking association file
  ;
+ ;
  ;     XXXX                                         XXX       X
  ;    XX  XX                                         XX      XX
  ;   XX         XXXX    XX XXX  XXXXXXX  XX  XXX     XX     XXXXX
@@ -25,6 +26,7 @@ MAGDRCU2 ;WOIFO/PMK - List entries in ^MAG(2006.5839) ; 05/18/2007 11:23
  ;   XX    X   XX  XX   XX  XX  XXXXXXX  XX  XX      XX      XX
  ;    XX  XX   XX  XX   XX  XX       XX  XX  XX      XX      XX XX
  ;     XXXX     XXXX    XX  XX  XXXXXXX   XXX XX    XXXX      XXX
+ ;
  ;
  ; Routine 2/2 in for application
  ;
@@ -34,7 +36,7 @@ REPORT ; now scan the database and generate the report
  N SEX,STATUS,STOP,VA,VAERR,VADM,WRK,X,Y,Z
  ;
  S WRK=$NA(^TMP("MAG",$J,"GMRC"))
- S NOW=$$HTE^XLFDT($H,0)
+ D NOW^%DTC,YX^%DTC S NOW=Y
  K @WRK
  ;
  S D0=0
@@ -142,7 +144,7 @@ ONELINE ; output one line of the report
  D NEWLINE(1)
  W "  ",ORDRDATE," (",STATUS(STATUS),") ",$E(SERVICE("S",SERVICE),1,30)
  W "  ",REQTYPE," #",GMRCIEN
- S Y=$$FMTE^XLFDT(EXAMDATE,1),EXAMDATE=$P(Y,",",1)_","_$E($P(Y,",",2),4,5)
+ S Y=EXAMDATE D DD^%DT S EXAMDATE=$P(Y,",",1)_","_$E($P(Y,",",2),4,5)
  I EXAMDATE'=$G(LASTEXAM) D
  . W ?65,"Exam: ",EXAMDATE
  . S LASTEXAM=EXAMDATE
@@ -183,4 +185,3 @@ ERROR(MSG) ; Error Message
  F I=1:1 Q:'$D(MSG(I))  W !,"*** ",MSG(I),?76," ***"
  W ! F I=1:1:80 W "*"
  Q
- ;

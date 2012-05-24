@@ -1,6 +1,6 @@
 PRCAFBD ;WASH-ISC@ALTOONA,PA/CLH-Build FMS Billing Document ;8/2/95  3:14 PM
-V ;;4.5;Accounts Receivable;**16,48,86,90,119,165,204,203,173,220,184,270**;Mar 20, 1995;Build 25
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;4.5;Accounts Receivable;**16,48,86,90,119,165,204,203,173,220,184**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
 EN(BILL,ERR) ;Process NEW BILL to FMS
  S ERR=-1
  Q:$D(RCONVERT)
@@ -28,8 +28,6 @@ EN(BILL,ERR) ;Process NEW BILL to FMS
   . N I F I=1:1:6 S ADDR(I)=$P(ADD,U,I)
   . I ADDR(6)["-" S ADDR(7)=$P(ADDR(6),"-",2),ADDR(6)=$P(ADDR(6),"-")
   . Q
- ; PRCA*4.5*270 Doc# not unique for corrected claims, remove from file 347 before creating new one to send
- I '$G(REFMS),$$GSTAT^RCFMFN02("BD-"_FMSNUM_" ")>-1 D DEL^RCFMFN02("BD-"_FMSNUM_" ")
  N FMSDT S FMSDT=$$FMSDATE^RCBEUTRA(DT)
  S ^TMP("PRCABD",$J,1)="BD2^"_$E(FMSDT,4,5)_U_$E(FMSDT,6,7)_U_$E(FMSDT,2,3)_"^^^^^^E^"_$E(VENCODE,1,9)_U_$E(VENCODE,10,11)_U_$J($P(REC,U,3),0,2)_"^^^^"_$E($G(ADDR(1)),1,30)_U_$E($G(ADDR(2)),1,30)_U_$E($G(ADDR(3)),1,30)
  S ^TMP("PRCABD",$J,1)=^TMP("PRCABD",$J,1)_U_$E($G(ADDR(4)),1,19)_U_$G(ADDR(5))_U_$G(ADDR(6))_U_$G(ADDR(7))_"^N^^^^^^W^~"

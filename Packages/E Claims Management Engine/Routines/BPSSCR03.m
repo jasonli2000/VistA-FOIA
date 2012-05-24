@@ -1,5 +1,5 @@
 BPSSCR03 ;BHAM ISC/SS - ECME USR SCREEN UTILITIES ;05-APR-05
- ;;1.0;E CLAIMS MGMT ENGINE;**1,5,7,8,10**;JUN 2004;Build 27
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  Q
  ;/**
@@ -10,7 +10,7 @@ BPSSCR03 ;BHAM ISC/SS - ECME USR SCREEN UTILITIES ;05-APR-05
  ;   R -regular for main screen, will show only latest comment
  ;   C - comment mode - show all comments
 ADDINF(BP59,BPARR,BPMLEN,BPMODE) ;to return additional information about the claim*/
- N BPX,BPN,BPTXT1,BPTXT2,BPTXT3,BPTXT4,BPX1,BPN2,BPSTATUS,BPSCOBA,BP59X,I
+ N BPX,BPN,BPTXT1,BPTXT2,BPTXT3,BPTXT4,BPX1,BPPRCNTG,BPN2,BPSTATUS
  S BPN=0,(BPTXT1,BPTXT2,BPTXT3,BPTXT4,BPX1)=""
  I BPMODE="R" D
  . S BPX=$$COMMENT^BPSSCRU3(BP59)
@@ -28,25 +28,38 @@ ADDINF(BP59,BPARR,BPMLEN,BPMODE) ;to return additional information about the cla
  . . . I BPX'="" S BPX="("_BPX_")",BPN=BPN+1,BPARR(BPN)=BPX
  S BPX=$$CLAIMST^BPSSCRU3(BP59)
  S BPSTATUS=$P(BPX,U)
- ; Show status for this BPS Transaction
- S BPTXT1=$$COBCLST^BPSSCRU6(BP59)
- ; Append status for associated claim, if one exists
- S BPSCOBA=$$ALLCOB59^BPSUTIL2(BP59)
- F I=1:1 S BP59X=$P(BPSCOBA,U,I) Q:BP59X=""  D
- . Q:BP59X=BP59
- . S BPTXT1=BPTXT1_" ("_$$COBCLST^BPSSCRU6(BP59X)_")"
+ S BPPRCNTG=$$LJ^BPSSCR02("("_$$PRCNTG^BPSSCRU3(BP59)_"%) ",6)
+ ;I BPX["AR" S BPARR(BPN)="Auto-Reversal",BPN=BPN+1
+ I BPSTATUS["E REVERSAL ACCEPTED" S BPTXT1=BPTXT1_"Reversal accepted "
+ I BPSTATUS["E REVERSAL REJECTED" S BPTXT1=BPTXT1_"Reversal rejected "
+ I BPSTATUS["E PAYABLE" S BPTXT1=BPTXT1_"Payable "
+ I BPSTATUS["E REJECTED" S BPTXT1=BPTXT1_"Rejected "
+ I BPSTATUS["E STRANDED" S BPTXT1=BPTXT1_"Stranded "
+ I BPSTATUS["E REVERSAL STRANDED" S BPTXT1=BPTXT1_"Stranded reversal"
+ I BPSTATUS["E CAPTURED" S BPTXT1=BPTXT1_"Captured "
+ I BPSTATUS["E DUPLICATE" S BPTXT1=BPTXT1_"Duplicate "
+ I BPSTATUS["E OTHER" S BPTXT1=BPTXT1_"Other "
+ I BPSTATUS["IN PROGRESS" S BPTXT1=BPTXT1_"In progress "
+ I BPSTATUS["CORRUPT" S BPTXT1=BPTXT1_"Corrupt "
+ I BPSTATUS["E REVERSAL OTHER" S BPTXT1=BPTXT1_"Reversal Other "
+ I BPTXT1="" S BPTXT1="Unknown status "
  ;
  I (BPSTATUS["E REJECTED")!(BPSTATUS["E REVERSAL REJECTED") D
  . I $L(BPTXT1)>0 S BPN=BPN+1,BPARR(BPN)=BPTXT1
  . S BPTXT1=""
  . S BPN2=BPN
  . D GETRJCOD^BPSSCRU3(BP59,.BPARR,.BPN,74,"")
- . D WRAPLN2^BPSSCRU5(.BPN,.BPARR,$$GETMESS^BPSSCRU3(504,BP59),74,"",0)
- . D WRAPLN2^BPSSCRU5(.BPN,.BPARR,$$GETMESS^BPSSCRU3(526,BP59),74,"",0)
+ . D WRAPLN2^BPSSCRU5(.BPN,.BPARR,$$GETMESS^BPSSCRU3(1000,504,BP59),74,"",0)
+ . D WRAPLN2^BPSSCRU5(.BPN,.BPARR,$$GETMESS^BPSSCRU3(1000,526,BP59),74,"",0)
+ . D WRAPLN2^BPSSCRU5(.BPN,.BPARR,$$GETMESS^BPSSCRU3(504,0,BP59),74,"",0)
+ . I BPN>BPN2 Q  ;reject codes are enough
+ . ;S BPX1=$P($P(BPX,U,3),"[") I BPTXT1=BPX1 S BPX1=""
+ . S:BPX1="" BPX1=$$GETMESS^BPSSCRU3(504,0,BP59)
+ . I $L(BPX1)>0 S BPTXT1=BPTXT1_"- "_$TR(BPX1,"]","")
  ;
- I (BPSTATUS["E OTHER")!(BPSTATUS["IN PROGRESS")!(BPSTATUS["E UNSTRANDED")!(BPSTATUS["E CAPTURED")!(BPSTATUS["E REVERSAL UNSTRANDED") D
+ I (BPSTATUS["E OTHER")!(BPSTATUS["IN PROGRESS")!(BPSTATUS["E STRANDED")!(BPSTATUS["E CAPTURED")!(BPSTATUS["E REVERSAL STRANDED") D
  . I (BPSTATUS["E OTHER")!(BPSTATUS["IN PROGRESS") S BPX1=$P(BPX,U,3) I BPTXT1=BPX1 S BPX1=""
- . S:BPX1="" BPX1=$$GETMESS^BPSSCRU3(504,BP59)
+ . S:BPX1="" BPX1=$$GETMESS^BPSSCRU3(504,0,BP59)
  . I $L(BPX1)>0 S BPTXT1=BPTXT1_"- "_$TR(BPX1,"]","")
  ;
  S BPTXT2=$E(BPTXT1,1,BPMLEN)
@@ -74,22 +87,12 @@ RESP(BP59) ;Payer Response Information
  Q
  ;
  ;/**
- ;Checks if the claim is closed and sets the "/Closed" indicator at the end of the text
- ;BP59 - pointer to file #9002313.59
- ;BPTXT - Current status text to be displayed
- ;return:
- ;if the claim is not closed, BPTXT is returned. If it is closed BPTXT_"/Closed " is returned
-CLMCLSTX(BP59,BPTXT) ;*/
- Q $S($$CLOSED02($P($G(^BPST(BP59,0)),U,4)):BPTXT_"/Closed ",1:BPTXT)
- ;
- ;/**
  ;Checks if the CLAIM for specific Transaction is CLOSED?
  ;BPCLAIM - ptr to #9002313.02
  ;see also CLOSED^BPSSCRU1
 CLOSED02(BPCLAIM) ;*/
- I +$G(BPCLAIM)=0 Q 0
  ; get closed status
- Q +$P($G(^BPSC(BPCLAIM,900)),U)=1
+ Q +$P($G(^BPSC(BPCLAIM,900)),U)=1  ;Q $$GET1^DIQ(9002313.02,CLAIM,901,"I")
  ;
  ;return:
  ; 1 - okay. matches criteria
@@ -97,22 +100,14 @@ CLOSED02(BPCLAIM) ;*/
 FILTER(BP59,BPARR) ;
  N BPST0,BPST1,BPRXREF,BPRX52,BPREFNUM
  N BPRET
- S BPRET=1 ;1 - okay by default
+ S BPRET=1 ;1 - okay bt default
  S BPST0=$G(^BPST(BP59,0))
  S BPST1=$G(^BPST(BP59,1))
- ; Do not display eligibility verification requests
- I $P(BPST0,U,15)="E" Q 0
  S BPRXREF=$$RXREF^BPSSCRU2(BP59)
  S BPRX52=+$P(BPRXREF,U) ;ptr to #52
  S BPREFNUM=$P(BPRXREF,U,2) ;refill #
- ;Check for Open Claim
- I $G(BPARR(2.02))="O",$$CLOSED02(+$P(BPST0,U,4)) Q 0
- ;Check for Closed Claim
- I $G(BPARR(2.02))="C",'$$CLOSED02(+$P(BPST0,U,4)) Q 0
- ;Eligibility Indicator
- I '$$FLTELIG^BPSSCR05(BP59,.BPARR) Q 0
- ;Submission type
- I '$$FLTSUBTP^BPSSCR05(BP59,.BPARR) Q 0
+ ;if closed
+ I $$CLOSED02(+$P(BPST0,U,4)) Q 0
  ;user
  I $G(BPARR(1.01))="U",$$FLTUSR(BPST0,.BPARR)=0 Q 0
  ;patient
@@ -124,9 +119,9 @@ FILTER(BP59,BPARR) ;
  ;only payable
  I $G(BPARR(1.06))="P",$$PAYABLE^BPSSCR02(BP59)=0 Q 0
  ;released
- I $G(BPARR(1.07))="R",$$RL^BPSSCRU2(BP59)'="R" Q 0
+ I $G(BPARR(1.07))="R",$$RL^BPSSCRU2(BP59)'="RL" Q 0
  ;non released
- I $G(BPARR(1.07))="N",$$RL^BPSSCRU2(BP59)="R" Q 0
+ I $G(BPARR(1.07))="N",$$RL^BPSSCRU2(BP59)="RL" Q 0
  ;window/cmop/mail
  I $G(BPARR(1.08))'="A",$$ISMWC(BPRX52,BPREFNUM,$G(BPARR(1.08)))=0 Q 0
  ;Back billing
@@ -136,7 +131,7 @@ FILTER(BP59,BPARR) ;
  ;if only rejected and only specific rejected codes should be displayed
  I $G(BPARR(1.06))="R",$G(BPARR(1.1))="R",$$FLTREJ(BP59,.BPARR)=0 Q 0
  ;insurance
- I '$$FLTINS^BPSSCR05(BP59,.BPARR) Q 0
+ I $G(BPARR(1.11))="I",$G(BPARR(1.14))'="",$P($$GETINSUR^BPSSCRU2(+BP59),U,2)'=$G(BPARR(1.14)) Q 0
  ;divisions - ECME pharmacies
  I $G(BPARR(1.13))="D",BPARR("DIVS")'[(";"_$P(BPST1,U,7)_";") Q 0
  Q 1
@@ -188,7 +183,6 @@ FLTREJ(BP59,BPARR) ;
  D REJCODES^BPSSCRU3(BP59,.BPRCODES)
  I $D(BPRCODES(BPRJCD)) Q 1
  Q 0
- ;
  ;check W(indow)/C(mop)/M(ail)
  ;input:
  ;BPRX52 - ptr to #52

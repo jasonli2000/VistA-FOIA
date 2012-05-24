@@ -1,5 +1,5 @@
-ONCOCKI ;Hines OIFO/GWB - Edit checks/INPUT TRANSFORM edit checks ;06/23/10
- ;;2.11;ONCOLOGY;**1,6,16,25,37,42,51**;Mar 07, 1995;Build 65
+ONCOCKI ;Hines OIFO/GWB - EDIT CHECKS/INPUT TRANSFORM EDIT CHECKS ;12/15/99
+ ;;2.11;ONCOLOGY;**1,6,16,25,37,42**;Mar 07, 1995
  ;
 11 S Y=$P(^ONCO(165.5,D0,0),U,2),Y=$S($D(^ONCO(160,+Y,1)):$P(^(1),U,2),1:"") Q:(Y=""!(X<Y)!(X=Y))
  S Y=$E(Y,4,5)_"/"_$E(Y,6,7)_"/"_($E(Y,1,3)+1700) W !!,"*****DATE DX is after LAST DATE CONTACT***** ",Y,! K X,Y
@@ -29,7 +29,6 @@ SEQ ;SEQUENCE NUMBER (165.5,.06)
 PSEX ;PATIENT NAME (165.5,.02) INPUT TRANSFORM
  S XX=$P(^ONCO(165.5,D0,0),U,1),XD0=X
 SEX Q:(XX<43!(XX>52))
- N SG,SX
  S SX=$P(^ONCO(160,XD0,0),U,8)
  I SX=1 Q:((XX>49)&(XX<53))  D  K X Q
  .S SG=$P($G(^ONCO(164.2,XX,0)),U,1)
@@ -37,11 +36,7 @@ SEX Q:(XX<43!(XX>52))
  I SX=2 Q:((XX>42)&(XX<49))  D  K X Q
  .S SG=$P($G(^ONCO(164.2,XX,0)),U,1)
  .W !!?10,"SEX = Female.  SITE/GP ",SG," is inappropriate."
- Q
  ;
 EX ;Kill variables and Exit
- K AC,YR,XX,XD0
+ K AC,YR,XX,XD0,SX
  Q
- ;
-CLEANUP ;Cleanup
- K D0

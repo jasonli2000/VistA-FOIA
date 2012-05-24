@@ -1,7 +1,6 @@
-DIPTED ;SFISC/GFT-EDIT PRINT TEMPLATE ;02/24/2009
- ;;22.0;VA FileMan;**97,160**;Mar 30, 1999;Build 21
- ;Per VHA Directive 2004-038, this routine should not be modified.
- ;
+DIPTED ;GFT ;04:17 PM  13 Feb 2002
+ ;;22.0;VA FileMan;**97**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  N DIC,DIPT,DIPTED,DRK,DIPTEDTY,I,J
  S DIC=.4,DIC(0)="AEQ",DIC("S")="I $P(^(0),U,8)=7!'$P(^(0),U,8)" D ^DIC Q:Y<1
  K DIC
@@ -27,7 +26,6 @@ DDW D EDIT^DDW("^TMP(""DIPTED"",$J)","M",DIPTH,"(File "_DRK_")",DIPTROW)
  X ^%ZOSF("EON")
  S DIPTROW=$O(DIPTEDER(0)) I DIPTROW W " ",DIPTEDER(DIPTROW) H 2 S DIPTH="ERROR!  Re-editing "_DIPTED K DIPTEDER G DDW
  I '$D(^UTILITY("DIP2",$J)) W "<NOTHING TO SAVE>",$C(7) G K
- S DDSCHG=1
  I $D(DXS)>9 M ^UTILITY("DIP2",$J,U,"DXS")=DXS
  M ^UTILITY("DIP2",$J,U,"DCL")=DCL
  I $D(DNP) S ^UTILITY("DIP2",$J,U,"DNP")=1
@@ -35,15 +33,13 @@ DDW D EDIT^DDW("^TMP(""DIPTED"",$J)","M",DIPTH,"(File "_DRK_")",DIPTROW)
  I $G(DHD)]"" S ^("H")=DHD
  Q
  ;
-GET(DIPTA,DIT) ;put displayable template into @DIPTA
- N DS,DIWD,D9,D0
+GET(DIPTA) ;put displayable template into @DIPTA
+ N DS,DIWD,D9
  K @DIPTA
- I '$D(DIT) S DIT=$NA(^DIPT(DIPT)),D0=DIPT
- E  S D0=-1
- S (DRK,J(0))=$P(@DIT@(0),U,4),L=0,D(L)="0FIELD",C=",",D9="",Y=2,Q="""",DHD=$G(^("H")),DISH=$D(^("SUB"))
- F DS(1)=0:0 S DS(1)=$O(@DIT@("F",DS(1))) Q:DS(1)=""  S DY=^(DS(1)) D Y^DIPT
+ S (DRK,J(0))=$P(^DIPT(DIPT,0),U,4),L=0,D(L)="0FIELD",C=",",D9="",Y=2,Q="""",D0=DIPT,DHD=$G(^("H")),DISH=$D(^("SUB"))
+ F DS(1)=0:0 S DS(1)=$O(^DIPT(DIPT,"F",DS(1))) Q:DS(1)=""  S DY=^(DS(1)) D Y^DIPT
  D:D9]"" UP^DIPT
- F D=2:1 Q:'$D(DS(D))  S @DIPTA@(D-1)=$J("",D>2*$G(DIWD(D))*3)_DS(D) ;indentation showing level of subfiles
+ F D=2:1 Q:'$D(DS(D))  S @DIPTA@(D-1)=$J("",D>2&$G(DIWD(D))*3)_DS(D) ;indentation showing level of subfiles
  Q
  ;
 PROCESS(DIPTA) ;puts nodes into ^UTILITY("DIP2")
@@ -58,10 +54,9 @@ PROCESS(DIPTA) ;puts nodes into ^UTILITY("DIP2")
  ;
 LINE(X) ;returns X as component of Template.  DD number is currently 'DK'
  N DIC,DICMX,DATE,Y,DICOMPX,DICOMP,DP,DJ
- I X?." " Q ""
  F P=$L(X):-1:1 Q:$A(X,P)>32  S X=$E(X,1,P-1) ;strip off trailing spaces
  F P=0:1  Q:$A(X)-32  S X=$E(X,2,999) ;strip off 'P' leading spaces
- I P<DIETAB,DL>1 F  D U I DL-1*3'>P Q  ;pop Up (MAYBE SEVERAL LEVELS) if we find outdentation
+ I P<DIETAB,DL>1 D U ;pop Up if we find outdentation
  S DIETAB=P
 F S (P,S)=""
 LIT I $E(X)="""",$L(X,"""")#2 F I=3:2:$L(X,"""") Q:$P(X,"""",I)]""&($E($P(X,"""",I)'=$C(95)))
@@ -100,11 +95,23 @@ WORD I DIPTEDTY=7 G EXP
 U S DL=DL-1,DV=DV(DL),DK=DL(DL),DIL=DIL(DL) F %=DIL:0 S %=$O(I(%)) Q:%=""  K I(%),J(%)
  Q
  ;
-SAVEFLDS(Y) ;POST-SAVE OF 'DIPTED' SCREENMAN FORM
+PUT ;save template from ^UTILITY
+ I '$D(^UTILITY("DIP2",$J)) Q
+ N DIC,DIPZ
+ S DIC("B")=DIPT
+SAVEAS S DIC=.4,DIC("A")="Save revised "_DIPTED_" as: ",DIC(0)="AEQL",DIC("S")="I $P(^(0),U,4)=DRK,$P(^(0),U,8)=DIPTEDTY"
+ D ^DIC
+ Q:Y<0  I $O(^DIPT(+Y,0))]"" W !,$C(7),"Are you sure you want to overwrite this '",$P(Y,U,2)," 'Template" S %=1 D YN^DICN I %-1 Q:%<2  K DIC("B") G SAVEAS
+ L +^DIPT(+Y)
+ S ^DIPT("F"_J(0),$P(Y,U,2),+Y)=1
+ S $P(^(0),U,4)=J(0),$P(^(0),U,8)=DIPTEDTY
+ L -^DIPT(+Y)
+ D SAVEFLDS(+Y)
+ Q
+ ;
+SAVEFLDS(Y) ;
  N DMAX,J,X
  Q:'$D(^UTILITY("DIP2",$J))!'$G(Y)
-CLEAR S $X=0,$Y=0 I $G(IOXY)]"" N DX,DY S (DY,DX)=0 X IOXY W $C(27,91,74)
- S Y=$$CLONE(Y) Q:'Y  ;ASK 'SAVE AS'
  D NOW^%DTC S $P(^DIPT(Y,0),U,2)=+$J(%,0,4)
  S $P(^DIPT(Y,0),U,5)=$G(DUZ)
  K ^DIPT(Y,"F") S J="" D  D J
@@ -118,33 +125,3 @@ CLEAR S $X=0,$Y=0 I $G(IOXY)]"" N DX,DY S (DY,DX)=0 X IOXY W $C(27,91,74)
  Q
  ;
 J S ^($O(^DIPT(+Y,"F",""),-1)+1)=J Q
- ;
-CLONE(DA) ;
- N DIC,DIPTEDTY,DIPTEDFI,X,Y,DIPTEDNM,DDS
- I '$D(^DIPT(DA,0)) Q 0
- S (DIPTEDNM,DIC("B"))=$P(^(0),U)
-ASK S DIPTEDFI=$P(^DIPT(DA,0),U,4),DIPTEDTY=$P(^(0),U,8) I 'DIPTEDFI Q 0
- S DIC=.4,DIC("A")="Save revised Print Template "_DIPTEDNM_" as: ",DIC(0)="AEQL",DIC("S")="I $P(^(0),U,4)=DIPTEDFI,$P(^(0),U,8)=DIPTEDTY"
- D ^DIC I Y<0 Q 0
- I +Y=DA Q DA
- I $O(^DIPT(+Y,0))]"" W !,$C(7),"Are you sure you want to overwrite this '",$P(Y,U,2),"' Template" S %=1 D YN^DICN I %-1 K DIC G ASK:%=2 Q 0
- L +^DIPT(+Y):5 E  W !,$C(7),"Sorry. Another user is editing this template." Q 0
- S ^DIPT("F"_DIPTEDFI,$P(Y,U,2),+Y)=1
- S $P(^DIPT(+Y,0),U,4)=DIPTEDFI,$P(^(0),U,8)=DIPTEDTY
- L -^DIPT(+Y)
- Q +Y
- ;
- ;
-PUT ;save template from ^UTILITY
- I '$D(^UTILITY("DIP2",$J)) Q
- N DIC,DIPZ
- S DIC("B")=DIPT
-SAVEAS S DIC=.4,DIC("A")="Save revised "_DIPTED_" as: ",DIC(0)="AEQL",DIC("S")="I $P(^(0),U,4)=DRK,$P(^(0),U,8)=DIPTEDTY"
- D ^DIC
- Q:Y<0  I $O(^DIPT(+Y,0))]"" W !,$C(7),"Are you sure you want to overwrite this '",$P(Y,U,2),"' Template" S %=1 D YN^DICN I %-1 Q:%<2  K DIC("B") G SAVEAS
- L +^DIPT(+Y):5 E  W !,$C(7),"Sorry. Another user is editing this template." Q
- S ^DIPT("F"_J(0),$P(Y,U,2),+Y)=1
- S $P(^DIPT(+Y,0),U,4)=J(0),$P(^(0),U,8)=DIPTEDTY
- L -^DIPT(+Y)
- D SAVEFLDS(+Y)
- Q

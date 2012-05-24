@@ -1,5 +1,5 @@
-FBNHEAU2 ;AISC/dmk - ask rates for cnh authorization ; 1/14/10 8:00pm
- ;;3.5;FEE BASIS;**111**;JAN 30, 1995;Build 17
+FBNHEAU2 ;AISC/dmk - ask rates for cnh authorization ;4/28/93  11:04
+ ;;3.5;FEE BASIS;;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 GETRAT S FBERR="",FBMULT=0,FBVIEN=IFN I '$D(^FBAA(161.21,"C",IFN)) S FBERR=1 W !,"Vendor: ",$P(^FBAAV(IFN,0),"^")," has no Contract data on file" Q
  S FBRIFN=$O(^FBAA(161.21,"ACR",IFN,-(FBPAYDT+.9))) I 'FBRIFN W !,"Vendor: ",$P(^FBAAV(IFN,0),"^")," has no current Contract data on file" S FBERR=1 Q
@@ -11,10 +11,10 @@ GETRAT S FBERR="",FBMULT=0,FBVIEN=IFN I '$D(^FBAA(161.21,"C",IFN)) S FBERR=1 W !
  I FBPAYDT>FBTDT S FBERR=1 W !,"Vendor: ",$P(^FBAAV(IFN,0),U)," has no current contract on file.",! Q
  ;display rates for selection
  W !!?25,"VENDOR RATE SELECTION",!!
- I FBMULT=0 S FBVIEN=IFN,FBRATE=1 D DISPLAY^FBAAVD1 S FB(0)=FBBEGDT_"^"_$S(FBTDT>FBENDDT:FBENDDT,1:FBTDT)_"^"_FBRATE_"^"_FBCNUM S:'FBRATE FBERR=1
+ I FBMULT=0 S FBVIEN=IFN,FBX=$$RATE^FBAAVD1(FBCNUM),FBRATE="" D DISPLAY^FBAAVD1 S FB(0)=FBBEGDT_"^"_$S(FBTDT>FBENDDT:FBENDDT,1:FBTDT)_"^"_FBRATE_"^"_FBCNUM S:'FBRATE FBERR=1
  I FBMULT S I="",FBRATE=0 F  S I=$O(FBRIFN(I)) Q:I=""!(FBERR)  D
- .S FBFR=$$FR(FBPAYDT,$P(FBRIFN(I),U,2)),FBTO=$$TO(FBENDDT,$P(FBRIFN(I),U,3)),FBCNUM=$P(FBRIFN(I),U)
- .W !?14,"For dates ",$$DATX^FBAAUTL(FBFR)_" - "_$$DATX^FBAAUTL(FBTO)_" : ",! S FBRATE=1 D DISPLAY^FBAAVD1 S:'FBRATE FBERR=1 Q:FBERR  D
+ . S FBX=$$RATE^FBAAVD1($P(FBRIFN(I),U)),FBFR=$$FR(FBPAYDT,$P(FBRIFN(I),U,2)),FBTO=$$TO(FBENDDT,$P(FBRIFN(I),U,3)),FBCNUM=$P(FBRIFN(I),U)
+ .W !?14,"For dates ",$$DATX^FBAAUTL(FBFR)_" - "_$$DATX^FBAAUTL(FBTO)_" : ",! D DISPLAY^FBAAVD1 S:'FBRATE FBERR=1 Q:FBERR  D
  .. S FB(I)=FBFR_"^"_FBTO_"^"_FBRATE_"^"_FBCNUM
  ;I FBMULT S FBCHECK=1 D EST K FBCHECK,FBATODT,FBTO,FBDEFP I FBERR D
  ;. W !,*7,"Insufficient contract data on file for current month.",!

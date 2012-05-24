@@ -1,8 +1,7 @@
-SDB ;FLA/RF,BSN/GRR - SET UP A CLINIC ;9/30/10  15:59
- ;;5.3;Scheduling;**20,63,167,455,568**;Aug 13, 1993;Build 14
+SDB ;FLA/RF,BSN/GRR - SET UP A CLINIC ; 19 SEP 84  11:51 am
+ ;;5.3;Scheduling;**20,63,167,455**;Aug 13, 1993
  S SDTOP=1,SDZQ=1 K SDREACT
 C Q:$D(SDREACT)!('$D(SDTOP))  W !! D DT^DICRW S (DLAYGO,DIC)=44,DIC(0)="MAQEZL",DIC("A")="Select CLINIC NAME: ",DIC("DR")="2////C",DIC("S")="I $P(^(0),""^"",3)=""C"",'$G(^(""OOS""))" K SDREACT
- D TURNON^DIAUTL(44,".01;8;2502;2503;2505;2506")
  D ^DIC K DIC("A"),DIC("S") G:Y<0 END S DIE=44,DA=+Y S:$P(Y,U,3)=1 DIE("NO^")=""
  K SDIN,SDINH,SDRE,SDRE1 I $D(^SC(DA,"I")),+^("I")>0 S SDIN=+^("I"),SDINH=SDIN,SDRE=+$P(^("I"),"^",2)
  S DR="[SDB]" S:'$D(^SC(DA,"ST",0)) ^SC(DA,"ST",0)="^44.005" D ^DIE K DIE("NO^")

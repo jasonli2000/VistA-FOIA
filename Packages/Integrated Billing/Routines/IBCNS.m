@@ -1,6 +1,6 @@
 IBCNS ;ALB/AAS - IS INSURANCE ACTIVE ; 22-JULY-91
- ;;2.0;INTEGRATED BILLING;**28,43,80,82,133,399**;21-MAR-94;Build 8
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**28,43,80,82,133**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;MAP TO DGCRNS
  ;
@@ -109,11 +109,11 @@ D1 ; If IBDTIN is defined, this date is used for displaying insurance
  S X=$P(IBINS,"^",6) W ?(47+OFF),$S(X="v":"SELF",X="s":"SPOUSE",1:"OTHER")
  W ?(55+OFF),$$DAT1^IBOUTL($P(IBINS,"^",8)),?(65+OFF+$S(OFF:1,1:0)),$$DAT1^IBOUTL($P(IBINS,"^",4))
  I 'OFF D
- .I $P($G(^DIC(36,+IBINS,0)),U,2)="N" W ?74,"*WNR*" Q
- .S X="" F CAT="INPATIENT","OUTPATIENT","PHARMACY","MENTAL HEALTH","DENTAL","LONG TERM CARE" D
+ .I $P($G(^DIC(36,+IBINS,0)),U,2)="N" W ?75,"*WNR*" Q
+ .S X="" F CAT="INPATIENT","OUTPATIENT","PHARMACY","MENTAL HEALTH","DENTAL" D
  .. S Y=$$PLCOV^IBCNSU3(+$P(IBINS,"^",18),$G(IBDTIN),+$O(^IBE(355.31,"B",CAT,"")))
  .. I +Y S Z=$S(CAT="PHARMACY":"R",1:$E(CAT)) S:Y>1 Z=$C($A(Z)+32) S X=X_Z
- .S:X="" X="no CV" I X'?6U W ?74,X
+ .S:X="" X="no CV" I X'?5U W ?75,X
  Q
  ;
 GRP(IBCPOL) ; -- return group name/group policy
@@ -129,7 +129,7 @@ GRPQ Q Y
  ;
 D2EXT ; display Conditional Coverage Comments and Riders (DFN,IBINS,X required)
  N Y,CAT,IBX,IBY,IBZ,ARR,IBCDFN S IBCDFN=X,IBZ=0 N X
- F CAT="INPATIENT","OUTPATIENT","PHARMACY","MENTAL HEALTH","DENTAL","LONG TERM CARE" D
+ F CAT="INPATIENT","OUTPATIENT","PHARMACY","MENTAL HEALTH","DENTAL" D
  . S Y=$$PLCOV^IBCNSU3(+$P(IBINS,"^",18),$G(IBDTIN),+$O(^IBE(355.31,"B",CAT,"")),.ARR)
  . S IBY=CAT_" Conditional: "
  . I +Y>1 S IBX=0 F  S IBX=$O(ARR(IBX)) Q:'IBX  W !,?17,IBY,?47,ARR(IBX) S IBY="",IBZ=1

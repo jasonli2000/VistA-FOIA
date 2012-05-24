@@ -1,6 +1,5 @@
-MAGDCCS2 ;WOIFO/MLH - DICOM Correct - Clinical Specialties - subroutines ; 13 Nov 2007 1:40 PM
- ;;3.0;IMAGING;**10,11,30,54**;03-July-2009;;Build 1424
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGDCCS2 ;WOIFO/MLH - DICOM Correct - Clinical Specialties - subroutines ; 05/06/2004  06:32
+ ;;3.0;IMAGING;**10,11,30**;16-September-2004
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGDCCS2 ;WOIFO/MLH - DICOM Correct - Clinical Specialties - subroutines ; 13 No
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -17,10 +17,10 @@ MAGDCCS2 ;WOIFO/MLH - DICOM Correct - Clinical Specialties - subroutines ; 13 No
  ;;
  Q
  ; Routine to create the MAGDY variable needed by MAGDCCS routine when
- ; manually correcting DICOM FIX files. 
+ ; manually correcting DICOM FIX files.
 EN ;
  ; MAGDY variable to be created during this execution.
- N D,DIC,DUOUT,DZ,MAGBEG,MAGEND,MAGDFN,MAGOUT,MAGX,MAGXX,INFO,MAGNME,MAGSSN,Y
+ N D,DIC,DZ,MAGBEG,MAGEND,MAGDFN,MAGOUT,MAGX,MAGXX,INFO,MAGNME,MAGSSN
  S MAGBEG=1070101,MAGEND=$$DT^XLFDT
  W !,"*** Select a request/consult with whose ***"
  W !,"***  TIU note to associate this image   ***"
@@ -33,17 +33,14 @@ EN ;
  ;
  D IX^DIC
  Q:$D(DUOUT)
- Q:'$D(Y(0))  ; 
- I "^DISCONTINUED^CANCELLED^"[("^"_$$GET1^DIQ(123,+Y,8)_"^") D  Q
- . W !!,"This consult has been cancelled and cannot be selected." H 2
- . Q
+ Q:'$D(Y(0))  ; nothing selected
  S (MAGDFN,MAGX)=$P(Y(0),U,2)_"~"_Y
  ;
  D ONE ; Lookup was on req/con number and successful
  Q
  ;
 PTINFO() ;
- N INFO,MAGOUT,MAGERR
+ N INFO,MAGOUT
  I '$D(MAGDFN) Q ""
  D GETS^DIQ(2,MAGDFN,".01;.09","E","MAGOUT","MAGERR")
  I $D(MAGERR) Q ""
@@ -83,7 +80,6 @@ ONE ; Process the single entry that was selected.
  Q
  ;
 MAGDY ;
- K MAGDY
  S MAGDY=MAGDFN_"^"_MAGNME_"^"_MAGSSN_"^"_"GMRC-"_MAGCASE_"^"_MAGPRC_"^"_MAGDTI
  S MAGDY=MAGDY_"^"_MAGCNI_"^"_MAGPIEN_"^"_$G(MAGPST)_"^"
  K MAGNME,MAGSSN,MAGCASE,MAGPRC,MAGDTI,MAGCNI,MAGPIEN,MAPST

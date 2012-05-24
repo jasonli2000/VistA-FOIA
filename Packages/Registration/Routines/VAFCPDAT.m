@@ -1,5 +1,5 @@
 VAFCPDAT ;BIR/CML/ALS-DISPLAY MPI/PD INFORMATION FOR SELECTED PATIENT ;10/24/02  13:13
- ;;5.3;Registration;**333,414,474,505,707,712**;Aug 13, 1993;Build 7
+ ;;5.3;Registration;**333,414,474,505,707**;Aug 13, 1993;Build 14
  ;Registration has IA #3299 for MPI/PD to call START^VAFCPDAT
  ;
  ;variable DFN is not NEWed or KILLed in this routine as that variable is passed in
@@ -19,15 +19,14 @@ START ;Entry point without device call, used for RPC calls
  .I $D(NOTRPC) W @IOF,!," "
  .W !,"ICN ",$G(ICN)," does not exist at ",SITENAM,"."
  .W !,"Search date: ",HDT,!,LN
- S DIC=2,DR=".01;.02;.03;.09;.111;.112;.113;.114;.115;.1112;.131;.313;.351;994;.0907;.0906;.121",DA=DFN,DIQ(0)="EI",DIQ="DNODE"  ;**707,712
- N NAME,SSN,DOB,SEX,CLAIM,DOD,ICN,STR1,STR2,STR3,CTY,ST,ZIP,PHN,MBI,SSNVER,PREAS,BAI  ;**707,712
+ S DIC=2,DR=".01;.02;.03;.09;.111;.112;.113;.114;.115;.1112;.131;.313;.351;994;.0907;.0906",DA=DFN,DIQ(0)="EI",DIQ="DNODE"  ;**707
+ N NAME,SSN,DOB,SEX,CLAIM,DOD,ICN,STR1,STR2,STR3,CTY,ST,ZIP,PHN,MBI,SSNVER,PREAS  ;**707
  D EN^DIQ1 K DIC,DR,DA,DIQ
  S NAME=$G(DNODE(2,DFN,.01,"E")),SSN=$G(DNODE(2,DFN,.09,"E"))
  S DOB=$$FMTE^XLFDT($G(DNODE(2,DFN,.03,"I")))
  S MBI=$G(DNODE(2,DFN,994,"I")),MBI=$S(MBI="Y":"YES",MBI="N":"NO",1:"NULL")  ;**707
  S SEX=$G(DNODE(2,DFN,.02,"E")),DOD=$G(DNODE(2,DFN,.351,"E"))
  S CLAIM=$G(DNODE(2,DFN,.313,"E")) S:CLAIM="" CLAIM="None"
- S BAI=$G(DNODE(2,DFN,.121,"E"))  ;**712
  S STR1=$G(DNODE(2,DFN,.111,"E")),STR2=$G(DNODE(2,DFN,.112,"E")),STR3=$G(DNODE(2,DFN,.113,"E"))
  S CTY=$G(DNODE(2,DFN,.114,"E")),ST=$G(DNODE(2,DFN,.115,"E")),ZIP=$G(DNODE(2,DFN,.1112,"E"))
  S PHN=$G(DNODE(2,DFN,.131,"E"))
@@ -65,8 +64,7 @@ START ;Entry point without device call, used for RPC calls
  W !,"Date of Birth: ",DOB
  I DOD]"" W !,"Date of Death: ",DOD
  I MBI]"" W !,"Multiple Birth Indicator: ",MBI  ;**707
- W !,"Address:" I BAI'="" W " (Bad Address Indicator: ",BAI,")"
- I STR1'="" W !?9,STR1
+ W !,"Address: ",STR1
  I STR2'="" W !?9,STR2
  I STR3'="" W !?9,STR3
  I CTY'="" W !?9,$E(CTY,1,20)_", "_$G(ST)_" "_$G(ZIP)
@@ -145,7 +143,7 @@ TFHDR ;
  W !!,"Treating Facilities:",?22,"Station:",?32,"DT Last Treated",?54,"Event Reason"
  W !,"--------------------",?22,"--------",?32,"---------------",?54,"------------"
  Q
-ICNHDR W !!,"ICN History:",!,"------------"
+ICNHDR  W !!,"ICN History:",!,"------------"
  Q
  ;
 SS S DIR(0)="E" D  D ^DIR K DIR I 'Y S QFLG=1

@@ -1,6 +1,6 @@
 IBCU64 ;ALB/ARH - AUTOMATED BILLER (INPT CONT) ;8/6/93
- ;;2.0;INTEGRATED BILLING;**14,80,130,51,137,400**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**14,80,130,51,137**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ; DBIA REFERENCE TO ^DGPM, DGPM("AMV1" , "ATID1", "APTF" = DBIA419
  ; DBIA REFERENCE TO PLASIH^DGUTL2 = DBIA421
  ; DBIA REFERENCE TO APLD^DGUTL2 =
@@ -29,7 +29,7 @@ LOS(IBBDT,IBEDT,BTF,IBPMCA,IBDTS) ; calculate the inpatient length of stay for a
  ;    absent or pass days not added,
  ;    admission and discharge on same day has LOS=1, discharge date=admission date+1 also has an LOS=1
  ; Array returned (if passed by reference) IBDTS=# of leave days
- ;                IBDTS(begin date)=end date for all leave periods 
+ ;                IBDTS(begin date)=end date for all leave periods
  N X,IBX,IBY,IBDISDT,IBADM,DFN,IBA S IBX=0 I '$G(IBBDT)!'$G(IBEDT) G LOSQ
  I IBBDT=IBEDT!($G(BTF)=2)!($G(BTF)=3) S IBEDT=$$FMADD^XLFDT(IBEDT,1) ; inclusive if interim continuous or first
  S IBX=$$FMDIFF^XLFDT(IBEDT,IBBDT,1) ; difference between begin and end date
@@ -90,28 +90,4 @@ NONCOV(IBBDT,IBEDT,IBPMCA,IBDTS) ; Determine the total # of non billable
  I Z>0,$G(IBZ(0))>0 S IBDTS=+IBZ(0) D
  . S Z=0 F  S Z=$O(IBZ(Z)) Q:'Z  S IBDTS(+$P(IBZ(Z),U))=$P(IBZ(Z),U,2)
  Q +$G(IBZ(0))
- ;
-PPS(IBIFN,IBPTF) ; Calculate the claim's default PPS - prospective payment system code.
- ; Also known as the DRG - diagnosis-related group.
- ; This field is a trigger from the .08 field PTF entry# to field# 170 for the PPS.
- ; IB*2*400 addition
- ; Input - IBIFN - ien to file 399
- ;         IBPTF - ien to file 45 - value of the .08 field
- NEW PPS S PPS=""
- I '$$INPAT^IBCEF(IBIFN) G PPSX                             ; pps field is for inpatients only
- I $$FT^IBCEF(IBIFN)'=3 G PPSX                              ; pps field is for UB claims only
- S PPS=+$$GET1^DIQ(45,+$G(IBPTF)_",",9,"")                  ; value of the discharge DRG from PTF
- I $$DRGTD^IBACSV(PPS,$$BDATE^IBACSV(IBIFN))="" S PPS=""    ; make sure DRG description exists
-PPSX ;
- Q PPS
- ;
-PPSC(IBIFN) ; Trigger condition for setting the PPS field (field# 170)
- ; Function value=1 if it is OK to fire the trigger
- N OK S OK=0
- I +$P($G(^DGCR(399,IBIFN,"U1")),U,15) G PPSCX      ; pps value already on file
- I '$$INPAT^IBCEF(IBIFN) G PPSCX                    ; must be an inpatient claim
- I $$FT^IBCEF(IBIFN)'=3 G PPSCX                     ; must be a UB claim
- S OK=1
-PPSCX ;
- Q OK
  ;

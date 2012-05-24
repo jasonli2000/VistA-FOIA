@@ -1,6 +1,6 @@
 IBCNSM3 ;ALB/AAS - INSURANCE MANAGEMENT - OUTPUTS ; 4/7/03 9:56am
- ;;2.0;INTEGRATED BILLING;**6,28,85,211,251,399**;21-MAR-94;Build 8
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**6,28,85,211,251**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 % G EN^IBCNSM
  ;
@@ -57,13 +57,11 @@ EDPOL(IBCDFN) ; -- Edit GROUP PLAN specific info
  I IBCPOL D
  .D SAVE^IBCNSP3(IBCPOL)
  .S DIE="^IBA(355.3,",DA=IBCPOL
- .;
- .S DR="S IBAD=$P($G(^IBA(355.3,DA,0)),U,2),Y=$S(IBAD=0:""@55"",IBAD="""":""@1"",1:""@25"");@1;.02;@25;.03;.04;@55;6.02;6.03;.09;"
- .S DR=DR_".15;S Y=$S($$CATOK^IBCEMRA($P(^(0),U,14)):""@60"",1:""@65"");@60;.14;@65;.16;I '$$FTFV^IBCNSU31(X) S Y=""@66"";.17;@66;.13;.05;.12;.06;.07;.08//YES;"
- .;
+ .;DAOU/EEN-Adding BIN and PCN (6.02,6.03)
+ .S DR="S IBAD=$P($G(^IBA(355.3,DA,0)),U,2),Y=$S(IBAD=0:""@55"",IBAD="""":""@1"",1:""@25"");@1;.02;@25;.03;.04;@55;6.02;6.03;.09;.15;S Y=$S($$CATOK^IBCEMRA($P(^(0),U,14)):""@60"",1:""@65"");@60;.14;@65;.13;.05;.12;.06;.07;.08//YES;"
+ .;DAOU/EEN-Adding BIN and PCN (6.02,6.03)
  .I $D(IBREG),'$G(IBNEWP) S DR="S IBAD=$P($G(^IBA(355.3,DA,0)),U,2),Y=$S(IBAD=0:""@55"",IBAD="""":""@1"",1:""@25"");@1;.02;@25;D 3^IBCNSM31;D 4^IBCNSM31;@55;6.02;6.03;.09;"
- .I $D(IBREG),'$G(IBNEWP) S DR=DR_".15;S Y=$S($$CATOK^IBCEMRA($P(^(0),U,14)):""@60"",1:""@65"");@60;.14;@65;.16;I '$$FTFV^IBCNSU31(X) S Y=""@66"";.17;@66;.13;.05;.12;.06;.07;.08//YES;"
- .;
+ .I $D(IBREG),'$G(IBNEWP) S DR=DR_".15;S Y=$S($$CATOK^IBCEMRA($P(^(0),U,14)):""@60"",1:""@65"");@60;.14;@65;.13;.05;.12;.06;.07;.08//YES;"
  .D ^DIE
  .D COMP^IBCNSP3(IBCPOL)
  .I IBDIF D UPDATE^IBCNSP3(IBCPOL),UPDATPT^IBCNSP3(DFN,IBCDFN) I $$DUPPOL^IBCNSOK1(IBCPOL,1)

@@ -1,10 +1,7 @@
-ECUTL1 ;ALB/ESD - Event Capture Classification Utilities ; 5/25/10 11:14am
- ;;2.0; EVENT CAPTURE ;**10,13,17,42,54,76,107**;8 May 96;Build 14
+ECUTL1 ;ALB/ESD - Event Capture Classification Utilities ;19 May 98
+ ;;2.0; EVENT CAPTURE ;**10,13,17,42,54**;8 May 96
  ;
-ASKCLASS(DFN,ECANS,ERR,ECTOPCE,ECPATST,ECHDA) ;  Ask classification questions
- ; (Agent Orange, Ionizing Radiation, Environmental Contaminants/South 
- ; West Asia Conditions, Service Connected, Military Sexual Trauma, 
- ; Head/Neck Cancer, Combat Veteran, Project 112/SHAD)
+ASKCLASS(DFN,ECANS,ERR,ECTOPCE,ECPATST,ECHDA) ;  Ask classification questions (Agent Orange, Ionizing Radiation, Environmental Contaminants, Service Conn)
  ;
  ;   Input:
  ;      DFN     - IEN of Patient file (#2)
@@ -36,14 +33,14 @@ ASKCLASS(DFN,ECANS,ERR,ECTOPCE,ECPATST,ECHDA) ;  Ask classification questions
  I $G(ECHDA) D
  .S ECVSTDT=$P($G(^ECH(ECHDA,0)),U,3)
  .S ECVST=$P($G(^ECH(ECHDA,0)),U,21)
- .F ECCL="AO","IR","EC","SC","MST","HNC","CV","SHAD" D
- ..S ECPIECE=$S(ECCL="AO":3,ECCL="IR":4,ECCL="EC":5,ECCL="SC":6,ECCL="MST":9,ECCL="HNC":10,ECCL="CV":11,1:12)
- ..S ECCLFLD=$P("^^Agent Orange^Ionizing Radiation^South West Asia Conditions^Service Connected^^^Military Sexual Trauma^Head/Neck Cancer^Combat Veteran^Project 112/SHAD","^",ECPIECE)
+ .F ECCL="AO","IR","EC","SC","MST","HNC","CV" D
+ ..S ECCLFLD=$S(ECCL="AO":"Agent Orange",ECCL="IR":"Ionizing Radiation",ECCL="EC":"Environmental Contaminants",ECCL="SC":"Service Connected",ECCL="HNC":"Head/Neck Cancer",ECCL="CV":"Combat Veteran",1:"Military Sexual Trauma")
+ ..S ECPIECE=$S(ECCL="AO":3,ECCL="IR":4,ECCL="EC":5,ECCL="SC":6,ECCL="MST":9,ECCL="HNC":10,1:11)
  ..S ECXX=$P($G(^ECH(ECHDA,"P")),U,ECPIECE),ECXX=$S(ECXX="Y":"YES",ECXX="N":"NO",1:"")
  ..I ECXX]"" S ECOLD(ECCL)=ECCLFLD_": "_ECXX
  .I $D(ECOLD) D
  ..W !,"*** Current encounter classification ***",!
- ..F ECCL="SC","CV","AO","IR","EC","MST","HNC","SHAD" D
+ ..F ECCL="SC","CV","AO","IR","EC","MST","HNC" D
  ...I $D(ECOLD(ECCL)) W !?4,ECOLD(ECCL)
  ;- Ask user classification question
  D CLASS^PXBAPI21("",DFN,ECVSTDT,1,ECVST) W !
@@ -52,9 +49,9 @@ ASKCLASS(DFN,ECANS,ERR,ECTOPCE,ECPATST,ECHDA) ;  Ask classification questions
  .F ECPXB=1:1:4 I $D(PXBDATA("ERR",ECPXB)) D
  ..I (PXBDATA("ERR",ECPXB)=1)!(PXBDATA("ERR",ECPXB)=4) S ERR=1
  ;- Otherwise, continue to setup ecans array, i.e., new classification data
- F ECCL="AO","IR","SC","EC","MST","HNC","CV","SHAD" D
- .S ECCLFLD=$S(ECCL="AO":21,ECCL="IR":22,ECCL="EC":23,ECCL="SC":24,ECCL="MST":35,ECCL="HNC":39,ECCL="CV":40,1:41)
- .S ECPXB=$S(ECCL="AO":1,ECCL="IR":2,ECCL="EC":4,ECCL="SC":3,ECCL="MST":5,ECCL="CV":7,ECCL="SHAD":8,1:6)
+ F ECCL="AO","IR","SC","EC","MST","HNC","CV" D
+ .S ECCLFLD=$S(ECCL="AO":21,ECCL="IR":22,ECCL="EC":23,ECCL="SC":24,ECCL="MST":35,ECCL="HNC":39,1:40)
+ .S ECPXB=$S(ECCL="AO":1,ECCL="IR":2,ECCL="EC":4,ECCL="SC":3,ECCL="MST":5,ECCL="CV":7,1:6)
  .S ANS=$P($G(PXBDATA(ECPXB)),U,2),ANS=$S(ANS=1:"Y",ANS=0:"N",1:"")
  .S ECANS(ECCL)=ECCLFLD_"^"_ANS
  ;- Delete old data if it exists
@@ -70,7 +67,7 @@ EDCLASS(ECIEN,ECANS) ;  Edit classifications fields in EC Patient
  ;      ECANS - Array of answers to classification questions asked
  ;
  ;  Output:
- ;      Classification fields 21,22,23,24,35,39,40,41 edited in file #721
+ ;      Classification fields 21,22,23,24,35,39,40 edited in file #721
  ;
  N DA,DIE,DR,ECCL
  S (DR,ECCL)=""
@@ -84,7 +81,7 @@ EDCLASS(ECIEN,ECANS) ;  Edit classifications fields in EC Patient
  . S DA=ECIEN
  . S DIE="^ECH("
  . ;
- . ;- Edit classification fields (AO, IR, EC, SC, MST, HNC, CV, SHAD)
+ . ;- Edit classification fields (AO, IR, EC, SC, MST, HNC, CV)
  . F  S ECCL=$O(ECANS(ECCL)) Q:ECCL=""  S DR=DR_+$P($G(ECANS(ECCL)),"^")_"////"_$P($G(ECANS(ECCL)),"^",2)_";"
  . ;
  . ;- Remove last ";" from DR string before editing
@@ -105,11 +102,10 @@ SETCLASS(ECANS) ;  Set answers to classification questions in EC variables
  ;                 field number of class ques from file #721^answer
  ;
  ;  Output:
- ;      EC classification var - ECAO,ECIR,ECZEC,ECSC,ECMST,ECHNC,ECCV,
- ;                              ECSHAD
+ ;      EC classification var - ECAO,ECIR,ECZEC,ECSC,ECMST,ECHNC,ECCV
  ;
  N ECCL,ECCLFLD
- S (ECCL,ECAO,ECIR,ECZEC,ECSC,ECMST,ECHNC,ECCV,ECSHAD)=""
+ S (ECCL,ECAO,ECIR,ECZEC,ECSC,ECMST,ECHNC,ECCV)=""
  ;
  ;- Drops out if invalid condition found
  D
@@ -127,7 +123,7 @@ SETCLASS(ECANS) ;  Set answers to classification questions in EC variables
  .. ;- Ionizing Radiation variable
  .. S:ECCLFLD=22 ECIR=$P(ECANS(ECCL),"^",2)
  .. ;
- .. ;- Environmental Contaminants/South West Asia Conditions variable
+ .. ;- Environmental Contaminants variable
  .. S:ECCLFLD=23 ECZEC=$P(ECANS(ECCL),"^",2)
  .. ;
  .. ;- Service Connected variable
@@ -141,9 +137,6 @@ SETCLASS(ECANS) ;  Set answers to classification questions in EC variables
  .. ;
  .. ;- Combat Veteran
  .. S:ECCLFLD=40 ECCV=$P(ECANS(ECCL),"^",2)
- .. ;
- .. ;- Project 112/SHAD (Shipboard Hazard and Defense)
- .. S:ECCLFLD=41 ECSHAD=$P(ECANS(ECCL),"^",2)
  Q
  ;
  ;
@@ -153,7 +146,7 @@ DELCLASS(ECIEN) ;  Delete classification fields in EC Patient file (#721)
  ;      ECIEN - EC Patient record (#721) IEN
  ;
  ;  Output:
- ;      Classification fields 21,22,23,24,35,39,40,41 deleted in file#721
+ ;      Classification fields 21,22,23,24,35,39,40 deleted in file #721
  ;
  N DA,DIE,DR,ECCL
  S DR=""
@@ -167,8 +160,8 @@ DELCLASS(ECIEN) ;  Delete classification fields in EC Patient file (#721)
  . S DA=ECIEN
  . S DIE="^ECH("
  . ;
- . ;- Delete classification fields (AO, IR, EC, SC, MST, HNC, CV, SHAD)
- . F ECCL=21:1:24,35,39,40,41 S DR=DR_ECCL_"////@;"
+ . ;- Delete classification fields (AO, IR, EC, SC, MST, HNC, CV)
+ . F ECCL=21:1:24,35,39,40 S DR=DR_ECCL_"////@;"
  . ;
  . ;- Remove last ";" from DR string before editing
  . S DR=$E(DR,1,($L(DR)-1))
@@ -201,66 +194,4 @@ UNLOCK(ECIEN) ;  Unlock EC Patient record
  ;      EC Patient record unlocked
  ;
  I $G(ECIEN) L -^ECH(ECIEN)
- Q
-RCNTVST(RESULT,DFN) ;
- ;
- ;This call uses the Patient and Visit file to return a list of recent
- ;visits. It returns the most recent 20 visits using both files but does 
- ;not return future visits from the Patient file.  It also filters out 
- ;canceled, rescheduled or no-show appts.  For the Patient file it uses 
- ;a start date of "" and an end date of "NOW". For the selected visit
- ;call, it only passes in and uses the DFN.
- ;
- ;API 1905
- ;Calls    
- ;  SELECTED^VSIT(DFN,SDT,EDT,HOSLOC,ENCTPE,NNCTPE,SRVCAT,NSRVCAT,LASTN) 
- ;  See API for detailed documentation
- ;
- ;API 3859
- ;Calls    GETAPPT^SDAMA201(DFN,SDFIELDS,SDAPSTAT,SDT,EDT,SDCNT)
- ;         See API for detailed documentation
- ;
- ;IA 10040 - This is a supported IA and is used to filter/screen
- ;           non clinics visits from being included in API 1905
- ;           not needed in 3859 as it contains a filter for clinics
- ;
- N ARR,CNT,DATE,NUM,PARAMS,P1,P1DT,P2,PDT,VDT,VIEN,X,X1,X2,Y,SDRESULTS
- D NOW^%DTC S DATE=%,Y=DATE
- S VDT=3050101
- S X1=DT,X2=(-15) D C^%DTC S PDT=X    ;get appts within last 15 days
- S RESULT(0)=0
- I '$G(DFN) Q
- K ^TMP("VSIT",$J)
- K ^TMP($J,"SDAMA201","GETAPPT")
- D SELECTED^VSIT(DFN,VDT,"","","","","","",30)
- D GETAPPT^SDAMA201(DFN,"1;2","R;NT",PDT,DATE,.SDRESULT)
- S VIEN=0
- F  S VIEN=$O(^TMP("VSIT",$J,VIEN)) Q:VIEN=""  S NUM=0 D
- .F  S NUM=$O(^TMP("VSIT",$J,VIEN,NUM)) Q:NUM=""  D
- ..S PARAMS=$G(^TMP("VSIT",$J,VIEN,NUM))
- ..;make sure location is a clinic
- ..I $P(PARAMS,U,3)="H" Q
- ..I $$GET1^DIQ(44,$P($P(PARAMS,U,2),";"),2,"I")'="C" Q
- ..S P1DT=$P(PARAMS,U,1),P1=$$FMTE^XLFDT(P1DT,"9M"),P2=$P($P(PARAMS,U,2),";",2)
- ..I '$G(P1DT)!($G(P2)="") Q
- ..I $D(ARR(P1DT,P2))=1 Q
- ..;;cntrl array, filter visits from PT file
- ..S ARR(P1DT,P2)=P1DT_U_$$LJ^XLFSTR(P1,25)_$$LJ^XLFSTR(P2,30)_U_P1_U_P2_U
- S VIEN=0
- F  S VIEN=$O(^TMP($J,"SDAMA201","GETAPPT",VIEN)) Q:VIEN=""  D
- .I $D(^TMP($J,"SDAMA201","GETAPPT","ERROR")) Q
- .S P1DT=$G(^TMP($J,"SDAMA201","GETAPPT",VIEN,1))
- .S P1=$$FMTE^XLFDT(P1DT,"9M")
- .S P2=$P($G(^TMP($J,"SDAMA201","GETAPPT",VIEN,2)),U,2)
- .I '$G(P1DT)!($G(P2)="") Q
- .I $D(ARR(P1DT,P2))=1 Q
- .;;cntrl array, filter visits from PT file
- .S ARR(P1DT,P2)=P1DT_U_$$LJ^XLFSTR(P1,25)_$$LJ^XLFSTR(P2,30)_U_P1_U_P2_U
- S VIEN=9999999999,CNT=1
- F  S VIEN=$O(ARR(VIEN),-1) Q:((VIEN="")!(CNT>20))  D
- .S NUM=0 F  S NUM=$O(ARR(VIEN,NUM)) Q:NUM=""  D
- ..S RESULT(CNT)=ARR(VIEN,NUM),CNT=CNT+1
- I $D(ARR) S RESULT(0)=CNT
- K ^TMP("VSIT",$J)
- K ^TMP($J,"SDAMA201","GETAPPT")
  Q

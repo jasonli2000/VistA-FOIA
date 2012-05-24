@@ -1,6 +1,6 @@
-DINIT12 ;SFISC/GFT,XAK-INITIALIZE VA FILEMAN ;16FEB2010
- ;;22.0;VA FileMan;**104,163**;Mar 30, 1999;Build 28
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DINIT12 ;SFISC/GFT,XAK-INITIALIZE VA FILEMAN ;1:32 PM  1 Jul 2002
+ ;;22.0;VA FileMan;**104**;Mar 30, 1999
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 DD F I=1:1 S X=$T(DD+I),Y=$P(X," ",3,99) G T:X?.P S @("^DD("_$E($P(X," ",2),3,99)_")=Y")
  ;;.4,0 FIELD^^1819^21
  ;;.4,0,"DT" 2950909
@@ -28,10 +28,6 @@ DD F I=1:1 S X=$T(DD+I),Y=$P(X," ",3,99) G T:X?.P S @("^DD("_$E($P(X," ",2),3,99
  ;;.4,7,0 DATE LAST USED^D^^0;7^S %DT="EX" D ^%DT S X=Y K:Y<1 X
  ;;.4,1815,0 ROUTINE INVOKED^F^^ROU;E1,13^Q
  ;;.4,1815,9 @
- ;;.4,1815,1,0 ^.1^1^1
- ;;.4,1815,1,1,0 ^^^MUMPS
- ;;.4,1815,1,1,1 Q
- ;;.4,1815,1,1,2 D DELETROU^DIEZ($TR(X,U))
  ;;.4,1816,0 PREVIOUS ROUTINE INVOKED^F^^ROUOLD;E1,13^Q
  ;;.4,1816,9 @
  ;;.4,10,0 DESCRIPTION^.4001^^%D;0
@@ -55,7 +51,7 @@ T ;
 DD1 F I=1:1 S X=$T(DD1+I),Y=$P(X," ",3,99) G DD2:X?.P S @("^DD("_$E($P(X," ",2),3,99)_")=Y")
  ;;.4,0,"ID","WRIT" I $P(^(0),U,8) N D1 S @("D1=$P($P($C(59)_$S($D(^DD(.4,8,0)):$P(^(0),U,3),1:0)_$E("_DIC_"Y,0),0),$C(59)_$P(^(0),U,8)_"":"",2),$C(59),1)") D EN^DDIOL("**"_D1_"**","","?0")
  ;;.4,0,"ID","WRITED" I $G(DZ)?1"???".E N % S %=0 F  S %=$O(^DIPT(Y,"%D",%)) Q:%'>0  I $D(^(%,0))#2 D EN^DDIOL(^(0),"","!?5")
- ;;.402,0,"ID","WRITED" I $G(DZ)?1"???".E N % S %=0 F  S %=$O(^DIE(Y,"%D",%)) Q:%'>0  I $D(^(%,0))#2 D EN^DDIOL(^(0),"","!?5")
+ ;;.402,0,"ID","WRITED" I $G(DZ)?1"???".E N % S %=0 F  S %=$O(^DIE(Y,"%D",%)) Q:%'>0  I $D(^(%,0))#2 D EN^DDIOL(^(0),"","!?5") ;;.4,1819,0 COMPILED^CJ3^^ ; ^S X=$S('$D(^DIPT(D0,"ROU"))#2:"NO",^("ROU")="":"NO",1:"YES")
  ;;.4,1620,9 ^
  ;;.4,1620,9.01
  ;;.4,1620,9.1 D ^DIET

@@ -1,5 +1,5 @@
-EASEZPF ;ALB/SCK/GAH - Print 1010EZ Enrollment form ; 10/19/2000
- ;;1.0;ENROLLMENT APPLICATION SYSTEM;**44,51,84**;Sep 5, 2006;Build 2
+EASEZPF ;ALB/SCK - Print 1010EZ Enrollment form ; 10/19/2000
+ ;;1.0;ENROLLMENT APPLICATION SYSTEM;**44,51**;Mar 15, 2001
  ;
  ; These routines print a version of the OMB approved VA10-10EZ form.
  ; No local modifications to these routines will be made.  Any changes
@@ -13,7 +13,7 @@ QUE(EASAPP,EASDFN) ; Queue the 1010EZ print
  ;  Output
  ;      ZTSK   - Task Number returned from call to Task Manager
  ;
- ;  
+ ;
  N ZTDESC,ZTIO,ZTRTN,ZTSAVE,ZTSK,ZUSR,POP,X,ERR
  ;
  ; Check for conditions to print form.  If conditions not met, quit
@@ -24,26 +24,19 @@ QUE(EASAPP,EASDFN) ; Queue the 1010EZ print
  W !?5,"Output to SCREEN will be unreadable.",!
  ;
  S EASAPP=$G(EASAPP),EASDFN=$G(EASDFN)
- ; Can't be a slave
+ ;
  S %ZIS="Q",%ZIS("S")="I $P($G(^(1)),U)'[""SLAVE""&($P($G(^(0)),U)'[""SLAVE"")"
  D ^%ZIS
  ;
  G:POP EXIT
+ S ZUSR=DUZ,ZTRTN="EN^EASEZPF",ZTDESC="1010EZ PRINT"
  ;EAS*1*51 -- if version # 6 or greater, use new print format
- S ZTRTN="EN^EASEZPF"
  I '$G(EASVRSN) S EASVRSN=$$VERSION^EASEZU4(EASAPP)
  I '(EASVRSN<6) S ZTRTN="EN^EASEZP6F"
- ; Either queue for print or print manually by user choice (EAS*1.0*84)
- I $D(IO("Q")) D  G EXIT ;Queued print chosen
- . S ZUSR=DUZ,ZTDESC="1010EZ PRINT"
- . F X="ZUSR","EASAPP","EASDFN" S ZTSAVE(X)=""
- . D ^%ZTLOAD
- . D HOME^%ZIS
  ;
- ;Manual print chosen
- D @ZTRTN
- D ^%ZISC
- G EXIT
+ F X="ZUSR","EASAPP","EASDFN" S ZTSAVE(X)=""
+ D ^%ZTLOAD
+ D HOME^%ZIS
  ;
 EXIT Q +$G(ZTSK)
  ;

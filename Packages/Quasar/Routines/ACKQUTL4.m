@@ -1,10 +1,6 @@
-ACKQUTL4 ;HCIOFO/BH-NEW/EDIT Visit Template Utilities for QUASAR ; 11/13/08 12:57pm
- ;;3.0;QUASAR;**1,8,14,17,16**;Feb 11, 2000;Build 37
+ACKQUTL4 ;HCIOFO/BH-NEW/EDIT Visit Template Utilities for QUASAR ; 04/01/99
+ ;;3.0;QUASAR;**1,8,14**;Feb 11, 2000;Build 14
  ;Per VHA Directive 10-93-142, this routine SHOULD NOT be modified.
- ;
- ;Reference/IA
- ;GETCUR^DGNTAPI/3457
- ;CVEDT^DGCV/4156
  ;
 CHK(Y,ACKVD) ;
  N ACKQQD
@@ -28,7 +24,7 @@ MST(ACKPCE,ACKVD,ACKPAT) ;
  I $P(ACKRET,"^",2)="Y" Q 1
  Q 0
  ;
-PROB(ACKPCE,ACKDIV) ;  Decides if Update PCE Problem List prompt appears
+PROB(ACKPCE,ACKDIV) ;  Decides if Update PCE Problem List prompt appaers
  I 'ACKPCE Q 0
  I '$$GET1^DIQ(509850.83,ACKDIV_",1",".09","I") Q 0
  Q 1
@@ -65,8 +61,9 @@ SETUP ;  Called from within the New/Edit visit template to set up parameters
  S ACKATS=1
  S ACKX=$O(^ACK(509850.6,"AMD",ACKPAT,0)),ACKD0=$O(^ACK(509850.6,"AMD",ACKPAT,+ACKX,0))
  I 'ACKX!('$D(^ACK(509850.6,+ACKD0,0))) S ACKATS=0
- ; 
- S (ACKAO,ACKRAD,ACKENV,ACKHNC,ACKCV)=0,(ACKLOSS,ACKLAMD)=""
+ ;
+ ;
+ S ACKAO=0,ACKRAD=0,ACKENV=0,ACKLOSS="",ACKLAMD=""
  I ACKPCE D STATUS
  S:ACKSC ACKQSER=1 S:ACKAO ACKQORG=1
  S:ACKRAD ACKQIR=1 S:ACKENV ACKQECON=1
@@ -74,10 +71,10 @@ SETUP ;  Called from within the New/Edit visit template to set up parameters
  D ELIG
  ;
  K VASV,VAEL
- ;  
+ ;
  Q
  ;
-PCE(ACKDIV,ACKVD) ;  Sets ACKPCE to 1 if - The send to PCE flag is set 
+PCE(ACKDIV,ACKVD) ;  Sets ACKPCE to 1 if - The send to PCE flag is set
  ; (for the division) and the PCE INTERFACE START DATE is before or on
  ; the same day as the Visit Date and the INTERFACE WITH PCE flag for
  ; the site is set to true.
@@ -86,17 +83,14 @@ PCE(ACKDIV,ACKVD) ;  Sets ACKPCE to 1 if - The send to PCE flag is set
  . I $$GET1^DIQ(509850.83,ACKDIV_",1",".03","I"),ACKVD'<$$GET1^DIQ(509850.83,ACKDIV_",1",".08","I") S ACKOUT=1
  Q ACKOUT
  ;
-STATUS ;  Sets Agent orange, Radiation and Environmental Contaminant and Combat indicators
- ;  AO,Rad
+ ;-----
+STATUS ;  Sets Agent orange, Radiation and Environmental Contaiment indicators
+ ;  if present.
+ ;
+ ;  Agent Orange and Radiation
  D SVC^VADPT S ACKAO=VASV(2),ACKRAD=VASV(3)
- ; Combat Veteran
- ; DBIA 4156
- S:$G(ACKVD) ACKCV=+$P($$CVEDT^DGCV(ACKPAT,ACKVD),U,3)
- ;  HNC
- N ACKHNC0
- D GETCUR^DGNTAPI(DFN,"ACKHNC0")
- S ACKHNC=$S((".3.4.5."[("."_$P($G(ACKHNC0("STAT")),U)_".")):1,1:0)
- ;  ENV
+ ;
+ ;  Environmental Contaminents
  S ACKENV=$$GET1^DIQ(2,ACKPAT,.322013,"I")
  I ACKENV="Y" S ACKENV=1
  S:ACKENV'="1" ACKENV=0
@@ -158,14 +152,14 @@ ELIGDIS  ;  Display patients eligibilities
  .W $$GET1^DIQ(8,ACKK2,5),!
  Q
  ;-----
- ;  Display Patient data concerning Rated Disabilities and service class.
+ ;  Display Patient data concerning Rated Disabilities and service clas.
 PATDIS ;
  S DFN=ACKPAT  D RATDIS^ACKQNQ
  D CLASDIS^ACKQNQ
  Q
  ;
-ACKCP() ;  This initializes the C&P Parameter.
- ;  First check site parameters file for C&P flag
+ACKCP() ;  This initialises the C&P Paramter.
+ ;  First check site parameteres file for C&P flag
  ;
  I '$$GET1^DIQ(509850.83,ACKDIV_",1",".06","I") Q 0
  ;
@@ -264,7 +258,7 @@ HLOSS ; Sets hearing loss variable if one or more diagnosis are for hearing
  S (ACKLOSS,ACKK4)=0
  F  S ACKK4=$O(^ACK(509850.6,ACKVIEN,1,ACKK4)) Q:ACKK4'?1.N!(ACKLOSS)  D
  .S ACKDIAG=$P(^ACK(509850.6,ACKVIEN,1,ACKK4,0),U,1)
- .I $P(^ACK(509850.1,ACKDIAG,0),U,5)=1 S ACKLOSS=1 Q 
+ .I $P(^ACK(509850.1,ACKDIAG,0),U,5)=1 S ACKLOSS=1 Q
  Q
  ;
 MODDIS ;  Display Modifiers - Called within Executable Help of Modiifer
@@ -276,16 +270,19 @@ MODDIS ;  Display Modifiers - Called within Executable Help of Modiifer
  ;
 CONVERT(ACKPRV) ; Converts the QSR Prov Code into a name string from file 200.
  ;
- ;ACKQ*3*17
- Q $$GET1^DIQ(509850.3,ACKPRV,.07)
+ N ACKPRV1,ACKPRV2
+ S ACKPRV1=$P(^ACK(509850.3,ACKPRV,0),U,1)
+ S ACKPRV2=$P(^USR(8930.3,ACKPRV1,0),U,1)
+ Q $$GET1^DIQ(200,ACKPRV2_",",.01)
  ;
 CONVERT1(ACKPRV) ;  Converts the Provider IEN number used within Quasar
  ;                  to its equivalent code used on the 200 file.
- ;ACKQ*3*17
- Q +$$GET1^DIQ(509850.3,ACKPRV,.07,"I")
+ N ACKPRV1
+ S ACKPRV1=$P(^ACK(509850.3,ACKPRV,0),U,1)
+ Q $P(^USR(8930.3,ACKPRV1,0),U,1)
  ;
 CONVERT2(ACKPRV) ;  Converts the Provider IEN number used within Quasar
  ;                  to its equivalent code used on the 200 file.
- ;ACKQ*3*17
- Q +$$GET1^DIQ(509850.3,ACKPRV,.07,"I")
- ;
+ N ACKPRV1
+ S ACKPRV1=$P(^ACK(509850.3,ACKPRV,0),U,1)
+ Q $P($G(^USR(8930.3,ACKPRV1,0)),U,1)

@@ -1,11 +1,12 @@
-RORRP016 ;HCIOFO/SG - RPC: LIST OF ICD-9 CODES ;6/16/06 2:16pm
- ;;1.5;CLINICAL CASE REGISTRIES;**1,10**;Feb 17, 2006;Build 32
+RORRP016 ;HCIOFO/SG - RPC: LIST OF ICD-9 CODES ; 6/16/06 2:16pm
+ ;;1.5;CLINICAL CASE REGISTRIES;**1**;Feb 17, 2006;Build 24
  ;
  ; This routine uses the following IAs:
  ;
  ; #3990         $$ICDDX^ICDCODE, $$ICDOP^ICDCODE, and
  ;               $$ICDD^ICDCODE (supported)
- ; #2051         LIST^DIC (supported)
+ ; #10082        Access to the file #80 (supported)
+ ; #10083        Access to the file #80.1 (supported)
  ;
  Q
  ;
@@ -63,7 +64,7 @@ RORRP016 ;HCIOFO/SG - RPC: LIST OF ICD-9 CODES ;6/16/06 2:16pm
  ; parameter for the next procedure call are returned in the
  ; @RORESULT@(0) and the subsequent nodes of the global array
  ; contain the codes.
- ; 
+ ;
  ; @RORESULT@(0)         Result Descriptor
  ;                         ^01: Number of codes
  ;                         ^02: FromName
@@ -118,15 +119,12 @@ QUERY(PART,FLAGS,NR,FROM) ;
  S:FLAGS["F" SCR=SCR_"I $P(D,U,10)'=""F"" "
  S:FLAGS["M" SCR=SCR_"I $P(D,U,10)'=""M"" "
  S:FLAGS["P" SCR=SCR_"I '$P(D,U,4) "
- S:SCR'="" SCR="S D=$G(^(0)) "_SCR ;Naked Ref: ^ICD9(
+ S:SCR'="" SCR="S D=$G(^(0)) "_SCR
  ;--- Get the list of codes and some data
- ;S FLDS="@;3;.01;9.5I;IXI",TMP="P"_$S(FLAGS["B":"B",1:"")
- S FLDS="@;.01;9.5I;IXI",TMP="P"_$S(FLAGS["B":"B",1:"")
+ S FLDS="@;3;.01;9.5I;IXI",TMP="P"_$S(FLAGS["B":"B",1:"")
  S XREF=$S(FLAGS["D":"#",FLAGS["K":"D",1:"BA")
  D LIST^DIC(80,,FLDS,TMP,NR,.FROM,PART,XREF,SCR,,RORESULT,"RORMSG")
  I $G(DIERR)  K @RORESULT  Q $$DBS^RORERR("RORMSG",-9,,,80)
- ;--- Add Diagnosis code to RORESULT using API
- D GETDIAG
  ;--- Success
  Q 0
  ;
@@ -138,15 +136,12 @@ QUERY1(PART,FLAGS,NR,FROM) ;
  I FLAGS["D"  S:PART'="" SCR=SCR_"I $P(D,U,4)["""_PART_""" ",PART=""
  S:FLAGS["F" SCR=SCR_"I $P(D,U,10)'=""F"" "
  S:FLAGS["M" SCR=SCR_"I $P(D,U,10)'=""M"" "
- S:SCR'="" SCR="S D=$G(^(0)) "_SCR ;Naked Ref: ^ICD0(
+ S:SCR'="" SCR="S D=$G(^(0)) "_SCR
  ;--- Get the list of codes and some data
- ;S FLDS="@;4;.01;9.5I;IXI",TMP="P"_$S(FLAGS["B":"B",1:"")
- S FLDS="@;.01;9.5I;IXI",TMP="P"_$S(FLAGS["B":"B",1:"")
+ S FLDS="@;4;.01;9.5I;IXI",TMP="P"_$S(FLAGS["B":"B",1:"")
  S XREF=$S(FLAGS["D":"#",FLAGS["K":"D",1:"BA")
  D LIST^DIC(80.1,,FLDS,TMP,NR,.FROM,PART,XREF,SCR,,RORESULT,"RORMSG")
  I $G(DIERR)  K @RORESULT  Q $$DBS^RORERR("RORMSG",-9,,,80.1)
- ;--- Add Operation/Procedure  to RORESULT using API
- D GETOPPR
  ;--- Success
  Q 0
  ;
@@ -208,39 +203,4 @@ REFINE1(PART,FLAGS,DATE) ;
  . K RORDESC
  ;---
  S $P(@RORESULT@(0),U)=CNT
- Q
- ;
- ;***** Get Diagnosis code and add to the @RORESULT@("DILIST") array
-GETDIAG ;
- N RORI,RORIEN,RORDIAG,ROR1,RORALL,RORNUM S RORI=0
- F  S RORI=$O(@RORESULT@("DILIST",RORI)) Q:RORI=""  D
- . S RORIEN=$P(@RORESULT@("DILIST",RORI,0),U,1)
- . S RORDIAG=$P($$ICDDX^ICDCODE(RORIEN,,,0),U,4)
- . ;get number of pieces in RORESULT
- . S RORNUM=$L(@RORESULT@("DILIST",RORI,0),U)
- . S ROR1=$P(@RORESULT@("DILIST",RORI,0),U,1) ;1st piece
- . S RORALL=$P(@RORESULT@("DILIST",RORI,0),U,2,RORNUM) ;all other pieces
- . S @RORESULT@("DILIST",RORI,0)=$G(ROR1)_U_$G(RORDIAG)_U_$G(RORALL)
- ;Update the 'map' in RORESULT to include field #3
- S RORNUM=$L(@RORESULT@("DILIST",0,"MAP"),U) ;number of pieces
- S ROR1=$P(@RORESULT@("DILIST",0,"MAP"),U,1) ;first piece
- S RORALL=$P(@RORESULT@("DILIST",0,"MAP"),U,2,RORNUM) ;all other pieces
- S @RORESULT@("DILIST",0,"MAP")=$G(ROR1)_U_"3"_U_$G(RORALL)
- Q
- ;***** Get Operation/Procedure and add to the RORESULT("DILIST") array
-GETOPPR ;
- N RORI,RORIEN,ROROPPR,ROR1,RORALL,RORNUM S RORI=0
- F  S RORI=$O(@RORESULT@("DILIST",RORI)) Q:RORI=""  D
- . S RORIEN=$P(@RORESULT@("DILIST",RORI,0),U,1)
- . S ROROPPR=$P($$ICDOP^ICDCODE(RORIEN,,,0),U,5)
- . ;get number of pieces in RORESULT to reflect field #3
- . S RORNUM=$L(@RORESULT@("DILIST",RORI,0),U)
- . S ROR1=$P(@RORESULT@("DILIST",RORI,0),U,1) ;1st piece
- . S RORALL=$P(@RORESULT@("DILIST",RORI,0),U,2,RORNUM) ;all other pieces
- . S @RORESULT@("DILIST",RORI,0)=$G(ROR1)_U_$G(ROROPPR)_U_$G(RORALL)
- ;Update the 'map' in RORESULT to include field #4
- S RORNUM=$L(@RORESULT@("DILIST",0,"MAP"),U) ;number of pieces
- S ROR1=$P(@RORESULT@("DILIST",0,"MAP"),U,1) ;first piece
- S RORALL=$P(@RORESULT@("DILIST",0,"MAP"),U,2,RORNUM) ;all other pieces
- S @RORESULT@("DILIST",0,"MAP")=$G(ROR1)_U_"4"_U_$G(RORALL)
  Q

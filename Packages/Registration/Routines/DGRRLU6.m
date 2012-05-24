@@ -1,5 +1,5 @@
-DGRRLU6 ;alb/aas - DG Replacement and Rehosting RPC for VADPT ; Jan-7-2003  ; 9/2/08 2:11pm
- ;;5.3;Registration;**538,786**;Aug 13, 1993;Build 21
+DGRRLU6 ;alb/aas - DG Replacement and Rehosting RPC for VADPT ; Jan-7-2003  ; Compiled April 27, 2004 10:10:10
+ ;;5.3;Registration;**538**;Aug 13, 1993
  ;
  ; CALLED BY DGRRLU LINE:
  ; IF (SEARCH="NAME"),($G(PARAMS("VERSION 2"))'="") DO BYNAME^DGRRLU6 ; sgg 05/06/04
@@ -60,8 +60,8 @@ PTDATA(DFN,DGRRPCNT) ;
  .. IF $E(ALIAS,1,$L(VALUE))=VALUE SET PTNAME="("_ALIAS_")  "_PTNAME,DONE=1
  . IF DONE=0 SET PTNAME="(Unknown Alias)  "_PTNAME
  ; -- REQUIRED COMPONENTS
- ;SENSITIV will be set to true to block the display of the SSN and DOB 
- ;if patient is marked as sensitive in DG Security Log (#38.1) file or 
+ ;SENSITIV will be set to true to block the display of the SSN and DOB
+ ;if patient is marked as sensitive in DG Security Log (#38.1) file or
  ;has an employee eligibility code
  SET SENSITIV=$S($P($G(^DGSL(38.1,DFN,0)),"^",2)=1:"true",1:"false")
  I SENSITIV="false" D
@@ -99,7 +99,7 @@ PTDATA(DFN,DGRRPCNT) ;
  ; get the PCP's IEN and convert to VPID (primary care physician)  sgg 06/17/04
  SET PATSPCP=$$NMPCPR^SCAPMCU2(DFN,DT,1)
  SET PCPIEN=$P(PATSPCP,"^",1)
- SET PCPNAME=$$CHARCHK^DGRRUTL($P(PATSPCP,"^",2)) ;786
+ SET PCPNAME=$P(PATSPCP,"^",2)
  SET PCPVPID=$$VPID^XUPS(+PCPIEN)
  ;
  SET LINE=LINE_" type='"_TYPE_"' primaryeligibility='"_PRIM_"' serviceconnected='"_SC_"' scpercent='"_SCPER_"'"

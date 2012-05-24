@@ -1,8 +1,10 @@
-DGPMXA ; GENERATED FROM 'DGPM ASIH ADMIT' INPUT TEMPLATE(#452), FILE 405;04/03/03
+DGPMXA ; GENERATED FROM 'DGPM ASIH ADMIT' INPUT TEMPLATE(#452), FILE 405;09/19/10
  D DE G BEGIN
 DE S DIE="^DGPM(",DIC=DIE,DP=405,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DGPM(DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(2)=% S %=$P(%Z,U,6) S:%]"" DE(4)=% S %=$P(%Z,U,7) S:%]"" DE(5)=% S %=$P(%Z,U,10) S:%]"" DE(10)=% S %=$P(%Z,U,11) S:%]"" DE(8)=% S %=$P(%Z,U,12) S:%]"" DE(6)=%
  I $D(^("DIR")) S %Z=^("DIR") S %=$P(%Z,U,1) S:%]"" DE(3)=%
+ I $D(^("ODS")) S %Z=^("ODS") S %=$P(%Z,U,1) S:%]"" DE(13)=%
+ I $D(^("USR")) S %Z=^("USR") S %=$P(%Z,U,3) S:%]"" DE(14)=% S %=$P(%Z,U,4) S:%]"" DE(16)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -184,4 +186,26 @@ X10 K:$L(X)>30!($L(X)<3)!(X[";") X
 12 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=12 D X12 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
 X12 D DFN^DGYZODS S:'DGODS Y=102
  Q
-13 D:$D(DG)>9 F^DIE17 G ^DGPMXA1
+13 S DW="ODS;1",DV="S",DU="",DLB="ODS AT ADMISSION",DIFLD=11500.01
+ S DU="1:YES;0:NO;"
+ S Y="1"
+ S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD:X="@",Z
+X13 Q
+14 S DW="USR;3",DV="RP200'",DU="",DLB="LAST EDITED BY",DIFLD=102
+ S DU="VA(200,"
+ S X=DUZ
+ S Y=X
+ S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD:X="@",Z
+X14 Q
+15 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=15 G A
+16 S DW="USR;4",DV="RD",DU="",DLB="LAST EDITED ON",DIFLD=103
+ S %=$P($H,",",2),X=DT_(%\60#60/100+(%\3600)+(%#60/10000)/100)
+ S Y=X
+ S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD
+X16 S %DT="STX" D ^%DT S X=Y K:Y<1 X
+ Q
+ ;
+17 G 0^DIE17

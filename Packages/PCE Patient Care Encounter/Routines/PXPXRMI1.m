@@ -1,6 +1,6 @@
-PXPXRMI1 ; SLC/PKR,SCK - Build indexes for the V files. ;06/17/2003
- ;;1.0;PCE PATIENT CARE ENCOUNTER;**119,194**;Aug 12, 1996;Build 2
- ;DBIA 4113 supports PXRMSXRM entry points. 
+PXPXRMI1 ; SLC/PKR - Build indexes for the V files. ;06/17/2003
+ ;;1.0;PCE PATIENT CARE ENCOUNTER;**119**;Aug 12, 1996
+ ;DBIA 4113 supports PXRMSXRM entry points.
  ;DBIA 4114 supports setting and killing ^PXRMINDX
  ;===============================================================
 VCPT ;Build the indexes for V CPT.
@@ -34,8 +34,7 @@ VCPT ;Build the indexes for V CPT.
  . I CPT="" D  Q
  .. S ETEXT=DAS_" missing CPT"
  .. D ADDERROR^PXRMSXRM(GLOBAL,ETEXT,.NERROR)
- . ;I '$D(^ICPT(CPT)) D  Q
- . I $$CPT^ICPTCOD(CPT)<0 D  Q
+ . I '$D(^ICPT(CPT)) D  Q
  .. S ETEXT=DAS_" invalid CPT"
  .. D ADDERROR^PXRMSXRM(GLOBAL,ETEXT,.NERROR)
  . S DFN=$P(TEMP,U,2)

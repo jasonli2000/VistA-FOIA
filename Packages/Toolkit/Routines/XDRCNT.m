@@ -1,6 +1,5 @@
-XDRCNT ;SF-IRMFO/OHPRD/LAB - Count/Tally records by status/merged status;   [ 08/13/92  09:50 AM ] ;8/28/08  17:55
- ;;7.3;TOOLKIT;**23,113**;Apr 25, 1995;Build 5
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+XDRCNT ;SF-IRMFO/OHPRD/LAB - Count/Tally records by status/merged status;   [ 08/13/92  09:50 AM ] ;11/10/93  13:28 [5/2/96 11:50am]
+ ;;7.3;TOOLKIT;**23**;Apr 25, 1995
  ;;
 START ;
  D EN^XDRVCHEK
@@ -35,8 +34,6 @@ INIT ;initialize variables
  ;
 GETFILE ;get file to tally records fo
  K XDRFL
- ; XT*7.3*113 input variable XDRNOPT to FILE^XDRDQUE-if UNDEF, allows PATIENT file to be selected
- N XDRNOPT
  S DIC("A")="Tally duplicate entries for which file? " D FILE^XDRDQUE
  Q:XDRQFLG
  S XDRCNT("GBL")=^DIC(XDRFL,0,"GL"),XDRCNT("GBL")=$P(XDRCNT("GBL"),U,2)

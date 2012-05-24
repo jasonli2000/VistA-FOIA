@@ -1,22 +1,22 @@
 BPSRPT3 ;BHAM ISC/BEE - ECME REPORTS ;14-FEB-05
- ;;1.0;E CLAIMS MGMT ENGINE;**1,3,5,7**;JUN 2004;Build 46
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,3,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q
  ;
  ; Select the ECME Pharmacy or Pharmacies
- ; 
+ ;
  ; Input Variable -> none
  ; Return Value ->   "" = Valid Entry or Entries Selected
  ;                                        ^ = Exit
- ;                                       
+ ;
  ; Output Variable -> BPPHARM = 1 One or More Pharmacies Selected
  ;                          = 0 User Entered 'ALL'
- ;                            
+ ;
  ; If BPPHARM = 1 then the BPPHARM array will be defined where:
  ;    BPPHARM(ptr) = ptr ^ BPS PHARMACY NAME and
  ;    ptr = Internal Pointer to BPS PHARMACIES file (#9002313.56)
- ;                    
+ ;
 SELPHARM() N DIC,DIR,DIRUT,DTOUT,DUOUT,X,Y
  ;
  ;Reset BPPHARM array
@@ -36,13 +36,13 @@ SELPHARM() N DIC,DIR,DIRUT,DTOUT,DUOUT,X,Y
  E  S BPPHARM=$S(Y="A":0,1:1)
  ;
  ;If division selected, ask prompt
- I $G(BPPHARM)=1 F  D  Q:Y="^"!(Y="") 
+ I $G(BPPHARM)=1 F  D  Q:Y="^"!(Y="")
  .;
  .;Prompt for entry
  .K X S DIC(0)="QEAM",DIC=9002313.56,DIC("A")="Select ECME Pharmacy Division(s): "
  .W ! D ^DIC
  .;
- .;Check for "^" or timeout 
+ .;Check for "^" or timeout
  .I ($G(DUOUT)=1)!($G(DTOUT)=1) K BPPHARM S Y="^" Q
  .;
  .;Check for blank entry, quit if no previous selections
@@ -75,10 +75,10 @@ SELPHARM() N DIC,DIR,DIRUT,DTOUT,DUOUT,X,Y
  Q Y
  ;
  ; Display (S)ummary or (D)etail Format
- ; 
+ ;
  ; Input Variable -> DFLT = 1 Summary
  ;                          2 Detail
- ;                          
+ ;
  ; Return Value ->   1 = Summary
  ;                   0 = Detail
  ;                   ^ = Exit
@@ -91,19 +91,54 @@ SELSMDET(DFLT) N DIR,DIRUT,DTOUT,DUOUT,X,Y
  S Y=$S(Y="S":1,Y="D":0,1:Y)
  Q Y
  ;
+ ; Select to Display Single (I)nsurance Company or (A)ll
+ ;
+ ; Input Variable -> DFLT = 1 Single Insurance
+ ;                          0 All Insurance
+ ;
+ ; Return Value ->   ptr to #36^Insurance Company Name
+ ;                     0 = All Insurances
+ ;                     ^ = Exit
+ ;
+SELINSIN(DFLT) N DIC,DIR,DIRUT,DUOUT,INS,X,Y
+ ;
+ S DFLT=$S($G(DFLT)=1:"Single Insurance",1:"ALL")
+ S DIR(0)="S^I:Single Insurance;A:ALL"
+ S DIR("A")="Display Single (I)nsurance Company or (A)LL",DIR("B")=DFLT
+ D ^DIR
+ I ($G(DUOUT)=1)!($G(DTOUT)=1) S Y="^"
+ S INS=$S(Y="I":1,Y="A":0,1:Y)
+ ;
+ ;Check for "^" or timeout, otherwise define INS
+ I ($G(DUOUT)=1)!($G(DTOUT)=1) S (INS,Y)="^"
+ ;
+ ;If single insurance selected, ask prompt
+ I $G(INS)=1 D
+ .;
+ .;Prompt for entry
+ .W ! S Y=$$SELINS^BPSRPT6()
+ .;
+ .;Check for "^", timeout, or blank entry
+ .I ($G(DUOUT)=1)!($G(DTOUT)=1)!($G(X)="") S (INS,Y)="^" Q
+ .;
+ .;If valid entry, setup INS
+ .I Y'="^" S INS=Y
+ ;
+ Q INS
+ ;
  ; Display (C)MOP or (M)ail or (W)indow or (A)ll
- ; 
+ ;
  ;    Input Variable -> DFLT = C CMOP
  ;                             W Window
  ;                             M Mail
  ;                             A All
- ;                          
+ ;
  ;    Return Value ->   C = CMOP
  ;                      W = Window
  ;                      M = Mail
  ;                      A = All
  ;                      ^ = Exit
- ; 
+ ;
 SELMWC(DFLT) N DIR,DIRUT,DTOUT,DUOUT,X,Y
  S DFLT=$S($G(DFLT)="C":"CMOP",$G(DFLT)="W":"Window",$G(DFLT)="M":"Mail",1:"ALL")
  S DIR(0)="S^C:CMOP;M:Mail;W:Window;A:ALL"
@@ -117,7 +152,7 @@ SELMWC(DFLT) N DIR,DIRUT,DTOUT,DUOUT,X,Y
  ;    Input Variable -> DFLT = 3 Backbill
  ;                             2 Real Time Fills
  ;                             1 ALL
- ;                          
+ ;
  ;    Return Value ->   3 = Backbill (manually)
  ;                      2 = Real Time Fills (automatically during FINISH)
  ;                      1 = ALL
@@ -133,16 +168,16 @@ SELRTBCK(DFLT) N DIR,DIRUT,DTOUT,DUOUT,X,Y
  Q Y
  ;
  ; Display Specific (D)rug or Drug (C)lass
- ; 
+ ;
  ;    Input Variable -> DFLT = 3 Drug Class
  ;                             2 Drug
  ;                             1 ALL
- ;                          
+ ;
  ;     Return Value ->   3 = Drug Class
  ;                       2 = Drug
  ;                       1 = ALL
  ;                       ^ = Exit
- ;                       
+ ;
 SELDRGAL(DFLT) N DIR,DIRUT,DTOUT,DUOUT,X,Y
  S DFLT=$S($G(DFLT)=2:"Drug",$G(DFLT)=3:"Drug Class",1:"ALL")
  S DIR(0)="S^D:Drug;C:Drug Class;A:ALL"
@@ -153,12 +188,12 @@ SELDRGAL(DFLT) N DIR,DIRUT,DTOUT,DUOUT,X,Y
  Q Y
  ;
  ; Select Drug
- ; 
+ ;
  ; Input Variable -> none
- ; 
+ ;
  ; Return Value -> ptr = pointer to DRUG file (#50)
  ;                   ^ = Exit
- ;                   
+ ;
 SELDRG() N DIC,DIRUT,DUOUT,X,Y
  ;
  ;Prompt for entry
@@ -173,9 +208,9 @@ SELDRG() N DIC,DIRUT,DUOUT,X,Y
  Q Y
  ;
  ; Select Drug Class
- ; 
+ ;
  ; Input Variable -> none
- ; 
+ ;
  ; Return Value -> ptr = pointer to VA DRUG CLASS file (#50.605)
  ;                   ^ = Exit
  ;
@@ -195,12 +230,12 @@ SELDRGCL() N DIC,DIRUT,DUOUT,Y
  ;                          1-6 OTHER REPORTS
  ;
  ; Return Value -> P1^P2
- ; 
+ ;
  ;           where P1 = From Date
  ;                    = ^ Exit
  ;                 P2 = To Date
  ;                    = blank for Exit
- ;                 
+ ;
 SELDATE(TYPE) N BPSIBDT,DIR,DIRUT,DTOUT,DUOUT,VAL,X,Y
  S TYPE=$S($G(TYPE)=7:"CLOSE",1:"TRANSACTION")
 SELDATE1 S VAL="",DIR(0)="DA^:DT:EX",DIR("A")="START WITH "_TYPE_" DATE: ",DIR("B")="T-1"
@@ -221,41 +256,3 @@ SELDATE1 S VAL="",DIR(0)="DA^:DT:EX",DIR("A")="START WITH "_TYPE_" DATE: ",DIR("
  .S $P(VAL,U,2)=Y
  ;
  Q VAL
- ;
- ; Select to Include Eligibility of (V)eteran, (T)ricare, or (A)ll
- ; 
- ; Input Variable -> DFLT = 0 = All
- ;                          1 = Veteran
- ;                          2 = Tricare
- ;                          3 = ChampVA (Reserved for future use)
- ; 
- ; Return Value ->  V, T, or 0 for All
-SELELIG(DFLT) N DIC,DIR,DIRUT,DUOUT,X,Y
- ;
- S DFLT=$S($G(DFLT)=1:"V",$G(DFLT)=2:"T",$G(DFLT)=3:"C",1:"A")
- S DIR(0)="S^V:VETERAN;T:TRICARE;A:ALL"
- S DIR("A")="Include Certain Eligibility Type or (A)ll",DIR("B")=DFLT
- D ^DIR
- I ($G(DUOUT)=1)!($G(DTOUT)=1) S Y="^"
- ;
- S Y=$S(Y="A":0,1:Y)
- Q Y
- ;
- ; Select to Include Open or Closed or All claims
- ; 
- ; Input Variable -> DFLT = 0 = All
- ;                          1 = Closed
- ;                          2 = Open
- ; 
- ; Return Value -> 0 = All, 1 = Closed, 2 = Open
-SELOPCL(DFLT) N DIC,DIR,DIRUT,DUOUT,X,Y
- ;
- S DFLT=$S($G(DFLT)=1:"C",$G(DFLT)=2:"O",1:"A")
- S DIR(0)="S^O:OPEN;C:CLOSED;A:ALL"
- S DIR("A")="Include (O)pen, (C)losed, or (A)ll Claims",DIR("B")=DFLT
- D ^DIR
- I ($G(DUOUT)=1)!($G(DTOUT)=1) S Y="^"
- ;
- S Y=$S(Y="C":1,Y="O":2,1:0)
- Q Y
- ;

@@ -1,5 +1,5 @@
 BPSOS6M ;BHAM ISC/FCS/DRS - Print log of claim ;06/01/2004
- ;;1.0;E CLAIMS MGMT ENGINE;**1,5,8**;JUN 2004;Build 29
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ; Display the BPS Log for a given BPS Transaction
@@ -34,14 +34,6 @@ CLAIMLOG(IEN59) ;EP - from BPSSCRDV
  ; Patient
  W !,"Patient: "
  S X=$P(REC(0),U,6) I X]"" S X=$P($G(^DPT(X,0)),U) W X
- ;
- ; Insurance
- W !,"Insurance: "_$$INSNAME^BPSSCRU6(IEN59)
- ;
- ; RX Coord of Benefits
- W !,"RX Coord of Benefits: "
- S X=$P(REC(0),U,14) S X=$S($G(X)>0:$G(X),1:1)
- W $S(X=2:"Secondary",X=3:"Tertiary",1:"Primary")
  ;
  ; Status and Response
  W !!,"Status: "

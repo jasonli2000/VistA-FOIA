@@ -1,5 +1,5 @@
 PSOLLLH ;BIR/EJW - HIPAA/NCPDP LASER LABELS ;7/20/06 10:21am
- ;;7.0;OUTPATIENT PHARMACY;**161,148,244,200,326,321,350**;DEC 1997;Build 4
+ ;;7.0;OUTPATIENT PHARMACY;**161,148,244,200**;DEC 1997;Build 7
  ;
  ;Reference to DUR1^BPSNCPD3 supported by DBIA 4560
  ;
@@ -16,7 +16,6 @@ SIGLOG N PSOSEQ,J,RXF,RXY,RXN,RX,FIRST,DATE,BLNKLIN,RX2,FDT,BLNKLN2,LAST,CNT
  .I RX="" Q
  .Q:$G(^PSRX(RX,"STA"))>11                           ;*244
  .S RXY=$G(^PSRX(RX,0)) I RXY="" Q
- .I $P(RXY,"^",2)'=$G(DFN) Q  ;*321
  .S CNT=$G(CNT)+1
  .S RX2=$G(^PSRX(RX,2)),FDT=$P(RX2,"^",2)
  .I FIRST!(CNT#4=1) D HDR,BARC S FIRST=0
@@ -90,13 +89,13 @@ LRP W !! S DIC("S")="I $P($G(^(0)),""^"",2),$D(^(""STA"")),$P($G(^(""STA"")),""^
 GETPT2 D DEM^VADPT S PNM=VADM(1)
  I $P(VADM(6),"^",2)]"" D  G LRP
  .W $C(7),!!,PNM_" Died "_$P(VADM(6),"^",2)_".",!
- D 6^VADPT,PID^VADPT6 S SSNP=""
+ D 6^VADPT,PID^VADPT6 S SSNP=$G(VA("BID"))
 Q1 W ! K POP,ZTSK S %ZIS("B")="",%ZIS="MNQ",%ZIS("A")="Select LABEL DEVICE: " D ^%ZIS S PSLION=ION K %ZIS("A")
  I $G(POP) Q
  I $G(IOST(0)),'$D(^%ZIS(2,IOST(0),55,"B","LL")) W !,"Must specify a laser labels printer for Signature Log Reprint" G Q1
  I '$G(IOST(0)) W !,"Nothing queued to print." H 1 Q
  D NOW^%DTC S Y=$P(%,"."),PSOFNOW=% X ^DD("DD") S PSONOW=Y
- F G="PPL","REPRINT","PNM","STATE","PS2","PSOHZIP","PSOPAR","PSOSITE","PS","PSONOW","PSOSYS","SSNP","DFN" S:$D(@G) ZTSAVE(G)=""
+ F G="PPL","REPRINT","PNM","STATE","PS2","PSOHZIP","PSOPAR","PSOSITE","PS","PSONOW","PSOSYS","SSNP" S:$D(@G) ZTSAVE(G)=""
  S ZTRTN="DQ^PSOLLLH",ZTIO=PSLION,ZTDESC="Outpatient Pharmacy Signature Log Reprint",ZTDTH=$H,PDUZ=DUZ
  D ^%ZISC,^%ZTLOAD W:$D(ZTSK) !!,"Signature Log Reprint queued",!! H 1 K G
  G QUEUE

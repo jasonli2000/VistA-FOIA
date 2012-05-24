@@ -1,7 +1,7 @@
 PRCAGDR ;WASH-ISC@ALTOONA,PA/CMS - BALANCE DISCREPANCY REPORT ;12/3/93  9:40 AM
-V ;;4.5;Accounts Receivable;**78,198,219**;Mar 20, 1995;Build 18
- ;;Per VHA Directive 2004-038, this routine should not be modified.
- N CHK,DAT,DEB,DIC,LN1,LN2,NAM,SSN,STD,PG,POP,Y,X,%ZIS S COMM=0
+V ;;4.5;Accounts Receivable;**78,198**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
+ N CHK,DAT,DEB,DIC,LN1,LN2,NAM,SSN,STD,PG,POP,Y,X,%ZIS
 PAT ;select patient
  N DPTNOFZY,DPTNOFZK S (DPTNOFZY,DPTNOFZK)=1
  W ! S DIC="^DPT(",DIC(0)="AENMQ",DIC("A")="Select Patient: " D ^DIC G:Y<1 OUT S DEB=$O(^RCD(340,"B",+Y_";DPT(",0)) I 'DEB W *7," No AR Information exists!" G PAT
@@ -17,7 +17,6 @@ DEV W ! S IOP="Q",%ZIS="QN",%ZIS("B")="" D ^%ZIS G:POP OUT
  S ZTSAVE("DEB")="",ZTSAVE("NAM")="",ZTSAVE("SSN")="",ZTSAVE("STD")="",ZTRTN="EN^PRCAGDR",ZTDESC="AR DISCREPANCY REPORT" D ^%ZTLOAD G OUT
  Q
 OUT D ^%ZISC
- K ^XTMP("PRCAGU",$J),COMM
  Q
 CONT ;Ask to Continue
  ;N Y
@@ -58,7 +57,7 @@ ST ;Start here find bills
  I BBAL=0,$G(SITE("ZERO")) D 4^PRCAGDT Q
  I BBAL'>0,'$D(^TMP("PRCAGT",$J,DEB)) D 5^PRCAGDT Q
  I BBAL<0,BBAL>-.99 D 6^PRCAGDT Q
- I BBAL'<0,'$D(^XTMP("PRCAGU",$J,DEB)),'COMM D 10^PRCAGDT Q  ;third letter printed, not comment
+ I BBAL'<0,'$$ACT^PRCAGT(DEB,LDT3) D 7^PRCAGDT Q
  I CHK=1 D OK^PRCAGDT
  K ^TMP("PRCAGT",$J)
  Q

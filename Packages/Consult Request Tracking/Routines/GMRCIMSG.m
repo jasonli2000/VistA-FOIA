@@ -1,5 +1,5 @@
 GMRCIMSG ;SLC/JFR - IFC MESSAGE HANDLING ROUTINE; 09/26/02 00:23
- ;;3.0;CONSULT/REQUEST TRACKING;**22,28,51,44**;DEC 27, 1997
+ ;;3.0;CONSULT/REQUEST TRACKING;**22,28,51**;DEC 27, 1997
  ;
  Q  ;don't start at the top
 IN ;process incoming message and save segments to ^TMP(
@@ -36,9 +36,6 @@ IN ;process incoming message and save segments to ^TMP(
  ;
 EX ; clean up ^TMP(
  K ^TMP("GMRCIF",$J)
- ;call Prosthetics routine - added for RMPR*3*83
- I $T(EN^RMPRFC3)'="" D  ;invoke prosthetics code if tag^routine exists
- . D EN^RMPRFC3
  Q
  ;
 ORRIN ;process IFC responses
@@ -89,7 +86,7 @@ ORRIN ;process IFC responses
  Q
  ;
 VALMSG(GMRCORC) ;check to make sure placer and filler # match current entry
- ; Input: 
+ ; Input:
  ;  GMRCORC = ORC segment from incoming HL7 msg
  ;
  I $P(GMRCORC,"|")="NW" Q 1 ; no #'s to match on new order

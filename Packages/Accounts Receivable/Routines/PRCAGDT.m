@@ -1,6 +1,6 @@
 PRCAGDT ;WASH-ISC@ALTOONA,PA/CMS - BALANCE DISCREPANCY REPORT TEXT ;12/3/93  10:36 AM
-V ;;4.5;Accounts Receivable;**219**;Mar 20, 1995;Build 18
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;4.5;Accounts Receivable;;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
 OK ;Statement should print
  N X,Y
@@ -38,6 +38,7 @@ OK ;Statement should print
  G OUT
 7 ;no new activity (something other than int/admin charges) since the last three statement dates
  W !!,"This patient's statement will not print because it has no new activity",!,"for the past three statement dates other than int/admin charges."
+ W !!,"If you want to force a statement to print you can create a comment",!,"transaction and mark it so that it will appear on the statement."
  G OUT
 8(BEG) ;statement print on or after this date
  N Y
@@ -46,10 +47,6 @@ OK ;Statement should print
  G OUT
 9 ;statement date is unknown
  W !!,"Patient Statement Day is UNKNOWN!"
- G OUT
-10 ;third letter already printed
- W !!,"This patient's statement will not print because the third letter has",!,"already been printed."
- W !!,"If you want to force a statement to print you can create a comment",!,"transaction and mark it so that it will appear on the statement."
  G OUT
 OUT ;Exit here if account will not print statement
  S CHK=0

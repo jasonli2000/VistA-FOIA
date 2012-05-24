@@ -1,12 +1,13 @@
 IBCNEDEP ;DAOU/ALA - Process Transaction Records ;17-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,271,300,416,438**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**184,271,300**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;  This program finds records needing HL7 msg creation
  ;  Periodically check for stop request for background task
  ;
  ;  Variables
  ;    RETR = # retries allowed
+ ;    HLMAX = Maximum # of HL7 msgs
  ;    MGRP = Msg Mailgroup
  ;    FAIL = # of days before failure
  ;    FMSG = Failure Mailman flag
@@ -36,7 +37,8 @@ EN ;  Entry point
  ;
  ;  Get IB Site Parameters
  S IBCNEP=$G(^IBE(350.9,1,51))
- S RETR=+$P(IBCNEP,U,6),BNDL=$P(IBCNEP,U,23)
+ S RETR=+$P(IBCNEP,U,6),HLMAX=$P(IBCNEP,U,15),BNDL=$P(IBCNEP,U,23)
+ S:HLMAX="" HLMAX=99999999
  S MGRP=$$MGRP^IBCNEUT5()
  S FAIL=$P(IBCNEP,U,5),TMSG=$P(IBCNEP,U,7),FMSG=$P(IBCNEP,U,20)
  S FLDT=$$FMADD^XLFDT(DT,-FAIL)
@@ -137,7 +139,7 @@ RET ;  If status is 'Retry'
  .. I PAYR=$$FIND1^DIC(365.12,"","X","~NO PAYER") Q
  .. ;
  .. I VERID="V" D CERE^IBCNEDEQ
- . ; If generating retry, set eIV status to comm failure (5) for
+ . ; If generating retry, set IIV status to comm failure (5) for
  . ; remaining related responses
  . D RSTA^IBCNEUT7(IEN)
  ;
@@ -164,20 +166,19 @@ FIN ; Prioritize requests for statuses 'Retry' and 'Ready to Transmit'
  ;
 LP ;  Loop through priorities, process as either verifications
  ;  or identifications
- N IHCNT
  S VNUM="",IHCNT=0
- F  S VNUM=$O(^TMP("IBQUERY",$J,VNUM)) Q:VNUM=""  D  Q:$G(ZTSTOP)!$G(QFL)=1
+ F  S VNUM=$O(^TMP("IBQUERY",$J,VNUM)) Q:VNUM=""  D  Q:IHCNT=HLMAX!$G(ZTSTOP)!$G(QFL)=1
  . I VNUM=1!(VNUM=3) D VER Q
- . ;D ID
+ . D ID
  ;
 EXIT ;  Finish
  K BUFF,CNT,D,D0,DA,DFN,DI,DIC,DIE,DISYS,DQ,DR,DTCRT,EXT,FAIL,FLDT,FUTDT
  K FRDT,FMSG,GT1,HCT,HIEN,HL,HLCDOM,HLCINS,HLCS,HLCSTCP,HLDOM,HLECH,%I,%H
  K HLEID,HLFS,HLHDR,HLINST,HLIP,HLN,HLPARAM,HLPROD,HLQ,HLRESLT,XMSUB
- K HLSAN,HLTYPE,HLX,IBCNEP,IBCNHLP,IEN,IHCNT,IN1,IRIEN,MDTM,MGRP,MSGID,TOT
+ K HLSAN,HLTYPE,HLX,IBCNEP,IBCNHLP,IEN,IN1,IRIEN,MDTM,MGRP,MSGID,TOT
  K NRETR,NTRAN,OVRIDE,PAYR,PID,QFL,QUERY,RETR,RSIEN,SRVDT,STA,TRANSR,X
- K ZMID,^TMP("IBQUERY",$J),Y,DOD,DGREL,TMSG,RSTYPE,OMSGID,QFL
- K IBCNETOT,HLP,SUBID,VNUM,BNDL,IBDATA,PATID
+ K ZMID,IHCNT,HLMAX,^TMP("IBQUERY",$J),Y,DOD,DGREL,TMSG,RSTYPE,OMSGID,QFL
+ K IBCNETOT,HLP,SUBID,VNUM,BNDL,IBDATA
  Q
  ;
 VER ;  Initialize HL7 variables protocol for Verifications
@@ -185,16 +186,20 @@ VER ;  Initialize HL7 variables protocol for Verifications
  D INIT^IBCNEHLO
  ;
  S DFN=""
- F  S DFN=$O(^TMP("IBQUERY",$J,VNUM,DFN)) Q:DFN=""  D  Q:$G(ZTSTOP)
+ F  S DFN=$O(^TMP("IBQUERY",$J,VNUM,DFN)) Q:DFN=""  D  Q:IHCNT=HLMAX!$G(ZTSTOP)
  . ;
  . ;  If the INQUIRE SECONDARY INSURANCES flag is 'yes',
  . ;  bundle verifications together, send a continuation pointer
  . I VNUM=3,BNDL D  Q:QFL
  .. S TOT=0,IEN="",QFL=0
  .. F  S IEN=$O(^TMP("IBQUERY",$J,VNUM,DFN,IEN)) Q:IEN=""  S TOT=TOT+1
+ .. ;
+ .. ;  If the total # of "bundled" verifications is
+ .. ;  greater than the maximum # of HL7 allowed, quit
+ .. I (TOT+IHCNT)>HLMAX S QFL=1 Q
  . ;
  . S IEN="",OMSGID="",QFL=0,CNT=0
- . F  S IEN=$O(^TMP("IBQUERY",$J,VNUM,DFN,IEN)) Q:IEN=""  D  Q:$G(ZTSTOP)
+ . F  S IEN=$O(^TMP("IBQUERY",$J,VNUM,DFN,IEN)) Q:IEN=""  D  Q:IHCNT=HLMAX!$G(ZTSTOP)
  .. ; Update count for periodic check
  .. S IBCNETOT=IBCNETOT+1
  .. ; Check for request to stop background job, periodically
@@ -215,6 +220,14 @@ VER ;  Initialize HL7 variables protocol for Verifications
  ... I CNT=1 S OMSGID=MSGID
  ;
  K HL,IN1,GT1,PID,DFN,^TMP($J,"HLS")
+ ;
+ ; Exit based on stop request
+ I $G(ZTSTOP) Q
+ ;
+ ;  If the # of HL7 msgs generate equals the
+ ;  maximum # of HL7 msgs allowed, quit
+ I IHCNT=HLMAX Q
+ ;
  Q
  ;
 ID ;  Send Identification Msgs
@@ -224,7 +237,7 @@ ID ;  Send Identification Msgs
  D INIT^IBCNEHLO
  ;
  S DFN=""
- F  S DFN=$O(^TMP("IBQUERY",$J,VNUM,DFN)) Q:DFN=""  D  Q:$G(ZTSTOP)!QFL
+ F  S DFN=$O(^TMP("IBQUERY",$J,VNUM,DFN)) Q:DFN=""  D  Q:IHCNT=HLMAX!$G(ZTSTOP)!QFL
  . ; Update count for periodic check
  . S IBCNETOT=IBCNETOT+1
  . ; Check for request to stop background job, periodically
@@ -235,8 +248,13 @@ ID ;  Send Identification Msgs
  . ;  Get the total # of identification msgs for a patient
  . F  S IEN=$O(^TMP("IBQUERY",$J,VNUM,DFN,IEN)) Q:IEN=""  S TOT=TOT+1
  . ;
+ . ;  If the total # of identification msgs for this
+ . ;  patient is greater than the maximum # of allowed
+ . ;  HL7 msgs, stop processing until the next night
+ . I (TOT+IHCNT)>HLMAX S QFL=1 Q
+ . ;
  . ;  For each identification transaction generate an HL7 msg
- . F  S IEN=$O(^TMP("IBQUERY",$J,VNUM,DFN,IEN)) Q:IEN=""  D
+ . F  S IEN=$O(^TMP("IBQUERY",$J,VNUM,DFN,IEN)) Q:IEN=""  D  Q:IHCNT=HLMAX
  .. D PROC
  .. ;
  .. I VNUM=4 S HLP("CONTPTR")=$G(OMSGID)
@@ -260,7 +278,7 @@ PROC ;  Process TQ record
  S QUERY=$P(TRANSR,U,11),EXT=$P(TRANSR,U,10),SRVDT=$P(TRANSR,U,12)
  S IRIEN=$P(TRANSR,U,13),HCT=0,NTRAN=$P(TRANSR,U,7),NRETR=$P(TRANSR,U,8)
  S SUBID=$P(TRANSR,U,16),OVRIDE=$P(TRANSR,U,14),STA=$P(TRANSR,U,4)
- S FRDT=$P(TRANSR,U,17),PATID=$P(TRANSR,U,19)
+ S FRDT=$P(TRANSR,U,17)
  ;
  ;  Build the HL7 msg
  S HCT=HCT+1,^TMP("HLS",$J,HCT)="PRD|NA"
@@ -271,13 +289,7 @@ PROC ;  Process TQ record
  . S HCT=HCT+1
  . I VNUM=1 S ^TMP("HLS",$J,HCT)=$TR(IN1,"*","") Q
  . I VNUM=2,'BNDL S ^TMP("HLS",$J,HCT)=$TR(IN1,"*","") Q
- . S CNT=CNT+1 I TOT=0 S TOT=1
+ . S CNT=CNT+1
  . S $P(IN1,HLFS,22)=TOT,$P(IN1,HLFS,21)=CNT
  . S ^TMP("HLS",$J,HCT)=$TR(IN1,"*","")
- ;
- ;  Build multi-field NTE segment
- D NTE^IBCNEHLQ
- ;  If build successful
- I NTE'="",$E(NTE,1)'="*" S HCT=HCT+1,^TMP("HLS",$J,HCT)=$TR(NTE,"*","")
- K NTE
  Q

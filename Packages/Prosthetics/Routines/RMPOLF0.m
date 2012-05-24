@@ -1,5 +1,5 @@
 RMPOLF0 ;HIN CIOFO/RVD-DRIVER FOR HO LETTERS ;06/22/99
- ;;3.0;PROSTHETICS;**29,55,115,159**;Feb 09, 1996;Build 2
+ ;;3.0;PROSTHETICS;**29,55,115**;Feb 09, 1996
  ;
  ; ODJ - patch 55 - 1/29/01 - replace 121 hard code mail symbol with
  ;                            call to site param. extrinsic
@@ -60,7 +60,7 @@ HEADER ;
  S STATNID=$P(^RMPR(669.9,RMPOXITE,0),U,2) I $D(^DIC(4,STATNID,99)) S STATNID=$P(^DIC(4,STATNID,99),U)
  S ^TMP($J,"DW",11,0)="|TAB|"_$P(VADM(1),",",2)_" "_$P(VADM(1),",",1)_"|TAB|In Reply Refer To: "_STATNID_"/"_$$ROU^RMPRUTIL(RMPOXITE)
  K STATNID
- S ^TMP($J,"DW",12,0)="|TAB|"_VAPA(1)
+ S ^TMP($J,"DW",12,0)="|TAB|"_VAPA(1)_"|TAB|SSN: "_$P(VADM(2),U,2)
  I VAPA(2)]"" S ^TMP($J,"DW",13,0)="|TAB|"_VAPA(2)_"|TAB|"_VADM(1),^TMP($J,"DW",14,0)="|TAB|"_VAPA(4)_","_" "_$P(VAPA(5),U,2)_" "_VAPA(6)
  E  S ^TMP($J,"DW",13,0)="|TAB|"_VAPA(4)_","_" "_$P(VAPA(5),U,2)_" "_VAPA(6)_"|TAB|"_VADM(1)
  ;

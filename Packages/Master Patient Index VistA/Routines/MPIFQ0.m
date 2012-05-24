@@ -1,12 +1,7 @@
-MPIFQ0 ;ALB/RJS-QUERY HANDLER TOP LEVEL ; 5/14/08 6:20pm
- ;;1.0; MASTER PATIENT INDEX VISTA ;**1,3,8,14,13,16,17,21,20,24,26,28,31,33,35,38,43,52**;30 Apr 99;Build 7
- ;
- ; Integration Agreements utilized:
- ;  EXC, START and STOP^RGHLLOG - #2796
- ;  FILE^VAFCTFU - #2988
- ;  $$EN^HLCSAC - #3471
- ;  NAME^VAFCPID2 - #3492
- ;
+MPIFQ0 ;ALB/RJS-QUERY HANDLER TOP LEVEL ;2/8/07  22:22
+ ;;1.0; MASTER PATIENT INDEX VISTA ;**1,3,8,14,13,16,17,21,20,24,26,28,31,33,35,38,43,40**;30 Apr 99;Build 13
+ ; Modified from FOIA VISTA,
+ ; GPL Copyright (C) 2007 WorldVistA
 INTACTV ;Interactive standalone query
  N DFN,NAME1,MPIFLL
  K DTOUT,DUOUT,X,Y,DIC
@@ -22,15 +17,19 @@ CIRNEXC ; Exception Entry Point
  I $$IFLOCAL^MPIF001(DFN)=1 S MPIFLL=""
  I $G(LOCDATA(2,DFN,991.01))>0&('$D(MPIFLL)) W:'$D(MPIFRPC) !,"Patient already has an ICN" G END
  S HLP("ACKTIME")=300,MPIQRYNM="EXACT_MATCH_QUERY"
- ;MPIQRYNM="VTQ_PID_ICN_NO_LOAD" **43 CHANGING QUERY NAME
+ ;MPIQRYNM="VTQ_PID_ICN_NO_LOAD" CHANGING QUERY NAME
  G JUMP
 VTQ G:$G(DFN)']"" END
  N LOCDATA ;Data Returned from GETDATA in ICN array
  D GETDATA("^DPT(",DFN,"LOCDATA",".01;.02;.03;.09;.301;391;1901")
  S LOCDATA(2,DFN,991.01)=$P($$MPINODE^MPIFAPI(DFN),"^"),TSSN=LOCDATA(2,DFN,.09)
- ;S MPIQRYNM="VTQ_PID_ICN_NO_LOAD" **43 CHANGING QUERY NAME
+ ;S MPIQRYNM="VTQ_PID_ICN_NO_LOAD" CHANGING QUERY NAME
  S MPIQRYNM="EXACT_MATCH_QUERY"
  I $G(LOCDATA(2,DFN,991.01))>0 S MPIFRTN="ALREADY HAS ICN" G END ;If Pt already has ICN don't connect to MPI
+ ;New VOE code
+ ;Agency EHR does not use MPI
+ I '($G(DUZ("AG"))="V"!$$GET^XPAR("SYS","MPIF VOE MPI")) G END ;DAOU/WCJ;WV/CJS
+ ;End EHR modifications
 JUMP N TIME,% D NOW^%DTC S TIME=%
  N HL,MPIINM,MPIOUT,MPIIN,MPIMCNT,MPICNT,MPICS,HEADER,TEST,SITE,MPIDC,SSN
  I $G(HLP("ACKTIME"))="" S HLP("ACKTIME")=30 ;If the HLP("ACKTIME") is not already set for the D/C
@@ -68,22 +67,20 @@ DECIDE ;If no data in ^TMP that means the patient was not found in the MPI w/VTQ
  I '$D(^TMP("MPIFVQQ",$J)) D  G EXIT
  .I '$D(MPIFS) W:'$D(MPIFRPC) !!,"Exact match for Patient was not found in the MPI..."
  .D A28^MPIFQ3(DFN) S MPIFRTN="DID A28"
- .;**43 log potential match exception if exist
- .;**52 removed all references to logging of Potential Matches because that will be done via a remote RPC in the Probabilistic Search flow on the MPI
+ .; log potential match exception if exist
+ .I MPIPOT=1 D
+ ..D START^RGHLLOG(0),EXC^RGHLLOG(218,"Potential match(es) found, please review via MPI/PD Exception Handler",DFN),STOP^RGHLLOG(0)
+ ..K MPIPOT
  ;If INDEX=1 it means we got 1 match check SSN see if definitely same pt
  I (INDEX=1) D  G EXIT
- .;**43 Removed &(TSSN=SSN) from line above as there will only be an exact match returned now
+ .; Removed &(TSSN=SSN) from line above, only be an exact match returned now
  .N CCMOR,ICN,DATA,TICN,SNM,SNM2,IEN
  .S DATA=^TMP("MPIFVQQ",$J,INDEX,"DATA"),CMOR=$P(DATA,"^",5),ICN=$P(DATA,"^",6),IEN=$$IEN^XUAF4(CMOR)
  .D START^RGHLLOG(0)
  .S TICN=$$GETDFN^MPIF001(+ICN)
  .I TICN>0,DFN'=TICN D
- ..; call the new DUPLICATE RECORD MERGE ADD API (see section 3.2.1.2)
- ..N XDRSLT,XDRLST,XDRFL
- ..S XDRFL=2,XDRLST(1)=TICN_"^"_DFN
- ..D ADD^XDRDADDS(.XDRSLT,XDRFL,.XDRLST) S TWODFN=1
- ..;D TWODFNS^MPIF002(TICN,DFN,ICN) S TWODFN=1
- ..;I '$D(MPIFS) W:'$D(MPIFRPC) !!,"Exception logged, another patient has the ICN returned already, requesting new ICN for this patient..."
+ ..D TWODFNS^MPIF002(TICN,DFN,ICN) S TWODFN=1
+ ..I '$D(MPIFS) W:'$D(MPIFRPC) !!,"Exception logged, another patient has the ICN returned already, requesting new ICN for this patient..."
  ..D A28^MPIFQ3(DFN),STOP^RGHLLOG(0) S MPIFRTN="Did A28" Q
  .;I TICN>0&(DFN'=TICN)
  .; CHECK IF NAME IS SAME - IF NOT POTENTIAL MATCH EXCEPTION
@@ -101,7 +98,7 @@ DECIDE ;If no data in ^TMP that means the patient was not found in the MPI w/VTQ
  .;I '$D(EXC) S EXC=214,TEXT="Name fields don't match between site and MPI for DFN "_DFN
  .;I $D(MPIFINT) D START^MPIFQ1(INDEX) Q
  .;I '$D(MPIFINT) D LOC2^MPIFQ3(DFN) Q
- .I '$D(MPIFS)&('$D(TWODFN)) W:'$D(MPIFRPC) !!,"Found Patient "_$G(LOCDATA(2,DFN,.01))_" on MPI",!,"  Updating ICN to "_+ICN_"  - just a minute..."
+ .I '$D(MPIFS)&('$D(TWODFN)) W:'$D(MPIFRPC) !!,"Found Patient "_$G(LOCDATA(2,DFN,.01))_" on MPI",!,"  Updating ICN to "_+ICN_" and CMOR to "_$P($$NS^XUAF4(IEN),"^")_" ("_CMOR_")  - just a minute..."
  .D STOP^RGHLLOG(0),UPDATE(DFN,ICN,CMOR) S MPIFRTN="GOT 1 HIT FROM MPI"
  ;I '$D(MPIFINT) D  G EXIT
  ;. came in via PIMS options to d/c with MPI
@@ -133,7 +130,7 @@ UPDATE(DFN,ICN,CMOR) ;
  Q:$G(LOCAL)="Y"
  N RESLT S RESLT=$$A24^MPIFA24B(DFN)
  I +RESLT<0 D EXC^RGHLLOG(208,"Problem building A24 (ADD TF) for DFN= "_DFN,DFN)
- ; Added for patch 31, create treating facility list
+ ; create treating facility list
  I $D(^TMP("MPIFVQQ",$J,INDEX,"TF")) D
  . N MPINTFI,MPINTF,TFSTRG,TFIEN,MPIFMDT
  . S MPINTFI=0
@@ -145,8 +142,6 @@ UPDATE(DFN,ICN,CMOR) ;
  .. D FILE^VAFCTFU(DFN,TFSTRG,1)
  Q
 GETDATA(DIC,DA,MPIFAR,DR,EI) ;
- ;This function returns the values stored in the fields via FM call DIQ1
- ;DIC=file reference, DA=IEN in file, ARRAY=array for the values to be stored in, DR=fields requested, EI=external/internal values
  N DIQ S DIQ=MPIFAR
  I $G(EI)]"" S DIQ(0)=EI
  D EN^DIQ1
@@ -165,7 +160,7 @@ MSA ;
  Q
 RDF ;
  Q
-QAK ;**43 added check for potential matches
+QAK ; check potential matches
  K MPIPOT S MPIPOT=0
  I MSG(1)["POTENTIAL MATCHES" S MPIPOT=1
  Q
@@ -189,5 +184,4 @@ RDT ;
  S STRING=$$SETSTR^VALM1(SSN,STRING,30,9),STRING=$$SETSTR^VALM1(BIRTHDAY,STRING,41,10)
  S STRING=$$SETSTR^VALM1(CMOR,STRING,54,20)
  S ^TMP("MPIFVQQ",$J,INDEX,0)=STRING,^TMP("MPIFVQQ",$J,"IDX",INDEX,INDEX)=""
- Q
  Q

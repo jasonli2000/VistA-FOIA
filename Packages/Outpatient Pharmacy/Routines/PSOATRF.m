@@ -1,5 +1,5 @@
 PSOATRF ;BIR/MHA - Automate Internet Refill ;07/09/07
- ;;7.0;OUTPATIENT PHARMACY;**264,322**;DEC 1997;Build 4
+ ;;7.0;OUTPATIENT PHARMACY;**264**;DEC 1997;Build 19
  ;Reference to ^PSSLOCK supported by DBIA 2789
  ;Reference ^PSDRUG supported by DBIA 221
  ;Reference ^PS(55 supported by DBIA 2228
@@ -15,7 +15,7 @@ START ;
  I $G(PSXSYS) D
  . K:($P($G(^PSX(550,+PSXSYS,0)),"^",2)'="A") PSXSYS
  . I $$VERSION^XPDUTL("PSO")<7.0 K PSXSYS
- I '$O(^XUSEC("PSOAUTRF","")) S PSOITMG="There are no users with PSOAUTRF key, at least one should have this key." G END
+ S DUZ=$O(^XUSEC("PSOAUTRF","")) I 'DUZ S PSOITMG="There are no users with PSOAUTRF key, at least one should have this key." G END
  I '$D(^PS(52.43,"AINST",PSOINST)) S PSOITMG="There are no internet refills to process for Institution "_PSOINST G END
  L +^XTMP(PSOITNS):3 E  S PSOITMG="Automate Internet Refill job is currently running - Try later." G END
  K ^XTMP(PSOITNS,$J)
@@ -61,12 +61,6 @@ PRORF ;
  . I '$P(PSOPAR,U,11),$G(^PSDRUG(DRG,"I"))]"",DT>$G(^("I")) D  Q
  . . S PSOITNF=1,PSOITMG="Drug is inactive for Rx # "_RXN_" cannot be refilled"
  . S I=$P(^PSRX(PSOITRX,2),U,9) S:'I I=PSOITDD D SDIV
- . ;
- . I $G(PSOBDIV) D  Q
- . . S PSOITNF=1
- . . S PSOITMG="Inactive division for Rx # "_RXN_".  Cannot refill."
- . . K PSOBDIV
- . ;
  . I $G(PSOPTPST(2,PSODFN,.1))]"",'PSORFN S PSOITNF=1,PSOITMG="Patient is an Inpatient on Ward "_PSOPTPST(2,PSODFN,.1) Q
  . I $G(PSOPTPST(2,PSODFN,148))="YES",'$P(PSORFN,U,2) S PSOITNF=1,PSOITMG="Patient is in a Contract Nursing Home" Q
  . D CHKRF Q:PSOITNF
@@ -94,10 +88,7 @@ CHKRF ;
  . . S PSOITNF=1,PSOITMG="Cannot refill Rx # "_RXN
  . . S PSOREA=$P(PSOY,U,4),PSOSTAT=PSOX("STA")
  . . I PSOREA["Z" S:PSOSTAT=4 PSOSTAT=1 D  Q
- . . . S PSOA=";"_PSOSTAT
- . . . D STATUS^PSODI(52,100,"PSOB")
- . . . S PSOA=$F(PSOB("POINTER"),PSOA)
- . . . S PSOA=$P($E(PSOB("POINTER"),PSOA,999),";",1)
+ . . . S PSOA=";"_PSOSTAT,PSOB=$P(^DD(52,100,0),U,3),PSOA=$F(PSOB,PSOA),PSOA=$P($E(PSOB,PSOA,999),";",1)
  . . . S PSOITMG=PSOITMG_" Rx is in "_$P(PSOA,":",2)_" status"
  . . . K PSOA,PSOB
  . . I PSOREA["M" S PSOITMG=PSOITMG_" Drug no longer used by Outpatient Pharmacy" Q
@@ -146,8 +137,7 @@ EX ;
  Q
  ;
 SDIV ;
- S PSOSITE=$G(PSOSITE(I)) I 'PSOSITE S PSOSITE=I,PSOBDIV=1 Q
- S PSOPAR=PSOPAR(I),PSOPRPAS=PSOPRPAS(I),PSORFN=PSORFN(I)
+ S PSOSITE=PSOSITE(I),PSOPAR=PSOPAR(I),PSOPRPAS=PSOPRPAS(I),PSORFN=PSORFN(I)
  S PSOPAR7=PSOPAR7(I),PSOPINST=PSOPINST(I)
  Q
  ;
@@ -191,4 +181,4 @@ NEXT ;
 DSP(X) ;
  Q:'X ""
  Q $E(X,4,5)_"/"_$E(X,6,7)_"/"_$E(X,2,3)
- ; 
+ ;

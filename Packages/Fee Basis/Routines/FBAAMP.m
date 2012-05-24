@@ -1,5 +1,5 @@
 FBAAMP ;AISC/CMR-MULTIPLE PAYMENT ENTRY ;9/29/2003
- ;;3.5;FEE BASIS;**4,21,38,55,61,67,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**4,21,38,55,61,67**;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  S FBMP=1 ;multiple payment flag
  G ^FBAACO
@@ -53,9 +53,7 @@ FILE S TP="",DR="1///^S X=FBJ;Q;2///^S X=FBK;47///^S X=FBUNITS"
  L -^FBAAC(DFN,1,FBV,1,FBSDI,1,FBAACPI)
  S FBINTOT=FBINTOT+FBK
  W " ....OK, DONE...."
- ; HIPAA 5010 - count line items that have 0.00 amount paid
- ;I FBK>0 S Z1=$P(^FBAA(161.7,FBAABE,0),"^",11)+1,$P(^(0),"^",11)=Z1
- S Z1=$P(^FBAA(161.7,FBAABE,0),"^",11)+1,$P(^(0),"^",11)=Z1
+ I FBK>0 S Z1=$P(^FBAA(161.7,FBAABE,0),"^",11)+1,$P(^(0),"^",11)=Z1
  W:Z1>(FBAAMPI-20) !,*7,"Warning, you can only enter ",(FBAAMPI-Z1)," more line items!" I Z1>(FBAAMPI-1) D  S FBMAX=1 G Q1
  .W !!,*7,"You have reached the maximum number of payments for a Batch!",!,"You must select another Batch for entering Payments!"
  G MULT

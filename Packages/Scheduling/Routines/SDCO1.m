@@ -1,5 +1,5 @@
-SDCO1 ;ALB/RMO - Appointment - Check Out;Apr 23 1999  ; 12/11/08 5:30pm  ; Compiled December 12, 2008 13:01:34
- ;;5.3;Scheduling;**27,132,149,193,250,296,446,538**;08/13/93;Build 5
+SDCO1 ;ALB/RMO - Appointment - Check Out;Apr 23 1999  ; Compiled November 16, 2006 15:24:29
+ ;;5.3;Scheduling;**27,132,149,193,250,296,446**;08/13/93;Build 77
  ;
  ;check out if sd/369 is released before 446!!!
  ;
@@ -93,7 +93,7 @@ EWLCHK ;check if patient has any open EWL entries (SD/372)
  .Q:'$D(^TMP($J,"SDWLPL"))
  .D LIST^SDWLPL("M",DFN)
  .F  Q:'$D(^TMP($J,"SDWLPL"))  N SDR D ANSW^SDWLEVAL(1,.SDR) I 'SDR D LIST^SDWLPL("M",DFN) D
- ..F  N SDR  D ANSW^SDWLEVAL(0,.SDR) Q:'$D(^TMP($J,"SDWLPL"))  I 'SDR W !!,"MUST ACCEPT OR ENTER A REASON NOT TO DISPOSITION MATCHED EWL ENTRY",!
+ ..F  N SDR  D ANSW^SDWLEVAL(0,.SDR) Q:'$D(^TMP($J,"SDWLPL"))  I 'SDR W !,"MUST ENTER A REASON NOT TO DISPOSITION MATCHED EWL ENTRY",!
  ..Q
  .Q
  Q

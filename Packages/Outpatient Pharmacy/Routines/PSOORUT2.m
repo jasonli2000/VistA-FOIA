@@ -1,5 +1,5 @@
 PSOORUT2 ;ISC BHAM/SAB - build listman screen ; 3/20/07 9:47am
- ;;7.0;OUTPATIENT PHARMACY;**11,146,132,182,233,243,261,268,264,305**;DEC 1997;Build 8
+ ;;7.0;OUTPATIENT PHARMACY;**11,146,132,182,233,243,261,268,264**;DEC 1997;Build 19
  ;External reference to SDPHARM1 supported by DBIA 4196
  ;External reference ^PS(55 supported by DBIA 2228
  ;External reference ^DIC(31 supported by DBIA 658
@@ -16,7 +16,7 @@ PSOORUT2 ;ISC BHAM/SAB - build listman screen ; 3/20/07 9:47am
  S ^TMP("PSOHDR",$J,7,0)=$S($P(HT,"^",8):$P(HT,"^",9)_" ("_$P(HT,"^")_")",1:"_______ (______)") K VM,WT,HT S PSOHD=7
  S GMRA="0^0^111" D ^GMRADPT S ^TMP("PSOHDR",$J,8,0)=+$G(GMRAL)
  S $P(^TMP("PSOHDR",$J,9,0)," ",62)="ISSUE  LAST REF DAY"
- S ^TMP("PSOHDR",$J,10,0)=" #  RX #         DRUG                                 QTY ST  DATE  "_$S($G(PSORFG):"RELD",1:"FILL")_" REM SUP"
+ S ^TMP("PSOHDR",$J,10,0)=" #  RX #         DRUG                                 QTY ST  DATE  FILL REM SUP"
  D ELIG^VADPT S IEN=1,^TMP("PSOPI",$J,IEN,0)="Eligibility: "_$P(VAEL(1),"^",2)_$S(+VAEL(3):"     SC%: "_$P(VAEL(3),"^",2),1:""),IEN=IEN+1
  S N=0 F  S N=$O(VAEL(1,N)) Q:'N  S $P(^TMP("PSOPI",$J,IEN,0)," ",14)=$P(VAEL(1,N),"^",2),IEN=IEN+1
  S ^TMP("PSOPI",$J,IEN,0)="",^TMP("PSOPI",$J,IEN,0)="RX PATIENT STATUS: "_$$GET1^DIQ(55,PSODFN,3),IEN=IEN+1
@@ -129,7 +129,7 @@ ALLERGY ;ALLERGIES & REACTIONS
 CHKNO(T) ;
  I T="No Allergy Assessment" S PSONOAL=T
  Q
-PSONOAL ;
+PSONOAL   ;
  N FLG3,FLG4,FLG5
  S CCC=$G(^TMP($J,"PSOAPT",2,1))
  S FLG3=$G(^TMP($J,"PSOAPT",3,1))

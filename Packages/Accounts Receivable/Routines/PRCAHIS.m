@@ -1,5 +1,5 @@
 PRCAHIS ;WASH-ISC@ALTOONA,PA/LDB-Transaction History Report ;9/27/93  4:32 PM
-V ;;4.5;Accounts Receivable;**110,198,233**;Mar 20, 1995;Build 4
+V ;;4.5;Accounts Receivable;**110,198**;Mar 20, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 EN ;Ask debtor and date range for transaction history
@@ -63,12 +63,12 @@ PRINT ;Print transactions
  ..Q:(BN=0)  S TN="" F  S TN=$O(^TMP("PRCAGT",$J,DEB,DATE,BN,TN)) Q:TN=""  Q:$D(DIRUT)  D SCRN D
  ...I 'TN,$D(^TMP("PRCAGT",$J,DEB,DATE,BN,0)) S PNODE=^(0),BN0=$G(^PRCA(430,+BN,0)) W !!,$$FMTE^XLFDT($P(DATE,".")) D
  ....S CAT=$P(BN0,"^",2),CAT=$S(CAT=24&$P(BN0,"^",16):$P(^PRCA(430.2,$P(BN0,"^",16),0),"^"),1:$P($G(^PRCA(430.2,+CAT,0)),"^"))
- ....W ?16,CAT," BILL",?56,$P($G(^PRCA(430,+BN,0)),"^"),?69,$J(+PNODE,10,2)
+ ....W ?16,CAT," BILL",?58,$P($G(^PRCA(430,+BN,0)),"^"),?68,$J(+PNODE,10,2)
  ....W !,?16,$P($G(^PRCA(430.3,+$P(BN0,"^",8),0)),"^")
  ...I TN S PNODE=^TMP("PRCAGT",$J,DEB,DATE,BN,TN) W !!,$$FMTE^XLFDT(DATE,"1D"),?16 S TYP=$P($G(^PRCA(433,+TN,1)),"^",2),TTYP=$P($G(^PRCA(430.3,+TYP,0)),U) W TTYP D
  ....S CAT=$P($G(^PRCA(430,+BN,0)),"^",2),CAT=$P($G(^PRCA(430.2,+CAT,0)),"^")
  ....S CATCARE=$P($G(^PRCA(430,+BN,0)),"^",16),CATCARE=$P($G(^PRCA(430.2,+$P(^(0),"^",16),0)),"^")
- ...I TN W ?56,$P($G(^PRCA(430,+BN,0)),"^") W:+TYP'=45 ?69,$J(+PNODE,10,2)
+ ...I TN W ?58,$P($G(^PRCA(430,+BN,0)),"^") W:+TYP'=45 ?68,$J(+PNODE,10,2)
  ...I TN W !?16,CAT W:CATCARE]"" !,?16,CATCARE
  ...I TN,(+TYP=45) D
  ....I $D(^PRCA(433,+TN,5)) W !?16,$P(^(5),"^",2)
@@ -91,4 +91,4 @@ HDR ;Heading for report
  W !,?20,"-------------------------------------"
  W !!,?18,"For Patient: ",$$NAM^RCFN01(DEB),!,?25,"SSN : ",$$SSN^RCFN01(DEB)
  W !,?20,"For dates: ",$$FMTE^XLFDT(BDATE,"1D"),"-",$$FMTE^XLFDT(EDATE,"1D")
- W !!," DATE",?16,"ACTIVITY",?56,"BILL #",?73,"AMOUNT",!,LINE
+ W !!," DATE",?16,"ACTIVITY",?58,"BILL #",?73,"AMOUNT",!,LINE

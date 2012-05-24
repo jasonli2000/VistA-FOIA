@@ -1,21 +1,28 @@
 RGRSUTIL ;ALB/RJS-MPI/PD UTILITIES ;03/12/96
- ;;1.0;CLINICAL INFO RESOURCE NETWORK;**1,3,19,45,57**;30 Apr 99;Build 2
+ ;;1.0;CLINICAL INFO RESOURCE NETWORK;**1,3,19,45**;30 Apr 99;Build 9
+ ;
 EXCEPT ;Members of the RG CIRN DEMOGRAPHIC ISSUES Mail Group are
- ;notified upon login if there are unresolved Primary View
- ;Reject exceptions for review in the MPI/PD Exception
- ;Handler ;**57 MPIC_1893 Only exception type 234 remains
+ ;notified upon login if there are unresolved exceptions in
+ ;the MPI/PD Exception Handler or if there are Primary View
+ ;Reject exceptions for review.
  ;
  ;Is user a member of this mail group?
  S RGCDI=$$FIND1^DIC(3.8,,,"RG CIRN DEMOGRAPHIC ISSUES")
  I RGCDI="" G END
  S XMDUZ=DUZ,Y=RGCDI D CHK^XMA21 I '$T G END
  ;User is a member.
- I $O(^RGHL7(991.1,"ASTAT","0",234,0)) D
+ S RGNOTFY=$$CUREX^RGEX01()
+ I (RGNOTFY=1)!(RGNOTFY=3) D
+ .D SET^XUS1A("!  <<------------------------------------------------------------------------>>")
+ .D SET^XUS1A("!  << Use the MPI/PD Exception Handling option on the Message Exception      >>")
+ .D SET^XUS1A("!  << Menu to resolve exceptions.                                            >>")
+ .D SET^XUS1A("!  <<------------------------------------------------------------------------>>")
+ I (RGNOTFY=2)!(RGNOTFY=3) D
  .D SET^XUS1A("!  <<------------------------------------------------------------------------>>")
  .D SET^XUS1A("!  << You have Primary View Reject exceptions that need to be reviewed using >>")
  .D SET^XUS1A("!  << the MPI/PD Exception Handling Option on the Message Exception Menu.    >>")
  .D SET^XUS1A("!  <<------------------------------------------------------------------------>>")
-END K RGCDI,XMDUZ,Y
+END K RGCDI,RGNOTFY,XMDUZ,Y
  Q
  ;
 SEG(SEGMENT,PIECE,CODE) ;Return segment from RGDC array and kill node
@@ -27,7 +34,7 @@ SEG(SEGMENT,PIECE,CODE) ;Return segment from RGDC array and kill node
  .I ($P(RGDATA,HL("FS"),1)=SEGMENT)&($P($P(RGDATA,HL("FS"),PIECE),RGC,1)=CODE) S RGDONE=1 K RGDC(RGNODE)
  Q:$D(RGDONE) $G(RGDATA)
  Q ""
-SEG1(SEGMENT,PIECE,CODE) ;Return segment from RGDC array 
+SEG1(SEGMENT,PIECE,CODE) ;Return segment from RGDC array
  N RGNODE,RGDATA,RGDONE,RGC K RGDONE
  I '$D(RGC) S RGC=$E(HL("ECH"))
  S RGNODE=0
@@ -51,7 +58,7 @@ SSNDFN(SSN) ;Input ssn output DFN
  Q:$L(DFN) DFN
  Q -1
  ;
-LINE() ; Return a dashed line.       
+LINE() ; Return a dashed line.
  Q $TR($J("",80)," ","-")
  ;
 PAUSE() ; Pause for CRT output.

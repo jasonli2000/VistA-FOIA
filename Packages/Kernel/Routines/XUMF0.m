@@ -1,11 +1,12 @@
 XUMF0 ;ISS/RAM - XUMF API's;04/15/02
- ;;8.0;KERNEL;**407,474**;Jul 10, 1995;Build 12
- ;Per VHA Directive 10-92-142, this routine should not be modified
+ ;;8.0;KERNEL;**407**;Jul 10, 1995;Build 8
  ;
  Q
  ;
  ;
 MFE(IFN,VUID,IEN,ERROR) ; -- update
+ ;
+ ;N IENS,MFE,I,X,ID,XREF,NAME,FLD,FDA,DIC,Y
  ;
  I 'IFN S ERROR="1^Error - IFN required HLNODE: "_HLNODE Q
  I IFN=4.009 S IEN=$$FIND1^DIC(IFN,,"B","GLOBAL VERSION") Q
@@ -34,21 +35,12 @@ STUB ; -- create record and update VUID with master flag
  S ROOT=$$ROOT^DILFD(IFN,,1)
  S IEN=$O(@ROOT@(XREF,NAME,0))
  ;
- I IEN D
- .N ROOT
- .S ROOT=$$ROOT^DILFD(IFN,,1)
- .M RECORD("BEFORE")=@ROOT@(IEN)
- .S RECORD("STATUS")=$$GETSTAT^XTID(IFN,,IEN_",")
- ;
  I 'IEN D  Q:ERROR
  .D CHK^DIE(IFN,.01,,NAME,.X)
  .I X="^" S ERROR="1^Error - .01 is invalid"_" File #: "_IFN_" HLNODE="_HLNODE Q
  .K DIC S DIC=IFN,DIC(0)="F" D FILE^DICN K DIC
  .I Y="-1" S ERROR="1^Error - stub entry IFN: "_IFN_" failed HLNODE: "_HLNODE Q
- .S IEN=+Y,RECORD("NEW")=1
- ;
- S:'$G(RECORD("NEW")) ^TMP("XUMF EVENT",$J,IFN,"BEFORE",IEN,"REPLACED BY")=""
- S:'$G(RECORD("NEW")) ^TMP("XUMF EVENT",$J,IFN,"BEFORE",IEN,"INHERITS FROM")=""
+ .S IEN=+Y
  ;
  S IENS=IEN_","
  ;
@@ -153,21 +145,6 @@ EM ; -- error message
  M X=^TMP("XUMF ERROR",$J)
  ;
  D ^XMD
- ;
- Q
- ;
- ;
-EVT ; -- calls the MFS event protocol
- ;
- N OROLD,X
- K DTOUT,DIROUT
- ;
- I '$D(^TMP("XUMF EVENT")) Q
- ;
- S X=+$O(^ORD(101,"B","XUMF MFS EVENTS",0))_";ORD(101,"
- D EN^XQOR
- ;
- K XQORPOP,X,^TMP("XUMF EVENT",$J) Q
  ;
  Q
  ;

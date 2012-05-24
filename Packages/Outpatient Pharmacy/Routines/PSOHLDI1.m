@@ -1,5 +1,5 @@
-PSOHLDI1 ;BIR/PWC,SAB - Automated Dispense Completion HL7 v.2.4 cont. ; 5/29/09 3:28pm
- ;;7.0;OUTPATIENT PHARMACY;**259,268,330**;DEC 1997;Build 5
+PSOHLDI1 ;BIR/PWC,SAB - Automated Dispense Completion HL7 v.2.4 cont. ;10/25/06 10:04am
+ ;;7.0;OUTPATIENT PHARMACY;**259,268**;DEC 1997;Build 9
  ;Reference to ^PSD(58.8 supported by DBIA 1036
  ;Reference to ^XTMP("PSA" supported by DBIA 1036
  ;This routine is called by PSOHLDIS
@@ -23,16 +23,15 @@ BINGREL ;displays to bingo board
  S RX0=^PS(52.11,DA,0),JOES=$P(RX0,"^",4),TICK=+$P($G(RX0),"^",2),GRP=$P($G(^PS(59.3,$P($G(^PS(52.11,DA,0)),"^",3),0)),"^",2)
  I GRP="T",'$G(TICK) S DIK="^PS(52.11," D ^DIK K DIK
  Q:'$G(DA)
- S PSZ=0 I '$D(^PS(59.2,DT,0)) K DD,DIC,DO,DA S X=DT,DIC="^PS(59.2,",DIC(0)="",DINUM=X D FILE^DICN S PSZ=1 Q:Y'>0 
+ S PSZ=0 I '$D(^PS(59.2,DT,0)) K DD,DIC,DO,DA S X=DT,DIC="^PS(59.2,",DIC(0)="",DINUM=X D FILE^DICN S PSZ=1 Q:Y'>0
  I PSZ=1 S DA(1)=+Y,DIC=DIC_DA(1)_",1,",(DINUM,X)=JOES,DIC(0)="",DIC("P")=$P(^DD(59.2,1,0),"^",2) K DD,DO D FILE^DICN K DIC,DA Q:Y'>0
  I PSZ=0 K DD,DIC,DO,DA S DA(1)=DT,(DINUM,X)=JOES,DIC="^PS(59.2,"_DT_",1,",DIC(0)="LZ" D FILE^DICN K DIC,DA,DO
  S DA=ODA D STATS1^PSOBRPRT,WTIME^PSOBING1
  Q
  ;
-DRGACCT(RXP,PSOSITE) ;update Drug Accountability Package PSO*209,*330
+DRGACCT(RXP) ;update Drug Accountability Package                      ;PSO*209
  S RXP=+$G(RXP) Q:'RXP
- S PSOSITE=+$G(PSOSITE) Q:'PSOSITE    ; PSO*7*330
- N PSA,DIC,DA,DR,X,Y,DIQ,PSODA,QDRUG,QTY,JOB192
+ N PSA,DIC,DA,DR,X,Y,DIQ,PSODA,PSOSITE,QDRUG,QTY,JOB192
  S (JOB192,PSODA)=0
  ;check for Drug Acct background job
  S X="PSA IV ALL LOCATIONS",DIC(0)="MZ",DIC=19.2 D ^DIC S JOB192=Y
@@ -46,6 +45,7 @@ DRGACCT(RXP,PSOSITE) ;update Drug Accountability Package PSO*209,*330
  . . S PSODA=1
  . . S:'$P($G(^XTMP("PSA",0)),U,2) $P(^(0),U,2)=DT
  ;drug stocked in Drug Acct Location?
+ S PSOSITE=+$O(^PS(59,0))
  S PSODA(1)=$S($D(^PSD(58.8,+$O(^PSD(58.8,"AOP",PSOSITE,0)),1,+$P(^PSRX(RXP,0),U,6))):1,1:0)
  ;if appropriate update ^XTMP("PSA", for Drug Acct
  S QTY=$P($G(^PSRX(RXP,0)),"^",7)
@@ -60,8 +60,6 @@ MAIL ;Send mail message
  S XMY("G.PSO EXTERNAL DISPENSE ALERTS")=""
  ;if no members in group, then send to PSXCMOPMGR key holders
  S PSOIEN=$O(^XMB(3.8,"B","PSO EXTERNAL DISPENSE ALERTS",0))
- I $G(FLL)'="" D
- . I FLL="P" S FLLN="Partial "_FLLN
  I '$O(^XMB(3.8,PSOIEN,1,0)) D
  . S PSOKEYN=0
  . F  S PSOKEYN=$O(^XUSEC("PSXCMOPMGR",PSOKEYN)) Q:'PSOKEYN  D

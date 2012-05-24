@@ -1,16 +1,16 @@
 IBCEMRAX ;ALB/DSM - MEDICARE REMITTANCE ADVICE DETAIL-PART A Cont'd ;25-APR-2003
- ;;2.0;INTEGRATED BILLING;**155,432**;21-MAR-94;Build 192
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**155**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  Q
  ;
-DEV(IBIFN,IBMRANOT) ; Prompt the user for a device  ; WCJ IB*2.0*432
+DEV(IBIFN) ; Prompt the user for a device
  ; Input: IBIFN= ien# of Claim file
- ;    IBMRANOT = 1 if NOT an MRA    ; WCJ IB*2.0*432
+ ;
  N %ZIS,ZTRTN,ZTSAVE,ZTDESC,POP,MRACNT
  I '$G(IBIFN) Q  ;DEV
  W !!,"This report displays Medicare-equivalent Remittance Advice Detail."
- S MRACNT=$$MRACNT^IBCEMU1(IBIFN,$G(IBMRANOT))
+ S MRACNT=$$MRACNT^IBCEMU1(IBIFN)
  I MRACNT>1 W !,"*** Multiple MRAs on File for this claim.  ",MRACNT," MRAs will be printed. ***"
  W !,"You will need a 132 column printer for this report",!
  ;
@@ -35,7 +35,7 @@ SRVHDR ; Print Srvice Level Header
  Q  ;SRVHDR
  ;
 SRVDATA ; Get Service Level Data of EOB file (#361.1 Level 15)
- ; 
+ ;
  N LNLVL,RLVL,GLVL,RLVLD,GLVLD,SRVDED,GRPCD,RSNCD,SRVCOIN,I,MOD,SRMKS,LNLVLD
  N PRCD,REVCD,UNIT,SRVDT,PRCTYP,ALWD,PAID,SRVDED,GLVL,RCNT,OPRCD,TOTL,LNORD,LNCNT
  ; Use array LNORD to sort Service Lines in order of Referenced Line #

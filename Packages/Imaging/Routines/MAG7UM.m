@@ -1,6 +1,5 @@
-MAG7UM ;WOIFO/MLH - Imaging - HL7 - utilities - make a message from a parse tree; 05/18/2007 11:23
- ;;3.0;IMAGING;**11,54**;03-July-2009;;Build 1424
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAG7UM ;WOIFO/MLH - Imaging - HL7 - utilities - make a message from a parse tree
+ ;;3.0;IMAGING;**11**;14-April-2004
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAG7UM ;WOIFO/MLH - Imaging - HL7 - utilities - make a message from a parse tree
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -15,6 +15,7 @@ MAG7UM ;WOIFO/MLH - Imaging - HL7 - utilities - make a message from a parse tree
  ;; | to be a violation of US Federal Statutes.                     |
  ;; +---------------------------------------------------------------+
  ;;
+ ;
  Q
  ;
 MAKE(XTREE,XMSG) ; make a parse tree into an array of message lines
@@ -24,13 +25,13 @@ MAKE(XTREE,XMSG) ; make a parse tree into an array of message lines
  ;   @XTREE@(NSEG,0)                    segment name
  ;   @XTREE@(NSEG,NFLD,NREP,NCMP,NSCM)  element data
  ;   @XTREE@("B",SEGID,NSEG)            null
- ;   
+ ;
  ;            XMSG      The name of a single-dimensional array to be populated
  ;                      with message lines ($NA format).  This array is
  ;                      cleared on invocation.
- ;                      
+ ;
  ;  OUTPUT:   XMSG      The array after being populated with message lines
- ; 
+ ;
  N UFS,UCS,URS,UEC,USS ;---------------- HL7 delimiters (universal)
  N X,I ; --------------------------------- scratch var
  N ERR ; ------------------------------- error flag
@@ -47,13 +48,13 @@ MAKE(XTREE,XMSG) ; make a parse tree into an array of message lines
  Q:$D(@XTREE)<10 -1 ; parse tree sent?
  S NSEG=$O(@XTREE@("")),NMSEG=1
  Q:$G(@XTREE@(NSEG,0))'="MSH" -2 ; an HL7 message?
- Q:$D(@XTREE@(NSEG,9,1,1,1))#10=0 -3 ; message type provided? 
+ Q:$D(@XTREE@(NSEG,9,1,1,1))#10=0 -3 ; message type provided?
  ; get delimiters or define defaults
  S UFS=$G(@XTREE@(NSEG,1,1,1,1)) I $L(UFS)-1 S UFS="|"
  S ENC=$G(@XTREE@(NSEG,2,1,1,1)) I $L(ENC)-4 S ENC="^~\&"
  S UCS=$E(ENC),URS=$E(ENC,2),UEC=$E(ENC,3),USS=$E(ENC,4)
  I $D(@XTREE@(NSEG,3,1,1,1))#10=0 S @XTREE@(1,3,1,1,1)="VistA Imaging"
- S @XTREE@(NSEG,7,1,1,1)=$$NOW^XLFDT()+17000000*1000000
+ D NOW^%DTC S @XTREE@(NSEG,7,1,1,1)=%*1000000+17000000000000
  I $D(@XTREE@(NSEG,10,1,1,1))#10=0 D
  . S X=""
  . F I=1:1:16 S X=X_$E("0123456789ABCDEF",$R(16)+1)
@@ -80,7 +81,7 @@ PROCFLD(XTREE,XNSEG,XNFLD,XSEG) ; process a field
  ;         XNSEG   segment number for parse tree
  ;         XNFLD   field number for parse tree
  ;         .XSEG   segment before addition of field
- ;         
+ ;
  ; output: .XSEG   segment after addition of field
  ;
  N NREP ; ---- repetition (occurrence) number
@@ -124,4 +125,3 @@ ESC(XDTA) ;apply escape sequence to data
  F  Q:XDTA'[$C(4)  S XDTA=$P(XDTA,$C(4))_UEC_"E"_UEC_$P(XDTA,$C(4),2,999)
  F  Q:XDTA'[$C(5)  S XDTA=$P(XDTA,$C(5))_UEC_"T"_UEC_$P(XDTA,$C(5),2,999)
  Q XDTA
- ;

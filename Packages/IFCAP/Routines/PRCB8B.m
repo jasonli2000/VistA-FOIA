@@ -1,6 +1,6 @@
 PRCB8B ;WISC/PLT-AUTO GENERATE FMS VT-DOCUMENTS ;11/12/96  15:42
-V ;;5.1;IFCAP;**71,142**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;**71**;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  QUIT  ;invalid entry
  ;
  ;.X = record id of file 2100.1 if generated, "" if fail
@@ -32,7 +32,6 @@ S S PRCRI(440.7)=$P(PRCFC,"^"),A=$P(PRCFC,"^",12),PRCSITE=$P(A,"-",2)
  . QUIT
  D SETSTAT^GECSSTAA(PRCRI(2100.1),"Q")
 EXIT S X=$G(PRCRI(2100.1))_"/"_PRCID
- L -^PRCH(440.7,PRCRI(440.7))
  QUIT
  ;
 SV2() ;create sv2
@@ -67,6 +66,7 @@ LINE(PRCA) ;assemble line
  D PIECE($J(A,0,2),2,15),PIECE($S(PRCAMT<0:"D",1:"I"),3,1),PIECE("E",5,1)
  S PRCSVB=PRCDATA
  QUIT PRCLIN_"^~"_PRCSVA_"^~"_PRCSVB_"^~"
+ ;
 PIECE(A,B,C) ;set piece in variable PRCDATA, A-VALUE, B-PPECE #, C-LENGTH
  S $P(PRCDATA,"^",B)=$E(A,1,C)
  QUIT

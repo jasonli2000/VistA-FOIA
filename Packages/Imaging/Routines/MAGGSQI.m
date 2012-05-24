@@ -1,6 +1,5 @@
-MAGGSQI ;WOIFO/GEK/SG - Image Integrity Checker ; 3/9/09 12:51pm
- ;;3.0;IMAGING;**8,93**;Dec 02, 2009;Build 163
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGGSQI ;WOIFO/GEK ; Image Integrity Checker ; [ 11/08/2001 17:18 ]
+ ;;3.0;IMAGING;**8**;Sep 15, 2004
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -20,7 +19,7 @@ RPT(MAGRY,CT,LASTIEN) ; Run the check for the last CT entries in Image file.
  N I,J,MAGX,ERRCT,ACTCT,TYPECT,MAGSTART,MAGPUR
  K ^XTMP("MAGCHK")
  S LASTIEN=$G(LASTIEN)
- ; See DOCU^MAGCRPT for documenation on this global
+ ; See DOCU^MAGCRTP for documenation on this global
  D NOW^%DTC S MAGSTART=%
  S X1=%,X2=60 D C^%DTC S MAGPUR=X K X,X1,X2
  ;Set purge, create and purge date
@@ -34,7 +33,6 @@ RPT(MAGRY,CT,LASTIEN) ; Run the check for the last CT entries in Image file.
  S I="A"
  S CT=$G(CT,5000),ERRCT=0,ACTCT=0
  F  S I=$O(^MAG(2005,I),-1) Q:CT<1  Q:'I  Q:I<LASTIEN  D
- . Q:$$ISDEL^MAGGI11(I)
  . S CT=CT-1,ACTCT=ACTCT+1
  . I '(ACTCT#1000) I IO(0)=IO U IO W "."
  . K MAGX
@@ -57,19 +55,18 @@ RPT(MAGRY,CT,LASTIEN) ; Run the check for the last CT entries in Image file.
  Q
 CHK(MAGRY,MAGIEN) ;
  ;
- N ERR,MAGDFN,MAGPK,MAGPKDA,MAGPKIP,MAGPKDA1,Y,I,MAGISGRP,MAGRPIEN
- N MAGN2,MAGN0,MAGPDFIL,MAGRCT,MAGN100,MAGZ,VALID
+ N MAGDFN,MAGPK,MAGPKDA,MAGPKIP,MAGPKDA1,Y,I,MAGISGRP,MAGRPIEN
+ N MAGN2,MAGN0,MAGPDFIL,MAGRCT,MAGDEL,MAGIMG,MAGN100,MAGZ,VALID
  S MAGRCT=0,MAGISGRP=0
+ ;GEK 01/09/03 Patch 8 : moved the next two lines here. So they are after init of MAGRCT
  S MAGRY(0)="0^Error during Image Integrity Check !"
+ I 'MAGIEN S MAGRY(MAGRCT)="0^Invalid Image pointer" Q
  ;
- I $$ISDEL^MAGGI11(MAGIEN,.ERR)  S MAGRY(0)="1^Deleted Image"  Q
- I ERR<0  D  Q:ERR<0
- . I +ERR=-43  D  Q
- . . S ERR=0,I=$O(MAGRY(""),-1)+1
- . . S MAGRY(I)="2^Image IEN exists, and is Deleted !"
- . . Q
- . S MAGRY(0)="0^Invalid Image pointer"
- . Q
+ S MAGDEL=$D(^MAG(2005.1,MAGIEN))
+ S MAGIMG=$D(^MAG(2005,MAGIEN))
+ I 'MAGIMG,MAGDEL S MAGRY(0)="1^Deleted Image" Q
+ I 'MAGIMG,'MAGDEL S MAGRY(0)="0^Invalid Image pointer" Q
+ I MAGIMG,MAGDEL S MAGRY($O(MAGRY(""),-1)+1)="2^Image IEN exists, and is Deleted !"
  ;
  S MAGN0=$G(^MAG(2005,MAGIEN,0))
  S MAGN2=$G(^MAG(2005,MAGIEN,2))
@@ -91,7 +88,7 @@ CHK(MAGRY,MAGIEN) ;
  . ; if image has data in parent fields, Quit if not same as Group entry.
  . I +MAGPK,($P(MAGN2,U,6,7)'=$P($G(^MAG(2005,MAGRPIEN,2)),U,6,7)) S MAGRY(MAGRCT)="0^Pointer Mismatch in Group" Q
  . ;Have a check that assures that the Group has this image in it's multiple
- . ;   ? Do we want to do this when we have the Grp entry, for each of its members. ? 
+ . ;   ? Do we want to do this when we have the Grp entry, for each of its members. ?
  . S (I,VALID)=0 F  S I=$O(^MAG(2005,MAGRPIEN,1,I)) Q:'I  D  Q:VALID
  . . I +^MAG(2005,MAGRPIEN,1,I,0)=MAGIEN S VALID=1
  . I VALID S MAGRY(MAGRCT)="1^Valid Group image."
@@ -168,7 +165,7 @@ CHK(MAGRY,MAGIEN) ;
  ;
  S MAGRY(0)="2^Images only point to Patient."
  Q
-CHKGRPCH(CHKY,GRPIEN,GRPDFN,GRPCH) ; Check the child of a Group.  
+CHKGRPCH(CHKY,GRPIEN,GRPDFN,GRPCH) ; Check the child of a Group.
  ;       i.e. an IEN in the "1" node of the Group.
  ;       Can't just check the IEN by calling CHK.  It might be okay that way.
  ;       Have to compare it to Groups IEN, and DFN

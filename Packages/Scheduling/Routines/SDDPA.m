@@ -1,5 +1,5 @@
 SDDPA ;MAN/GRR,ALB/TMP - DISPLAY APPOINTMENTS ; 13 SEP 84  4:21 pm
- ;;5.3;Scheduling;**140,334,545**;Aug 13, 1993;Build 8
+ ;;5.3;Scheduling;**140,334**;Aug 13, 1993
  D:'$D(DT) DT^SDUTL K SDACS
 RD Q:$D(SDACS)  S HDT=DT,APL="",SDRG=0,SDEDT=""
  K ^UTILITY($J) W ! S SDEND=0,DIC="^DPT(",DIC(0)="AEQM" D ^DIC G:X=""!(X="^") END I Y<0 W !,*7,*7,"PATIENT NOT FOUND",*7,*7 G RD
@@ -25,32 +25,8 @@ RANGE D DATE^SDUTL Q:POP  S HDT=BEGDATE,SDEDT=ENDDATE_.9,SDRG=1,SDONE=0
 ARCH I 'SDONE W @IOF,!!,"This patient has archived appts during this time period:",! W !,?3,"ARCHIVED DATE RANGE    # APPOINTMENTS     TAPE #      DATE ARCHIVED",!
  W !,?3,$S(B:$$FMTE^XLFDT(B,"5D"),1:""),"-",$S(C:$$FMTE^XLFDT(C,"5D"),1:""),?32,+D,?45,E S Y=+Z D DTS^SDUTL W ?59,Y
  S SDONE=1 K B,C,D,E,Z Q
-FLEN ;following code changed with SD/545
- S SC=+^DPT(DFN,"S",NDT,0),L=L+1,COV=$S($P(^DPT(DFN,"S",NDT,0),U,11)=1:" (COLLATERAL) ",1:"") I $D(^SC(SC,"S",NDT)) F ZL=0:0 S ZL=$O(^SC(SC,"S",NDT,1,ZL)) Q:ZL=""  D
- .N POP S POP=0
- .I '$D(^SC(SC,"S",NDT,1,ZL,0)) I $D(^SC(SC,"S",NDT,1,ZL,"C")) D RESET I POP S APL=APLEN Q
- .I +^SC(SC,"S",NDT,1,ZL,0)=DFN S APL=$P(^SC(SC,"S",NDT,1,ZL,0),U,2)
- K POP,APLEN
+FLEN S SC=+^DPT(DFN,"S",NDT,0),L=L+1,COV=$S($P(^DPT(DFN,"S",NDT,0),"^",11)=1:" (COLLATERAL) ",1:"") I $D(^SC(SC,"S",NDT)) F ZL=0:0 S ZL=$O(^SC(SC,"S",NDT,1,ZL)) Q:ZL=""  I +^(ZL,0)=DFN S APL=$P(^SC(SC,"S",NDT,1,ZL,0),"^",2) Q
  Q
- ;
-RESET ;reset zero node of appt multiple in file #44 if values are known SD/545
- I 'DFN S POP=1 Q
- I '$D(^DPT(DFN,"S",NDT,0)) S POP=1 Q
- I '$G(^DPT(DFN,"S",NDT,0)) S POP=1 Q
- I '+^DPT(DFN,"S",NDT,0) S POP=1 Q
- I $P(^DPT(DFN,"S",NDT,0),U,2)="CA"!($P(^(0),U,2)="PC")!($P(^(0),U,2)="PCA") K ^SC(SC,"S",NDT,1,ZL,"C") S APLEN=+^SC(SC,"SL"),POP=1 Q
- S (NODE,APLEN,STAT1)=""
- S NODE=^DPT(DFN,"S",NDT,0),APLEN=+^SC(SC,"SL"),STAT1=$P(NODE,U,2)
- S DA=ZL,DA(1)=NDT,DA(2)=SC
- S DIE="^SC("_DA(2)_",""S"","_DA(1)_",1,"
- S DR=".01///^S X=DFN;1///^S X=APLEN" D ^DIE
- S SC=DA(2)
- S $P(^SC(SC,"S",NDT,1,ZL,0),U,6)=$P(NODE,U,18)
- S $P(^SC(SC,"S",NDT,1,ZL,0),U,7)=$P(NODE,U,19)
- I STAT1="C" S $P(^SC(SC,"S",NDT,1,ZL,0),U,9)=STAT1
- K NODE,APLEN,STAT1,DA,DR,DIE
- Q
- ;
 CHKSO S SDNS=$S($P(^DPT(DFN,"S",NDT,0),"^",2)']""!($P(^(0),"^",2)["I"):"",1:$P(^(0),"^",2)),SDBY="" I SDNS["C" S SDU=+$P(^DPT(DFN,"S",NDT,0),"^",12),SDBY=$S($D(^VA(200,SDU,0)):$P(^(0),"^",1),1:SDU) K SDU
  F SDJ=3,4,5 I $P(^DPT(DFN,"S",NDT,0),"^",SDJ)]"" S L=L+1,^UTILITY($J,L)=$P(^(0),"^",SDJ)_"^"_$S(SDJ=3:"LAB",SDJ=4:"XRAY",1:"EKG")_"^0^0"
  Q

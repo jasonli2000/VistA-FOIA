@@ -1,4 +1,4 @@
-RTCX ; GENERATED FROM 'RT PENDING REQUESTS' PRINT TEMPLATE (#478) ; 07/15/96 ; (FILE 190.1, MARGIN=132)
+RTCX ; GENERATED FROM 'RT PENDING REQUESTS' PRINT TEMPLATE (#478) ; 09/19/10 ; (FILE 190.1, MARGIN=132)
  G BEGIN
 D I Y=DITTO(C) S Y="" Q
  S DITTO(C)=Y
@@ -14,6 +14,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
+ S I(0)="^RTV(190.1,",J(0)=190.1
  S X=$G(^RTV(190.1,D0,0)) D N:$X>0 Q:'DN  W ?0 S Y=$P(X,U,1),C=1 D D S C=$P(^DD(190.1,.01,0),U,2) D Y^DIQ:Y S C="," W $E(Y,1,15)
  S I(100)="^RT(",J(100)=190 S I(0,0)=D0 S DIP(1)=$S($D(^RTV(190.1,D0,0)):^(0),1:"") S X=$P(DIP(1),U,1),X=X S D(0)=+X S D0=D(0) I D0>0 D A1
  G A1R
@@ -45,13 +46,15 @@ C2R ;
  Q
 A1R ;
  K J(100),I(100) S:$D(I(0,0)) D0=I(0,0)
- D N:$X>84 Q:'DN  W ?84,$E(D0,1,9)
+ D N:$X>84 Q:'DN  W ?84,$E(D0,1,12)
  S X=$G(^RTV(190.1,D0,0)) D N:$X>95 Q:'DN  W ?95 S Y=$P(X,U,5) S C=$P(^DD(190.1,5,0),U,2) D Y^DIQ:Y S C="," W $E(Y,1,15)
  D N:$X>112 Q:'DN  W ?112 S Y=$P(X,U,4) D DT
  S:$D(RTCOUNT) RTCOUNT=RTCOUNT+1 K DIP K:DN Y
  K Y
  Q
 HEAD ;
- W !,?41,"CURRENT",?112,"DATE/TIME RECORD"
- W !,?0,"NAME",?22,"TYPE",?35,"REC#",?41,"LOCATION",?59,"Phone/Room",?84,"REQ#",?95,"REQUESTOR",?112,"NEEDED"
+ W !,?41,"CURRENT"
+ W !,?0,"NAME",?22,"TYPE",?35,"REC#",?41,"LOCATION",?59,"Phone/Room",?84,"REQ#"
+ W !,?112,"DATE/TIME RECORD"
+ W !,?95,"REQUESTOR",?112,"NEEDED"
  W !,"------------------------------------------------------------------------------------------------------------------------------------",!!

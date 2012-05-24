@@ -1,6 +1,6 @@
 IBCNEHLM ;DAOU/ALA - HL7 Registration MFN Message ;10-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,251,300,416,438**;21-MAR-94;Build 52
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**184,251,300**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;**Program Description**
  ;  This program will process the outgoing registration MFN message
@@ -43,7 +43,7 @@ REG ;  Registration message for when a site installs
  S INACT=$E($$GET1^DIQ(350.9,"1,",51.08,"E"))
  S IHLP=$P(IBCNE,U,13),IHLT=$P(IBCNE,U,14),CNTC=$P(IBCNE,U,16)
  S IHLS=$P(IBCNE,U,19)
- S IVER="5"
+ S IVER="3"
  ;
  I IHLP="I" S (IHLT,IHLS)=""
  ;
@@ -54,9 +54,9 @@ REG ;  Registration message for when a site installs
  . S CNTCEM=$P($G(^VA(200,CNTC,.15)),U,1)
  ;
  ;  Email if any missing data
- I CNTC="" S MCT=MCT+1,MSG(MCT)="The Contact Person is not defined in the eIV Site Parameters.  ",QFL=1
- I CNTC'="",CNTCPH="" S MCT=MCT+1,MSG(MCT)="The office phone number of the eIV Contact Person is not defined  (File 200, Field .132).  ",QFL=1
- I CNTC'="",CNTCEM="" S MCT=MCT+1,MSG(MCT)="The email address of the eIV Contact Person is not defined  (File 200, Field .151).  ",QFL=1
+ I CNTC="" S MCT=MCT+1,MSG(MCT)="The Contact Person is not defined in the IIV Site Parameters.  ",QFL=1
+ I CNTC'="",CNTCPH="" S MCT=MCT+1,MSG(MCT)="The office phone number of the IIV Contact Person is not defined  (File 200, Field .132).  ",QFL=1
+ I CNTC'="",CNTCEM="" S MCT=MCT+1,MSG(MCT)="The email address of the IIV Contact Person is not defined  (File 200, Field .151).  ",QFL=1
  ;
  I IHLP="B",IHLT=""!(IHLS="") D  S QFL=1
  . S MCT=MCT+1,MSG(MCT)="The ""HL7 Response Processing Method"" selected is Batch but the HL7 Batch "
@@ -64,7 +64,7 @@ REG ;  Registration message for when a site installs
  . S MSG(MCT)=MSG(MCT)_$S(IHLT="":"Start",1:"End")_" Time is blank.  "
  ;
  I FRSH=""!(INACT="")!(IHLP="") D
- . S MCT=MCT+1,MSG(MCT)="The following eIV Site Parameters are not defined:  "
+ . S MCT=MCT+1,MSG(MCT)="The following IIV Site Parameters are not defined:  "
  . I FRSH="" S MCT=MCT+1,MSG(MCT)="""Days between electronic reverification checks"" is blank.  "
  . I INACT="" S MCT=MCT+1,MSG(MCT)="""Look at a patient's inactive insurance?"" is blank.  "
  . I IHLP="" S MCT=MCT+1,MSG(MCT)="""HL7 Response Processing Method"" is blank.  "
@@ -101,7 +101,7 @@ HL ;  When a site installs, the enrollment should be an
  ;
  D GENERATE^HLMA("IBCNE IIV REGISTER","GM",1,.HLRESLT,"")
  I $P(HLRESLT,U,2)]"" S HLRESLT="Error - "_$P(HLRESLT,U,2,99) D  Q
- . S MSG(1)="HL7 eIV Registration Message not created."
+ . S MSG(1)="HL7 IIV Registration Message not created."
  . S MSG(2)=HLRESLT
  . D MLMN
  K ^TMP("HLS",$J)
@@ -109,7 +109,7 @@ HL ;  When a site installs, the enrollment should be an
  ;
 MLMN ;  MailMan Message
  D TXT^IBCNEUT7("MSG")
- S XMSUB="eIV Registration Failure"
+ S XMSUB="IIV Registration Failure"
  D MSG^IBCNEUT5(MGRP,XMSUB,"MSG(")
  K XMSUB,XMY,MSG,XMZ,XMDUZ
  Q

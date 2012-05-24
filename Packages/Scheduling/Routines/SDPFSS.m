@@ -1,5 +1,22 @@
-SDPFSS ;ALB/SCK - Patient Financial Services System  ;22-APR-2005
- ;;5.3;Scheduling;**430**;Aug 13, 1993
+SDPFSS ;ALB/SCK - Patient Financial Services System  ;11/24/0622-APR-2005
+ ;;5.3;Scheduling;**430,502**;Aug 13, 1993  ;Build 14
+ ; Modified from FOIA VISTA,
+ ; Copyright (C) 2007 WorldVistA
+ ;
+ ; This program is free software; you can redistribute it and/or modify
+ ; it under the terms of the GNU General Public License as published by
+ ; the Free Software Foundation; either version 2 of the License, or
+ ; (at your option) any later version.
+ ;
+ ; This program is distributed in the hope that it will be useful,
+ ; but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ ; GNU General Public License for more details.
+ ;
+ ; You should have received a copy of the GNU General Public License
+ ; along with this program; if not, write to the Free Software
+ ; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+ ;
  ;
  Q
  ;
@@ -10,14 +27,22 @@ EVENT ; Entry point for PFSS Protocol event.  This procedure will manage the IBB
  ;
  ; Check conditions before proceeding
  Q:'$G(DFN)
+ ; VWSD LOCAL MOD HERE SDVWNVAI VARIABLE, SEE DEFINITION AT VWSD LOCAL MOD BELOW
+ I $D(SDVWNVAI) G OVER
  Q:'$$CHECK
+OVER ;
+ ;END LOCAL MOD
  Q:$$TESTPAT^VADPT(DFN)
- ;
+ ;VWSD LOCAl MOD
  ; Call the ICN API to generate an ICN if one does not exist for the patient.
+ ;VWSD SDVWNVAI VARIABLE -LOCAL MOD FOR disabling the need for ICN or use of other ICN system for non-VA system
  S SDOK=$$ICNLC^MPIF001(DFN)
- I SDOK<0 D
+ I $D(SDVWNVAI) G OVER1
+ I (SDOK<0) D
  . D ERRMSG^SDPFSS2(SDOK)
  ;
+OVER1 ;
+ ;END LOCAL MOD
  ; Get event type
  S SDEVENT=$S($D(SDAMEVT):$$GET1^DIQ(409.66,SDAMEVT,.01),1:"OTHER")
  I SDEVENT="CHECK-OUT",+$G(SDPFSFLG) S SDEVENT="DELETE CO"

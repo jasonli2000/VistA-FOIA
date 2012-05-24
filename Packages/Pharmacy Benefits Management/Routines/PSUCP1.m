@@ -1,10 +1,10 @@
-PSUCP1 ;BIR/TJH,PDW - PBM - CONTROL POINT, MANUAL ENTRY ; 1/10/11 8:08am
- ;;4.0;PHARMACY BENEFITS MANAGEMENT;**15,18**;MARCH, 2005;Build 7
+PSUCP1 ;BIR/TJH,PDW - PBM - CONTROL POINT, MANUAL ENTRY ;25 AUG 1998
+ ;;4.0;PHARMACY BENEFITS MANAGEMENT;;MARCH, 2005
  ;
  ;DBIA's
  ; Reference to file #4   supported by DBIA 10090
  ; Reference to file #4.3 supported by DBIA 10091
- ; 
+ ;
 EN ; start here
  D PSUHDR ; display option explanation
  S PSUERR=0
@@ -34,17 +34,10 @@ DATES ; do this if user entered N, wants date range
  ..W !!,"The end date of the search must be greater than the start date.",!
  ..K PSUSDT,PSUEDT
  ..S ERC=2 ; condition 2, ask dates again
- .I PSUSDT>DT!(PSUEDT>DT) D  Q
+ .I PSUSDT>DT!(PSUEDT>DT) D
  ..W !!,"Searches cannot be executed for future dates.",!
  ..K PSUSDT,PSUEDT
  ..S ERC=2 ; condition 2, ask dates again
- .;PSU*4*18 Warn if range > 93 days.
- .N X1,X2,X,% S X1=PSUEDT,X2=PSUSDT D ^%DTC I X>93 D  Q
- ..W !!,"WARNING you have chosen a range greater than 93 days."
- ..W !,"This could potentially create a very large amount of data."
- ..W !,"This may result in system problems."
- ..W !!,"Are you sure you want to continue"
- ..D YN^DICN W ! I %'=1 S ERC=2
  I ERC=1 G ERR
  I ERC=2 S ERC=0 G DATES
  ;
@@ -157,17 +150,14 @@ MODHLP I X["?" D  G MODULE:X["??",MODP
  I (PSUOPTS["1,2,3,4")&(PSUOPTS[6) S ^XTMP("PSU_"_PSUJOB,"CBAMIS")=""
  ;
 RPT ; select report type - full report or summary only
- N PSUGO
  D:PSUOPTS'=11&(PSUOPTS'=12)        ; no summary for VITALS/IMMS OR AA**
  . S DIR("A")="Print Summary Only"
  . S DIR("?",1)="Please answer with a 'Y' or 'N'."
  . S DIR("?")="Answer Yes and only the summary report will be generated."
  . S DIR(0)="YO",DIR("B")="NO"
  . D ^DIR K DIR,DIRUT,DIROUT,DUOUT,DTOUT W !
- . ;PSU*4*15
- . I (Y["^") S:Y="^" PSUGO=1 S:Y["^^" PSUGO=2 Q
+ . G ERR:Y="",ERR:Y="^",MODULE:Y["^^"
  . S PSUSMRY=$S(Y:1,1:0)
- G ERR:$G(PSUGO)=1,MODULE:$G(PSUGO)=2
  S:PSUOPTS=11!(PSUOPTS=12) PSUSMRY=0
  ;
  ;

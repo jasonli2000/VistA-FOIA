@@ -1,6 +1,6 @@
 IBCNBAA ;ALB/ARH-Ins Buffer: process Accept set-up ;1 Jun 97
- ;;2.0;INTEGRATED BILLING;**82,184,246,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**82,184,246**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;
 ACCEPT(IBBUFDA,IBINSDA,IBGRPDA,IBPOLDA) ; process a buffer entry for acceptance then save in Insurance files
@@ -17,7 +17,7 @@ ACCEPT(IBBUFDA,IBINSDA,IBGRPDA,IBPOLDA) ; process a buffer entry for acceptance 
  ;    7) buffer ins/group/policy data deleted
  ;    8) buffer entry status updated
  ;
- N DFN,IBX,IBELIG,IBHELP,IBNEWINS,IBNEWGRP,IBNEWPOL,IBMVINS,IBMVGRP,IBMVPOL,IBACCPT,DIR,X,Y,DIRUT,IBDONE S IBDONE=0
+ N DFN,IBX,IBHELP,IBNEWINS,IBNEWGRP,IBNEWPOL,IBMVINS,IBMVGRP,IBMVPOL,IBACCPT,DIR,X,Y,DIRUT,IBDONE S IBDONE=0
  K ^TMP($J,"IB BUFFER SELECTED")  ; initialize selection file
  S IBINSDA=+$G(IBINSDA),IBGRPDA=+$G(IBGRPDA),IBPOLDA=+$G(IBPOLDA),(IBNEWINS,IBNEWGRP,IBNEWPOL,IBMVINS,IBMVGRP,IBMVPOL)=0
  S DFN=+$G(^IBA(355.33,+$G(IBBUFDA),60)) I 'DFN G ACCPTQ
@@ -59,10 +59,6 @@ ACPOL ;
  ;
  I +IBMVPOL=4 D POLICY^IBCNBAC(IBBUFDA,IBPOLDA,1) ; Ind. Accept-Skip Blanks
  ;
-ACEB ;
- W @IOF
- D ELIG^IBCNBCD(IBBUFDA,IBPOLDA) S IBELIG=$$REPL() I $D(DIRUT) G ACCPTQ
- ;
 CHECK ; display changes that will be made and ask user for confirmation
  W @IOF
  ;
@@ -81,16 +77,13 @@ CHECK ; display changes that will be made and ask user for confirmation
  I 'IBPOLDA S IBX="A NEW Patient Policy will be added for this patient and this Group/Plan."
  W !!,$G(IORVON)_"STEP 3: Patient Policy"_$J("",58)_$G(IORVOFF) W !,IBX
  ;
- I IBELIG S IBX="The Buffer data will"_$S(IBELIG:"",1:" not")_" replace the existing EB data."
- W !!,$G(IORVON)_"STEP 4: Eligibility/Benefits"_$J("",58)_$G(IORVOFF) W !,IBX
- ;
- I +IBINSDA,$P(IBMVINS,U,1)=0,+IBGRPDA,$P(IBMVGRP,U,1)=0,+IBPOLDA,$P(IBMVPOL,U,1)=0,+IBELIG=0 W !!!,"This would result in No Change to the existing Insurance data.  Process aborted." D WAIT G ACCPTQ
+ I +IBINSDA,$P(IBMVINS,U,1)=0,+IBGRPDA,$P(IBMVGRP,U,1)=0,+IBPOLDA,$P(IBMVPOL,U,1)=0 W !!!,"This would result in No Change to the existing Insurance data.  Process aborted." D WAIT G ACCPTQ
  ;
  I '$$OK G ACCPTQ
  ;
 PROCESS ; process all changes selected by user, add/edit insurance files based on buffer data, cleanup, ...
  ;
- D ACCEPT^IBCNBAR(IBBUFDA,DFN,IBINSDA,IBGRPDA,IBPOLDA,IBMVINS,IBMVGRP,IBMVPOL,IBNEWINS,IBNEWGRP,IBNEWPOL,IBELIG)
+ D ACCEPT^IBCNBAR(IBBUFDA,DFN,IBINSDA,IBGRPDA,IBPOLDA,IBMVINS,IBMVGRP,IBMVPOL,IBNEWINS,IBNEWGRP,IBNEWPOL)
  S IBDONE=1
  ;
 ACCPTQ K ^TMP($J,"IB BUFFER SELECTED")  ; cleanup selection file
@@ -134,14 +127,6 @@ NEW(IBDESC) ; ask user if they want to add a new entry to the insurance files (3
  S DIR("?",3)="that matches this buffer entry.",DIR("?",4)=""
  W ! S DIR(0)="YO",DIR("A")="No "_IBDESC_" Selected, Add a New "_IBDESC D ^DIR I +Y=1 S IBX=1
 NEWQ Q IBX
- ;
-REPL() ; ask user if they want to replace eligibility/benefits data in pt. insuarance
- N DIR,X,Y,IBX
- S IBX=0
- S DIR(0)="YO",DIR("A")="Replace the Pt's Eligibility/Benefits data",DIR("B")="YES"
- S DIR("?")="Enter Yes to replace existing Eligibility/Benefits data with one from eIV response."
- W ! D ^DIR I +Y=1 S IBX=1
- Q IBX
  ;
 OK() ; ask the user if the buffer data should be moved to the insurance files
  ; returns 1 if yes, 0 otherwise

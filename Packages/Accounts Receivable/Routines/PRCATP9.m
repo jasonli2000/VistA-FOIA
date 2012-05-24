@@ -1,4 +1,4 @@
-PRCATP9 ; GENERATED FROM 'PRCAT NEW TRANS' PRINT TEMPLATE (#399) ; 10/02/99 ; (FILE 433, MARGIN=80)
+PRCATP9 ; GENERATED FROM 'PRCAT NEW TRANS' PRINT TEMPLATE (#399) ; 09/19/10 ; (FILE 433, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -16,7 +16,7 @@ BEGIN ;
  D N:$X>0 Q:'DN  W ?0 W "TRANSACTION NO.:"
  S X=$G(^PRCA(433,D0,0)) S Y=$P(X,U,1) W:Y]"" $J(Y,7,0)
  D N:$X>0 Q:'DN  W ?0 W "BILL NO.: "
- D N:$X>14 Q:'DN  W ?14 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^PRCA(430,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
+ D N:$X>14 Q:'DN  W ?14 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^PRCA(430,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,30)
  W ?14 S PRCABN=$P(X,U,2) K DIP K:DN Y
  S I(100)="^PRCA(430,",J(100)=430 S I(0,0)=D0 S DIP(1)=$S($D(^PRCA(433,D0,0)):^(0),1:"") S X=$P(DIP(1),U,2),X=X S D(0)=+X S D0=D(0) I D0>0 D A1
  G A1R
@@ -28,7 +28,7 @@ A1R ;
  D N:$X>0 Q:'DN  W ?0 W "TRANS.DATE: "
  S X=$G(^PRCA(433,D0,1)) D N:$X>14 Q:'DN  W ?14 S Y=$P(X,U,1) D DT
  D N:$X>39 Q:'DN  W ?39 W "TRANS.TYPE: "
- D N:$X>52 Q:'DN  W ?52 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^PRCA(430.3,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,20)
+ D N:$X>52 Q:'DN  W ?52 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^PRCA(430.3,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,20)
  D T Q:'DN  D N D N:$X>1 Q:'DN  W ?1 W "FY"
  D N:$X>9 Q:'DN  W ?9 W "APPROP.SYMBOL"
  D N:$X>29 Q:'DN  W ?29 W "TRANS.AMOUNT"

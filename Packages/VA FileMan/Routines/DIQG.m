@@ -1,6 +1,6 @@
-DIQG ;SFISC/DCL-DATA RETRIEVAL PRIMITIVE ;24AUG2009
- ;;22.0;VA FileMan;**76,118,133,149,162**;Mar 30, 1999;Build 19
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DIQG ;SFISC/DCL-DATA RETRIEVAL PRIMITIVE ;29JUL2006
+ ;;22.0;VA FileMan;**76,118,133,149**;Mar 30, 1999;Build 2
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 GET(DIQGR,DA,DR,DIQGPARM,DIQGETA,DIQGERRA,DIQGIPAR) ; file,rec,fld,parm,targetarray,errarray,int
 DDENTRY I $G(U)'="^" N U S U="^"
  I '$G(DA) N X S X(1)="RECORD" Q $$F(.X,2)
@@ -58,13 +58,13 @@ AUDIT I $G(DIQGAUDD) D  ;Is there an AUDIT TRAIL for the field?
  .I P S Y=$$DIA^DIAUTL(DIQGAUDD,DIQGAUDR,P)
  .Q:C'["P"!'Y  N F S F=+$P(C,"P",2) Q:F=DIQGEY("FILE")&(Y=DA)
  .S Y=$$GET1^DIQ(F,Y_",",.01,"A"_DIQGAUDD),C=$TR(C,"PO") ;Recurse to get old POINTER value (as long as recursion isn't infinite!)
- I 'DIQGPI&(C["O"!(C["S")!(C["P")!(C["V")!(C["D"))&($D(@DIQGDN@(DIQGDRN,0))) S C=$P(^(0),"^",2) Q $$EXTERNAL^DIDU(+$P(DIQGDN,"(",2),DIQGDRN,"A",Y)  ;"ALLOW" bad data
+ I 'DIQGPI&(C["O"!(C["S")!(C["P")!(C["V")!(C["D"))&($D(@DIQGDN@(DIQGDRN,0))) S C=$P(^(0),"^",2) Q $$EXTERNAL^DIDU(+$P(DIQGDN,"(",2),DIQGDRN,"",Y)
  Q $G(Y)
  ;
 BMW I C,$P(^DD(+C,.01,0),"^",2)["W" Q:DIQGWPB "$CREF$"_DIQGR_DA_","_$$Q^DIQGU(P)_")" D  G:X="" FE Q:DIQGWPO $NA(@DIQGETA) Q:DIQGIPAR "$WP$" Q ""
  .I DIQGETA']"" K X S X(1)="TARGET ARRAY" D BLD^DIALOG(202,.X) S X="" Q
  .S X=DIQGR_DA_","_$$Q^DIQGU(P)_")"
- .I '$O(@X@(0)) S X="" Q
+ .I '$P($G(@X@(0)),"^",3) S X="" Q
  .I DIQGZN M @DIQGETA=@X K @DIQGETA@(0) Q
  .S Y=0 F  S Y=$O(@X@(Y)) Q:Y'>0  I $D(^(Y,0)) S @DIQGETA@(Y)=^(0)
  .Q

@@ -1,10 +1,10 @@
-PRCHLO4 ;WOIFO/RLL/DAP-EXTRACT ROUTINE CLO REPORT SERVER ;12/30/10  15:01
- ;;5.1;IFCAP;**83,98,130,154**;Oct 20, 2000;Build 5
+PRCHLO4 ;WOIFO/RLL/DAP-EXTRACT ROUTINE CLO REPORT SERVER ; 10/16/06 2:10pm
+V ;;5.1;IFCAP;**83,98**; Oct 20, 2000;Build 37
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ; Continuation of PRCHLO3
  ;
  ; PRCHLO3 routines are used to Write out the Header and data
- ; associated with each of the 29 tables created for the Clinical
+ ; associated with each of the 19 tables created for the Clinical
  ; logistics Report Server. The files are built from the extracts
  ; located in the ^TMP($J) global.
  ;
@@ -41,13 +41,6 @@ TSTFIL ; Test entry point
  D POAMDCF  ; PO Amendment Changes Data
  D POAMDDF  ; PO Amendment Description Data
  D POAMBKF  ; PO Amount Breakout Code Data
- D FIL410   ; FILE 410
- D FIL424   ; FILE 424
- D FIL4241  ; FILE 424.1
- D INVHDR^PRCHLO7 ;File 421.5 header
- D INVPAY^PRCHLO7 ;Subfile 421.531
- D INVFMS^PRCHLO7 ;Subfile 421.541
- D INVCERT^PRCHLO7 ;Subfile 421.51
 GIPBL1 ; GIP REPORTS
  D BLDGP1^PRCPLO3
  D BLDGP2^PRCPLO3
@@ -224,40 +217,6 @@ POAMBKF ; Create flat file for PO amount breakout code
  D PAMTBKW^PRCHLO3
  D CLOSE^%ZISH("FILE1")
  Q
-FIL410 ; Create flat file for file 410 (Control Point Activity)
- N OUTFIL20
- S OUTFIL20="IFCP"_STID_"F20.TXT"
- D OPEN^%ZISH("FILE1",FILEDIR,OUTFIL20,"W")
- D USE^%ZISUTL("FILE1")
- D CONTRPH^PRCHLO3
- D CONTRPW^PRCHLO3
- D CLOSE^%ZISH("FILE1")
- N OUTFIL21
- S OUTFIL21="IFCP"_STID_"F21.TXT"
- D OPEN^%ZISH("FILE1",FILEDIR,OUTFIL21,"W")
- D USE^%ZISUTL("FILE1")
- D SUBCPH^PRCHLO3
- D SUBCPW^PRCHLO3
- D CLOSE^%ZISH("FILE1")
- Q
-FIL424 ; Create flat file for file 424 (1358 Daily Record)
- N OUTFIL22
- S OUTFIL22="IFCP"_STID_"F22.TXT"
- D OPEN^%ZISH("FILE1",FILEDIR,OUTFIL22,"W")
- D USE^%ZISUTL("FILE1")
- D DR1358H^PRCHLO3
- D DR1358W^PRCHLO3
- D CLOSE^%ZISH("FILE1")
- Q
-FIL4241 ;Create flat file for file 424.1 (1358 Authorization Detail)
- N OUTFIL23
- S OUTFIL23="IFCP"_STID_"F23.TXT"
- D OPEN^%ZISH("FILE1",FILEDIR,OUTFIL23,"W")
- D USE^%ZISUTL("FILE1")
- D AD1358H^PRCHLO3
- D AD1358W^PRCHLO3
- D CLOSE^%ZISH("FILE1")
- Q
 TSTF ; Test directory for file creation
  N FILEDIR,TFILE,OUTFILT,POP,STID
  ; POP is returned by OPEN^%ZISH if file cannot be created.
@@ -274,8 +233,8 @@ TSTF ; Test directory for file creation
  . W !,"$ ! This directory is used to store PO activity"
  . W !,"$ ! extracts and GIP Extracts which are transmitted"
  . W !,"$ ! to the Clinical Logistics Report Server on a monthly"
- . W !,"$ ! basis. There are 29 extract files IFCPXXXF1 through"
- . W !,"$ ! IFCPXXXF27, IFCPXXXG1 and IFCPXXXG2. In addition, there"
+ . W !,"$ ! basis. There are 21 extract files IFCPXXXF1 through"
+ . W !,"$ ! IFCPXXXF19, IFCPXXXG1 and IFCPXXXG2. In addition, there"
  . W !,"$ ! are 2 working files used for the FTP Transfer:"
  . W !,"$ ! CLRSxxx.DAT and CLRS1xxx.COM. CLRSREADMExxx.TXT is also present"
  . W !,"$ EXIT"
@@ -285,15 +244,6 @@ TSTF ; Test directory for file creation
  ;
 CRTCOM ; Create .DAT file to transfer file(s)
  N FILEDIR,POP,STID,OUTFLL1
- ; PRC*5.1*130 begin
- N PRCHUSN,PRCHPSW
- S PRCHUSN=$$GET^XPAR("SYS","PRCPLO USER NAME",1,"Q")
- I PRCHUSN="" S PRCPMSG(1)="There is no user name identified in the CLRS USER NAME Parameter.",PRCPMSG(2)="Please correct and retry." D MAILFTP^PRCHLO4A S CLRSERR=3 Q
- S PRCHUSN=$$DECRYP^XUSRB1(PRCHUSN)
- S PRCHPSW=$$GET^XPAR("SYS","PRCPLO PASSWORD",1,"Q")
- I PRCHPSW="" S PRCPMSG(1)="There is no password identified in the CLRS PASSWORD Parameter.",PRCPMSG(2)="Please correct and retry." D MAILFTP^PRCHLO4A S CLRSERR=3 Q
- S PRCHPSW=$$DECRYP^XUSRB1(PRCHPSW)
- ; PRC*5.1*130 end
  S STID=$$GET1^DIQ(4,$$KSP^XUPARAM("INST")_",",99)
  S POP=""  ; POP is returned by OPEN^%ZISH
  ; S FILEDIR="$1$DGA2:[ANONYMOUS.CLRS]"  ;set dir for outpt files.
@@ -305,8 +255,9 @@ CRTCOM ; Create .DAT file to transfer file(s)
  . Q
  I CLRSERR'=3  D
  . D USE^%ZISUTL("FILE1")
- . ; Enter user name and password for Report Server Login ; PRC*5.1*130
- . W PRCHUSN,!,PRCHPSW,!
+ . W "clrsadmin",!  ; Enter user name for Report Server Login
+ . W "1025clrs",!  ;pw=1025clrs Enter P/W for Report Server Login
+ . ; W "SET DEFAULT /LOCAL $1$DGA2:[ANONYMOUS.CLRS]",!
  . W "SET DEFAULT /LOCAL "_FILEDIR,!
  . W "PUT IFCP"_STID_"*.*;*",!  ; new code to issue PUT command
  . W "EXIT",!  ; Exit FTP

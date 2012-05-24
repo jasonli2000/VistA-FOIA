@@ -1,5 +1,5 @@
-PSGCAPIV ;BIR/MV-ACTION PROFILE #2 IV ORDERS ; 8/28/09 12:24pm
- ;;5.0; INPATIENT MEDICATIONS ;**9,58,169,232**;16 DEC 97;Build 2
+PSGCAPIV ;BIR/MV-ACTION PROFILE #2 IV ORDERS ;07 Apr 98 / 1:10 PM
+ ;;5.0; INPATIENT MEDICATIONS ;**9,58,169**;16 DEC 97
  ;
  ; Reference to ^PS(52.6 is supported by DBIA# 1231
  ; Reference to ^PS(52.7 is supported by DBIA# 2173
@@ -14,7 +14,7 @@ START ;
 IV ;
  N X,ON55 S DFN=PSGP D GT55^PSIVORFB
  Q:"DE"[P(17)
- S X=$P(P("MR"),U,2) Q:XTYPE=2&(X["IV")  Q:XTYPE=3&(PST="S")&'($S(X="IV":1,X["IVP":1,1:0))  ;If med route is IVPB or IVP do not quit (PSJ*5*232)
+ S X=$P(P("MR"),U,2) Q:XTYPE=2&(X["IV")  Q:XTYPE=3&(PST="S")&'($S(X="IV":1,X="IVPB":1,1:0))
  S QST=$$ONE^PSJBCMA(DFN,ON,P(9),P(2),P(3))
  I QST'="O" S QST=$S(P(9)["PRN":"P",1:"C")
  I DRG S X=$S($G(DRG("AD",1)):DRG("AD",1),1:$G(DRG("SOL",1))),DRG=$S(P(4)="H":"* TPN *",1:$E($$ENPDN^PSGMI($P(X,U,6)),1,20))

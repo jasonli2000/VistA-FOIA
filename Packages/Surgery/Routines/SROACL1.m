@@ -1,5 +1,5 @@
 SROACL1 ;BIR/MAM - CARDIAC PREOP CLINICAL DATA ;06/13/06
- ;;3.0; Surgery ;**38,71,95,125,153,160,174**;24 Jun 93;Build 8
+ ;;3.0; Surgery ;**38,71,95,125,153,160**;24 Jun 93;Build 7
  ;
  ; Reference to EN1^GMRVUT0 supported by DBIA #1446
  ;
@@ -25,22 +25,20 @@ WT I $P(SRA(206),"^",2)="" S SRSD=$$FMADD^XLFDT(SRED,-30),NYUK=$$HW(SRSD,SRED,"W
  S NYUK=$P(SRA(206),"^",22) D YN S SRAO(22)=SHEMP_"^355"
  S NYUK=$P(SRA(209),"^",2),SRAO(23)=$S(NYUK="N":"NONE",NYUK="I":"IABP",NYUK="V":"VAD",NYUK="A":"ARTI",NYUK="O":"OTHER",1:"")_"^474"
  S NYUK=$P(SRA(206),"^",38) D YN S SRAO(24)=SHEMP_"^463"
- S NYUK=$P(SRA(208),"^",19) D YN S SRAO(25)=SHEMP_"^509"
 DISP ; display fields
  S SRPAGE="PAGE: 1" D HDR^SROAUTL
- W !," 1. Height:",?29,$P(SRAO(1),"^"),?41,"14. Number prior heart surgeries: ",?70,$P(SRAO(14),"^")
- W !," 2. Weight:",?29,$P(SRAO(2),"^"),?41,"15. Prior heart surgeries:" D H485
- W !," 3. Diabetes:",?27,$P(SRAO(3),"^"),?41,"16. Peripheral Vascular Disease:",?75,$P(SRAO(16),"^")
- W !," 4. COPD:",?30,$P(SRAO(4),"^"),?41,"17. Cerebral Vascular Disease:",?75,$P(SRAO(17),"^")
- W !," 5. FEV1:",?($S($P(SRAO(5),"^")="NS":30,1:27)),$P(SRAO(5),"^")_$S($P(SRAO(5),"^")="":"",$P(SRAO(5),"^")="NS":"",1:" liters"),?41,"18. Angina (use CCS Class):",?75,$P(SRAO(18),"^")
- W !," 6. Cardiomegaly (X-ray):",?30,$P(SRAO(6),"^"),?41,"19. CHF (use NYHA Class):",?75,$P(SRAO(19),"^")
- W !," 7. Pulmonary Rales:",?30,$P(SRAO(7),"^"),?41,"20. Current Diuretic Use:",?75,$P(SRAO(20),"^")
- W !," 8. Current Smoker: ",$J($P(SRAO(8),"^"),19),?41,"21. Current Digoxin Use:",?75,$P(SRAO(21),"^")
- W !," 9. Active Endocarditis:",?30,$P(SRAO(9),"^"),?41,"22. IV NTG within 48 Hours:",?75,$P(SRAO(22),"^")
- W !,"10. Resting ST Depression:",?30,$P(SRAO(10),"^"),?41,"23. Preop Circulatory Device:",?75,$P(SRAO(23),"^")
- W !,"11. Functional Status: ",$J($P(SRAO(11),"^"),17),?41,"24. Hypertension (Y/N):",?75,$P(SRAO(24),"^")
- W !,"12. PCI: ",$J($P(SRAO(12),"^"),29),?41,"25. Preop Atrial Fibrillation:",?75,$P(SRAO(25),"^")
- W !,"13. Prior MI: ",$J($P(SRAO(13),"^"),24)
+ W !," 1. Height:",?29,$P(SRAO(1),"^"),?41,"13. Prior MI: ",$J($P(SRAO(13),"^"),24)
+ W !," 2. Weight:",?29,$P(SRAO(2),"^"),?41,"14. Number prior heart surgeries: ",?70,$P(SRAO(14),"^")
+ W !," 3. Diabetes:",?27,$P(SRAO(3),"^"),?41,"15. Prior heart surgeries:" D H485
+ W !," 4. COPD:",?30,$P(SRAO(4),"^"),?41,"16. Peripheral Vascular Disease:",?75,$P(SRAO(16),"^")
+ W !," 5. FEV1:",?($S($P(SRAO(5),"^")="NS":30,1:27)),$P(SRAO(5),"^")_$S($P(SRAO(5),"^")="":"",$P(SRAO(5),"^")="NS":"",1:" liters"),?41,"17. Cerebral Vascular Disease:",?75,$P(SRAO(17),"^")
+ W !," 6. Cardiomegaly (X-ray):",?30,$P(SRAO(6),"^"),?41,"18. Angina (use CCS Class):",?75,$P(SRAO(18),"^")
+ W !," 7. Pulmonary Rales:",?30,$P(SRAO(7),"^"),?41,"19. CHF (use NYHA Class):",?75,$P(SRAO(19),"^")
+ W !," 8. Current Smoker: ",$J($P(SRAO(8),"^"),19),?41,"20. Current Diuretic Use:",?75,$P(SRAO(20),"^")
+ W !," 9. Active Endocarditis:",?30,$P(SRAO(9),"^"),?41,"21. Current Digoxin Use:",?75,$P(SRAO(21),"^")
+ W !,"10. Resting ST Depression:",?30,$P(SRAO(10),"^"),?41,"22. IV NTG within 48 Hours:",?75,$P(SRAO(22),"^")
+ W !,"11. Functional Status: ",$J($P(SRAO(11),"^"),17),?41,"23. Preop circulatory Device:",?75,$P(SRAO(23),"^")
+ W !,"12. PCI: ",$J($P(SRAO(12),"^"),29),?41,"24. Hypertension (Y/N):",?75,$P(SRAO(24),"^")
  W !! F MOE=1:1:80 W "-"
  Q
 YN ; store answer

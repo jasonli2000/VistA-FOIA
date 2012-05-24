@@ -1,5 +1,5 @@
-MAGBRTUT ;WOIFO/EdM - Routing Utilities ; 10/30/2008 09:20
- ;;3.0;IMAGING;**9,11,30,51,50,85,54**;03-July-2009;;Build 1424
+MAGBRTUT ;WOIFO/EdM - Routing Utilities ; 12/15/2006 13:50
+ ;;3.0;IMAGING;**9,11,30,51,50,85**;16-March-2007;;Build 1039
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -78,7 +78,7 @@ SEND(IMAGE,LOC,PRI,MECH,FROM,ID) ; Enter image into Routing Queue
  . . S ^MAGQUEUE(2006.035,"STS",ORIGIN,"WAITING",PRI,LOC,D0)=""
  . . Q
  . ;
- . L +^MAGQUEUE(2006.035,0):1E9 ; Background job MUST wait
+ . L +^MAGQUEUE(2006.035,0)
  . S D0=$O(^MAGQUEUE(2006.035," "),-1)+1
  . S X=$G(^MAGQUEUE(2006.035,0))
  . S $P(X,"^",1,2)="SEND QUEUE^2006.035"
@@ -88,7 +88,8 @@ SEND(IMAGE,LOC,PRI,MECH,FROM,ID) ; Enter image into Routing Queue
  . S X=IMAGE_"^"_LOC_"^"_T_"^"_MECH_"^"_ORIGIN_"^"_ID
  . S:ID'="" ^MAGQUEUE(2006.035,"ID",ID,D0)=""
  . S ^MAGQUEUE(2006.035,D0,0)=X
- . S ^MAGQUEUE(2006.035,D0,1)="WAITING^"_PRI_"^"_$$NOW^XLFDT()
+ . D NOW^%DTC
+ . S ^MAGQUEUE(2006.035,D0,1)="WAITING^"_PRI_"^"_%
  . S ^MAGQUEUE(2006.035,"STS",ORIGIN,"WAITING",PRI,LOC,D0)=""
  . S ^MAGQUEUE(2006.035,"DEST",LOC,"WAITING",IMAGE,T,D0)=""
  . L -^MAGQUEUE(2006.035,0)
@@ -115,7 +116,7 @@ DCMLIST(OUT,LOCATION) N D0,LO,LST,N,NM,X
 EVALPU(OUT,UNTIL) ; RPC = MAG DICOM ROUTE EVAL PURGE
  N D0,MORE,N,P1,P4,P5,P6,P7,P8,TIME
  S TIME=$$STAMP($H)+55,N=0,MORE=0
- L +^MAGQUEUE(2006.03,0):1E9 ; Background process must wait
+ L +^MAGQUEUE(2006.03,0):19 ; Background process must wait
  S D0="" F  S D0=$O(^MAGQUEUE(2006.03,"B","EVAL",D0)) Q:D0=""  D  Q:MORE
  . S X=$G(^MAGQUEUE(2006.03,D0,0))
  . S P4=$P(X,"^",4),P6=$P(X,"^",6)
@@ -166,15 +167,15 @@ REMOVE(OUT,OLD,KEY) ; RPC = MAG DICOM XMIT REMOVE GATEWAY
  S:'$G(KEY) KEY=5
  I KEY'=5,KEY'=6 S OUT="-3,Invalid key specified ("_KEY_")" Q
  ;
- L +^MAG(2006.587,0):1E9 ; Background process MUST wait
+ L +^MAG(2006.587,0):19 ; Background process MUST wait
  S (N,D0)=0 F  S D0=$O(^MAG(2006.587,D0)) Q:'D0  D
  . S X=$G(^MAG(2006.587,D0,0)),ID=$P(X,"^",KEY) Q:ID'=OLD
  . S N=N+1
  . S LOC=$P(X,"^",7),SVC=$P(X,"^",1)
  . I LOC'="",SVC'="" K ^MAG(2006.587,"C",SVC,OLD,LOC,D0)
  . I LOC'="" K ^MAG(2006.587,"D",OLD,LOC,D0)
- . I SVC'="" K ^MAG(2006.587,"B",SVC,D0)
- . K ^MAG(2006.587,D0)
+ . I SVC'="" K ^MAG(2006.586,"B",SVC,D0)
+ . K ^MAG(2005.676,D0)
  . Q
  S X=$G(^MAG(2006.587,0))
  S $P(X,"^",1,2)="DICOM TRANSMIT DESTINATION^2006.587"

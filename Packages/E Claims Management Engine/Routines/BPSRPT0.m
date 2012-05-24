@@ -1,11 +1,11 @@
 BPSRPT0 ;BHAM ISC/BEE - ECME REPORTS ;14-FEB-05
- ;;1.0;E CLAIMS MGMT ENGINE;**1,5,7,10**;JUN 2004;Build 27
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q
  ;
  ; Front End for ECME Reports
- ; 
+ ;
  ; Input variable: BPRTYPE -> 1 = Payable Claims
  ;                          2 = Rejected Claims
  ;                          3 = Claims Submitted, Not Yet Released
@@ -13,20 +13,19 @@ BPSRPT0 ;BHAM ISC/BEE - ECME REPORTS ;14-FEB-05
  ;                          5 = Recent Transactions
  ;                          6 = Totals By Date
  ;                          7 = Closed Claims
- ;                          8 = Spending Account Report
- ;                          
+ ;
  ; Passed variables - The following local variables are passed around the BPSRPT* routines
  ;                    and are not passed as parameters but are assumed to be defined:
  ;                    BPACREJ,BPAUTREV,BPBEGDT,BPBLINE,BPCCRSN,BPDRGCL,BPDRUG,BPENDDT,BPEXCEL,
  ;                    BPINSINF,BPGRPLN,BPMWC,BPNOW,BPPAGE,BPPHARM,BPQ,BPQSTDRG,
  ;                    BPRLNRL,BPRTBCK,BPSDATA,BPSUMDET,BPRTYPE
- ;                          
+ ;
 EN(BPRTYPE) N %,BPACREJ,BPAUTREV,BPBEGDT,BPCCRSN,BPDRGCL,BPDRUG,BPENDDT,BPEXCEL,BPNOW,BPPHARM,BPINSINF,BPMWC,BPQ,BPQSTDRG
- N BPREJCD,BPRLNRL,BPRPTNAM,BPRTBCK,BPSCR,BPSUMDET,CODE,POS,STAT,X,Y,BPINS,BPARR,BPELIG,BPOPCL
+ N BPREJCD,BPRLNRL,BPRPTNAM,BPRTBCK,BPSCR,BPSUMDET,CODE,POS,STAT,X,Y
  ;
  ;Verify that a valid report has been requested
- I ",1,2,3,4,5,6,7,8,"'[(","_$G(BPRTYPE)_",") W "<Invalid Menu Definition - Report Undefined>" H 3 Q
- S BPRPTNAM=$P("PAYABLE CLAIMS^REJECTED CLAIMS^SUBMIT,NOT RELEASED CLAIMS^REVERSED CLAIMS^RECENT TRANSACTIONS^TOTALS^CLOSED CLAIMS^SPENDING ACCOUNT REPORT","^",BPRTYPE)
+ I ",1,2,3,4,5,6,7,"'[(","_$G(BPRTYPE)_",") W "<Invalid Menu Definition - Report Undefined>" H 3 Q
+ S BPRPTNAM=$S(BPRTYPE=1:"PAYABLE CLAIMS",BPRTYPE=2:"REJECTED CLAIMS",BPRTYPE=3:"SUBMIT,NOT RELEASED CLAIMS",BPRTYPE=4:"REVERSED CLAIMS",BPRTYPE=5:"RECENT TRANSACTIONS",BPRTYPE=6:"TOTALS",BPRTYPE=7:"CLOSED CLAIMS",1:"")
  ;
  ;Get current Date/Time
  D NOW^%DTC S Y=% D DD^%DT S BPNOW=Y
@@ -39,10 +38,9 @@ EN(BPRTYPE) N %,BPACREJ,BPAUTREV,BPBEGDT,BPCCRSN,BPDRGCL,BPDRUG,BPENDDT,BPEXCEL,
  ;Returns 1 for Summary, 0 for Detail
  S BPSUMDET=$$SELSMDET^BPSRPT3(2) I BPSUMDET="^" G EXIT
  ;
- ;Prompt to allow selection of Multiple Insurances or All (Default to ALL)
- ;See description for $$INSURSEL^BPSSCRCU
- S BPINS=$$INSURSEL^BPSSCRCU(.BPARR,DUZ) I BPINS<1 G EXIT
- S BPINSINF=$S(BPARR(1.11)="I":BPARR("INS"),1:0)
+ ;Prompt to Display Single Insurance or All (Default to ALL)
+ ;Returns Insurance Company Name (from #36) or 0 for All
+ S BPINSINF=$$SELINSIN^BPSRPT3(0) I BPINSINF="^" G EXIT
  ;
  ;Prompt to Display (C)MOP or (M)ail or (W)indow or (A)LL (Default to ALL)
  ;Returns (A-ALL,M-Mail,W-Window,C-CMOP)
@@ -66,14 +64,14 @@ EN(BPRTYPE) N %,BPACREJ,BPAUTREV,BPBEGDT,BPCCRSN,BPDRGCL,BPDRUG,BPENDDT,BPEXCEL,
  ;
  ;Prompt to select Date Range
  ;Returns (Start Date^End Date)
- I (",1,2,3,4,5,6,7,8,")[BPRTYPE S BPBEGDT=$$SELDATE^BPSRPT3(BPRTYPE) D  I BPBEGDT="^" G EXIT
+ I (",1,2,3,4,5,6,7,")[BPRTYPE S BPBEGDT=$$SELDATE^BPSRPT3(BPRTYPE) D  I BPBEGDT="^" G EXIT
  .I BPBEGDT="^" Q
  .S BPENDDT=$P(BPBEGDT,U,2)
  .S BPBEGDT=$P(BPBEGDT,U)
  ;
  ;Prompt to Include (R)ELEASED or (N)OT RELEASED or (A)LL (Default to RELEASED)
  ;Returns (1-ALL,2-RELEASED,3-NOT RELEASED)
- S BPRLNRL=$S(BPRTYPE=3:3,1:1) I (",1,2,4,6,7,8,")[BPRTYPE S BPRLNRL=$$SELRLNRL^BPSRPT4(2) I BPRLNRL="^" G EXIT
+ S BPRLNRL=$S(BPRTYPE=3:3,1:1) I (",1,2,4,6,7,")[BPRTYPE S BPRLNRL=$$SELRLNRL^BPSRPT4(2) I BPRLNRL="^" G EXIT
  ;
  ;Prompt to Include (S)pecific Reject Code or (A)LL (Default to ALL)
  ;Returns (0-ALL,ptr-Pointer to Selected Reject Code in #9002313.93)
@@ -90,14 +88,6 @@ EN(BPRTYPE) N %,BPACREJ,BPAUTREV,BPBEGDT,BPCCRSN,BPDRGCL,BPDRUG,BPENDDT,BPEXCEL,
  ;Prompt to Include (S)pecific Close Claim Reason or (A)ll (Default to All)
  ;Returns (0-All,ptr-Pointer to #356.8)
  S BPCCRSN=0 I (",7,")[BPRTYPE S BPCCRSN=$$SELCCRSN^BPSRPT4(0) I BPCCRSN="^" G EXIT
- ;
- ;Prompt for Eligibility Indicator for rejected claims report
- ;Returns (V=Veteran,T=TRICARE,0=All)
- S BPELIG=0 I (",2,")[BPRTYPE S BPELIG=$$SELELIG^BPSRPT3(1) I BPELIG="^" G EXIT
- ;
- ;Prompt for Open/Closed/All claims
- ;Returns (1=Closed,2=Open,0=All)
- S BPOPCL=0 I (",2,")[BPRTYPE S BPOPCL=$$SELOPCL^BPSRPT3(2) I BPOPCL="^" G EXIT
  ;
  ;Prompt for Excel Capture (Detail Only)
  S BPEXCEL=0 I 'BPSUMDET S BPEXCEL=$$SELEXCEL^BPSRPT4() I BPEXCEL="^" G EXIT

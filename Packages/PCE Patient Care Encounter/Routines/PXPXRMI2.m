@@ -1,6 +1,6 @@
-PXPXRMI2 ; SLC/PKR,SCK - Build indexes for the V files (continued). ;06/17/2003
- ;;1.0;PCE PATIENT CARE ENCOUNTER;**119,194**;Aug 12, 1996;Build 2
- ;DBIA 4113 supports PXRMSXRM entry points. 
+PXPXRMI2 ; SLC/PKR - Build indexes for the V files (continued). ;06/17/2003
+       ;;1.0;PCE PATIENT CARE ENCOUNTER;**119**;Aug 12, 1996
+ ;DBIA 4113 supports PXRMSXRM entry points.
  ;DBIA 4114 supports setting and killing ^PXRMINDX
  ;===============================================================
 VPED ;Build the indexes for V PATIENT ED.
@@ -100,8 +100,7 @@ VPOV ;Build the indexes for V POV.
  . I POV="" D  Q
  .. S ETEXT=DAS_" missing POV (ICD9)"
  .. D ADDERROR^PXRMSXRM(GLOBAL,ETEXT,.NERROR)
- . ;I '$D(^ICD9(POV)) D  Q
- . I $$ICDDX^ICDCODE(POV)<0 D  Q
+ . I '$D(^ICD9(POV)) D  Q
  .. S ETEXT=DAS_" invalid ICD9"
  .. D ADDERROR^PXRMSXRM(GLOBAL,ETEXT,.NERROR)
  . S DFN=$P(TEMP,U,2)

@@ -1,5 +1,5 @@
 PSOCPDUP ;BIR/SAB - Dup drug and class checker for copy orders ;1/3/05 11:34am
- ;;7.0;OUTPATIENT PHARMACY;**11,27,32,130,132,192,207,222,243,305**;DEC 1997;Build 8
+ ;;7.0;OUTPATIENT PHARMACY;**11,27,32,130,132,192,207,222,243**;DEC 1997;Build 22
  ;External references PSOL and PSOUL^PSSLOCK supported by DBIA 2789
  ;External references to ^ORRDI1 supported by DBIA 4659
  ;External references to ^XTMP("ORRDI" supported by DBIA 4660
@@ -21,7 +21,6 @@ DUP S:$P(PSOSD(STA,DNM),"^",2)<10!($P(PSOSD(STA,DNM),"^",2)=16) DUP=1 W !,PSONUL
  S RXREC=+PSOSD(STA,DNM),MSG="Discontinued During Prescription Entry COPY - Duplicate Drug"
 DATA S DUPRX0=^PSRX(RXREC,0),RFLS=$P(DUPRX0,"^",9),ISSD=$P(^PSRX(RXREC,0),"^",13),RX0=DUPRX0,RX2=^PSRX(RXREC,2),SIG=$P($G(^PSRX(RXREC,"SIG")),"^"),$P(RX0,"^",15)=+$G(^PSRX(RXREC,"STA"))
  W !!,$J("Status: ",24) S J=RXREC D STAT^PSOFUNC W ST K RX0,RX2 W ?40,$J("Issued: ",24),$E(ISSD,4,5)_"/"_$E(ISSD,6,7)_"/"_$E(ISSD,2,3)
- D PRSTAT^PSODRDUP(RXREC)
  K FSIG,BSIG I $P($G(^PSRX(RXREC,"SIG")),"^",2) D FSIG^PSOUTLA("R",RXREC,54) F PSREV=1:1 Q:'$D(FSIG(PSREV))  S BSIG(PSREV)=FSIG(PSREV)
  K FSIG,PSREV I '$P($G(^PSRX(RXREC,"SIG")),"^",2) D EN2^PSOUTLA1(RXREC,54)
  W !,$J("SIG: ",24) W $G(BSIG(1))

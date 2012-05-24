@@ -1,23 +1,6 @@
-RORX006A ;HOIFO/BH,SG,VAC - LAB UTILIZATION (QUERY & SORT) ;4/7/09 2:07pm
- ;;1.5;CLINICAL CASE REGISTRIES;**8,13**;Feb 17, 2006;Build 27
+RORX006A ;HCIOFO/BH,SG - LAB UTILIZATION (QUERY & SORT) ; 11/8/05 8:35am
+ ;;1.5;CLINICAL CASE REGISTRIES;;Feb 17, 2006
  ;
- ; This routine uses the following IAs:
- ;
- ; #2056         GET1^DIQ (supported)
- ; 
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*8    MAR  2010   V CARR       Modified to handle ICD9 filter for
- ;                                      'include' or 'exclude'.
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can select specific patients,
- ;                                      clinics, or divisions for the report.
- ;                                      
- ;******************************************************************************
- ;******************************************************************************
  Q
  ;
  ;***** LOADS AND PROCESSES THE LAB DATA
@@ -39,7 +22,6 @@ LABDATA(DFN) ;
  Q:RC<0 RC  Q:$D(@DST@("PAT",DFN))<10 0
  ;
  ;--- Calculate intermediate totals of the tests
- N PTNT ;added 'new' statement
  S TSTIEN=0,(PTNR,PTNT)=0
  F  S TSTIEN=$O(@DST@("PAT",DFN,"R",TSTIEN))  Q:TSTIEN'>0  D
  . S NR=+$G(@DST@("PAT",DFN,"R",TSTIEN))
@@ -110,40 +92,22 @@ QUERY(FLAGS) ;
  N RORPTN        ; Number of patients in the registry
  ;
  N CNT,ECNT,IEN,IENS,PATIEN,RC,TMP,VA,VADM,XREFNODE
- N RCC,FLAG
- N RORCDLIST     ; Flag to indicate whether a clinic or division list exists
- N RORCDSTDT     ; Start date for clinic/division utilization search
- N RORCDENDT     ; End date for clinic/division utilization search
- ;
  S XREFNODE=$NA(^RORDATA(798,"AC",+RORREG))
  S RORPTN=$$REGSIZE^RORUTL02(+RORREG)  S:RORPTN<0 RORPTN=0
  S (CNT,ECNT,RC)=0
  ;
- ;=== Set up Clinic/Division list parameters
- S RORCDLIST=$$CDPARMS^RORXU001(.RORTSK,.RORCDSTDT,.RORCDENDT)
- ;
  ;--- Browse through the registry records
  S IEN=0
- S FLAG=$G(RORTSK("PARAMS","ICD9FILT","A","FILTER"))
  F  S IEN=$O(@XREFNODE@(IEN))  Q:IEN'>0  D  Q:RC<0
  . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . S IENS=IEN_",",CNT=CNT+1
- . ;--- Get the patient DFN
- . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
- . ;--- Check for patient list and quit if not on list
- . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",PATIEN)) Q
  . ;--- Check if the patient should be skipped
  . Q:$$SKIP^RORXU005(IEN,FLAGS,RORSDT,ROREDT)
- . ;--- Check if ICD9 Filter Includes or Excludes Patient
- . S RCC=0
- . I FLAG'="ALL" D
- . . S RCC=$$ICD^RORXU010(PATIEN,RORREG)
- . I (FLAG="INCLUDE")&(RCC=0) Q
- . I (FLAG="EXCLUDE")&(RCC=1) Q
- . ;--- End of ICD9 Filter check
- . ;--- Check for Clinic or Division list and quit if not in list
- . I RORCDLIST,'$$CDUTIL^RORXU001(.RORTSK,PATIEN,RORCDSTDT,RORCDENDT) Q
+ . ;
+ . ;--- Get the patient IEN (DFN)
+ . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
+ . ;
  . ;--- Get the patient's data
  . D VADEM^RORUTL05(PATIEN,1)
  . S RORPNAME=VADM(1),RORLAST4=VA("BID")
@@ -172,9 +136,8 @@ SORT() ;
  S IEN=0,NDLT=0
  F  S IEN=$O(@NODE@("RES",IEN))  Q:IEN'>0  D
  . S NDLT=NDLT+1
- . K RORMSG S NAME=$$GET1^DIQ(60,IEN,.01,,,"RORMSG")
- . ;D:$G(DIERR) DBS^RORERR("RORMSG",-9,,,60,IEN)
- . D:$G(RORMSG("DIERR")) DBS^RORERR("RORMSG",-9,,,60,IEN)
+ . S NAME=$$GET1^DIQ(60,IEN,.01,,,"RORMSG")
+ . D:$G(DIERR) DBS^RORERR("RORMSG",-9,,,60,IEN)
  . S:NAME?." " NAME="Unknown ("_IEN_")"
  . S TMP=+$G(@NODE@("RES",IEN,"R"))
  . S @NODE@("RES","B",TMP,NAME,IEN)=""

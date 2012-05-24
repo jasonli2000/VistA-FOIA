@@ -1,6 +1,6 @@
 PRCABD ;SF-ISC/RSD-DISPLAY/PRINT BILL ;12/15/95  10:54
-V ;;4.5;Accounts Receivable;**29,57,104,109,154,233**;Mar 20, 1995;Build 4
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;4.5;Accounts Receivable;**29,57,104,109,154**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
 DEV Q:'$D(PRCABT)  K ZTSAVE S %ZIS="QM" D ^%ZIS Q:POP  G EN:IO=IO(0)
  I $D(IO("Q")) S ZTRTN=$S(PRCABT=3:"EN^PRCABD",1:"^PRCABP"_PRCABT),ZTDTH=$H,ZTSAVE("D0")="",ZTSAVE("PRCABT")="",ZTSAVE("PRCADFM")="" D ^%ZTLOAD G Q
  U IO
@@ -30,15 +30,15 @@ FLN ;first line of detail after description
  Q:$D(FLN)  D ASK Q:PRCADQ  S FLN=1
  W:PRCABT=2 $P(PRCADI0,U,7),?11 S Y=$P(PRCADI0,U,1) D DT
  W ?11 I $L($G(DIWF))<25 W DIWF S DIWF=""
- W:$P(PRCADI0,U,3)]"" ?37,$J($S($P(PRCADI0,U,3)?1".".N:"0"_$P(PRCADI0,U,3),1:$P(PRCADI0,U,3)),8)
- W:$P(PRCADI0,U,4)]"" ?47,$J($P(PRCADI0,U,4),12,4) W ?62,$S($D(^PRCD(420.5,+$P(PRCADI0,U,5),0)):$P(^(0),U,1),1:"")
- W ?65,$J($P(PRCADI0,U,6),15,2)
+ W:$P(PRCADI0,U,3)]"" ?39,$J($S($P(PRCADI0,U,3)?1".".N:"0"_$P(PRCADI0,U,3),1:$P(PRCADI0,U,3)),8)
+ W:$P(PRCADI0,U,4)]"" ?49,$J($P(PRCADI0,U,4),10,4) W ?63,$S($D(^PRCD(420.5,+$P(PRCADI0,U,5),0)):$P(^(0),U,1),1:"")
+ W ?68,$J($P(PRCADI0,U,6),12,2)
  Q
 ASK I $E(IOST,1,2)="C-",($Y+4)>IOSL W !?8,"ENTER '^' TO HALT: " R X:DTIME S:X["^"!'$T PRCADQ=1 Q:PRCADQ  W @IOF D HDR Q
  I $E(IOST,1,2)'="C-",($Y+4)>IOSL W @IOF D HDR
  Q
-HDR I PRCABT=2 W !,"ORDER NO.",?11,"DATE",?37,"QUANTITY",?55,"COST",?61,"PER",?74,"AMOUNT"
- E  W !," DATE",?11,"DESCRIPTION",?37,"QUANTITY",?55,"COST",?61,"PER",?74,"AMOUNT"
+HDR I PRCABT=2 W !,"ORDER NO.",?11,"DATE",?38,"QUANTITY",?55,"COST",?62,"PER",?74,"AMOUNT"
+ E  W !," DATE",?11,"DESCRIPTION",?38,"QUANTITY",?55,"COST",?62,"PER",?74,"AMOUNT"
  I '$D(PRCADUL) S PRCADUL="",$P(PRCADUL,"_",80)="_"
  W !,PRCADUL,! Q
 ADD F I=1:1:4 S:I<4&($P(X,U,I)]"") X(J)=$P(X,U,I),J=J+1 I I=4 S X(J)=$P(X,U,4) S:$P(X,U,5)'="" X(J)=X(J)_", "_$P(X,U,5)_" "_$P(X,U,6)

@@ -1,6 +1,8 @@
 VAFCQRY2 ;BIR/DLR-Query for patient demographics ;10/18/2000
  ;;5.3;Registration;**428**;Aug 13, 1993
  ;
+ ;WVEHR/JMC - 17 June 11 - Changed HL7 table references from nnnn to HL7nnnn
+ ;
  ;Reference to $$GETDFNS^MPIF002 supported by IA #3634.
  ;
 CHKID(ICN,SSN,DFN) ;
@@ -46,7 +48,7 @@ BLDEVN(DFN,SEQ,EVN,HL,EVR,ERR) ;build EVN for TF last treatment date and event r
  S EVR=""
  ;S TFIEN=$O(^DGCN(391.91,"APAT",DFN,+$$SITE^VASITE,0))
  ;if patient is not already in the associated facility list add
- D EN1^VAFCTF(DFN,1) S TFIEN=$O(^DGCN(391.91,"APAT",DFN,+$$SITE^VASITE,0))  ;suppress messaging 
+ D EN1^VAFCTF(DFN,1) S TFIEN=$O(^DGCN(391.91,"APAT",DFN,+$$SITE^VASITE,0))  ;suppress messaging
  I $G(TFIEN)'="" S TFZN=^DGCN(391.91,TFIEN,0) S LTD=$P(TFZN,"^",3) I +$P(TFZN,"^",7)'=0 S EVR=$$GET1^DIQ(391.91,TFIEN_",",.07)
  ;check to see if this is a pivot file trigger if so reset trigger
  I +$G(PIVOTPTR)>0 I $D(^VAT(391.71,+$G(PIVOTPTR),0)) D
@@ -54,7 +56,7 @@ BLDEVN(DFN,SEQ,EVN,HL,EVR,ERR) ;build EVN for TF last treatment date and event r
  I $G(USERNAME)="" S USERNAME=DUZ
  S USERNAME=$$GET1^DIQ(200,+USERNAME_",",.01)
  S USERNAME=$$HLNAME^HLFNC(USERNAME,HL("ECH"))
- S USERID=DUZ_COMP_$P(USERNAME,COMP)_COMP_$P(USERNAME,COMP,2)_COMP_COMP_COMP_COMP_COMP_COMP_"USVHA"_SUBCOMP_SUBCOMP_"0363"_COMP_"L"_COMP_COMP_COMP_"NI"_COMP_"VA FACILITY ID"_SUBCOMP_$P($$SITE^VASITE,"^",3)_SUBCOMP_"L"
+ S USERID=DUZ_COMP_$P(USERNAME,COMP)_COMP_$P(USERNAME,COMP,2)_COMP_COMP_COMP_COMP_COMP_COMP_"USVHA"_SUBCOMP_SUBCOMP_"HL70363"_COMP_"L"_COMP_COMP_COMP_"NI"_COMP_"VA FACILITY ID"_SUBCOMP_$P($$SITE^VASITE,"^",3)_SUBCOMP_"L"
  I $G(EVN(1))="" S EVN(1)="EVN"_HL("FS")_HL("FS")_$$HLDATE^HLFNC(LTD)_HL("FS")_HL("FS")_HL("FS")_USERID_HL("FS")_$$HLDATE^HLFNC(LTD)_HL("FS")_$P($$SITE^VASITE,"^",3)
  I $G(EVN(1))'="" S $P(EVN(1),HL("FS"),2)=$G(EVR),$P(EVN(1),HL("FS"),5)=$G(EVR),$P(EVN(1),HL("FS"),3)=$$HLDATE^HLFNC(LTD),$P(EVN(1),HL("FS"),7)=$$HLDATE^HLFNC(LTD),$P(EVN(1),HL("FS"),8)=$P($$SITE^VASITE,"^",3),$P(EVN(1),HL("FS"),6)=USERID
  Q

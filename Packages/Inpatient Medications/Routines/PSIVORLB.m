@@ -1,5 +1,5 @@
-PSIVORLB ;BIR/MLM-PRINT OUT LABELS ; 8/5/08 9:22am
- ;;5.0; INPATIENT MEDICATIONS ;**58,184**;16 DEC 97;Build 12
+PSIVORLB ;BIR/MLM-PRINT OUT LABELS ;28 OCT 97 / 1:25 PM
+ ;;5.0; INPATIENT MEDICATIONS ;**58**;16 DEC 97
  ;
  ; Reference to ^PS(52.6 is supported by DBIA 1231.
  ; Reference to ^PS(52.7 is supported by DBIA 2173.
@@ -8,7 +8,7 @@ ENX ;Print example label
  D FULL^VALM1
  S PSIVFLAG=1,PSIVRM=$P(PSIVSITE,U,13) S:PSIVRM<1 PSIVRM=30 D:$E(P("OT"))="I" ORFLDS^PSIVEDT1 W:$E(P("OT"))'="I" !,"Med Route: ",$P(P("MR"),U,2),!
 START F PSIV1=1:1:PSIVNOL S LINE=0 D RE I '$D(PSIVFLAG) F LINE=LINE+1:1:(PSIVSITE+$P(PSIVSITE,U,16)) W !
-Q K PSIVDOSE,P16,LINE,MESS,PSIVCT,PSIV2,PSIVFLAG,PSIVRM,PSIV1,PDOSE,PDATE,XX1,XX2,BAG,CX,PSIMESS Q
+Q K PSIVDOSE,P16,LINE,MESS,PSIVCT,PSIV2,PSIVFLAG,PSIVRM,PSIV1,PDOSE,PDATE,XX1,XX2,BAG,CX Q
 RE ;
  D:'$D(VADM(2)) DEM^VADPT
  I PSIV1,P(4)="A"!(P(5)=0) S:P(15)>2880!('P(15)) P(15)=2880 S P(16)=P16+PSIV1#(1440/P(15)+.5\1) S:'P(16) P(16)=1440/P(15)+.5\1
@@ -25,16 +25,14 @@ SOL F PSIV=0:0 S PSIV=$O(DRG("SOL",PSIV)) Q:'PSIV  S Y=DRG("SOL",PSIV) D SOL1,P 
 INF S X=$P(P(8),"@") D:X]"" P I P("OPI")]"" S X=$P(P("OPI"),"^") D P
  S X=P(9) D:X]"" P
  S X=P(11) D:X]"" P
- ; PSJ*5*184 - Display all messages if more than one additive has a message.
- I $D(MESS) S PSIMESS="" F  S PSIMESS=$O(MESS(PSIMESS)) Q:PSIMESS=""  S X=PSIMESS D P
+ I $D(MESS) S X=MESS D P
  I $D(^PS(59.5,PSIVSN,4)) S Y=^(4) F PSIV=1:1 S X=$P(Y,U,PSIV) Q:X=""  D P
  S X=PSIV1_"["_PSIVNOL_"]" D P
  Q
 P F LINE=LINE+1:1 X:LINE>+PSIVSITE "S LINE=1 F ZZ=1:1 Q:ZZ>$P(PSIVSITE,""^"",16)  W !" K ZZ W $E(X,1,PSIVRM),! S X=$E(X,PSIVRM+1,999) Q:$L(X)<1
  Q
 SOL1 S X=$S($P(Y,U,2)]"":$P(Y,U,2)_" "_$P(Y,U,3),1:"**********") Q
-MESS ; PSJ*5*184 - make MESS a local array so all messages display for all additives.
- I $P(^PS(52.6,+$P(Y,U),0),U,9)]"" S MESS($P(^PS(52.6,+$P(Y,U),0),U,9))=""
+MESS I '$D(MESS) I $P(^PS(52.6,+$P(Y,U),0),U,9)]"" S MESS=$P(^(0),U,9)
  Q
 CONVER ;Expand dose to date.dose and set in X
  I P(15)>1440 S X=$$CONVER1^PSIVORE2($P(PSIVDOSE," "),P(15),(PSIV1-1)) Q

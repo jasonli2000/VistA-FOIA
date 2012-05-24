@@ -1,6 +1,11 @@
-ZTMB ;SEA/RDS-Taskman: Manager, Boot/ Option, ZTMRESTART ;10/07/08  16:13
- ;;8.0;KERNEL;**275,355,446**;Jul 10, 1995;Build 35
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ZTMB ;SEA/RDS-Taskman: Manager, Boot/ Option, ZTMRESTART ;12/21/2004  14:37
+ ;;8.0;KERNEL;**275,355**;Jul 10, 1995;Build 9
+ ;
+ ;NOTE:  On DataTree systems:
+ ;For automatic startup of TaskMan at boot, save as %ustart in SYS.
+ ;In %ustart, remove ';' from the next two lines:
+ ;I $P($ZVER,"/",2)>4.0,$P($ZVER,"/",2)<4.3 VIEW 1:296:$C(2) ;increase name table allocation
+ ;I  ZZSWITCH 256 ;display current namespace
  ;
 START ;Start Taskmanager
  N %,X,Z,ZTOS,ZTMB,ZTUCI,ZTMODE,ZTPAIR,ZTVOL,ZTNODE,ZTMULT
@@ -23,14 +28,11 @@ VXD2 I Z,$$EC^%ZOSV["access not authorized"!($$EC^%ZOSV["no privilege") W !!,"Yo
  Q
  ;
 CACHE ;Cache or OpenM
- I $ZV'["VMS" J START^%ZTM0 Q  ;Non-VMS start in current namespace
+ I $ZV'["VMS" J START^%ZTM0:ZTUCI Q  ;Non-VMS start
  ;For Cache/VMS
+ S %=($ZF("GETJPI",$J,"PROCPRIV")["SHARE") I % W !,"Don't start TaskMan with the SHARE privilege" Q
  S Z=0,%=$O(^%ZIS(14.7,"B",ZTPAIR,0)),ZTMODE=$P($G(^%ZIS(14.7,+%,0)),U,10)
- I '$L(ZTMODE) D  Q  ;Non-DCL Start
- . S %=($ZF("GETJPI",$J,"PROCPRIV")["SHARE")
- . I % W !,"Don't start TaskMan with the SHARE privilege" Q
- . J START^%ZTM0
- . Q
+ I '$L(ZTMODE) J START^%ZTM0:ZTUCI Q  ;Non-DCL start
  I $L(ZTMODE) D
  . N CONF S CONF=$P(ZTPAIR,":",2)
  . ;Remove the '/NOLOG' if you want a log file for trouble shooting
@@ -72,12 +74,6 @@ RESTART ;Restart Taskmanager
 INIT S U="^",ZTOS=^%ZOSF("OS"),ZTUCI=$P(^%ZOSF("MGR"),",")
  D GETENV^%ZOSV S ZTVOL=$P(Y,U,2),ZTNODE=$P(Y,U,3),ZTPAIR=$P(Y,U,4)
  Q
- ;
- ;NOTE:  On DataTree systems:
- ;For automatic startup of TaskMan at boot, save as %ustart in SYS.
- ;In %ustart, remove ';' from the next two lines:
- ;I $P($ZVER,"/",2)>4.0,$P($ZVER,"/",2)<4.3 VIEW 1:296:$C(2) ;increase name table allocation
- ;I  ZZSWITCH 256 ;display current namespace
  ;
 NULLDEV ;SELECT NULL DEVICE (DTM OS Dependent)
  N %HW

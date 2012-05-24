@@ -1,4 +1,4 @@
-IBXEX ; GENERATED FROM 'IB NEW EXEMPTION' INPUT TEMPLATE(#516), FILE 354.1;10/25/02
+IBXEX ; GENERATED FROM 'IB NEW EXEMPTION' INPUT TEMPLATE(#516), FILE 354.1;09/19/10
  D DE G BEGIN
 DE S DIE="^IBA(354.1,",DIC=DIE,DP=354.1,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^IBA(354.1,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(2)=% S %=$P(%Z,U,3) S:%]"" DE(3)=% S %=$P(%Z,U,4) S:%]"" DE(4)=% S %=$P(%Z,U,5) S:%]"" DE(5)=% S %=$P(%Z,U,6) S:%]"" DE(6)=% S %=$P(%Z,U,7) S:%]"" DE(7)=% S %=$P(%Z,U,8) S:%]"" DE(9)=%
@@ -74,7 +74,7 @@ C2 G C2S:$D(DE(2))[0 K DB
  K ^IBA(354.1,"APIDT",+X,+$P(^IBA(354.1,DA,0),U,3),-($P(^(0),U)),DA)
  S X=DE(2),DIC=DIE
  K ^IBA(354.1,"ACAN",X,-$P(^IBA(354.1,DA,0),"^",14),DA)
-C2S S X="" Q:DG(DQ)=X  K DB
+C2S S X="" G:DG(DQ)=X C2F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^IBA(354.1,"AP",$E(X,1,30),DA)=""
  S X=DG(DQ),DIC=DIE
@@ -85,7 +85,7 @@ C2S S X="" Q:DG(DQ)=X  K DB
  I $P(^IBA(354.1,DA,0),U,3),+^(0) S ^IBA(354.1,"APIDT",X,+$P(^(0),U,3),-($P(^(0),U)),DA)=""
  S X=DG(DQ),DIC=DIE
  I $P(^IBA(354.1,DA,0),"^",14) S ^IBA(354.1,"ACAN",X,-$P(^(0),"^",14),DA)=""
- Q
+C2F1 Q
 X2 Q
 3 D:$D(DG)>9 F^DIE17,DE S DQ=3,DW="0;3",DV="RSI",DU="",DLB="TYPE",DIFLD=.03
  S DE(DW)="C3^IBXEX"
@@ -101,14 +101,14 @@ C3 G C3S:$D(DE(3))[0 K DB
  K ^IBA(354.1,"APIDT",+$P(^IBA(354.1,DA,0),U,2),+X,-($P(^(0),U)),DA)
  S X=DE(3),DIC=DIE
  K ^IBA(354.1,"ACY",+X,+$P(^IBA(354.1,DA,0),U,2),+$E($P(^(0),U),1,3),DA)
-C3S S X="" Q:DG(DQ)=X  K DB
+C3S S X="" G:DG(DQ)=X C3F1 K DB
  S X=DG(DQ),DIC=DIE
  N IBX S IBX=^IBA(354.1,DA,0) I $P(IBX,U,2),$P(IBX,U,3),$P(IBX,U,4)'="",$P(IBX,U,10) S ^IBA(354.1,"AIVDT",+$P(IBX,U,3),+$P(IBX,U,2),-($P(IBX,U)),DA)=""
  S X=DG(DQ),DIC=DIE
  I $P(^IBA(354.1,DA,0),U,2),+^(0) S ^IBA(354.1,"APIDT",+$P(^(0),U,2),+X,-($P(^(0),U)),DA)=""
  S X=DG(DQ),DIC=DIE
  I $P(^IBA(354.1,DA,0),U,2),+^(0) S ^IBA(354.1,"ACY",+X,+$P(^(0),U,2),+$E($P(^(0),U),1,3),DA)=""
- Q
+C3F1 Q
 X3 Q
 4 D:$D(DG)>9 F^DIE17,DE S DQ=4,DW="0;4",DV="RSI",DU="",DLB="STATUS",DIFLD=.04
  S DE(DW)="C4^IBXEX"
@@ -120,10 +120,10 @@ X3 Q
 C4 G C4S:$D(DE(4))[0 K DB
  S X=DE(4),DIC=DIE
  K ^IBA(354.1,"AS",$E(X,1,30),DA)
-C4S S X="" Q:DG(DQ)=X  K DB
+C4S S X="" G:DG(DQ)=X C4F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^IBA(354.1,"AS",$E(X,1,30),DA)=""
- Q
+C4F1 Q
 X4 Q
 5 D:$D(DG)>9 F^DIE17,DE S DQ=5,DW="0;5",DV="RP354.2'I",DU="",DLB="EXEMPTION REASON",DIFLD=.05
  S DE(DW)="C5^IBXEX"
@@ -135,10 +135,10 @@ X4 Q
 C5 G C5S:$D(DE(5))[0 K DB
  S X=DE(5),DIC=DIE
  K ^IBA(354.1,"AR",$E(X,1,30),DA)
-C5S S X="" Q:DG(DQ)=X  K DB
+C5S S X="" G:DG(DQ)=X C5F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^IBA(354.1,"AR",$E(X,1,30),DA)=""
- Q
+C5F1 Q
 X5 Q
 6 D:$D(DG)>9 F^DIE17,DE S DQ=6,DW="0;6",DV="S",DU="",DLB="HOW ADDED",DIFLD=.06
  S DU="1:SYSTEM;2:MANUAL;"
@@ -176,9 +176,14 @@ C10 G C10S:$D(DE(10))[0 K DB
  N IBX S IBX=^IBA(354.1,DA,0) K ^IBA(354.1,"AIVDT",+$P(IBX,U,3),+$P(IBX,U,2),-($P(IBX,U)),DA)
  S X=DE(10),DIC=DIE
  K ^IBA(354.1,"ACY",+$P(^IBA(354.1,DA,0),U,3),+$P(^(0),U,2),+$E($P(^(0),U),1,3),DA)
-C10S S X="" Q:DG(DQ)=X  K DB
- D ^IBXEX1
- Q
+C10S S X="" G:DG(DQ)=X C10F1 K DB
+ S X=DG(DQ),DIC=DIE
+ S ^IBA(354.1,"AA",$E(X,1,30),DA)=""
+ S X=DG(DQ),DIC=DIE
+ N IBX S IBX=^IBA(354.1,DA,0) I +X,$P(IBX,U,2),$P(IBX,U,3),$P(IBX,U,4)'="" S ^IBA(354.1,"AIVDT",+$P(IBX,U,3),+$P(IBX,U,2),-($P(IBX,U)),DA)=""
+ S X=DG(DQ),DIC=DIE
+ I X,+$P(^IBA(354.1,DA,0),U,2),+$P(^(0),U,3),+^(0) S ^IBA(354.1,"ACY",+$P(^(0),U,3),+$P(^(0),U,2),+$E($P(^(0),U),1,3),DA)=""
+C10F1 Q
 X10 Q
 11 D:$D(DG)>9 F^DIE17,DE S DQ=11,DW="0;11",DV="FO",DU="",DLB="ELECTRONIC SIGNATURE",DIFLD=.11
  S DQ(11,2)="S Y(0)=Y S Y(0)=Y S Y=""<Hidden>"""
@@ -197,10 +202,12 @@ X12 I '$D(IBPRIOR) S Y="@99"
  S X=Y,DB(DQ)=1,DE(DW,"4/")="" G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
  G RD:X="@",Z
 C13 G C13S:$D(DE(13))[0 K DB
- D ^IBXEX2
-C13S S X="" Q:DG(DQ)=X  K DB
- D ^IBXEX3
- Q
+ S X=DE(13),DIC=DIE
+ K ^IBA(354.1,"APRIOR",$E(X,1,30),DA)
+C13S S X="" G:DG(DQ)=X C13F1 K DB
+ S X=DG(DQ),DIC=DIE
+ S ^IBA(354.1,"APRIOR",$E(X,1,30),DA)=""
+C13F1 Q
 X13 Q
 14 S DQ=15 ;@99
 15 G 0^DIE17

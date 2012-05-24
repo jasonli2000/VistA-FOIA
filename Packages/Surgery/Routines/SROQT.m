@@ -1,5 +1,5 @@
-SROQT ;BIR/ADM - QTRLY RPT MESSAGE TO SERVER ;05/11/10
- ;;3.0; Surgery ;**38,43,62,67,70,77,50,95,123,126,129,153,160,163,174**;24 Jun 93;Build 8
+SROQT ;BIR/ADM - QTRLY RPT MESSAGE TO SERVER ;07/18/07
+ ;;3.0; Surgery ;**38,43,62,67,70,77,50,95,123,126,129,153,160,163**;24 Jun 93;Build 2
  ;** NOTICE: This routine is part of an implementation of a nationally
  ;**         controlled procedure. Local modifications to this routine
  ;**         are prohibited.
@@ -20,7 +20,7 @@ SP S SRNODE=SRDIV_"^2" F SRSS=50:1:55 S SRNODE=SRNODE_"^"_^TMP("SRSS",$J,SRSS)
 IX S SRNODE=SRDIV_"^5" F J=1:1:6 D PROC
  S SRNODE=SRNODE_"^^^" F J=9:1:12 D PROC
  S ^TMP("SRQTR",$J,5)=SRNODE
-COMP S SRNODE=SRDIV_"^6" F I=1:1:39 S SRNODE=SRNODE_"^"_SRC(I)
+COMP S SRNODE=SRDIV_"^6" F I=1:1:38 S SRNODE=SRNODE_"^"_SRC(I)
  S ^TMP("SRQTR",$J,6)=SRNODE
 RES S X="" F I=1:1:14,99 S X=X_$G(SRATT(I))_"^"
  S ^TMP("SRATT",$J,"TOTAL")=X
@@ -89,7 +89,7 @@ CURRENT ; get current reporting quarter
 DATES ; get start and end dates
  S SRSMO=$S(SRQTR=1:"1001",SRQTR=2:"0101",SRQTR=3:"0401",1:"0701"),SREMO=$S(SRQTR=1:"1231",SRQTR=2:"0331",SRQTR=3:"0630",1:"0930"),SRSTART=$S(SRQTR=1:SRYR-1,1:SRYR)_SRSMO,SREND=$S(SRQTR=1:SRYR-1,1:SRYR)_SREMO
  Q
-VAR ; set report variables for non-interactive calls     
+VAR ; set report variables for non-interactive calls
  D CURRENT,DATES S SRFLG=1
  Q
 AUTO ; automatic transmission of report

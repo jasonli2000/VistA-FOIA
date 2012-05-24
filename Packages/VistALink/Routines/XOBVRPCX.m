@@ -1,6 +1,7 @@
 XOBVRPCX ;; mjk/alb - VistaLink RPC Formatter Sink ; 07/27/2002  13:00
- ;;1.6;VistALink;;May 08, 2009;Build 15
- ;Per VHA directive 2004-038, this routine should not be modified.
+ ;;1.5;VistALink;;Sep 09, 2005
+ ;;Foundations Toolbox Release v1.5 [Build: 1.5.0.026]
+ ;
  QUIT
  ;
  ; -- unwrap stream
@@ -48,7 +49,7 @@ GETLEN() ; -- get the length of the next value
  ; -- Ex. of why 4: VAL=00001
  QUIT +$PIECE($$GETSTR(LENSIZE+4),"=",2)
  ;
-GETSTR(LEN) ; -- extracts string of length, LEN, from stream buffer and returns extracted string 
+GETSTR(LEN) ; -- extracts string of length, LEN, from stream buffer and returns extracted string
  NEW X
  FOR  QUIT:($LENGTH(XOBUF)'<LEN)  DO READ(LEN-$LENGTH(XOBUF))
  SET X=$EXTRACT(XOBUF,1,LEN)
@@ -106,12 +107,12 @@ J2SE ; -- c/s type
  ;
 V1 ; -- set up security compatibility for VL v1.0 client
  ;      (tag also called by ELST^XOBRPCI)
- ;     
+ ;
  SET XOBDATA("XOB RPC","SECURITY","TYPE")="j2se"
  SET XOBDATA("XOB RPC","SECURITY","DIV")=""
  SET XOBDATA("XOB RPC","SECURITY","STATE")="authenticated"
  QUIT
- ; ---------------------   RPC Parameter Processing  -----------------
+ ; ---------------------   RPC Paramter Processing  -----------------
 PARMS ;
  ;
  ; -- get how many parameters to expect
@@ -125,7 +126,7 @@ PARMS ;
  . SET XOBPN="XOBP"_POS
  . SET XOBDATA("XOB RPC","PARAMS",POS)=XOBPN
  . ;
- . ; -- get single value 
+ . ; -- get single value
  . IF TYP'="array" DO  QUIT
  . . ; -- get value for ref type
  . . IF TYP="ref" SET @XOBPN=@$$GETVAL() QUIT

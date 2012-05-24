@@ -1,5 +1,5 @@
 SROMOD ;BIR/ADM - CPT Modifier Input ; [ 02/27/01  6:32 AM ]
- ;;3.0; Surgery ;**88,100,127,165**;24 Jun 93;Build 6
+ ;;3.0; Surgery ;**88,100,127**;24 Jun 93
  Q
 DISPLAY ; display name with modifier
  N SRY,SRDA,SRDATE S SRDATE=DT
@@ -15,9 +15,7 @@ PCHK ; return value of modifier if acceptable for principal procedure
  N SRSDATE S SRSDATE=DT K ICPTVDT
  S SROK=0,SRCODE="",SRDA=$S($G(SRTN):SRTN,$D(DA(1)):DA(1),$D(DA):DA,1:""),SRM=$S($D(SRM):SRM,1:+Y)
  I SRDA S SRSDATE=$P(^SRF(SRDA,0),"^",9),SRCODE=$P($G(^SRF(SRDA,"OP")),"^",2)
- ;;Begin *165 - RJS
- I 'SRCODE!(X=51) Q
- ;; End *165 - RJS
+ I 'SRCODE Q
  S SRZ=$P($$MODP^ICPTMOD(SRCODE,SRM,"I",SRSDATE),"^") I SRZ>0 S SROK=SRZ
  S ICPTVDT=SRSDATE
  Q
@@ -101,4 +99,3 @@ QUES1 N SRI,SRMD,SRX,SRY,SRZ S DIR("?",1)=" Answer with OTHER PROCEDURE CPT MODI
  .S DIR("?",SRCT)="   "_SRY_"   "_SRZ,SRCT=SRCT+1
  S DIR("?",SRCT)="",DIR("?")="     You may enter a new OTHER PROCEDURE CPT MODIFIER, if you wish."
  Q
-  

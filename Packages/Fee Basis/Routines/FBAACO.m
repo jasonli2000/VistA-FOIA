@@ -1,5 +1,5 @@
 FBAACO ;AISC/GRR-ENTER MEDICAL PAYMENT ;7/13/2003
- ;;3.5;FEE BASIS;**4,61,79,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**4,61,79**;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 EN583 ;driver for opt payments (entry point for uc)
  K FBAAOUT,FBPOP
@@ -70,10 +70,8 @@ PAT ;set up patient in patient file
  I '$D(^FBAAC(DFN,0)) K DD,DO S (X,DINUM)=DFN,DIC(0)="L",DLAYGO=162,DIC="^FBAAC(" D FILE^DICN K DLAYGO,DIC,DINUM,DD,DO,DA
  Q
 MM ;check for money management of entire invoice
- ; fb*3.5*116
- ;I FBAAPTC="R" S FBAAMM="" Q
- ;W ! S DIR(0)="Y",DIR("A")="Will any line items in this invoice be for contracted services",DIR("B")="No",DIR("?")="Answering no indicates interest will not be paid for any line items." D ^DIR K DIR I $D(DIRUT) S FBAAOUT=1 Q
- ;S FBAAMM=$S(Y=1:1,1:"")
- D MMPPT^FBAACP
+ I FBAAPTC="R" S FBAAMM="" Q
+ W ! S DIR(0)="Y",DIR("A")="Will any line items in this invoice be for contracted services",DIR("B")="No",DIR("?")="Answering no indicates interest will not be paid for any line items." D ^DIR K DIR I $D(DIRUT) S FBAAOUT=1 Q
+ S FBAAMM=$S(Y=1:1,1:"")
  Q
 OUT K FBAADT,FBX,FBAACP W:FBINTOT>0 !!,"Invoice: "_FBAAIN_" Totals $ "_$J(FBINTOT,1,2) Q

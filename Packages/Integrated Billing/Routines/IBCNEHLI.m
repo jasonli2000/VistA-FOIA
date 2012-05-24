@@ -1,6 +1,6 @@
 IBCNEHLI ;DAOU/ALA - Incoming HL7 messages ;16-JUN-2002
- ;;2.0;INTEGRATED BILLING;**184,252,251,271,300,416**;21-MAR-94;Build 58
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**184,252,251,271,300**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;**Program Description**
  ;  This program parses each incoming HL7 message.
@@ -21,13 +21,13 @@ EN ;  Starting point - put message into a TMP global
  . F  S CNT=$O(HLNODE(CNT)) Q:'CNT  D
  .. S ^TMP($J,"IBCNEHLI",SEGCNT,CNT)=HLNODE(CNT)
  ;
- ;  Get the eIV user
- S IDUZ=$$FIND1^DIC(200,"","X","INTERFACE,IB EIV")
+ ;  Get the IIV user
+ S IDUZ=$$FIND1^DIC(200,"","X","INTERFACE,IB IIV")
  ;   Determine which protocol to use
  S SEGMT=$G(^TMP($J,"IBCNEHLI",1,0))
  I $E(SEGMT,1,3)'="MSH" D  D ERR Q
  . S MSG(1)="MSH Segment is not the first segment found"
- . S MSG(2)="Please call the Help Desk and report this problem."
+ . S MSG(2)="Please log a NOIS for this problem."
  S HLFS=$E(SEGMT,4)
  S EVENT=$P(SEGMT,HLFS,9),IBPRTCL=""
  ;
@@ -75,10 +75,10 @@ ACK ;  Acknowledgement Processing
  ;
 ERR ; Process an error
  S MGRP=$$MGRP^IBCNEUT5()
- D MSG^IBCNEUT5(MGRP,"INCOMING eIV HL7 PROBLEM","MSG(")
+ D MSG^IBCNEUT5(MGRP,"INCOMING IIV HL7 PROBLEM","MSG(")
  K MSG,MGRP
  Q
- ; 
+ ;
 HL7VAL() ; Check for valid post 300 response
  N X,HCT
  S X=0,HCT=0

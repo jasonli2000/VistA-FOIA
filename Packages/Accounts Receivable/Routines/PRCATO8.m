@@ -1,4 +1,4 @@
-PRCATO8 ; GENERATED FROM 'PRCAT DISP CP' PRINT TEMPLATE (#405) ; 10/02/99 ; (FILE 430, MARGIN=80)
+PRCATO8 ; GENERATED FROM 'PRCAT DISP CP' PRINT TEMPLATE (#405) ; 09/19/10 ; (FILE 430, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -16,7 +16,7 @@ BEGIN ;
  D N:$X>0 Q:'DN  W ?0 W "BILL NO.: "
  S X=$G(^PRCA(430,D0,0)) D N:$X>12 Q:'DN  W ?12,$E($P(X,U,1),1,30)
  D N:$X>29 Q:'DN  W ?29 W "CATEGORY: "
- D N:$X>42 Q:'DN  W ?42 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^PRCA(430.2,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
+ D N:$X>42 Q:'DN  W ?42 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^PRCA(430.2,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,30)
  D N:$X>0 Q:'DN  W ?0 W "CONTROL POINT:"
  S X=$G(^PRCA(430,D0,11)) D N:$X>21 Q:'DN  W ?21,$E($P(X,U,1),1,15)
  D N:$X>29 Q:'DN  W ?29 W "DATE BILL PREPARED:"
@@ -30,7 +30,7 @@ BEGIN ;
 A1 ;
  S X=$G(^PRCA(430,D0,2,D1,0)) D N:$X>1 Q:'DN  W ?1,$E($P(X,U,1),1,30)
  D N:$X>20 Q:'DN  W ?20,$E($P(X,U,4),1,30)
- D N:$X>40 Q:'DN  W ?40 S Y=$P(X,U,5) S Y=$S(Y="":Y,$D(^PRCD(420.3,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,6)
+ D N:$X>40 Q:'DN  W ?40 S Y=$P(X,U,5) S Y=$S(Y="":Y,$D(^PRCD(420.3,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,6)
  D N:$X>55 Q:'DN  W ?55,$E($P(X,U,8),1,9)
  Q
 A1R ;

@@ -1,5 +1,5 @@
 BPSRPT1 ;BHAM ISC/BEE - ECME REPORTS ;14-FEB-05
- ;;1.0;E CLAIMS MGMT ENGINE;**1,5,7,8,10**;JUN 2004;Build 27
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  Q
  ;
@@ -11,7 +11,7 @@ BPSRPT1 ;BHAM ISC/BEE - ECME REPORTS ;14-FEB-05
  ;  BPPHARM/BPPHARM(ptr) - Set to 0 for all pharmacies, if set to 1 array
  ;                         of internal pointers of selected pharmacies
  ;              BPSUMDET - (1) Summary or (0) Detail format
- ;              BPINSINF - Set to 0 for all insurances or list of file 36 IENs
+ ;              BPINSINF - Set to 0 for all insurances or insurance co name
  ;                 BPMWC - 1-ALL,2-Mail,3-Window,4-CMOP Prescriptions
  ;               BPRTBCK - 1-ALL,2-RealTime,3-Backbill Claim Submission
  ;               BPRLNRL - 1-ALL,2-RELEASED,3-NOT RELEASED
@@ -22,7 +22,7 @@ BPSRPT1 ;BHAM ISC/BEE - ECME REPORTS ;14-FEB-05
  ;               BPCCRSN - Set to 0 for all closed claim reasons or ptr to #356.8
  ;              BPAUTREV - 0-ALL,1-Auto Reversed
  ;               BPACREJ - 0-ALL,1-REJECTED,2-ACCEPTED
- ;              
+ ;
 COLLECT(BPGLTMP) N BP02,BP57,BP59,BPENDDT1,BPLDT02,BPLDT57,X,Y,OK,BPIX
  ;
  ;Check Variables
@@ -35,7 +35,7 @@ COLLECT(BPGLTMP) N BP02,BP57,BP59,BPENDDT1,BPLDT02,BPLDT57,X,Y,OK,BPIX
  ;Loop through BPS CLAIMS
  ;
  ;First look for fill/refill cross reference
- ;Loop through Date of Service Index in BPS CLAIMS file and find link to 
+ ;Loop through Date of Service Index in BPS CLAIMS file and find link to
  ;claim in BPS TRANSACTION.  Process earliest Date of Service entry found in
  ;BPS TRANSACTION
  ;
@@ -52,11 +52,11 @@ COLLECT(BPGLTMP) N BP02,BP57,BP59,BPENDDT1,BPLDT02,BPLDT57,X,Y,OK,BPIX
  . . S @BPGLTMP@("FILE59",BP59)=BPLDT02_"^02"
  . . D PROCESS(BP59)
  ;
- ;#9002313.59 has only one entry per claim with, which has a date 
+ ;#9002313.59 has only one entry per claim with, which has a date
  ;  of the latest update for the claim
- ;#9002313.57 has more than one entries per claim and keep all 
+ ;#9002313.57 has more than one entries per claim and keep all
  ;  changes made the claim
- ;so we have to go thru #9002313.57 to find the earliest date 
+ ;so we have to go thru #9002313.57 to find the earliest date
  ;related to the claim to check it against BPBEGDT
  S BPLDT57=BPBEGDT-0.00001
  F  S BPLDT57=+$O(^BPSTL("AH",BPLDT57)) Q:BPLDT57=0!(BPLDT57>BPENDDT)  D
@@ -78,10 +78,7 @@ FM2YMD(BPFMDT) N Y,Y1
  ;
  ;Process each Entry
  ;
-PROCESS(BP59) ;
- N BPBCK,BPDFN,BPREF,BPPAYBL,BPPLAN,BPREJ,BPRLSDT,BPRX,BPRXDRG,BPSTATUS,BPSEQ
- ;
- S BPSEQ=$$COB59^BPSUTIL2(BP59)
+PROCESS(BP59) N BPBCK,BPDFN,BPREF,BPPAYBL,BPPLAN,BPREJ,BPRLSDT,BPRX,BPRXDRG,BPSTATUS
  ;
  ;Get ABSBRXI - ptr to #52
  S BPRX=+$P($G(^BPST(BP59,1)),U,11)
@@ -91,9 +88,6 @@ PROCESS(BP59) ;
  ;
  ;Get PATIENT - ptr to #2
  S BPDFN=+$P($G(^BPST(BP59,0)),U,6)
- ; 
- ; Skip eligibility verification transactions
- I $P($G(^BPST(BP59,0)),U,15)="E" G XPROC
  ;
  ;Check for correct BPS Pharmacy (DIVISION)
  I $G(BPPHARM)=1,$$CHKPHRM(BP59)=0 G XPROC
@@ -103,11 +97,10 @@ PROCESS(BP59) ;
  I BPRLNRL'=1 I ((BPRLNRL=2)&(BPRLSDT=0))!((BPRLNRL=3)&(BPRLSDT)) G XPROC
  ;
  ;Get Status
- S BPSTATUS=$$STATUS^BPSRPT6(BPRX,BPREF,BPSEQ)
+ S BPSTATUS=$$STATUS^BPSRPT6(BPRX,BPREF)
  ;
  ;if REVERSAL
  I BPRTYPE=4,BPSTATUS'["REVERSAL" G XPROC  ; exclude non-reversed
- I BPRTYPE=4,$$CLOSED02^BPSSCR03($P(^BPST(BP59,0),U,4))=1 G XPROC  ; exclude closed claims for Reversal Report
  ;
  ;if PAYABLE
  S BPPAYBL=BPSTATUS["PAYABLE"
@@ -118,6 +111,7 @@ PROCESS(BP59) ;
  S BPREJ=BPSTATUS["REJECTED"
  I BPRTYPE=2,BPSTATUS["REVERSAL" G XPROC ; exclude rejected reversals
  I BPRTYPE=2,'BPREJ G XPROC  ; exclude non-rejected
+ I BPRTYPE=2,$$CLSCLM(BP59) G XPROC  ;exclude closed claims
  ;
  ;if SUBMITTED NOT RELEASED exclude released ones
  I BPRTYPE=3,BPRLSDT'=0 G XPROC
@@ -128,10 +122,7 @@ PROCESS(BP59) ;
  ;
  ;if CLOSED
  I BPRTYPE=7,'$$CLSCLM(BP59) G XPROC  ;exclude open claims
- ;I BPRTYPE=7,BPSTATUS'["REJECTED" G XPROC  ;exclude non-rejected closed claims
- ;
- ;if Spending Account Report, check Pricing Segment for data
- I BPRTYPE=8,'$$PRICING^BPSRPT5(BP59) G XPROC
+ I BPRTYPE=7,BPSTATUS'["REJECTED" G XPROC  ;exclude non-rejected closed claims
  ;
  ;if Recent Transactions, exclude closed claims
  I BPRTYPE=5,$$CLSCLM(BP59) G XPROC
@@ -147,9 +138,8 @@ PROCESS(BP59) ;
  I BPMWC'="A",$$MWC^BPSRPT6(BPRX,BPREF)'=BPMWC G XPROC
  ;
  ;Check for selected insurance
- S BPPLAN=$$INSNAM^BPSRPT6(BP59)
- I BPINSINF'=0,'$$CHKINS^BPSSCRCU($P(BPPLAN,U,1),BPINSINF) G XPROC
- S BPPLAN=$P(BPPLAN,U,2)
+ S BPPLAN=$P($$INSNAM^BPSRPT6(BP59),U,2)
+ I BPINSINF'=0,BPINSINF'=BPPLAN G XPROC
  ;
  ;Check for selected drug
  S BPRXDRG=$$GETDRUG^BPSRPT6(BPRX)
@@ -169,12 +159,6 @@ PROCESS(BP59) ;
  ;Check for Specific Reject Code
  I BPREJCD'=0,'$$CKREJ(BP59,BPREJCD) G XPROC
  ;
- ;Check for Eligibility Code
- I BPELIG'=0,BPELIG'=$$ELIGCODE^BPSSCR05(BP59) G XPROC
- ;
- ;Check Open/Closed claim
- I BPOPCL'=0,((BPOPCL=2)&($$CLOSED02^BPSSCR03($P(^BPST(BP59,0),U,4))=1))!((BPOPCL=1)&($$CLOSED02^BPSSCR03($P(^BPST(BP59,0),U,4))'=1)) G XPROC
- ;
  ;Save Entry for Report
  D SETTMP^BPSRPT2(BPGLTMP,BPDFN,BPRX,BPREF,BP59,BPBEGDT,BPENDDT,.BPPHARM,BPSUMDET,BPPLAN,BPRLSDT,BPPAYBL,BPREJ,BPRXDRG,$P(BPSTATUS,U))
  ;
@@ -184,7 +168,7 @@ XPROC Q
  ;
  ; Defined Variable: BPPHARM(ptr) - List of BPS Pharmacies to Report on
  ; Input Variable: BP59 - Lookup to BPS TRANSACTION (#59)
- ; 
+ ;
  ; Returned Value -> 0 = Entry not in list of selected pharmacies
  ;                   1 = Entry is in list of selected pharmacies
 CHKPHRM(BP59) N PHARM
@@ -195,11 +179,11 @@ CHKPHRM(BP59) N PHARM
  ;Determine whether claim is Released or Not Released
  ;
  ; Input Variables: BPRX - ptr to PRESCRIPTION (#52)
- ;                 BPREF - refill # (0-No Refills,1-1st Refill, 2-2nd, ...) 
+ ;                 BPREF - refill # (0-No Refills,1-1st Refill, 2-2nd, ...)
  ;
  ; Return Value ->             0 = Not Released
  ;                 released date = Released
- ;                 
+ ;
 RELEASED(BPRX,BPREF) N RDT
  ;
  I BPREF=0 S RDT=$$RXRELDT^BPSRPT6(BPRX)\1
@@ -222,7 +206,7 @@ AUTOREV(BP59) N AR,BP02
  ; Input Variable: BP59 - Lookup to BPS TRANSACTION (#59)
  ; Return Value -> 1 = Closed
  ;                 0 = Not Closed
- ;                 
+ ;
 CLSCLM(BP59) N BP02,CL
  S BP02=+$P($G(^BPST(BP59,0)),U,4)
  S CL=+$G(^BPSC(BP02,900))
@@ -260,13 +244,12 @@ PAUSE2 N X
  ;
  ;Get ECME#
  ;
- ;BP59 - ptr to 9002313.59
- ;output :
- ;ECME number from 9002313.02
- ; 7 or 12 digits of the prescription IEN file 52
- ; or 12 spaces
-ECMENUM(BP59) ;*/
- Q $$ECMENUM^BPSSCRU2(BP59)
+ ; Input Variable: BP59 - Lookup to BPS TRANSACTION (#59)
+ ; Returned value -> Last 7 digits of ECME#
+ ;
+ECMENUM(BP59) N BPY1,BPY2
+ S BPY1=(BP59\1),BPY2=$E(BPY1,$L(BPY1)-6,99) ;last 7 digits
+ Q BPY2
  ;
  ;Convert FM date or date.time to displayable (mm/dd/yy HH:MM) format
  ;

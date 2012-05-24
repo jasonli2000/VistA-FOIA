@@ -1,30 +1,64 @@
-PXRMAGE ; SLC/PKR - Utilities for age calculations. ;10/07/2005
- ;;2.0;CLINICAL REMINDERS;**4**;Feb 04, 2005;Build 21
+PXRMAGE ; SLC/PKR - Utilities for age calculations. ;1/27/07  17:46
+ ;;2.0;CLINICAL REMINDERS;**4,7**;Feb 04, 2005;Build 14
+ ; Modified from FOIA VISTA,
+ ; Copyright (C) 2007 WorldVistA
+ ;
+ ; This program is free software; you can redistribute it and/or modify
+ ; it under the terms of the GNU General Public License as published by
+ ; the Free Software Foundation; either version 2 of the License, or
+ ; (at your option) any later version.
+ ;
+ ; This program is distributed in the hope that it will be useful,
+ ; but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ ; GNU General Public License for more details.
+ ;
+ ; You should have received a copy of the GNU General Public License
+ ; along with this program; if not, write to the Free Software
+ ; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
  ;===========================================
 AGE(DOB,DOD,DATE) ;Given a date of birth, date of death, and a date
  ;return the age on that date. If the date of death is not null the
  ;return the age on the date of death. All dates should be in VA
  ;Fileman format.
- N CDATE
+ N CDATE,X,X1,X2,X3
  S CDATE=$S(DOD="":DATE,DOD'="":DOD)
- Q (CDATE-DOB)\10000
+ S X=(CDATE-DOB)\10000 Q:X>1 X ; Begin VOE changes to support pediatrics
+ S X1=CDATE,X2=DOB
+ D ^%DTC S X3=X\365.25,X=$S(X3>2:X3,1:X_"D")
+ Q X ; End VOE changes to support pediatric ages
  ;
  ;===========================================
-AGECHECK(AGE,MINAGE,MAXAGE) ;Given an AGE, MINimumAGE, and MAXimumAGE
+AGECHECK(PXRMAGE,MINAGE,MAXAGE) ;Given an AGE (with "Y", "M" or "D"), MINimumAGE, and MAXimumAGE
  ;return true if age lies within the range.
  ;Special values of NULL or 0 mean there are no limits.
  ;
- S MAXAGE=+MAXAGE
- S MINAGE=+MINAGE
+ ; IHS/CIA/MGH - 5/12/2004 PATCH 1001 Changed to function call to calculate age
+ ; Two lines changed and one added ; for VOE too
+ ;S MAXAGE=+MAXAGE
+ ;S MINAGE=+MINAGE
+ ;
+ S MAXAGE=$$DECODE(MAXAGE) ; DECODE used in VOE Pediatric patients
+ S MINAGE=$$DECODE(MINAGE)
+ S AGEDAYS=$$DECODE(PXRMAGE)
+ ;
  ;See if too old.
- I (AGE>MAXAGE)&(MAXAGE>0) Q 0
+ I (AGEDAYS>MAXAGE)&(MAXAGE>0) Q 0
  ;
  ;See if too young.
  I MINAGE=0 Q 1
- I AGE<MINAGE Q 0
+ I AGEDAYS<MINAGE Q 0
  Q 1
  ;
- ;===========================================
+DECODE(AGEVALUE) ; Put age from VADPT into format for reminders ; for VOE too
+ ; IHS/CIA/MGH - 5/12/2004 PATCH 1001 Added function to change age into days
+ N NUM,CODE,MULT
+ S NUM=+AGEVALUE,CODE=$P(AGEVALUE,NUM,2)
+ S MULT=1.0
+ I CODE="M" S MULT=30.42
+ I CODE=""!(CODE="Y") S MULT=365.25
+ Q +(MULT*NUM)
+ ;======================================================================
 FMTAGE(MINAGE,MAXAGE) ;Format the minimum age and maximum age for display.
  N STR
  I $L(MINAGE)!$L(MAXAGE) D
@@ -78,18 +112,19 @@ MMF(DEFARR,PXRMPDEM,MINAGE,MAXAGE,FREQ,FIEVAL) ;Set the baseline minimum age,
  ;===========================================
 OVERLAP(NAR,MINA,MAXA) ;Check age ranges for overlap.  Return an error message
  ;if an overlap is found.
+ ;IHS/CIA/MGH Changes made to decode the ages into numeric results
  I NAR'>1 Q 0
  N IC,IN,JC,MAXI,MAXJ,MINI,MINJ,OVRLAP,TEXT
  S OVRLAP=0
  F IC=1:1:NAR-1 D
- . S MAXI=MAXA(IC)
+ . S MAXI=$$DECODE(MAXA(IC)) ; DECODE used in VOE Pediatric patients
  . I MAXI="" S MAXI=1000
- . S MINI=MINA(IC)
+ . S MINI=$$DECODE(MINA(IC))
  . I MINI="" S MINI=0
  . F JC=IC+1:1:NAR D
- .. S MAXJ=MAXA(JC)
+ .. S MAXJ=$$DECODE(MAXA(JC))
  .. I MAXJ="" S MAXJ=1000
- .. S MINJ=MINA(JC)
+ .. S MINJ=$$DECODE(MINA(JC))
  .. I MINJ="" S MINJ=0
  .. S IN=0
  .. I (MINJ'<MINI)&(MINJ'>MAXI) S IN=1
@@ -120,4 +155,25 @@ OVLAP() ;Check age ranges for overlap. Called from definition editor after
  . K ^TMP($J,"OVERLAP")
  . W !,"Please correct this problem."
  Q OVERLAP
+ ;
+ ;======================================================================
+RESTORE(SOURCE,INDEX,FREQ,MINAGE,MAXAGE) ;Restore FREQ, MINAGE, and
+ ;MAXAGE back to the original form.  From IHS for VOE
+ N IND,TEMP
+ I SOURCE="CFIND" D
+ . S IND=$O(^PXD(811.9,PXRMITEM,10,"B",INDEX,""))
+ . S TEMP=^PXD(811.9,PXRMITEM,10,IND,0)
+ ;
+ I SOURCE="HFIND" D
+ . S IND=$O(^PXD(811.9,PXRMITEM,6,"B",INDEX,""))
+ . S TEMP=^PXD(811.9,PXRMITEM,6,IND,0)
+ ;
+ I SOURCE="TFIND" D
+ . S IND=$O(^PXD(811.9,PXRMITEM,4,"B",INDEX,""))
+ . S TEMP=^PXD(811.9,PXRMITEM,4,IND,0)
+ ;
+ S MINAGE=$P(TEMP,U,2)
+ S MAXAGE=$P(TEMP,U,3)
+ S FREQ=$P(TEMP,U,4)
+ Q
  ;

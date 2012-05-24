@@ -1,8 +1,8 @@
 SROAPCA ;BIR/MAM - PRINT CLINICAL DATA ;09/27/04
- ;;3.0;Surgery;**38,47,71,95,125,134,153,160,174,175**;24 Jun 93;Build 6
+ ;;3.0; Surgery ;**38,47,71,95,125,134,153,160**;24 Jun 93;Build 7
  F I=0,206,207,208,200.1 S SRA(I)=$G(^SRF(SRTN,I)),$P(LN,"-",79)=""
  S X=$P(SRA(0),"^",9),SRADATE=$E(X,4,5)_"/"_$E(X,6,7)_"/"_$E(X,2,3)
- W:$Y @IOF W !,?7,"VA SURGICAL QUALITY IMPROVEMENT PROGRAM - CARDIAC SPECIALTY",!
+ W:$Y @IOF W !,?5,"VA CONTINUOUS IMPROVEMENT IN CARDIAC SURGERY PROGRAM (CICSP/CICSP-X)",!
  W ! F MOE=1:1:80 W "="
  W !,"I. IDENTIFYING DATA",?60,"Case #: "_SRTN
  N SRSPH1,SRZIP S (SRSPH1,SRZIP)=""
@@ -30,24 +30,22 @@ SROAPCA ;BIR/MAM - PRINT CLINICAL DATA ;09/27/04
  S NYUK=$P(SRA(209),"^",2),SRAO(26)=$S(NYUK="N":"NONE",NYUK="I":"IABP",NYUK="V":"VAD",NYUK="A":"ARTI",NYUK="O":"OTHER",1:NYUK)_"^474"
  S NYUK=$P(SRA(206),"^",38) D YN S SRAO(27)=SHEMP_"^463"
  S NYUK=$P(SRA(206),"^",10) D YN S SRAO(29)=SHEMP_"^349"
- S NYUK=$P(SRA(208),"^",19) D YN S SRAO(30)=SHEMP_"^509"
 DISP ; display fields
  W ! F MOE=1:1:80 W "="
  W !,"II. CLINICAL DATA"
- W !,"Gender:",?26,$P(SRAO(2),"^"),?40,"Prior MI:",$J($P(SRAO(17),"^"),30)
- W !,"Age:",?26,SRAO(3),?40,"# of prior heart surgeries:",?75,$P(SRAO(18),"^")
- W !,"Height:",?26,$P(SRAO(4),"^"),?40,"Prior heart surgeries: " D H485
- W !,"Weight:",?26,$P(SRAO(5),"^"),?40,"Peripheral Vascular Disease:",?75,$P(SRAO(19),"^")
- W !,"Diabetes:",?26,$P(SRAO(6),"^"),?40,"Cerebral Vascular Disease:",?75,$P(SRAO(20),"^")
- W !,"COPD:",?26,$P(SRAO(7),"^"),?40,"Angina (use CCS Class):",?75,$P(SRAO(21),"^")
- W !,"FEV1:",?26,$P(SRAO(8),"^")_$S($P(SRAO(8),"^")="":"",$P(SRAO(8),"^")="NS":"",1:" liters"),?40,"CHF (use NYHA Class):",?75,$P(SRAO(22),"^")
- W !,"Cardiomegaly (X-ray): ",?26,$P(SRAO(9),"^"),?40,"Current Diuretic Use:",?75,$P(SRAO(23),"^")
- W !,"Pulmonary Rales:",?26,$P(SRAO(10),"^"),?40,"Current Digoxin Use:",?75,$P(SRAO(24),"^")
- W !,"Current Smoker: ",$J($P(SRAO(11),"^"),22),?40,"IV NTG 48 Hours Preceding Surgery:",?75,$P(SRAO(25),"^")
- W !,"Active Endocarditis:",?26,$P(SRAO(29),"^"),?40,"Preop Circulatory Device:",?74,$P(SRAO(26),"^")
- W !,"Resting ST Depression:",?26,$P(SRAO(14),"^"),?40,"Hypertension:",?75,$P(SRAO(27),"^")
- W !,"Functional Status: ",$J($P(SRAO(15),"^"),18),?40,"Preoperative Atrial Fibrillation:",?75,$P(SRAO(30),"^")
- W !,"PCI: ",$J($P(SRAO(16),"^"),34)
+ W !,"Gender:",?26,$P(SRAO(2),"^"),?40,"PCI: ",$J($P(SRAO(16),"^"),34)
+ W !,"Age:",?26,SRAO(3),?40,"Prior MI:",$J($P(SRAO(17),"^"),30)
+ W !,"Height:",?26,$P(SRAO(4),"^"),?40,"# of prior heart surgeries:",?75,$P(SRAO(18),"^")
+ W !,"Weight:",?26,$P(SRAO(5),"^"),?40,"Prior heart surgeries: " D H485
+ W !,"Diabetes:",?26,$P(SRAO(6),"^"),?40,"Peripheral Vascular Disease:",?75,$P(SRAO(19),"^")
+ W !,"COPD:",?26,$P(SRAO(7),"^"),?40,"Cerebral Vascular Disease:",?75,$P(SRAO(20),"^")
+ W !,"FEV1:",?26,$P(SRAO(8),"^")_$S($P(SRAO(8),"^")="":"",$P(SRAO(8),"^")="NS":"",1:" liters"),?40,"Angina (use CCS Class):",?75,$P(SRAO(21),"^")
+ W !,"Cardiomegaly (X-ray): ",?26,$P(SRAO(9),"^"),?40,"CHF (use NYHA Class):",?75,$P(SRAO(22),"^")
+ W !,"Pulmonary Rales:",?26,$P(SRAO(10),"^"),?40,"Current Diuretic Use:",?75,$P(SRAO(23),"^")
+ W !,"Current Smoker: ",$J($P(SRAO(11),"^"),22),?40,"Current Digoxin Use:",?75,$P(SRAO(24),"^")
+ W !,"Active Endocarditis:",?26,$P(SRAO(29),"^"),?40,"IV NTG 48 Hours Preceding Surgery:",?75,$P(SRAO(25),"^")
+ W !,"Resting ST Depression:",?26,$P(SRAO(14),"^"),?40,"Preop circulatory Device:",?74,$P(SRAO(26),"^")
+ W !,"Functional Status: ",$J($P(SRAO(15),"^"),18),?40,"Hypertension:",?75,$P(SRAO(27),"^")
  K SRA,SRAO D ^SROAPCA1
  Q
 YN ; store answer

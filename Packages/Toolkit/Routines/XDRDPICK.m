@@ -1,6 +1,5 @@
-XDRDPICK ;SF-IRMFO.SEA/JLI - SELECT A PAIR OF POTENTIAL DUPLICATES AND VIEW ;10/10/08  13:38
- ;;7.3;TOOLKIT;**23,47,113**;Apr 25, 1995;Build 5
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+XDRDPICK ;SF-IRMFO.SEA/JLI - SELECT A PAIR OF POTENTIAL DUPLICATES AND VIEW ;07/27/2000  09:56
+ ;;7.3;TOOLKIT;**23,47**;Apr 25, 1995
  ;;
 EN ;
  N XDRFL,CMORS1,CMORS2,D0,DA,DIC,DIE,DIR,ICNT,ICNT1,JCNT,LCNT,NCNT,PNCT,TMPGLA,TMPGLB,XDRDA,XDRFILN,XDRGLB,Y,PRIFILE
@@ -75,8 +74,6 @@ SHOW ;
  I $$COUNT^XDRRMRG2(XDRFL,X1,X2)>1 S X1=X2,X2=+X
  S XQADATA=XDRDA_U_X1_";"_X2_U_"PRIMARY"_U_XDRFL
  D ^XDRRMRG1
- ; If Primary verifier has set status to DUPLICATE, set STATUS at top level
- ; to "X" (VERIFICATION IN PROCESS)
  S DA=$$FIND1^DIC(15.02,","_XDRDA_",","X","PRIMARY")
  I DA>0 D
  . S X=$P(^VA(15,XDRDA,0),U,3)
@@ -87,38 +84,18 @@ SHOW ;
  . . S DIE="^VA(15,",DA=XDRDA D ^DIE K DIE,DR
  . . D SETUP^XDRRMRG1(XDRDA)
  . . D CHEKVER^XDRRMRG1
- ; If PATIENT, status=VERIFIED, NOT A DUPLICATE, add patients to MPI DO NOT LINK file(new with XT*7.3*113)
- I XDRFL=2,$P(^VA(15,XDRDA,0),U,3)="N" D
- . ;Quit if routine ^MPIFDNL is not loaded
- . S X="MPIFDNL" X ^%ZOSF("TEST") Q:'$T
- . S X=^VA(15,XDRDA,0)
- . D CALLRPC^MPIFDNL(DUZ,DUZ(2),+X,+$P(X,U,2))
  Q
  ;
 BUSY ;
  W !!,$C(7),"Record is being processed by someone else.",!!
  Q
  ;
-FILE(XDRFLAG) ;
- ; If XDRFLAG=1, option not available to the PATIENT file (#2) (new with XT*7.3*113)
- N X,XDRPT,XDRFLNM
- S (X,XDRPT)=0
- S XDRFLAG=+$G(XDRFLAG)
- I XDRFLAG=1 W !,"* This option is not available for PATIENTS"
- S XDRFLNM=""
- F I=0:0 S I=$O(^VA(15.1,I)) Q:I'>0  D
- . I XDRFLAG=1,I=2 S XDRPT=1 Q
- . S X=X+1,X(I)=""
- . S XDRFLNM=$P($G(^DIC(I,0)),U)
- . Q
- I X=0 Q -1
+FILE() ;
+ N X
+ S X=0
+ F I=0:0 S I=$O(^VA(15.1,I)) Q:I'>0  S X=X+1,X(I)=""
  I X=1 Q $O(X(""))
- S:'XDRFLAG XDRFLNM="PATIENT"
- K DIC S DIC=15.1,DIC(0)="AEQM"
- S DIC("A")="Which FILE are the potential duplicates in (e.g., "_XDRFLNM_")? "
- S DIC("B")=XDRFLNM
- I XDRFLAG=1 S DIC("S")="I Y'=2"
- D ^DIC K DIC
+ K DIC S DIC=15.1,DIC(0)="AEQM",DIC("A")="Which FILE are the potential duplicates in (e.g., PATIENT)? ",DIC("B")="PATIENT" D ^DIC K DIC
  Q +Y
  ;
 CMORS ; RETURN DATA RANKED BY CMORS (HIGH VALUES FIRST)

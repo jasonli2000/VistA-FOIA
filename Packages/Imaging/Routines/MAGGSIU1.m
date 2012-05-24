@@ -1,6 +1,5 @@
-MAGGSIU1 ;WOIFO/GEK/NST - Utilities for Image Add/Modify ; 04 Mar 2010 4:04 PM
- ;;3.0;IMAGING;**7,8,108**;Mar 19, 2002;Build 1738;May 20, 2010
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGGSIU1 ;WOIFO/GEK - Utilities for Image Add/Modify ; [ 12/27/2000 10:49 ]
+ ;;3.0;IMAGING;**7,8**;Sep 15, 2004
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +7,7 @@ MAGGSIU1 ;WOIFO/GEK/NST - Utilities for Image Add/Modify ; 04 Mar 2010 4:04 PM
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -20,14 +20,14 @@ MAGGSIU1 ;WOIFO/GEK/NST - Utilities for Image Add/Modify ; 04 Mar 2010 4:04 PM
  ; GEK 11/04/2002  Keep MAGGTU1 as utility for DA2NAME and DRIVE
  ;
 MAKENAME(MAGGFDA) ; get info from the MAGGFDA array
- ;  For all Images the Name (.01) is first 18 characters of patient name 
+ ;  For all Images the Name (.01) is first 18 characters of patient name
  ;    concatenated with SSN.
  ;  If No patient name is sent, well make the name from the short desc.
- ;  We were making name of : 
+ ;  We were making name of :
  ;    $E(PATENT NAME,1,10)' '$E(DESC CATEG,1,9)' 'MM/DD/YY   (DOC DATE)
  N ZDESC,X
  S ZDESC=""
- ; If we don't have a patient name ( later) we set .01 to Short Desc 
+ ; If we don't have a patient name ( later) we set .01 to Short Desc
  ; if it exists.
  I $D(MAGGFDA(2005,"+1,",10)) S ZDESC=$E(MAGGFDA(2005,"+1,",10),1,30)
  ;                   DFN
@@ -37,8 +37,8 @@ MAKENAME(MAGGFDA) ; get info from the MAGGFDA array
  . S ZDESC=$E($P(^DPT(X,0),U),1,18)_"   "_$P(^DPT(X,0),U,9)
  ;
  Q ZDESC
-MAKECLAS ; Patch 8: This call will attempt to compute an Image CLASS ^ (#41) CLASS [2P] 
- ; from the TYPE Field   (#42) TYPE [3P]  
+MAKECLAS ; Patch 8: This call will attempt to compute an Image CLASS ^ (#41) CLASS [2P]
+ ; from the TYPE Field   (#42) TYPE [3P]
  ; Call assumes the FM FDA Array MAGGFDA exists.
  ;// Note : this is also called from MAGGTIA. TYPE may not exist.
  ; Calling RTN expects MAGERR to exist if error.
@@ -70,13 +70,13 @@ MAKEPKG ;Patch 8 This call will attempt to compute the field (#40) PACKAGE INDEX
  D ISCNSLT^TIUCNSLT(.OK,$P(MAGRY,U,2)) I OK S MAGGFDA(2005,"+1,",40)="CONS" Q
  S MAGGFDA(2005,"+1,",40)="NOTE"
  Q
-MAKEPROC ; Patch 8: This call will attempt to compute PROCEDURE field  ^ (#6) PROCEDURE [8F] 
+MAKEPROC ; Patch 8: This call will attempt to compute PROCEDURE field  ^ (#6) PROCEDURE [8F]
  ; from Fields:   (#41) CLASS [2P]  or PACKAGE field (#40) PACKAGE [1S]
  ; Call assumes the FM FDA Array MAGGFDA exists.
- ; We are here because TYPE INDEX, CLASS INDEX and PACKAGE INDEX exist but PROCEDURE doesn't 
- ; Calling RTN expects MAGERR to exist if error. ; 
+ ; We are here because TYPE INDEX, CLASS INDEX and PACKAGE INDEX exist but PROCEDURE doesn't
+ ; Calling RTN expects MAGERR to exist if error. ;
  N TYPE,CLS,PKG
- I $G(MAGGFDA(2005,"+1,",40),"NONE")'="NONE" S MAGGFDA(2005,"+1,",6)=MAGGFDA(2005,"+1,",40) Q 
+ I $G(MAGGFDA(2005,"+1,",40),"NONE")'="NONE" S MAGGFDA(2005,"+1,",6)=MAGGFDA(2005,"+1,",40) Q
  S TYPE=$G(MAGGFDA(2005,"+1,",42))
  ; Can't make Type required.  yet.
  S CLS=$P(^MAG(2005.83,TYPE,0),U,2)
@@ -85,7 +85,7 @@ MAKEPROC ; Patch 8: This call will attempt to compute PROCEDURE field  ^ (#6) PR
  Q
 MAKEORIG ; Patch 8: This call will default the Origin field #45 to "VA"
  ; We are here because TYPE exists in the Array but Origin doesn't
- S MAGGFDA(2005,"+1,",45)="V"       ; Patch 108: set to "V"
+ S MAGGFDA(2005,"+1,",45)="VA"
  Q
 KILLENT(MAGGDA) ; Delete the entry just created, because of Post processing Error
  D CLEAN^DILF

@@ -1,5 +1,5 @@
-BPSJPREG ;BHAM ISC/LJF - HL7 Registration MFN Message ;6/12/08  15:38
- ;;1.0;E CLAIMS MGMT ENGINE;**1,3,2,5,7**;JUN 2004;Build 46
+BPSJPREG ;BHAM ISC/LJF - HL7 Registration MFN Message ;21-NOV-2003
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,3,2,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ;**Program Description**
@@ -27,17 +27,12 @@ BPSJPREG ;BHAM ISC/LJF - HL7 Registration MFN Message ;6/12/08  15:38
 REG(PHARMIX,BPSJVAL) ;  Registration message for when a site installs
  ;
  N HL,HL7DTG,HLECH,HLEID,HLFS,HLLNK,HLPRO,BPSHLRS,IPA,IPP,NPKEY,NCPDP
- N MGRP,MCT,MSG,TAXID,ZRPSEG,BPSJVAL2,BPSJPRES,BPSZ
+ N MGRP,MCT,MSG,TAXID,ZRPSEG,BPSJVAL2,BPSJPRES
  ;
  S (MCT,TAXID)=0,BPSJVAL=$G(BPSJVAL)
  ;
  I '$G(PHARMIX) Q
  K ^TMP("HLS",$J)
- ;
- ; only send Active or recently made inactive pharmacies, no reason to send
- ; inactive ones over and over
- S BPSZ=$G(^BPS(9002313.56,PHARMIX,0))
- I 'BPSJVAL,'$P(BPSZ,"^",10),'$P(BPSZ,"^",4) Q
  ;
  ; NPI Processing
  ; Get DropDeadDate and Date/Time Last Change
@@ -73,6 +68,7 @@ REG(PHARMIX,BPSJVAL) ;  Registration message for when a site installs
  D INIT^HLFNC2(HLPRO,.HL)
  S HLFS=$G(HL("FS")) I HLFS="" S HLFS="|"
  S HLECH=$E($G(HL("ECH"),1)) I HLECH="" S HLECH="^"
+ S HL("SITE")=$$SITE^VASITE,HL("SAF")=$P(HL("SITE"),U,2,3)
  S HL("EPPORT")=IPP,HLEID=$$HLP^BPSJUTL(HLPRO)
  ;
  ;Get fileman date/time, ensuring seconds are included: 3031029.135636
@@ -110,8 +106,6 @@ REG(PHARMIX,BPSJVAL) ;  Registration message for when a site installs
  .. S MCT=MCT+1,MSG(MCT)="ECME Pharmacy Registration HL7 Message not created. (PHARMIX: "_PHARMIX_")"
  .. S MCT=MCT+1,MSG(MCT)=BPSHLRS
  .. D MSG^BPSJUTL(.MSG,"ECME Pharmacy Registration")
- . ; update last status sent
- . S $P(^BPS(9002313.56,PHARMIX,0),"^",4)=$P(^BPS(9002313.56,PHARMIX,0),"^",10)
  . I BPSJVAL D    ;Interactive: show success
  .. W !!,"ECME Pharmacy Registration HL7 Message was created successfully."
  ;

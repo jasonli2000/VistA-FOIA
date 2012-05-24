@@ -1,6 +1,6 @@
 PRCPUUIP ;WISC/RFJ-utility update item prim to secondary            ;08 Jul 92
- ;;5.1;IFCAP;**126**;Oct 20, 2000;Build 2
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
  ;
@@ -59,7 +59,6 @@ ITEM(INVPT,ITEMDA,TRANTYPE,ORDERNO,PRCPDATA) ;  update inventory point item
  S $P(ITEMDATA,"^",7)=$P(ITEMDATA,"^",7)+PRCPDATA("QTY")
  S $P(ITEMDATA,"^",27)=$P(ITEMDATA,"^",27)+PRCPDATA("INVVAL")
  S $P(ITEMDATA,"^",22)=0,%=$P(ITEMDATA,"^",7)+$P(ITEMDATA,"^",19) I %>0 S $P(ITEMDATA,"^",22)=$J($P(ITEMDATA,"^",27)/%,0,3) I $P(ITEMDATA,"^",22)'>0 S $P(ITEMDATA,"^",22)=0
- I TRANTYPE="P",$P(ITEMDATA,"^",22)=0 S $P(ITEMDATA,"^",22)=$P(ITEMDATA,"^",15)
  S ^PRCP(445,INVPT,1,ITEMDA,0)=ITEMDATA
  L -^PRCP(445,INVPT,1,ITEMDA)
  Q

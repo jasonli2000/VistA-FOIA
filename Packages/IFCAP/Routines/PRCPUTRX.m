@@ -1,5 +1,5 @@
 PRCPUTRX ;WISC/RFJ-transaction history file 445.2 sets              ;07 Jul 92
-V ;;5.1;IFCAP;**1,126**;Oct 20, 2000;Build 2
+V ;;5.1;IFCAP;**1**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
@@ -39,9 +39,7 @@ ADDTRAN(INVPT,ITEMDA,TRANTYPE,ORDERNO,PRCPDATA) ;  add transaction entry
  I '$D(PRCPDATA("PKG")) S PRCPDATA("PKG")=$$UNIT^PRCPUX1(INVPT,ITEMDA,"/")
  F %="QTY","INVVAL","SELVAL" I '$G(PRCPDATA(%)) S PRCPDATA(%)=0
  S %=$G(^PRCP(445,INVPT,1,ITEMDA,0))
- I '$G(PRCPDATA("AVGUNIT")) D
- . S PRCPDATA("AVGUNIT")=+$P(%,"^",22)
- . I TRANTYPE="P",PRCPDATA("AVGUNIT")=0 S PRCPDATA("AVGUNIT")=+$P(%,"^",15)
+ S:'$G(PRCPDATA("AVGUNIT")) PRCPDATA("AVGUNIT")=+$P(%,"^",22)
  S:'$G(PRCPDATA("SELUNIT")) PRCPDATA("SELUNIT")=+$P(%,"^",15)
  F %="REF","2237PO","ISSUE","OTHERPT","REASON","RECIPIENT","USER" I '$D(PRCPDATA(%)) S PRCPDATA(%)=""
  ;

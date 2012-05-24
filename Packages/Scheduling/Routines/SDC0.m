@@ -1,5 +1,5 @@
 SDC0 ;MAN/GRR,ALB/TMP/LDB - Continuation of SDC (cancel a clinic) ; 16 JUL 2003  1:27 pm
- ;;5.3;Scheduling;**303,330,379,398,467,478,545**;Aug 13, 1993;Build 8
+ ;;5.3;Scheduling;**303,330,379,398,467,478**;Aug 13, 1993
  ;
  ;SD/467 - open matched EWL entries with canceled appointments
  ;
@@ -30,12 +30,7 @@ BEG1 N SDFIRST
  I $D(SDLT),$D(^UTILITY("SDLT",$J)) D PR^SDC3,END Q
  Q:$D(SDLT)  D ^SDAUT1
  I MAX=0 W !,"AUTO-REBOOKING NOT ALLOWED FOR THIS CLINIC" G APP:ALS["Y",END
- F GDATE=CDATE:0 S GDATE=$O(^SC(SC,"S",GDATE)) Q:GDATE=""!(GDATE>(CDATE+1))  D
- .F L=0:0 S L=$O(^SC(SC,"S",GDATE,1,L)) Q:L=""  D  Q:POP  S A=^SC(SC,"S",GDATE,1,L,0) I $D(^DPT(+A,"S",GDATE,0)),$P(^(0),"^",2)="C",$P(^(0),"^",14)=SDTIME D ^SDAUT2,^SDCCP
- ..S POP=0
- ..I '$D(^SC(SC,"S",GDATE,1,L,0)) I $D(^("C")) S J=GDATE,J2=L D DELETE^SDC1 K J,J2 S POP=1 Q  ;SD*545 delete corrupt record
- ..I '+$G(^SC(SC,"S",GDATE,1,L,0)) S J=GDATE,J2=L D DELETE^SDC1 K J,J2 S POP=1 Q  ;SD*545 delete corrupt record
- K POP
+ F GDATE=CDATE:0 S GDATE=$O(^SC(SC,"S",GDATE)) Q:GDATE=""!(GDATE>(CDATE+1))  F L=0:0 S L=$O(^SC(SC,"S",GDATE,1,L)) Q:L=""  S A=^(L,0) I $D(^DPT(+A,"S",GDATE,0)),$P(^(0),"^",2)="C",$P(^(0),"^",14)=SDTIME D ^SDAUT2,^SDCCP
  D:ALS["Y" APP
 END ;
  D:$G(SC)>0&($G(CDATE)>0) RESOLVE
@@ -48,8 +43,6 @@ CHK K SDOK1 I $D(^SC(SC,"SL")) S SL=^("SL"),%=$P(SL,"^",6),SI=$S(%="":4,%<3:4,%:
 RESOLVE ;evaluate canceled and rebooked appointments with relation to EWL
  S GDATE=CDATE K ^TMP("SDWLREB",$J),^TMP($J,"SDWLPL")
  F  S GDATE=$O(^SC(SC,"S",GDATE)) Q:GDATE=""!(GDATE>(CDATE+1))  S L=0 F  S L=$O(^SC(SC,"S",GDATE,1,L)) Q:L=""  D
- .I '$D(^SC(SC,"S",GDATE,1,L,0)) I $D(^("C")) S J=GDATE,J2=L D DELETE^SDC1 K J,J2 Q  ;SD*5.3*545 delete corrupt record
- .I '+$G(^SC(SC,"S",GDATE,1,L,0)) S J=GDATE,J2=L D DELETE^SDC1 K J,J2 Q  ;SD*5.3*545 delete corrupt record with missing DFN
  .S DFN=+^SC(SC,"S",GDATE,1,L,0)
  .N RBFLG,SDTRB,SDCAN,SDREB S SDREB=0 D REBOOK^SDWLREB(DFN,GDATE,SC,.RBFLG,.SDTRB,.SDCAN) Q:SDCAN'=SDTIME
  .I $E(RBFLG,1,2)'="CC" Q  ;not canceled by clinic
@@ -61,19 +54,12 @@ RESOLVE ;evaluate canceled and rebooked appointments with relation to EWL
 DUP ;SCREEN FOR DUPLICATE PATIENTS - SD*5.3*379
  S SDAP="" F  S SDAP=$O(^SC(SC,"S",SD,SDAP)) Q:SDAP=""  D
  .S SDAPNUM="" F  S SDAPNUM=$O(^SC(SC,"S",SD,SDAP,SDAPNUM)) Q:SDAPNUM=""  D
- ..I '$D(^SC(SC,"S",SD,SDAP,SDAPNUM,0)) I $D(^("C")) S J=SD,J2=SDAPNUM D DELETE^SDC1 Q  ;SD*545 delete corrupt record
- ..I '+$G(^SC(SC,"S",SD,SDAP,SDAPNUM,0)) S J=SD,J2=SDAPNUM D DELETE^SDC1 Q  ;SD*545 if DFN missing delete record
  ..I $D(^SC(SC,"S",SD,SDAP,SDAPNUM,0)) D
  ...S A=$P(^SC(SC,"S",SD,SDAP,SDAPNUM,0),"^",1)
  ...I '$D(^TMP("SDC0",$J,SD,A)) S ^TMP("SDC0",$J,SD,A)="" D ^SDC3
  Q
 APP I $G(SDFFFF)=1 S SDFIRST=0
- F GDATE=CDATE:0 S GDATE=$O(^SC(+SC,"S",GDATE)) Q:GDATE=""!(GDATE>(CDATE+1))  F L=0:0 S L=$O(^SC(+SC,"S",GDATE,1,L)) Q:L=""  D  Q:POP  S A=^SC(+SC,"S",GDATE,1,L,0) D CHECK
- .S POP=0
- .I '$D(^SC(+SC,"S",GDATE,1,L,0)) I $D(^("C")) S J=GDATE,J2=L D DELETE^SDC1 K J,J2 S POP=1 Q  ;SD*545 delete corrupt record
- .I '+$G(^SC(+SC,"S",GDATE,1,L,0)) S J=GDATE,J2=L D DELETE^SDC1 K J,J2 S POP=1 Q  ;SD*545 if DFN missing delete record
- .Q
- K POP
+ F GDATE=CDATE:0 S GDATE=$O(^SC(+SC,"S",GDATE)) Q:GDATE=""!(GDATE>(CDATE+1))  F L=0:0 S L=$O(^SC(+SC,"S",GDATE,1,L)) Q:L=""  S A=^(L,0) D CHECK
  I $D(^TMP($J,"BADADD")) D BADADD^SDLT K ^TMP($J,"BADADD")
  Q
 CHK1 S (SDX,X)=GDATE D WRAPP^SDLT

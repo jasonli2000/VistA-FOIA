@@ -1,5 +1,5 @@
 PRCAATR ;WASH-ISC@ALTOONA,PA/RGY-VIEW TRANSACTION FOR BILLS ;2/14/96  2:46 PM
-V ;;4.5;Accounts Receivable;**36,104,172,138,233**;Mar 20, 1995;Build 4
+V ;;4.5;Accounts Receivable;**36,104,172,138**;Mar 20, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 EN1(BILL) ;ENTRY POINT FROM PRCAAPR
  NEW X,COUNT,OUT,TRAN,SEL,PRCAATRX,PRCAIO,PRCAIOS,D0,PRCAQUE,POP,PRCAPRT,Y,ZTSK
@@ -12,11 +12,11 @@ HDR ;Header
  D HDR^PRCAAPR1
  I $P($G(^PRCA(430,BILL,13)),"^") W !,"MEDICARE CONTRACTUAL ADJUSTMENT: ",$J($P($G(^PRCA(430,BILL,13)),"^"),0,2)
  I $P($G(^PRCA(430,BILL,13)),"^",2) W !,"UNREIMBURSED MEDICARE EXPENSE: ",$J($P($G(^PRCA(430,BILL,13)),"^",2),0,2)
- W !,"Bill #: ",$P(^PRCA(430,BILL,0),"^") D:$P(^(0),"^",9)'=+DEBT DEB W !!,"#",?8,"Tr #",?17,"Type",?52,"Date",?70,"Amount"
+ W !,"Bill #: ",$P(^PRCA(430,BILL,0),"^") D:$P(^(0),"^",9)'=+DEBT DEB W !!,"#",?8,"Tr #",?17,"Type",?52,"Date",?68,"Amount"
  S X="",$P(X,"-",IOM)="" W !,X
  Q
 DIS ;Display transactions
- W !,?17,"Original Amount",?52,$$SLH^RCFN01($P(^PRCA(430,BILL,0),"^",10)),?65,$J($P(^(0),"^",3),11,2)
+ W !,?17,"Original Amount",?52,$$SLH^RCFN01($P(^PRCA(430,BILL,0),"^",10)),?65,$J($P(^(0),"^",3),9,2)
  I '$O(^PRCA(433,"C",BILL,0)) D
  . S X="",$P(X,"*",20)="" W !!,X,"  NO TRANSACTION INFORMATION AVAILABLE  ",X
 RD . R !!,"Press return to continue: ",X:DTIME S:'$T DTOUT=1 S OUT=1
@@ -24,7 +24,7 @@ RD . R !!,"Press return to continue: ",X:DTIME S:'$T DTOUT=1 S OUT=1
  . Q
  F TRAN=0:0 S TRAN=$O(^PRCA(433,"C",BILL,TRAN)) Q:'TRAN!$D(OUT)  D TLN
  S X=$G(^PRCA(430,BILL,7))
- I '$D(OUT) W !?65,"-----------",!,?64,"$",$J($P(X,"^")+$P(X,"^",2)+$P(X,"^",3)+$P(X,"^",4)+$P(X,"^",5),11,2) D READ
+ I '$D(OUT) W !?65,"------",!,?64,"$",$J($P(X,"^")+$P(X,"^",2)+$P(X,"^",3)+$P(X,"^",4)+$P(X,"^",5),9,2) D READ
  Q
 TLN ;Display a transaction
  N YR
@@ -34,7 +34,7 @@ TLN ;Display a transaction
  W $S($P($G(^PRCA(430.3,+$P(X,"^",2),0)),"^",3)=17:$P($G(^PRCA(433,TRAN,5)),"^",2),1:$P($G(^(0)),"^"))
  ;  show decrease adjustments as negative (patch 4.5*172)
  I $P(X,"^",2)=35 S:$P(X,"^",5)>0 $P(X,"^",5)=-$P(X,"^",5)
- W ?52,$S(+X:$$SLH^RCFN01(+X),1:""),?65,$J($P(X,"^",5),11,2)
+ W ?52,$S(+X:$$SLH^RCFN01(+X),1:""),?65,$J($P(X,"^",5),9,2)
 Q1 Q
 READ ;Read a trans number
  I IO'=IO(0) G Q2

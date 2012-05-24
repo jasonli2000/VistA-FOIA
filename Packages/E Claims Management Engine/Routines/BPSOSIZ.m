@@ -1,5 +1,5 @@
 BPSOSIZ ;BHAM ISC/FCS/DRS/DLF - Filing BPS Transaction ;06/01/2004
- ;;1.0;E CLAIMS MGMT ENGINE;**1,5,7,8,10**;JUN 2004;Build 27
+ ;;1.0;E CLAIMS MGMT ENGINE;**1,5**;JUN 2004;Build 45
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q
@@ -8,20 +8,25 @@ BPSOSIZ ;BHAM ISC/FCS/DRS/DLF - Filing BPS Transaction ;06/01/2004
  ; Input
  ;   IEN59    - BPS Transaction number
  ;   MOREDATA - Array of data created by BPSNCPD*
- ;   BP77 - BPS REQUEST file ien
-EN(IEN59,MOREDATA,BP77) ;EP - BPSOSRB
+EN(IEN59,MOREDATA) ;EP - BPSOSRB
+ ;
  ; Initialize variables
- N EXISTS,ERROR,X
- S ERROR=0
+ N RX,RXR,EXISTS,ERROR,X
+ S ERROR=0,RX=$P(IEN59,"."),RXR=+$E($P(IEN59,".",2),1,4)
+ ;
  ;
  D LOG^BPSOSL(IEN59,$T(+0)_"-Building Transaction")
  ;
  ; Lock the transaction
- I '$$LOCK59(IEN59) D ERROR(BP77,IEN59,"Could not lock the BPS Transaction") Q
+ I '$$LOCK59(IEN59) D ERROR(IEN59,"Could not lock the transaction") Q
+ ;
+ ; Check for claims that should not be resubmitted
+ S X=$$RXPAID^BPSOSIY(IEN59)
+ I X D ERROR(IEN59,"RXPAID^BPSOSIY returned "_X) Q
  ;
  ; Make sure that the record is not already IN PROGRESS
  S X=+$$STATUS59^BPSOSRX(IEN59)
- I X'=0,X'=31,X'=99 D ERROR(BP77,IEN59,"STATUS is "_X) Q
+ I X'=0,X'=99 D ERROR(IEN59,"STATUS is "_X) Q
  ;
  ; Check if the BPS Transaction exists
  S EXISTS=$$EXIST59(IEN59)
@@ -30,11 +35,11 @@ EN(IEN59,MOREDATA,BP77) ;EP - BPSOSRB
  I EXISTS D CLEAR59(IEN59)
  ;
  ; If the record does not exist, create new record and validate the IEN
- I 'EXISTS S X=$$NEW59(IEN59) I X'=IEN59 D ERROR(BP77,IEN59,"NEW59 returned "_X) Q
+ I 'EXISTS S X=$$NEW59(IEN59) I X'=IEN59 D ERROR(IEN59,"NEW59 returned "_X) Q
  ;
  ; Update the fields.  If error is returned, log to the BPS Transaction, which
  ;   we know exists at this point
- S ERROR=$$INIT^BPSOSIY(IEN59,BP77) ;MOREDATA is passed in background
+ S ERROR=$$INIT^BPSOSIY(IEN59)
  I ERROR D ERROR^BPSOSU($T(+0),IEN59,ERROR,"BPS Transaction not updated"),UNLOCK59(IEN59) Q
  ;
  ; Validate the transaction
@@ -46,13 +51,11 @@ EN(IEN59,MOREDATA,BP77) ;EP - BPSOSRB
  ;
  ; LOCK59 - Lock Transaction
 LOCK59(IEN59) ;
- D LOG^BPSOSL(IEN59,$T(+0)_"-Lock BPS Transaction")
  L +^BPST(IEN59):5
  Q $T
  ;
  ; UNLOCK59 - Unlock record
 UNLOCK59(IEN59) ;
- D LOG^BPSOSL(IEN59,$T(+0)_"-Unlock BPS Transaction")
  L -^BPST(IEN59)
  Q
  ;
@@ -63,10 +66,9 @@ EXIST59(IEN59) ;
  Q $S(X>0:X,X=0:0)
  ;
  ; NEW59 - Create a new BPS Transaction record
- ; IEN59 - BPS TRANSACTION ien
 NEW59(IEN59) ;
  ; Initialize variables
- N FDA,IEN,MSG,FN,BPSTIME,BPCOB
+ N FDA,IEN,MSG,FN
  ;
  ; The .01 node and IEN should be the transaction number
  S FN=9002313.59
@@ -113,11 +115,6 @@ CLEAR59(IEN59) ;
  F  S ENTRY=$O(^BPST(IEN59,13,ENTRY)) Q:+ENTRY=0  D
  . S FDA(FN,ENTRY_","_IEN59_",",.01)=""
  ;
- ; Delete COB OTHER PAYERS multiple
- S FN=9002313.5914,ENTRY=0
- F  S ENTRY=$O(^BPST(IEN59,14,ENTRY)) Q:'ENTRY  D
- . S FDA(FN,ENTRY_","_IEN59_",",.01)=""
- ;
  ; Fileman call to do the delete
  D FILE^DIE("","FDA","MSG")
  ;
@@ -137,8 +134,10 @@ PREVISLY(IEN59) ;EP - BPSOSRB, BPSOSU
  Q
  ;
  ; ERROR - Log an error to the log
-ERROR(BP77,IEN59,ERROR) ;
- D LOG^BPSOSL(IEN59,$T(+0)_"-Calling BPSOSRB to handle error")
- D ERROR^BPSOSRB(BP77,IEN59,ERROR)
+ERROR(IEN59,MSG) ;
+ N RX,RXR
+ S RX=$P(IEN59,"."),RXR=+$E($P(IEN59,".",2),1,4)
+ D LOG^BPSOSL(IEN59,$T(+0)_"-Skipping: "_$G(MSG))
+ K ^XTMP("BPSOSRX",RX,RXR)
  D UNLOCK59(IEN59)
  Q

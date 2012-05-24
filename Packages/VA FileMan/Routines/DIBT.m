@@ -1,13 +1,13 @@
-DIBT ;SFISC/GFT,TKW,TOAD-STORE A SORT TEMPLATE ;11NOV2008
- ;;22.0;VA FileMan;**82,160**;Mar 30, 1999;Build 21
- ;Per VHA Directive 2004-038, this routine should not be modified.
+DIBT ;SFISC/GFT,TKW,TOAD-STORE A SORT TEMPLATE ;06:20 PM  2 Apr 2001
+ ;;22.0;VA FileMan;**82**;Nov 17, 1998
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 MENU ;
 0 ; select and edit templates, until user quits
  S DIC="^DOPT(""DIBT"",",DICF=DI
  I '$D(^DOPT("DIBT",.402)) S ^(0)="TEMPLATE FILE^1.01" K ^("B") D
  .F X=.4,.401,.402 S ^DOPT("DIBT",X,0)=$P(^DIC(X,0),U)
  .N DIK S DIK=DIC D IXALL^DIK
- S DIC(0)="QEAIN",DIC("A")="Select TEMPLATE File: "
+ S DIC(0)="FQEAIN",DIC("A")="Select TEMPLATE File: "
  S DIC("S")="I Y=.4!(Y=.401)!(Y=.402)"
  D ^DIC K DIC Q:Y<0
  K DTOUT F  Q:'$$T(+Y,DICF)  I $D(DTOUT) K DTOUT Q
@@ -17,10 +17,9 @@ T(DDSFILE,DICF) ;=.4,.401,.402
  N Y,DIC,DIERR,DDSPARM,DR,DA,DIN
  W !! S DIC=DDSFILE,DIC("S")="I $P(^(0),U,4)="_DICF_",Y'<1",D="F"_DICF
  S DIC(0)="AEQI" D IX^DIC I Y<0 Q 0
- S DA=+Y,DIN=$$SCREEN G SCROLL:DIN=0 I 'DIN Q 0
+ S DA=+Y I '$$SCREEN G SCROLL
  S DIN=$S(DDSFILE=.4:"DIPTED",DDSFILE=.402:"DIETED",1:"DIBTED")
- S DR="["_DIN_"]",DDSPARM="" D ^DDS Q '$D(DIERR)
- ;
+ S DR="["_DIN_"]",DDSPARM="E" D ^DDS I '$D(DIERR) Q 1
 SCROLL N DIE,DIOVRD,DR
  S DIE=DDSFILE,DR=".01:3;5:7;10;707;491620",DIOVRD=1 D ^DIE Q 1
  ;
@@ -29,13 +28,13 @@ SCREEN(HELP) ;
  K DUZ("SCREEN") ;COMMENT OUT THIS LINE IF YOU WANT FILEMAN TO REMEMBER!
  I $G(DUZ("SCREEN"))=0 Q 0
  D SET^DDGLIB0 I $D(DIERR) Q 0
- I '$G(DUZ("SCREEN")) D  I '$D(DUZ("SCREEN")) Q U  ;ABORT
+ I '$G(DUZ("SCREEN")) D
  .S DIR(0)="Y",DIR("A")="Do you want to use the screen-mode version",DIR("B")="YES"
  .I $D(HELP) S DIR("?")=HELP
  .D ^DIR I Y-1 S:Y=0 DUZ("SCREEN")=0 Q
  .S DUZ("SCREEN")=1
  D KILL^DDGLIB0()
- ;I ^DD("OS")=9 U $I:VT=1 ;FOR DATATREE
+ I ^DD("OS")=9 U $I:VT=1 ;FOR DATATREE
  Q +$G(DUZ("SCREEN"))
  ;
 S ;

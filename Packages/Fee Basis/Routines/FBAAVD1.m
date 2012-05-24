@@ -1,5 +1,5 @@
-FBAAVD1 ;AISC/DMK/GRR-COMMUNITY NURSING HOME VENDOR DISPLAY ; 1/15/10 2:06pm
- ;;3.5;FEE BASIS;**9,111**;JAN 30, 1995;Build 17
+FBAAVD1 ;AISC/DMK/GRR-COMMUNITY NURSING HOME VENDOR DISPLAY ;9/8/97
+ ;;3.5;FEE BASIS;**9**;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  I $Y+11>IOSL D  Q:'Y
  . I $E(IOST,1,2)="C-" S DIR(0)="E" D ^DIR K DIR I 'Y Q
@@ -29,16 +29,15 @@ CNH(X,Z) ;retrieve latest vendor contract
  I Y="" S Y=$P($G(^FBAA(161.21,+$O(^(+$O(^FBAA(161.21,"AC",X,DT)),0)),0)),U,1,3)
  Q $S($G(Z):Y,1:$P(Y,U))
  ;
-RATE(X,FBCNRTS) ;retrieve rates
+RATE(X) ;retrieve rates
  ;X=contract number
- ;FBCNRTS = optional array, contains the associated rates.
- ;returns the number of rates associated with a contract.  
- N I,CNT
+ ;returns rates delimited by '^'
+ N I,CNT,Y
  I $S('$D(X):1,X']"":1,'$D(^FBAA(161.21,"B",X)):1,1:0) Q ""
  S X=$O(^FBAA(161.21,"B",X,0))
  S (I,CNT)=0,Y="" F  S I=$O(^FBAA(161.22,"AC",X,I)) Q:'I  I $D(^FBAA(161.22,I,0)) S CNT=CNT+1 D
- .S FBCNRTS(CNT)=$P(^FBAA(161.22,I,0),"^",2)
- Q CNT
+ .S $P(Y,"^",CNT)=$P(^FBAA(161.22,I,0),"^",2)
+ Q Y
  ;
 DISPLAY ;
  ;will display rates on screen for selection
@@ -49,12 +48,11 @@ DISPLAY ;
  I $S('$G(FBVIEN):1,'$D(^FBAAV(FBVIEN,0)):1,1:0) S FBX="" Q
  I $S($G(FBCNUM)']"":1,'$D(^FBAA(161.21,"B",FBCNUM)):1,1:0) S FBX="" Q
  N I,J
- N FBCONRTS,FBX S FBX=$$RATE(FBCNUM,.FBCONRTS) I $G(FBX)<0 S FBRATE="" Q
- S J="" F I=1:1 S J=$G(FBCONRTS(I)) Q:'J  S X=J,X2="2$" D COMMA^%DTC S J=X D
+ S:'$D(FBX) FBX=$$RATE(FBCNUM) I FBX']"" S FBRATE="" Q
+ S J="" F I=1:1 S J=$P(FBX,U,I) Q:'J  S X=J,X2="2$" D COMMA^%DTC S J=X D
  .W:I#2 !?10,$S($D(FBRATE):I_")"_J,1:"RATE "_I_":"_J)
  .W:I#2=0 ?40,$S($D(FBRATE):I_")"_J,1:"RATE "_I_":"_J)
  Q:'$D(FBRATE)
  W ! S DIR(0)="N^1:"_(I-1) D ^DIR K DIR I $D(DIRUT) S FBRATE="" Q
- ;S FBRATE=$P(FBX,U,Y)
- S FBRATE=$G(FBCONRTS(Y))
+ S FBRATE=$P(FBX,U,Y)
  Q

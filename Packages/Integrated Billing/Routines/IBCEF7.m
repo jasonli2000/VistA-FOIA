@@ -1,12 +1,9 @@
 IBCEF7 ;WOIFO/SS - FORMATTER AND EXTRACTOR SPECIFIC BILL FUNCTIONS ;8/6/03 10:56am
- ;;2.0;INTEGRATED BILLING;**232,349,432**;21-MAR-94;Build 192
+ ;;2.0;INTEGRATED BILLING;**232,349**;21-MAR-94;Build 46
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
 ALLPROV ;called from #364.5 entry "N-ALL CUR/OTH PROVIDER INFO"
- ;*342/TAZ - Added call to LPRV^IBCEF80 for line level providers; restructured due to line length
- I +$G(IBXSAVE("PROVINF",IBXIEN))=0 D
- . N IBZ
- . D PROVIDER(IBXIEN,"C",.IBZ),PROVIDER(IBXIEN,"O",.IBZ) S IBXSAVE("PROVINF",IBXIEN)=IBXIEN M IBXSAVE("PROVINF",IBXIEN)=IBZ
+ I +$G(IBXSAVE("PROVINF",IBXIEN))=0 N IBZ D PROVIDER(IBXIEN,"C",.IBZ),PROVIDER(IBXIEN,"O",.IBZ) S IBXSAVE("PROVINF",IBXIEN)=IBXIEN M IBXSAVE("PROVINF",IBXIEN)=IBZ
  Q
  ;for PRV1
  ;Input:
@@ -50,7 +47,7 @@ PRV1(IB399) ;
  ;Input :
  ; IBXIEN - ien in #399
  ;Output:
- ; IBZOUT(Z) - array with ien of #36 
+ ; IBZOUT(Z) - array with ien of #36
 OTHSBID(IBXIEN,IBZOUT) ;
  N Z,Z0,Z1,IBZ,C
  D F^IBCEF("N-ALL INSURANCE CO 837 ID","IBZ")
@@ -81,7 +78,7 @@ ELMADD2(IBXIEN,IBP,IBARR) ;
  ;Input :
  ; IBXIEN - ien in #399
  ;Output:
- ; IBZOUT(Z) - array with STR LINE1|STR LINE2|CITY|STATE|ZIP 
+ ; IBZOUT(Z) - array with STR LINE1|STR LINE2|CITY|STATE|ZIP
 OTHADD2(IBXIEN,IBZOUT) ;
  N C,Z,Z0,Z1,IBZ,IBZIP,IB1,IBDFN1
  S IBZOUT=""
@@ -96,7 +93,7 @@ OTHADD2(IBXIEN,IBZOUT) ;
  ;Input:
  ; IBDFN-patient ien
  ; IBINS - input array with insurance pointers to 36
- ;Output 
+ ;Output
  ; STR LINE1|STR LINE2|CITY|STATE|ZIP
 FR2PAT(IBDFN,IBINS) ;information about "other insured" address
  N Z3,Z4,Z5,IBZIP
@@ -132,7 +129,7 @@ ELMADDR(IBXIEN,IBP,IBARR) ;
  ;Input :
  ; IBXIEN - ien in #399
  ;Output:
- ; IBXSAVE("OTH_PROV_ADDR",Z) 
+ ; IBXSAVE("OTH_PROV_ADDR",Z)
 OTHADDR(IBXIEN) ;
  N C,Z,Z0,Z1,IBZ,IBZIP,IB1,IBINS
  D F^IBCEF("N-OTH INSURANCE CO IEN 36") ;array with iens of file #36
@@ -151,7 +148,6 @@ OTHADDR(IBXIEN) ;
  ;IBFUNC -function (3-RENDERING,etc)
  ;Output: VARIABLE POINTER (PTR;file_root)
 PROVPTR(IBIEN399,IBFUNC) ;
- ;*432/TAZ - No longer used for IBXSAVE array setup
  N IBN
  S IBN=$O(^DGCR(399,IBIEN399,"PRV","B",IBFUNC,0))
  I +IBN=0 Q 0
@@ -189,12 +185,12 @@ GETNMEL(IBFULL,IBEL) ;Get name element
  ; where:
  ; IBPROV - see input parameter
  ; PRNUM: 1=primary insurance provider, 2= secondary, 3 -tretiary
- ; PRTYPE: Provider type(FUNCTION) 
+ ; PRTYPE: Provider type(FUNCTION)
  ; SEQ# : sequence number (1st is used for ID1, 2nd - for ID2, etc)
  ; PROV : provider/VARIABLEPTR
  ; INSUR: Insurance PTR #36 or NONE
  ; IDTYPE: ID type
- ; ID: ID 
+ ; ID: ID
  ; FORMTYP: Form type 1=UB,2=1500
  ; CARETYP: Care type 0=both inp/outp,1=inpatient, 2=outpatient
 PROVIDER(IB399,IBPROV,IBRES) ;
@@ -215,7 +211,7 @@ PROVINF(IB399,IBPRNUM,IBRES,IBSORT,IBINSTP) ;
  D PROVINF^IBCEF74(IB399,IBPRNUM,.IBRES,IBSORT,IBINSTP)
  Q
  ;
-PSPRV(IBIFN) ; Returns information for bill ien IBIFN for purchased svc 
+PSPRV(IBIFN) ; Returns information for bill ien IBIFN for purchased svc
  ; Returns 4 digit data in following format:
  ;  1st digit: 0 if not outside facility
  ;             1 if outside facility

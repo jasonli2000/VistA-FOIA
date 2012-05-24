@@ -1,9 +1,8 @@
-PSGOE92 ;BIR/CML3-ACTIVE ORDER EDIT (CONT.) ; 2/18/10 4:15pm
- ;;5.0;INPATIENT MEDICATIONS ;**2,35,50,58,81,110,215,237**;16 DEC 97;Build 13
+PSGOE92 ;BIR/CML3-ACTIVE ORDER EDIT (CONT.) ;27 Jan 98 / 9:32 AM
+ ;;5.0; INPATIENT MEDICATIONS ;**2,35,50,58,81,110**;16 DEC 97
  ;
  ;Reference to ^DD(53.1 is supported by DBIA #2256.
  ;Reference to ^PS(55 is supported by DBIA #2191.
- ;Reference to ^PSDRUG is supported by DBIA #2192.
  ;
 1 ; provider
  S MSG=0,PSGF2=1 S:PSGOEEF(PSGF2) BACK="1^PSGOE92"
@@ -22,6 +21,7 @@ A1 I $G(PSJORD),$G(PSGP) I $$COMPLEX^PSJOE(PSGP,PSJORD) S PSGOEE=0 D  G DONE
  . W !!?5,"Self Med may not be edited for active complex orders." D PAUSE^VALM1
  S MSG=0,PSGF2=5 S:PSGOEEF(PSGF2) BACK="5^PSGOE92" K PSGOEEF(6) S:PSGSM PSGOEEF(6)=""
 A5 W !,"SELF MED: " W:PSGSM]"" $P("NO^YES","^",PSGSM+1),"// " R X:DTIME I X="^"!'$T W:'$T $C(7) S PSGOEE=0 G DONE
+ ;I "01"[X,$L(X)<2 S:PSGSM=""&(X]"") PSGSM=X W:PSGSM]"" "  (",$P("NO^YES","^",PSGSM+1),")" G:'PSGSM DONE G 6
  I "01"[X,$L(X)<2 S:X]"" PSGSM=+X W:PSGSM]"" "  (",$P("NO^YES","^",PSGSM+1),")" G:'PSGSM DONE S PSGOEEF(6)="" G 6
  I X="@" W $C(7),"  (Required)" G A5
  I X?1"^".E D ENFF G:Y>0 @Y G A5
@@ -53,22 +53,8 @@ A6 I $G(PSJORD),$G(PSGP) I $$COMPLEX^PSJOE(PSGP,PSJORD) S PSGOEE=0 D  G DONE
  D DDOC^PSGOE82(PSGX) ;* Perform allergy/adv. reaction order checks
  NEW PSJDOSE
  D DOSECHK^PSJDOSE
- I +$G(PSJDSFLG) D DSPWARN^PSJDOSE S:$G(PSGOEEF(109))="" PSGOEEF(109)=1 ; PSJ*5*237 - Check PSGOEEF(109) to prevent infinite loop
- ; PSJ*5*215 - If Dispense Drug(s) changed, make entry in Activity Log.
- ; Compare the edited dispense drug information in ^PS(53.45 to the active
- ; order dispense drug information in ^PS(55.
- S (PSJDDTMP,PSJDD55,PSJDTMP1,PSJDD551)=""
- F PSJDDTMP=0:0 S PSJDDTMP=$O(^PS(53.45,PSJSYSP,2,PSJDDTMP)) Q:'PSJDDTMP  D
- . S PSJDDTMP(PSJDDTMP)=$G(^PS(53.45,PSJSYSP,2,PSJDDTMP,0))
- . S PSJDTMP1=PSJDTMP1_"Disp Drug: "_"("_$P($G(PSJDDTMP(PSJDDTMP)),"^",1)_") "_$P($G(^PSDRUG($P($G(PSJDDTMP(PSJDDTMP)),"^",1),0)),"^")_" Units: "_$P($G(PSJDDTMP(PSJDDTMP)),"^",2)_" "
- F PSJDD55=0:0 S PSJDD55=$O(^PS(55,DFN,5,+ON,1,PSJDD55)) Q:'PSJDD55  D
- . S PSJDD55(PSJDD55)=$G(^PS(55,DFN,5,+ON,1,PSJDD55,0))
- . S PSJDD551=PSJDD551_"Disp Drug: "_"("_$P($G(PSJDD55(PSJDD55)),"^",1)_") "_$P($G(^PSDRUG($P($G(PSJDD55(PSJDD55)),"^",1),0)),"^")_" Units: "_$P($G(PSJDD55(PSJDD55)),"^",2)_" "
- ; If the two temporary strings PSJDTMP1 and PSJDD551 do not match each other exactly
- ; then an edit has been made to the Dispense Drug Field.  Make a new entry in
- ; the Activity Log for this order.
- I PSJDTMP1'=PSJDD551 D NEWUDAL^PSGAL5(DFN,+ON,6000,"Dispense Drug",PSJDD551)
- K PSGOEEND,PSJDDTMP,PSJDTMP1,PSJDD55,PSJDD551 G DONE
+ I +$G(PSJDSFLG) D DSPWARN^PSJDOSE S PSGOEEF(109)=1
+ K PSGOEEND G DONE
  ;
 15 ; comments
  I $G(PSJORD),$G(PSGP) I $$COMPLEX^PSJOE(PSGP,PSJORD) S PSGOEE=0 D  G DONE
@@ -76,6 +62,7 @@ A6 I $G(PSJORD),$G(PSGP) I $$COMPLEX^PSJOE(PSGP,PSJORD) S PSGOEE=0 D  G DONE
  S MSG=0,PSGF2=15,BACK="15^PSGOE92",DA=PSJSYSP,DR=1,DIE="^PS(53.45," D ^DIE W ! G DONE
  ;
 72 ; provider comments
+ ;S MSG=0,PSGF2=72,BACK="72^PSGOE92",DA=PSJSYSP,DR=4,DIE="^PS(53.45," D ^DIE W ! G DONE
  ;
 DONE ;
  I PSGOEE G:'PSGOEEF(PSGF2) @BACK S PSGOEE=PSGOEEF(PSGF2)

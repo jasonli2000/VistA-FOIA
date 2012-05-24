@@ -1,5 +1,5 @@
-ECXPHVE ;ALB/JAM - Pharmacy Volume Edit ; 6/8/09 12:27pm
- ;;3.0;DSS EXTRACTS;**92,120**;Dec 22, 1997;Build 43
+ECXPHVE ;ALB/JAM - Pharmacy Volume Edit ; 7/10/06 3:00pm
+ ;;3.0;DSS EXTRACTS;**92**;Dec 22, 1997;Build 30
  ;
 EN ;entry point from menu option
  N DIR,DIRUT,ECXX,Y,STOP,ECPIECE
@@ -23,10 +23,10 @@ EXTEDT ;Edit extracts - PRE, IVP, or UDP
  I ECXX="PRE" D
  .S DIC="^ECX(727.81,",DR="16;22"
  .D TURNON^DIAUTL(727.81,"16;22","y")
- ;IVP extract (file #727.819) edit Quantity (field #10)&Total Doses per Day (#20)
+ ;IVP extract (file #727.819) edit Quantity (field #10)
  I ECXX="IVP" D
- .S DIC="^ECX(727.819,",DR="10;20"
- .D TURNON^DIAUTL(727.819,"10;20","y")
+ .S DIC="^ECX(727.819,",DR="10"
+ .D TURNON^DIAUTL(727.819,"10","y")
  ;UDP extract (file #727.809) edit Quantity (field #10)
  I ECXX="UDP" D
  .S DIC="^ECX(727.809,",DR="10"
@@ -36,7 +36,7 @@ EXTEDT ;Edit extracts - PRE, IVP, or UDP
  .S DIC("W")="W ?30,""  "",$P(^(0),U,2),""  "",?45,$P(^(0),U,3),""  "",?55,$$GET1^DIQ(2,+$P(^(0),U,5),.01,""E"")"
 RESET I $G(ECXX)="" Q
  I ECXX="PRE" D TURNON^DIAUTL(727.81,"16;22","e")
- I ECXX="IVP" D TURNON^DIAUTL(727.819,"10;20","e")
+ I ECXX="IVP" D TURNON^DIAUTL(727.819,"10","e")
  I ECXX="UDP" D TURNON^DIAUTL(727.809,"10","e")
  I $G(ECPIECE) S $P(^ECX(728,1,7.1),"^",ECPIECE)=""
  Q

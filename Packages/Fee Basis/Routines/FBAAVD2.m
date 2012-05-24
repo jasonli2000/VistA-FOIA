@@ -1,9 +1,9 @@
-FBAAVD2 ;AISC/DMK-EDIT VENDOR DEMOGRAPHICS ; 8/31/09 11:36am
- ;;3.5;FEE BASIS;**9,10,47,65,98,111**;JAN 30, 1995;Build 17
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+FBAAVD2 ;AISC/DMK-EDIT VENDOR DEMOGRAPHICS ;07/17/06
+ ;;3.5;FEE BASIS;**9,10,47,65,98**;JAN 30, 1995;Build 54
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
 EDITV ;entry to edit vendor demographic data
  ;DA defined to IEN of vendor file (161.2)
- Q:'$G(DA)  N FBADT,FBDA,Z6 S FBDA=DA  L +^FBAAV(DA):$G(DILOCKTM,3) I '$T W !,"Another user is editing this vendor record. Try again later.",! Q
+ Q:'$G(DA)  N FBADT,FBDA,Z6 S FBDA=DA L +^FBAAV(DA):1 I '$T W !,"Unable to access vendor record. Trying again.",! G EDITV
  S FBT=$S($D(FBT):FBT,1:""),FBT=$S(FBT="N":FBT,1:"C")
  S FEEO="",DIE="^FBAAV(",DR="[FBAA EDIT VENDOR]",DIE("NO^")="BACKOUTOK"
  S Z1=$G(^FBAAV(DA,0)),Z3=$G(^(1)),Z4=$G(^("AMS")),Z5=$G(^("ADEL")),Z6=$P($G(^(3)),U,2)
@@ -13,7 +13,7 @@ EDITV ;entry to edit vendor demographic data
  K DIE
  L -^FBAAV(DA)
  ;check if data was changed
- I $D(^FBAAV(DA,0)),(($P(Z1,U,2,6)'=$P(^FBAAV(DA,0),U,2,6))!($P(Z1,U,8,16)'=$P(^FBAAV(DA,0),U,8,16))!($P(Z3,U,10)'=$P($G(^FBAAV(DA,1)),U,10))!$$GRPDIF^FBAAUTL6(DA)!($P($G(^FBAAV(DA,3)),U,2)'=Z6)) D
+ I $D(^FBAAV(DA,0)),(($P(Z1,U,2,6)'=$P(^FBAAV(DA,0),U,2,6))!($P(Z1,U,8,16)'=$P(^FBAAV(DA,0),U,8,16))!($P(Z3,U,10)'=$P($G(^FBAAV(DA,1)),U,10))!$$GRPDIF^FBAAUTL6(DA))!($P($G(^FBAAV(DA,3)),U,2))'=Z6 D
  .S FBVNAME=$P(^FBAAV(DA,0),U),FBIEN1=DA,FBADT=$P(Z5,U,4),FBNPI=$P($G(^FBAAV(FBIEN1,3)),U,2)
  .;check if date last received from austin, version 3.  If so, then did not receive in upload - send update instead of change
  .;fbadt = date received from austin.
@@ -29,7 +29,7 @@ EDITV ;entry to edit vendor demographic data
  .I FBT="F" S FBIEN1=DA,FEEO="" D SETGL^FBAAVD Q  ; send FEE-ONLY
  .;If date from austin not null then add vendor entry for a change
  .K DD,DO S DIC="^FBAAV(",DIC(0)="L",DLAYGO=161.2,X=FBVNAME D FILE^DICN Q:Y<0  S FBIEN=+Y
- .F  L +^FBAAV(FBIEN):$G(DILOCKTM,3) Q:$T  W !,"Another user is editing this vendor record.  Trying again.  ",!
+ .L +^FBAAV(FBIEN)
  .S ^FBAAV(FBIEN,0)=$G(^FBAAV(FBIEN1,0))
  .S ^FBAAV(FBIEN,1)=$G(^FBAAV(FBIEN1,1))
  .S ^FBAAV(FBIEN,"AMS")=$G(^FBAAV(FBIEN1,"AMS")),$P(^FBAAV(FBIEN,"AMS"),"^")=""
@@ -40,7 +40,7 @@ EDITV ;entry to edit vendor demographic data
  .S DIK="^FBAAV(",DA=FBIEN D IX1^DIK
  .L -^FBAAV(FBIEN)
  .;restore original vendor data
- .F  L +^FBAAV(FBIEN1):$G(DILOCKTM,3) Q:$T  W !,"Another user is editing this vendor record.  Trying again.  ",!
+ .L +^FBAAV(FBIEN1)
  .S DIE="^FBAAV(",DA=FBIEN1,DR="[FB VENDOR UPDATE]" D ^DIE K DIE
  .D UPDGRP^FBAAUTL6(FBIEN1)
  .L -^FBAAV(FBIEN1)
@@ -53,8 +53,7 @@ CONTR ;enter contract information for a CNH vendor
  S FBLIEN=$P($G(^FBAA(161.25,FBVIEN,0)),"^",6) I FBLIEN]"",FBLIEN'=FBVIEN W !!,*7,"Cannot add contract information to this vendor until change has been",!,"approved by Austin." Q
  W ! S DIC="^FBAA(161.21,",DIC(0)="AEQLM",DLAYGO=161.21,DIC("S")="I $P(^(0),U,4)="_FBVIEN
  D ^DIC K DIC,DLAYGO Q:X=""!(X="^")  G CONTR:Y<0
- S DA=+Y,FBCNUM=$P(Y,"^",2),DIE="^FBAA(161.21,"
- F  L +^FBAA(161.21,DA):$G(DILOCKTM,3) Q:$T  W !,"This contract is being edited by another user, trying again.",!
+ S DA=+Y,FBCNUM=$P(Y,"^",2),DIE="^FBAA(161.21," L +^FBAA(161.21,DA)
  S ZO1=^FBAA(161.21,DA,0),DR="[FBNH ENTER CONTRACT]",DIE("NO^")="" D ^DIE K DIE,DR
  I '$G(DA) K ZO1 Q
  I $D(^FBAA(161.22,"AC",DA)) D
@@ -69,11 +68,11 @@ CONTR ;enter contract information for a CNH vendor
  S FBCIEN=DA K FBX
 RATE K DA W ! S DIR(0)="161.22,.02",DIR("A")="Enter Nursing Home Rate",DIR("?")="^K FBX,FBRATE D DISPLAY^FBAAVD1 W !,""Enter an amount between .01 and 9999999.99""" D ^DIR
  K DIR Q:$D(DIRUT)  Q:'Y  S FBR=+Y
- ;I $L($$RATE^FBAAVD1($P(^FBAA(161.21,FBCIEN,0),"^",1)))+$L("^"_FBR)>510 W !,*7,"There are too many rates loaded for that contract! Please remove obsolete rates.",! Q
+ I $L($$RATE^FBAAVD1($P(^FBAA(161.21,FBCIEN,0),"^",1)))+$L("^"_FBR)>510 W !,*7,"There are too many rates loaded for that contract! Please remove obsolete rates.",! Q
  I $D(^FBAA(161.22,"AD",FBCIEN,FBR)) K FBR W !,*7,"Rate already exists for that contract!",! G RATE
  S X=$P(^FBAA(161.22,0),U,3)
 RETRY S X=X+1 G:$D(^FBAA(161.22,X)) RETRY
- F  L +^FBAA(161.22,X):$G(DILOCKTM,3) Q:$T  W !,"Another user is editing this rate record.  Trying again.  ",!
+ L +^FBAA(161.22,X)
  K DD,DO S DIC="^FBAA(161.22,",DIC(0)="L",DLAYGO=161.22,DIC("DR")=".02////^S X="_FBR_";.03////^S X="_FBCIEN D FILE^DICN K DIC,DLAYGO
  L -^FBAA(161.22,+Y)
  G RATE

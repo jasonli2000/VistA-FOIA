@@ -1,4 +1,4 @@
-PRCHI1 ; GENERATED FROM 'PRCH ITEM TXHIST' PRINT TEMPLATE (#1193) ; 10/27/00 ; (FILE 442, MARGIN=80)
+PRCHI1 ; GENERATED FROM 'PRCH ITEM TXHIST' PRINT TEMPLATE (#1193) ; 09/19/10 ; (FILE 442, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -18,14 +18,14 @@ BEGIN ;
  G A1R
 A1 ;
  S X=$G(^PRC(442,D0,2,D1,2)) D N:$X>24 Q:'DN  W ?24 S Y=$P(X,U,8) W:Y]"" $J(Y,10,2)
- S X=$G(^PRC(442,D0,2,D1,0)) W ?36 S Y=$P(X,U,3) S Y=$S(Y="":Y,$D(^PRCD(420.5,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,2)
+ S X=$G(^PRC(442,D0,2,D1,0)) W ?36 S Y=$P(X,U,3) S Y=$S(Y="":Y,$D(^PRCD(420.5,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,2)
  D N:$X>42 Q:'DN  W ?42 W " "
  W ?45 D CALCCST^PRCHRPTX K DIP K:DN Y
  S X=$G(^PRC(442,D0,2,D1,2)) W ?56 S Y=$P(X,U,1) W:Y]"" $J(Y,10,2)
  S X=$G(^PRC(442,D0,2,D1,0)) W ?68 S Y=$P(X,U,2) W:Y]"" $J(Y,9,0)
  Q
 A1R ;
- S X=$G(^PRC(442,D0,1)) D N:$X>0 Q:'DN  W ?0 S Y=$P(X,U,1) S Y=$S(Y="":Y,$D(^PRC(440,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,36)
+ S X=$G(^PRC(442,D0,1)) D N:$X>0 Q:'DN  W ?0 S Y=$P(X,U,1) S Y=$S(Y="":Y,$D(^PRC(440,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,36)
  K Y
  Q
 HEAD ;

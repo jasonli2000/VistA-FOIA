@@ -1,6 +1,5 @@
-XDRDPRGE ;SF-IRMFO/IHS/OHPRD/JCM - PURGE DUPLICATE RECORD FILE; ;8/28/08  18:20
- ;;7.3;TOOLKIT;**23,42,113**;Apr 25, 1995;Build 5
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+XDRDPRGE ;SF-IRMFO/IHS/OHPRD/JCM - PURGE DUPLICATE RECORD FILE;   [ 08/13/92  09:50 AM ] ;08/24/99  09:59
+ ;;7.3;TOOLKIT;**23,42**;Apr 25, 1995
  ;;
 START ;
  D INIT G:XDRQFLG END
@@ -19,8 +18,7 @@ INIT ;
 INITX Q
  ;
 FILE ;
- W !,"* This option is not available for PATIENTS" ; (new with XT*7.3*113)
- S DIC("S")="I Y'=2"
+ ;S DIC("S")=
  S DIC(0)="QEAZ"
  S DIC("A")="Select File to Be Checked to purge: "
  S DIC="^VA(15.1," D ^DIC K DIC,X

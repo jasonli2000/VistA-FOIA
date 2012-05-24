@@ -1,6 +1,6 @@
 IBCRU6 ;ALB/ARH - RATES: UTILITIES (SPECIAL GROUPS); 10-OCT-1998
- ;;2.0;INTEGRATED BILLING;**106,138,399**;21-MAR-94;Build 8
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.0;INTEGRATED BILLING;**106,138**;21-MAR-94
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 CSSG(CS,BR,TYPE,ARR) ; search for special group(s) of TYPE this CS belongs, returns IFN of first group found TYPE
  ; outputs ARR(order)=group ifn ^ groups 0 node, if passed by reference
@@ -31,26 +31,16 @@ GRVLNK(ITM,GRP,ARR) ; return the ifn^revenue code for a particular ITEM as defin
  ;          ARR(IFN of Rv Cd link in 363.33) = IFN of Rv Cd link in 363.33 ^ revenue code
  ;  (since ranges and specific individual ITEMs can be defined, one ITEM may be set up for more than one revenue
  ;   code, the one used on the bills will be the return value, any others will be in the array)
- ;
- N IBALL,IBRVD,IBXRF,IBRV,IBEND,IBX,IBY,IBC,IBC1,IBC2
- S IBALL=+$G(ARR),IBRVD="",GRP=+$G(GRP),ITM=+$G(ITM) I 'ITM!'GRP G GRVLNKQ
+ N IBALL,IBRVD,IBXRF,IBRV,IBEND,IBX,IBY S IBALL=+$G(ARR),IBRVD="",GRP=+$G(GRP),ITM=+$G(ITM) I 'ITM!'GRP G GRVLNKQ
  ;
  S IBXRF="AGP",IBX=$O(^IBE(363.33,IBXRF,GRP,+ITM,0))
  I +IBX S IBRV=+IBX_U_+$G(^IBE(363.33,+IBX,0)),ARR(+IBX)=IBRV,IBRVD=IBRV I 'IBALL G GRVLNKQ
  ;
- I ITM<100000 S IBXRF="AGPE" D  G GRVLNKQ
- . S IBEND=ITM-.1 F  S IBEND=$O(^IBE(363.33,IBXRF,GRP,+IBEND)) Q:'IBEND  D  I +IBRVD,'IBALL Q
- .. S IBX=0 F  S IBX=$O(^IBE(363.33,IBXRF,GRP,+IBEND,IBX)) Q:'IBX  D  I +IBRVD,'IBALL Q
- ... S IBY=$G(^IBE(363.33,IBX,0))
- ... I +$P(IBY,U,3),$P(IBY,U,3)'>ITM S IBRV=+IBX_U_+IBY,ARR(+IBX)=IBRV I 'IBRVD S IBRVD=IBRV
- ;
- I ITM>99999 S IBXRF="AGPE",IBC=$$CODEC^ICPTCOD(ITM) D  G GRVLNKQ
- . S IBEND=99999 F  S IBEND=$O(^IBE(363.33,IBXRF,GRP,+IBEND)) Q:'IBEND  D  I +IBRVD,'IBALL Q
- .. S IBX=0 F  S IBX=$O(^IBE(363.33,IBXRF,GRP,+IBEND,IBX)) Q:'IBX  D  I +IBRVD,'IBALL Q
- ... S IBY=$G(^IBE(363.33,IBX,0))
- ... S IBC1=$$CODEC^ICPTCOD(+$P(IBY,U,3)),IBC2=IBC1 I +$P(IBY,U,4) S IBC2=$$CODEC^ICPTCOD(+$P(IBY,U,4))
- ... I IBC]IBC1,IBC']IBC2 S IBRV=+IBX_U_+IBY,ARR(+IBX)=IBRV I 'IBRVD S IBRVD=IBRV
- ;
+ S IBXRF="AGPE"
+ S IBEND=ITM-.1 F  S IBEND=$O(^IBE(363.33,IBXRF,GRP,+IBEND)) Q:'IBEND  D  I +IBRVD,'IBALL Q
+ . S IBX=0 F  S IBX=$O(^IBE(363.33,IBXRF,GRP,+IBEND,IBX)) Q:'IBX  D  I +IBRVD,'IBALL Q
+ .. S IBY=$G(^IBE(363.33,IBX,0))
+ .. I +$P(IBY,U,3),$P(IBY,U,3)'>ITM S IBRV=+IBX_U_+IBY,ARR(+IBX)=IBRV I 'IBRVD S IBRVD=IBRV
 GRVLNKQ Q IBRVD
  ;
 PRVTYP(PRV,IBDT) ; find the provider type/discount group of a provider on a given date

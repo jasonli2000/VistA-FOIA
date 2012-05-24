@@ -1,7 +1,6 @@
-BPSOSU3 ;BHAM ISC/FCS/DRS/FLS - copied for ECME ;03/07/08  10:37
- ;;1.0;E CLAIMS MGMT ENGINE;**1,7**;JUN 2004;Build 46
- ;;Per VHA Directive 2004-038, this routine should not be modified.
- ;
+BPSOSU3 ;BHAM ISC/FCS/DRS/FLS - copied for ECME ;06/01/2004
+ ;;1.0;E CLAIMS MGMT ENGINE;**1**;JUN 2004
+ ;----------------------------------------------------------------------
  ;----------------------------------------------------------------------
  ;Standard SET and YESNO Functions
  ;----------------------------------------------------------------------

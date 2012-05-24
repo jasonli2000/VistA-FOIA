@@ -1,9 +1,9 @@
-PRCHT2 ; GENERATED FROM 'PRCHPUSH' INPUT TEMPLATE(#749), FILE 442;10/27/00
+PRCHT2 ; GENERATED FROM 'PRCHPUSH' INPUT TEMPLATE(#749), FILE 442;09/19/10
  D DE G BEGIN
 DE S DIE="^PRC(442,",DIC=DIE,DP=442,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRC(442,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(2)=% S %=$P(%Z,U,3) S:%]"" DE(11)=%
- I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,1) S:%]"" DE(6)=% S %=$P(%Z,U,2) S:%]"" DE(15)=% S %=$P(%Z,U,3) S:%]"" DE(19)=% S %=$P(%Z,U,7) S:%]"" DE(9)=% S %=$P(%Z,U,11) S:%]"" DE(17)=% S %=$P(%Z,U,15) S:%]"" DE(3)=% S %=$P(%Z,U,17) S:%]"" DE(4)=%
- I  S %=$P(%Z,U,18) S:%]"" DE(5)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(2)=% S %=$P(%Z,U,3) S:%]"" DE(11)=% S %=$P(%Z,U,10) S:%]"" DE(23)=% S %=$P(%Z,U,14) S:%]"" DE(26)=%
+ I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,1) S:%]"" DE(6)=% S %=$P(%Z,U,2) S:%]"" DE(15)=% S %=$P(%Z,U,3) S:%]"" DE(19)=% S %=$P(%Z,U,4) S:%]"" DE(20)=% S %=$P(%Z,U,7) S:%]"" DE(9)=% S %=$P(%Z,U,10) S:%]"" DE(24)=% S %=$P(%Z,U,11) S:%]"" DE(17)=%
+ I  S %=$P(%Z,U,15) S:%]"" DE(3)=% S %=$P(%Z,U,17) S:%]"" DE(4)=% S %=$P(%Z,U,18) S:%]"" DE(5)=%
  I $D(^(18)) S %Z=^(18) S %=$P(%Z,U,10) S:%]"" DE(8)=%
  K %Z Q
  ;
@@ -68,10 +68,10 @@ X1 S (PRCHN("SVC"),PRCHN("SC"),PRCHNRQ)="",PRCHN("MP")=5,PRCHN("SFC")=+$P(^PRC(4
 C2 G C2S:$D(DE(2))[0 K DB
  S X=DE(2),DIC=DIE
  K ^PRC(442,"F",$E(X,1,30),DA)
-C2S S X="" Q:DG(DQ)=X  K DB
+C2S S X="" G:DG(DQ)=X C2F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRC(442,"F",$E(X,1,30),DA)=""
- Q
+C2F1 Q
 X2 Q
 3 D:$D(DG)>9 F^DIE17,DE S DQ=3,DW="1;15",DV="RDX",DU="",DLB="P.O. DATE",DIFLD=.1
  S DE(DW)="C3^PRCHT2"
@@ -79,10 +79,10 @@ X2 Q
 C3 G C3S:$D(DE(3))[0 K DB
  S X=DE(3),DIC=DIE
  K ^PRC(442,"AB",$E(X,1,30),DA)
-C3S S X="" Q:DG(DQ)=X  K DB
+C3S S X="" G:DG(DQ)=X C3F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRC(442,"AB",$E(X,1,30),DA)=""
- Q
+C3F1 Q
 X3 S %DT="EX" D ^%DT S X=Y K:Y<1 X I $D(X) D EN1^PRCHNPO6
  Q
  ;
@@ -107,10 +107,10 @@ X5 Q
 C6 G C6S:$D(DE(6))[0 K DB
  S X=DE(6),DIC=DIE
  K ^PRC(442,"D",$E(X,1,30),DA)
-C6S S X="" Q:DG(DQ)=X  K DB
+C6S S X="" G:DG(DQ)=X C6F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRC(442,"D",$E(X,1,30),DA)=""
- Q
+C6F1 Q
 X6 D EN3^PRCHNPO5
  Q
  ;
@@ -123,20 +123,20 @@ X7 S:PRCHN("SC")'=1 Y=8
 C8 G C8S:$D(DE(8))[0 K DB
  S X=DE(8),DIC=DIE
  K ^PRC(442,"K",$E(X,1,30),DA)
-C8S S X="" Q:DG(DQ)=X  K DB
+C8S S X="" G:DG(DQ)=X C8F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRC(442,"K",$E(X,1,30),DA)=""
- Q
+C8F1 Q
 X8 K:X[""""!($A(X)=45) X I $D(X) K:$L(X)>10!($L(X)<9)!'((X?3N1"-"3N1"-"2N)!(X?3N1"-"5UN)) X I $D(X) K:+X'=+^PRC(442,DA,0) X
  I $D(X),X'?.ANP K X
  Q
  ;
-9 D:$D(DG)>9 F^DIE17,DE S DQ=9,DW="1;7",DV="R*P420.8'",DU="",DLB="SOURCE CODE",DIFLD=8
+9 D:$D(DG)>9 F^DIE17,DE S DQ=9,DW="1;7",DV="R*P420.8'X",DU="",DLB="SOURCE CODE",DIFLD=8
  S DU="PRCD(420.8,"
  S X=PRCHN("SC")
  S Y=X
  G Y
-X9 S DIC("S")="I "_$S($D(PRCHPUSH):"""13""[$E(^(0))",$D(PRCHNRQ):"""1390""[$E(^(0))",1:"""2456789B""[$E(^(0))") D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
+X9 S DIC("S")="I "_$S($G(PRCHPC)=2:"""0236B""[$E(^(0))",$D(PRCHPUSH):"""13""[$E(^(0))",$D(PRCHNRQ):"""1390""[$E(^(0))",1:"""2456789B""[$E(^(0))") D ^DIC K DIC S DIC=$G(DIE),X=+Y K:Y<0 X
  Q
  ;
 10 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=10 D X10 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
@@ -150,12 +150,12 @@ C11 G C11S:$D(DE(11))[0 K DB
  K ^PRC(442,"E",$P(X," ",1),DA)
  S X=DE(11),DIC=DIE
  S $P(^PRC(442,DA,0),U,19)="",$P(^(17),U,1)=""
-C11S S X="" Q:DG(DQ)=X  K DB
+C11S S X="" G:DG(DQ)=X C11F1 K DB
  S X=DG(DQ),DIC=DIE
  S ^PRC(442,"E",$P(X," ",1),DA)=""
  S X=DG(DQ),DIC=DIE
  I $D(^PRC(420,+^PRC(442,DA,0),1,+X,0)) S Z=^(0) S:$P(Z,U,12) $P(^PRC(442,DA,0),U,19)=$P(Z,U,12) S:$P(Z,U,18) $P(^PRC(442,DA,17),U,1)=$E($P(Z,U,18),1,3) K Z
- Q
+C11F1 Q
 X11 K:X[""""!($A(X)=45) X I $D(X) K:'$D(PRC("SITE"))!('$D(^PRC(442,DA,1))) X Q:'$D(X)  S:$P(^(1),U,15)]"" PRC("FY")=$P(^(1),U,15) D EN1^PRCHNPO5 Q:'$D(X)  S $P(^PRC(442,DA,0),U,4)=PRC("APP")
  I $D(X),X'?.ANP K X
  Q
@@ -189,4 +189,36 @@ X18 I X="PATIENT" W *7,"No Patient Deliveries allowed from Federal Sources." S Y
 X19 S Z0=$S($P($G(^PRC(442,D0,23)),U,7)]"":$P($G(^PRC(442,D0,23)),U,7),1:$E($G(^PRC(442,D0,0)),1,3)) K:'Z0 X Q:'Z0  S DIC="^PRC(411,Z0,1,",DIC(0)="QEM" D ^DIC S X=+Y K:Y'>0 X K Z0,DIC
  Q
  ;
-20 D:$D(DG)>9 F^DIE17 G ^PRCHT21
+20 S DW="1;4",DV="RS",DU="",DLB="VERBAL PURCHASE ORDER (Y/N)",DIFLD=6
+ S DU="Y:YES;N:NO;"
+ S Y="NO"
+ S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD
+X20 Q
+21 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=21 G A
+22 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=22 G A
+23 S DW="0;10",DV="RDX",DU="",DLB="DELIVERY DATE",DIFLD=7
+ S X="TODAY"
+ S Y=X
+ G Y
+X23 S %DT="EX" D ^%DT S X=Y K:Y<1 X I $D(X) S Z1=$S($D(^PRC(442,DA,1)):$P(^(1),U,15),1:""),Z2=$S('Z1:"Missing P.O. DATE",X<Z1:"DELIVERY DATE before P.O. DATE",1:"") W:Z2'="" *7,"   * ",Z2 K:Z2'="" X K Z1,Z2
+ Q
+ ;
+24 S DW="1;10",DV="R*P200'",DU="",DLB="PA/PPM/AUTHORIZED BUYER",DIFLD=16
+ S DU="VA(200,"
+ G RE
+X24 S DIC("S")="I $D(^(400)),$P(^(400),U,1)>1 Q:$D(PRCHNRQ)  I $P(^(400),U,1)>2" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
+ Q
+ ;
+25 S D=0 K DE(1) ;20
+ S Y="COMMENTS^W^^0;1^Q",DG="4",DC="^442.04" D DIEN^DIWE K DE(1) G A
+ ;
+26 S DW="0;14",DV="RNJ3,0",DU="",DLB="LINE ITEM COUNT",DIFLD=15
+ G RE
+X26 K:+X'=X!(X>999)!(X<0)!(X?.E1"."1N.N) X
+ Q
+ ;
+27 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=27 D X27 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X27 K PRCHN,PRCHB
+ Q
+28 G 0^DIE17
