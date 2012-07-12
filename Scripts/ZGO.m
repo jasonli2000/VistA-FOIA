@@ -40,7 +40,9 @@ SLASH(DIR)
  E  U $P W "Output directory must end in a slash!" Q 0
 FILES ; Build FILES() mapping FGR components to file number
  N N S N=0 F  S N=$O(^DIC(N)) Q:N=""  D:+N
- . N F S F=$$FILE($$ROOT^DILFD(N,"",1)),@F=N
+ . N F,ROOT
+ . S ROOT=$$ROOT^DILFD(N,"",1) I ROOT="" W "W: No Global root for file number: "_N,! Q
+ . S F=$$FILE(ROOT),@F=N
  Q
 FILE(N)
  N I,FILE
