@@ -1,4 +1,4 @@
-MCAROS3 ; GENERATED FROM 'MCARSR3' PRINT TEMPLATE (#996) ; 10/04/96 ; (FILE 694.5, MARGIN=80)
+MCAROS3 ; GENERATED FROM 'MCARSR3' PRINT TEMPLATE (#2064) ; 07/22/97 ; (FILE 694.5, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(996,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(2064,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D N:$X>1 Q:'DN  W ?1 X DXS(1,9) K DIP K:DN Y W X
  D N:$X>44 Q:'DN  W ?44 W "Date of death"
  S X=$G(^MCAR(694.5,D0,13)) D N:$X>65 Q:'DN  S DIWL=66,DIWR=80 S Y=$P(X,U,5) X ^DD("DD") S:Y["@" Y=$P(Y,"@")_"  "_$P(Y,"@",2) S X=Y D ^DIWP

@@ -1,9 +1,9 @@
 PRCV442B ;WOIFO/CC-GET DATA WHEN ITEM DELETED, SET UP AUDIT FILE;1/29/05
-V ;;5.1;IFCAP;**81,86**;Oct 20, 2000
+V ;;5.1;IFCAP;**81**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
-RRAUD(POIEN,PRCV,PRCVCR,PRCVDAT) ; add deleted Receiving Report to audit file
+RRAUD(POIEN,PRCV,PRCVCR) ; set deleted Receiving Report into audit file
  ;
  ;   POIEN  = the ien of the purchase order from which the receiving
  ;            report is being deleted.
@@ -12,10 +12,10 @@ RRAUD(POIEN,PRCV,PRCVCR,PRCVDAT) ; add deleted Receiving Report to audit file
  ;            qty ordered ^ unit price ^ NIF ^ pkg mult ^ qty rec'd
  ;            ^ total item cost ^ total discount ^ delivery date
  ;   PRCVCR = the date/time the receiving report was created
- ;  PRCVDAT = The date/time of deletion processing
  ;
- N PRCVRA,PRCVRN,PRCVIEN,PRCVY
+ N PRCVDAT,PRCVRA,PRCVRN,PRCVIEN,PRCVY
  S PRCVID=$P(PRCV,"^",1) Q:PRCVID']""  ; DM DOC ID
+ S PRCVDAT=$$NOW^XLFDT ; get date/time to use as deleted date/time
  S PRCVRN=$O(^PRCV(414.02,"B",PRCVID,0)) ; find DM DOC ID record
  I +PRCVRN'>0 D MAIL("X1",POIEN,PRCVID,$P(PRCV,"^",2)) Q  ; notify users that DM DOC ID record not in audit file
  S PRCVIEN="+1,"_PRCVRN_","

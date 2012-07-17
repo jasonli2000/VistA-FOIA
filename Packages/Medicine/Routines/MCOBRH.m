@@ -1,4 +1,4 @@
-MCOBRH ; GENERATED FROM 'MCRHBRPR' PRINT TEMPLATE (#1036) ; 10/04/96 ; (FILE 701, MARGIN=80)
+MCOBRH ; GENERATED FROM 'MCRHBRPR' PRINT TEMPLATE (#2104) ; 07/22/97 ; (FILE 701, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(1036,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(2104,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D N:$X>0 Q:'DN  W ?0 W "MEDICAL PATIENT: "
  S X=$G(^MCAR(701,D0,0)) S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^MCAR(690,Y,0))#2:$P(^(0),U,1),1:Y) S Y=$S(Y="":Y,$D(^DPT(Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
  D N:$X>0 Q:'DN  W ?0 W "HEIGHT:"

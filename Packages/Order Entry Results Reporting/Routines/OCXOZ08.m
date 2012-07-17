@@ -1,4 +1,4 @@
-OCXOZ08 ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
+OCXOZ08 ;SLC/RJS,CLA - Order Check Scan ;NOV 3,2010 at 19:22
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;**32,221,243**;Dec 17,1997;Build 242
  ;;  ;;ORDER CHECK EXPERT version 1.01 released OCT 29,1998
  ;
@@ -11,7 +11,7 @@ OCXOZ08 ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
  Q
  ;
 CHK164 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK163+17^OCXOZ07.
+ ;  Called from CHK163+11^OCXOZ07.
  ;
  Q:$G(OCXOERR)
  ;
@@ -26,7 +26,7 @@ CHK164 ; Look through the current environment for valid Event/Elements for this 
  ; CH( --------------> IS THIS A CHOLECYSTOGRAM RADIOLOGY PROCEDURE
  ;
  S OCXDF(73)=$P($G(OCXPSD),"|",1) I $L(OCXDF(73)) S OCXDF(59)=$P($$CH(OCXDF(73)),"^",1) I $L(OCXDF(59)),(OCXDF(59)) S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) D CHK171
- S OCXDF(2)=$P($G(OCXPSD),"|",2) I $L(OCXDF(2)),($E(OCXDF(2),1,2)="PS") S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) S OCXDF(62)=$$AGE^ORQPTQ4(OCXDF(37)) I $L(OCXDF(62)) D CHK426^OCXOZ0D
+ S OCXDF(2)=$P($G(OCXPSD),"|",2) I $L(OCXDF(2)),($E(OCXDF(2),1,2)="PS") S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) S OCXDF(62)=$$AGE^ORQPTQ4(OCXDF(37)) I $L(OCXDF(62)) D CHK426^OCXOZ0E
  Q
  ;
 CHK171 ; Look through the current environment for valid Event/Elements for this patient.
@@ -59,7 +59,7 @@ CHK176 ; Look through the current environment for valid Event/Elements for this 
  Q
  ;
 CHK182 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK163+18^OCXOZ07.
+ ;  Called from CHK163+12^OCXOZ07.
  ;
  Q:$G(OCXOERR)
  ;
@@ -77,7 +77,7 @@ CHK182 ; Look through the current environment for valid Event/Elements for this 
  ; FLAB( ------------> FORMATTED LAB RESULTS
  ;
  S OCXDF(62)=$$AGE^ORQPTQ4(OCXDF(37)) I $L(OCXDF(62)),(OCXDF(62)>65) S OCXDF(64)=$$FLAB(OCXDF(37),"SERUM CREATININE^SERUM UREA NITROGEN","SERUM SPECIMEN") D CHK186
- S OCXDF(76)=$P($$CRCL(OCXDF(37)),"^",2) I $L(OCXDF(76)),(OCXDF(76)<50),(OCXDF(76)>0) D CHK247^OCXOZ0A
+ S OCXDF(76)=$P($$CRCL(OCXDF(37)),"^",2) I $L(OCXDF(76)),(OCXDF(76)<50),(OCXDF(76)>0) D CHK247^OCXOZ0B
  S OCXDF(123)=$P($$POLYRX^ORKPS(OCXDF(37)),"^",1) I $L(OCXDF(123)),(OCXDF(123)) S OCXDF(109)=$P($$NUMRX^ORKPS(OCXDF(37)),"^",1),OCXOERR=$$FILE(DFN,95,"109") Q:OCXOERR 
  Q
  ;

@@ -1,5 +1,5 @@
 VBECHLRT ;HOIFO/BNT - VBECS HL7 ADT Messaging Routing routine;July 13, 2004
- ;;1.0;VBECS;**10**;Apr 14, 2005;Build 15
+ ;;1.0;VBECS;;Apr 14, 2005;Build 35
  ;
  ; Note: This routine supports data exchange with an FDA registered
  ; medical device. As such, it may not be changed in any way without
@@ -17,7 +17,6 @@ EN ; Get Message and queue TaskMan to send it on.
  ;
  ; Only send ADT A08 Message Types
  N VBECEVNT,HLA,MSG,VBI,VBJ,SG,VBECSEND
- D INIT^HLFNC2("VAFC ADT-A08 SERVER",.HL) ;Initialize HL7 variables
  S VBECEVNT=HL("ETN")
  S VBECSEND=0
  Q:VBECEVNT'[$E("A08")

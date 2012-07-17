@@ -1,22 +1,12 @@
 RORX003 ;HOIFO/SG,VAC - GENERAL UTILIZATION AND DEMOGRAPHICS ;4/7/09 2:06pm
- ;;1.5;CLINICAL CASE REGISTRIES;**1,8,13**;Feb 17, 2006;Build 27
+ ;;1.5;CLINICAL CASE REGISTRIES;**1,8**;Feb 17, 2006;Build 8
+ ;
+ ; Modified March 2009 for ICD9 Filter for INCLUDE or EXCLUDE
  ;
  ; This routine uses the following IAs:
  ;
  ; #10103  FMADD^XLFDT, FMDIFF^XLFDT, FMTE^XLFDT (supported)
  ;
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*8    MAR  2010   V CARR       Modified to handle ICD9 filter for
- ;                                      'include' or 'exclude'.
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can select specific patients,
- ;                                      clinics, or divisions for the report.
- ;******************************************************************************
- ;******************************************************************************
  Q
  ;
  ;***** OUTPUTS THE REPORT HEADER
@@ -79,9 +69,6 @@ UTLDMG(RORTSK) ;
  N RORSUM        ; Summary data
  N RORUTIL       ; Requested utilization types
  N RORUCNT       ; Utilization counters
- N RORCDLIST     ; Flag to indicate whether a clinic or division list exists
- N RORCDSTDT     ; Start date for clinic/division utilization search
- N RORCDENDT     ; End date for clinic/division utilization search
  ;
  N CNT,ECNT,IEN,IENS,PARAMS,PATIENTS,RC,REPORT,RORPTN,SFLAGS,TMP,XREFNODE
  N RCC,FLAG,DFN
@@ -114,10 +101,6 @@ UTLDMG(RORTSK) ;
  S RORDTE0=$P($$FMTE^XLFDT(DT,7),"/")-10  ; 10 year "sliding window"
  ;
  S FLAG=$G(RORTSK("PARAMS","ICD9FILT","A","FILTER"))
- ;
- ;=== Set up Clinic/Division list parameters
- S RORCDLIST=$$CDPARMS^RORXU001(.RORTSK,.RORCDSTDT,.RORCDENDT)
- ;
  D
  . ;=== Report header
  . S RC=$$HEADER(REPORT)  Q:RC<0
@@ -129,25 +112,19 @@ UTLDMG(RORTSK) ;
  . D TPPSETUP^RORTSK01(95)
  . S (CNT,IEN,RC)=0
  . F  S IEN=$O(@XREFNODE@(IEN))  Q:IEN'>0  D  Q:RC<0
- . . ;--- Calculate 'progress' for the GUI display
  . . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . . S IENS=IEN_",",CNT=CNT+1
- . . ;-- Get patient DFN
- . . S DFN=$$PTIEN^RORUTL01(IEN) Q:DFN'>0
- . . ;--- Check for patient list and quit if not in list
- . . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",DFN)) Q
  . . ;--- Check if the patient should be skipped
  . . Q:$$SKIP^RORXU005(IEN,SFLAGS,RORSDT,ROREDT)
  . . ;--- Check if the ICD9 Filter includes or excludes the patient
+ . . S DFN=$$PTIEN^RORUTL01(+IENS)
  . . S RCC=0
  . . I FLAG'="ALL" D
  . . . S RCC=$$ICD^RORXU010(DFN,RORREG)
  . . I (FLAG="INCLUDE")&(RCC=0) Q
  . . I (FLAG="EXCLUDE")&(RCC=1) Q
  . . ;--- End of ICD9 check.
- . . ;--- Check for Clinic or Division list and quit if not in list
- . . I RORCDLIST,'$$CDUTIL^RORXU001(.RORTSK,DFN,RORCDSTDT,RORCDENDT) Q
  . . ;--- Process the registry record
  . . S TMP=$$PATIENT^RORX003A(IENS,PATIENTS)
  . . I TMP<0  S ECNT=ECNT+1  Q

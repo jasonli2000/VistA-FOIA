@@ -1,4 +1,4 @@
-NURSPA2 ; GENERATED FROM 'NURS-P-STF' PRINT TEMPLATE (#574) ; 04/03/98 ; (continued)
+NURSPA2 ; GENERATED FROM 'NURS-P-STF' PRINT TEMPLATE (#291) ; 04/06/99 ; (continued)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,6 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
+ D N:$X>27 Q:'DN  W ?27 W "-------------------------------"
  S I(1)=4,J(1)=210.03 F D1=0:0 Q:$O(^NURSF(210,D0,4,D1))'>0  X:$D(DSC(210.03)) DSC(210.03) S D1=$O(^(D1)) Q:D1'>0  D:$X>60 T Q:'DN  D E1
  G E1R
 E1 ;

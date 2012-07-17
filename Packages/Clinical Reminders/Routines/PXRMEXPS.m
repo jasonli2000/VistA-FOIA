@@ -1,5 +1,5 @@
-PXRMEXPS ; SLC/PKR - Packing save routines. ;3/08/2010
- ;;2.0;CLINICAL REMINDERS;**12,16**;Feb 04, 2005;Build 119
+PXRMEXPS ; SLC/PKR - Packing save routines. ;09/08/2009
+ ;;2.0;CLINICAL REMINDERS;**12**;Feb 04, 2005;Build 73
  ;==========================================
 ADD(FILENUM,IEN,PACKLIST,NF) ;
  S NF=+$O(PACKLIST(FILENUM,"IEN"),-1)+1
@@ -66,7 +66,6 @@ GETSRTN(FILENUM) ;Return the save routine according to the file number.
  I FILENUM=142.5 Q "SHSO^PXRMEXPS"
  I FILENUM=601.71 Q "SGEN^PXRMEXPS"
  I FILENUM=790.404 Q "SGEN^PXRMEXPS"
- I FILENUM=801 Q "SROC^PXRMEXPS"
  I FILENUM=801.41 Q "SDIALOG^PXRMEXPS"
  I FILENUM=810.2 Q "SEDEF^PXRMEXPS"
  I FILENUM=810.4 Q "SLR^PXRMEXPS"
@@ -403,43 +402,6 @@ SRT(FILENUM,TIEN,PACKLIST) ;Reminder terms.
  ;Sponsor
  S SPON=+$P(^PXRMD(811.5,TIEN,100),U,2)
  I SPON>0 D SGEN(811.6,SPON,.PACKLIST)
- Q
- ;
- ;==========================================
-SROC(FILENUM,ROCIEN,PACKLIST) ;Reminder Order Checks.
- ;packed order check structure up
- D SGENR(FILENUM,ROCIEN,.PACKLIST)
- N SUB,DRCL,OI,OLIST,RIEN,ROUTINE,TIEN,TLIST,WPNODE
- ;packed list of Drug Classes
- I $D(^PXD(801,ROCIEN,2)) D
- .S SUB=0 F  S SUB=$O(^PXD(801,ROCIEN,1.5,SUB)) Q:SUB'>0  D
- ..S DRCL=$P($G(^PXD(801,ROCIEN,1.5,SUB,0)),U) Q:DRCL'>0
- ..S ROUTINE=$$GETSRTN(50.605)_"(50.605,DRCL,.PACKLIST)"
- ..D @ROUTINE
- ;packed list of Orderable Item
- I $D(^PXD(801,ROCIEN,2)) D
- .S SUB=0 F  S SUB=$O(^PXD(801,ROCIEN,2,SUB)) Q:SUB'>0  D
- ..S OI=$P($G(^PXD(801,ROCIEN,2,SUB,0)),U) Q:OI'>0
- ..S ROUTINE=$$GETSRTN(101.43)_"(101.43,OI,.PACKLIST)"
- ..D @ROUTINE
- ;loop through rules and packed definitions or terms
- S SUB=0 F  S SUB=$O(^PXD(801,ROCIEN,3,SUB)) Q:SUB'>0  D
- .I $D(^PXD(801,ROCIEN,3,SUB,4))>0 D
- ..;search for TIU Objects
- ..S WPNODE="3,"_SUB_",4"
- ..D TIUSRCH^PXRMEXU1("^PXD(801,",ROCIEN,WPNODE,.OLIST,.TLIST)
- ..I $D(OLIST)>0 D
- ... S ROUTINE=$$GETSRTN(8925.1)_"(8925.1,.OLIST,.PACKLIST)"
- ... D @ROUTINE K OLIST
- ..K TLIST
- .;packed term up only
- .S TIEN=$P($G(^PXD(801,ROCIEN,3,SUB,2)),U) I TIEN>0 D  Q
- ..S ROUTINE=$$GETSRTN(811.5)_"(811.5,TIEN,.PACKLIST)"
- ..D @ROUTINE
- .;packed definition up if defined
- .S RIEN=$P($G(^PXD(801,ROCIEN,3,SUB,3)),U) I RIEN>0 D
- ..S ROUTINE=$$GETSRTN(811.9)_"(811.9,RIEN,.PACKLIST)"
- ..D @ROUTINE
  Q
  ;
  ;==========================================

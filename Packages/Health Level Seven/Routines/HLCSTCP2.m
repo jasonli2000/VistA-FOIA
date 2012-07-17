@@ -1,5 +1,5 @@
-HLCSTCP2 ;SFIRMFO/RSD - BI-DIRECTIONAL TCP ;12/01/2010
- ;;1.6;HEALTH LEVEL SEVEN;**19,43,49,57,63,64,66,67,76,77,87,109,133,122,140,142,145,153**;Oct 13,1995;Build 11
+HLCSTCP2 ;SFIRMFO/RSD - BI-DIRECTIONAL TCP ;06/29/2009 17:40
+ ;;1.6;HEALTH LEVEL SEVEN;**19,43,49,57,63,64,66,67,76,77,87,109,133,122,140,142,145**;Oct 13,1995;Build 4
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;Sender 
  ;Request connection, send outbound message(s) delimited by MLLP
@@ -139,7 +139,7 @@ QUE ; -- Check "OUT" queue for processing IF there is a message do it
  ...D LLCNT^HLCSTCP(HLDP,4,1)
  ...S HLREREAD="0^No Response"
  ...;check if the port needs to be closed and re-opened before the next re-transmission attempt
- ...I $G(HLDRETR("CLOSE")) D CLOSE^%ZISTCP K HLPORT
+ ...I $G(HLDRETRY("CLOSE")) D CLOSE^%ZISTCP K HLPORT
  .. ;X 0=re-read msg, 1=commit ack, 3=app ack success, 4=error
  .. S X=$$RSP^HLTP31(HLRESP,.HLN)
  .. ;X=0, re-read msg. Incorrect ack (bad MSH,MSA,msg id,or sending app)

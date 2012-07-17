@@ -1,5 +1,5 @@
-LEXQIP ;ISL/KER - Query - ICD Procedure - Extract ;01/03/2011
- ;;2.0;LEXICON UTILITY;**62,73**;Sep 23, 1996;Build 10
+LEXQIP ;ISL/KER - Query - ICD Procedure - Extract ;10/30/2008
+ ;;2.0;LEXICON UTILITY;**62**;Sep 23, 1996;Build 16
  ;               
  ; Global Variables
  ;    ^ICD0(              ICR   4485
@@ -36,6 +36,7 @@ CSV ; Code Set Versioning Display
  . S LEXNAM=$O(^ICD0(+LEXIEN,67,"B"," "),-1)
  . S LEXNAM=$O(^ICD0(+LEXIEN,67,"B",+LEXNAM," "),-1)
  . S LEXNAM=$P($G(^ICD0(+LEXIEN,67,+LEXNAM,0)),"^",2)
+ . S:'$L(LEXNAM) LEXNAM=$P($G(^ICD0(+LEXIEN,0)),"^",3)
  Q:'$L($G(LEXNAM))
  ;
  ; Get the "Unversioned" Fields

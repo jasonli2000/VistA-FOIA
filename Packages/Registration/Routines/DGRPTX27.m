@@ -1,4 +1,4 @@
-DGRPTX27 ; ;07/14/09
+DGRPTX27 ; ;08/28/09
  D DE G BEGIN
 DE S DIE="^DPT(D0,""E"",",DIC=DIE,DP=2.0361,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^DPT(D0,"E",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=%

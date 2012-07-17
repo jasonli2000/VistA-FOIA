@@ -1,5 +1,5 @@
-ECXDEPT ;ALB/GRR - Department lookup for extracts;June 11, 2002 ; 9/26/06 3:39pm
- ;;3.0;DSS EXTRACTS;**46,92**;Dec 22, 1997;Build 30
+ECXDEPT ;ALB/GRR - Department lookup for extracts;June 11, 2002
+ ;;3.0;DSS EXTRACTS;**46**;Dec 22, 1997
  ;Only the Division Logic is implemented and used in this release
  ;
  ;Input: X=Division
@@ -103,23 +103,22 @@ GETDEPT(X) ;LOOKUP DEPARTMENT
  Q Y
  ;
 GETDIV(X) ;GET PRODUCTION DIVISION
- ;Input   X=ien medical center division, file #40.8
+ ;Input   X=ien medical center division
  ;Output  Y=division number 3-6 characters
  N Y S Y=""
  Q:X="" Y
- S Y=$$GET1^DIQ(40.8,X,.07,"I") ;Get institution file pointer
- Q $S(Y="":"",1:$$RADDIV(Y)) ;Get station number
+ S Y=$P($G(^DG(40.8,X,0)),"^",2) ;Get station number
+ Q Y
  ;
 PREDIV(X) ;GET PRODUCTION DIVISION FOR PRE
  ;Input  X=ien Outpatient Site file (#59)
  ;Output Y=division number 3-6 characters
- N Y,IN S Y=""
- K ^TMP($J,"ECXDIV")
+ N Y,IN,XR S Y=""
  Q:X="" Y
- D PSS^PSO59(X,"","ECXDIV")
- S IN=$P($G(^TMP($J,"ECXDIV",X,100)),U,1)  ;Get related inst number
- S Y=$$RADDIV(IN)
- K ^TMP($J,"ECXDIV")
+ ;S Y=$P($G(^PS(59,X,0)),"^",6) ;Get station number
+ S IN=$P($G(^PS(59,X,"INI")),"^") ;Get related institution number
+ S XR=$G(^DG(40.8,"AD",IN,X)) I XR'="" S Y=$P($G(^DG(40.8,XR,0)),U,2)
+ I Y="" S Y=$P($G(^DIC(4,IN,99)),U)
  Q Y
  ;
 RADDIV(X) ;GET PRODUCTION DIVISION FOR RAD

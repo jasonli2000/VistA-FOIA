@@ -1,4 +1,4 @@
-FBCTAU1 ; ;04/21/09
+FBCTAU1 ; ;09/10/08
  D DE G BEGIN
 DE S DIE="^FBAAA(D0,1,",DIC=DIE,DP=161.01,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^FBAAA(D0,1,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(4)=%,DE(8)=% S %=$P(%Z,U,2) S:%]"" DE(14)=% S %=$P(%Z,U,3) S:%]"" DE(16)=% S %=$P(%Z,U,5) S:%]"" DE(18)=% S %=$P(%Z,U,7) S:%]"" DE(22)=% S %=$P(%Z,U,21) S:%]"" DE(19)=%

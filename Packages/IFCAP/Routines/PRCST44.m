@@ -1,4 +1,4 @@
-PRCST44 ; ;10/27/00
+PRCST44 ; ;11/22/00
  D DE G BEGIN
 DE S DIE="^PRCS(410.6,",DIC=DIE,DP=410.6,DL=4,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRCS(410.6,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(1)=% S %=$P(%Z,U,3) S:%]"" DE(7)=% S %=$P(%Z,U,4) S:%]"" DE(4)=% S %=$P(%Z,U,5) S:%]"" DE(8)=%

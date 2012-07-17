@@ -1,4 +1,4 @@
-A1CKC13 ; ;04/10/06
+A1CKC13 ; ;03/28/06
  S X=DG(DQ),DIC=DIE
  X ^DD(2,.36205,1,1,1.3) I X S X=DIV S Y(1)=$S($D(^DPT(D0,.362)):^(.362),1:"") S X=$P(Y(1),U,1),X=X S DIU=X K Y S X="" X ^DD(2,.36205,1,1,1.4)
  S X=DG(DQ),DIC=DIE

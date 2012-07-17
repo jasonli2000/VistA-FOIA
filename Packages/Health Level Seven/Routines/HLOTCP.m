@@ -1,5 +1,5 @@
-HLOTCP ;ALB/CJM- TCP/IP I/O - 10/4/94 1pm ;03/01/2011
- ;;1.6;HEALTH LEVEL SEVEN;**126,131,134,137,138,139,146,153**;Oct 13, 1995;Build 11
+HLOTCP ;ALB/CJM- TCP/IP I/O - 10/4/94 1pm ;07/17/2009
+ ;;1.6;HEALTH LEVEL SEVEN;**126,131,134,137,138,139,146**;Oct 13, 1995;Build 16
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
 OPEN(HLCSTATE,LOGICAL) ;
@@ -254,31 +254,22 @@ READ(BUF) ;
  ;For client reads the timeout value is dynamically adjusted based
  ;on a random sample. For server reads the timeout is static.
  ;
- ;
-ZB31 ;
- N RETURN
- S RETURN=0
  ;for the server the timeout is static
- I $G(HLCSTATE("SERVER")) D
- .R BUF:HLCSTATE("READ TIMEOUT")
- .S RETURN=$T
+ I $G(HLCSTATE("SERVER")) R BUF:HLCSTATE("READ TIMEOUT") Q $T
  ;
- E  D  ;client
- .I ($R(100)<10) D
- ..;measure how long the READ really takes
- .. N T1,T2
- .. S T1=$$NOW^XLFDT
- .. R BUF:100
- ..I $T D
- ...S RETURN=1
- ...S T2=$$NOW^XLFDT
- ...D SETTIME($$FMDIFF^XLFDT(T2,T1,2))
- ..E  D
- ...S RETURN=0
+ N RETURN
+ I ($R(100)<10) D  Q RETURN
+ .;measure how long the READ really takes
+ . N T1,T2
+ . S T1=$$NOW^XLFDT
+ . R BUF:100
+ .I $T D
+ ..S RETURN=1
+ ..S T2=$$NOW^XLFDT
+ ..D SETTIME($$FMDIFF^XLFDT(T2,T1,2))
  .E  D
- ..R BUF:HLCSTATE("READ TIMEOUT")
- ..S RETURN=$T
-ZB32 ;
+ ..S RETURN=0
+ E  R BUF:HLCSTATE("READ TIMEOUT") Q $T
  ;
  Q RETURN
  ;

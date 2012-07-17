@@ -2,7 +2,9 @@ LABORATORY INSTRUMENT CODE
 ZWR
 ^LAB(61.39,0)="LABORATORY INSTRUMENT CODE^61.39^25^3"
 ^LAB(61.39,1,0)="VITEK"
-^LAB(61.39,1,1,0)="^61.391^538^534"
+^LAB(61.39,1,1,0)="^61.391^538^535"
+^LAB(61.39,1,1,1,0)="TODAY^Haemophiluslikebacilli-"
+^LAB(61.39,1,1,1,1)="1451"
 ^LAB(61.39,1,1,2,0)="gvc^Gramvariablecocci-"
 ^LAB(61.39,1,1,3,0)="gbv^Gramvariablebacilli-"
 ^LAB(61.39,1,1,4,0)="gpc^Grampositivecocci-"
@@ -981,6 +983,7 @@ ZWR
 ^LAB(61.39,1,1,538,0)="acibac^Acinetobacter baumannii"
 ^LAB(61.39,1,1,538,1)="7159108"
 ^LAB(61.39,1,1,"B","PC",116)=""
+^LAB(61.39,1,1,"B","TODAY",1)=""
 ^LAB(61.39,1,1,"B","acbact",405)=""
 ^LAB(61.39,1,1,"B","achspv",404)=""
 ^LAB(61.39,1,1,"B","achxyl",403)=""

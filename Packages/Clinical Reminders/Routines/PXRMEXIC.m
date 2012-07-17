@@ -1,5 +1,5 @@
-PXRMEXIC ; SLC/PKR/PJH - Routines to install repository entry components. ;04/16/2010
- ;;2.0;CLINICAL REMINDERS;**6,12,17,16**;Feb 04, 2005;Build 119
+PXRMEXIC ; SLC/PKR/PJH - Routines to install repository entry components. ;03/16/2010
+ ;;2.0;CLINICAL REMINDERS;**6,12,17**;Feb 04, 2005;Build 102
  ;=================================================
 FILE(PXRMRIEN,EXISTS,IND120,JND120,ACTION,ATTR,NAMECHG) ;Read and process a
  ;file entry in repository entry PXRMRIEN. IND120 and JND120 are the
@@ -73,8 +73,8 @@ FILE(PXRMRIEN,EXISTS,IND120,JND120,ACTION,ATTR,NAMECHG) ;Read and process a
  . D SFMVPI^PXRMEXIU(.FDA,.NAMECHG,142.14)
  ;
  ;Special handling for file 801
- I TOPFNUM=801 D  Q:PXRMDONE
- . D ROC^PXRMEXU5(.FDA)
+ ;I TOPFNUM=801 D  Q:PXRMDONE
+ ;. D ROC^PXRMEXU5(.FDA)
  ;
  ;Special handling for file 801.41
  I TOPFNUM=801.41 D  Q:PXRMDONE
@@ -158,10 +158,6 @@ FILE(PXRMRIEN,EXISTS,IND120,JND120,ACTION,ATTR,NAMECHG) ;Read and process a
  .. W !
  .. H 2
  S VERSN=$$GETTAGV^PXRMEXU3(^PXD(811.8,PXRMRIEN,100,3,0),"<PACKAGE_VERSION>")
- I TOPFNUM=801 D
- .;mapp OI associate with a Drug Class
- .N PXRMEXCH
- .D EXCHINST^PXRMORXR(ATTR("PT01"))
  I TOPFNUM=811.2 D
  .;Rebuild taxonomy expansions.
  . N IEN,PXRMEXCH

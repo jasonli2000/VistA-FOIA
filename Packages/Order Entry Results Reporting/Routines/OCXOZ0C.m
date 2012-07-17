@@ -1,4 +1,4 @@
-OCXOZ0C ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
+OCXOZ0C ;SLC/RJS,CLA - Order Check Scan ;NOV 3,2010 at 19:22
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;**32,221,243**;Dec 17,1997;Build 242
  ;;  ;;ORDER CHECK EXPERT version 1.01 released OCT 29,1998
  ;
@@ -8,6 +8,79 @@ OCXOZ0C ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
  ; ** will be lost the next time the rule compiler executes.    **
  ; ***************************************************************
  ;
+ Q
+ ;
+CHK302 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK6+19^OCXOZ02.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK302 Variables
+ ; OCXDF(34) ---> Data Field: ORDER NUMBER (NUMERIC)
+ ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
+ ; OCXDF(55) ---> Data Field: SITE FLAGGED RESULT (BOOLEAN)
+ ; OCXDF(96) ---> Data Field: ORDERABLE ITEM NAME (FREE TEXT)
+ ; OCXDF(147) --> Data Field: PATIENT LOCATION (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; FILE(DFN,102, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: SITE FLAGGED FINAL IMAGING RESULT)
+ ; ORDITEM( ---------> GET ORDERABLE ITEM FROM ORDER NUMBER
+ ; PATLOC( ----------> PATIENT LOCATION
+ ;
+ I $L(OCXDF(55)),(OCXDF(55)) S OCXDF(96)=$$ORDITEM(OCXDF(34)),OCXDF(147)=$P($$PATLOC(OCXDF(37)),"^",2),OCXOERR=$$FILE(DFN,102,"9,96,147") Q:OCXOERR 
+ Q
+ ;
+CHK314 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK35+18^OCXOZ04.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK314 Variables
+ ; OCXDF(113) --> Data Field: LAB TEST ID (NUMERIC)
+ ; OCXDF(114) --> Data Field: LAB TEST PRINT NAME (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; FILE(DFN,103, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: HL7 LAB TEST RESULTS ABNORMAL)
+ ;
+ I $L(OCXDF(113)) S OCXDF(114)=$$PRINTNAM^ORQQLR1(OCXDF(113)),OCXOERR=$$FILE(DFN,103,"12,13,96,114") Q:OCXOERR 
+ Q
+ ;
+CHK324 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK34+16^OCXOZ04.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK324 Variables
+ ; OCXDF(34) ---> Data Field: ORDER NUMBER (NUMERIC)
+ ; OCXDF(96) ---> Data Field: ORDERABLE ITEM NAME (FREE TEXT)
+ ; OCXDF(113) --> Data Field: LAB TEST ID (NUMERIC)
+ ; OCXDF(114) --> Data Field: LAB TEST PRINT NAME (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; FILE(DFN,105, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: HL7 LAB ORDER RESULTS CRITICAL)
+ ; ORDITEM( ---------> GET ORDERABLE ITEM FROM ORDER NUMBER
+ ;
+ S OCXDF(96)=$$ORDITEM(OCXDF(34)) I $L(OCXDF(113)) S OCXDF(114)=$$PRINTNAM^ORQQLR1(OCXDF(113)),OCXOERR=$$FILE(DFN,105,"12,13,96,114") Q:OCXOERR 
+ Q
+ ;
+CHK336 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK6+20^OCXOZ02.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK336 Variables
+ ; OCXDF(34) ---> Data Field: ORDER NUMBER (NUMERIC)
+ ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
+ ; OCXDF(55) ---> Data Field: SITE FLAGGED RESULT (BOOLEAN)
+ ; OCXDF(96) ---> Data Field: ORDERABLE ITEM NAME (FREE TEXT)
+ ; OCXDF(147) --> Data Field: PATIENT LOCATION (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; FILE(DFN,109, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: SITE FLAGGED FINAL CONSULT RESULT)
+ ; ORDITEM( ---------> GET ORDERABLE ITEM FROM ORDER NUMBER
+ ; PATLOC( ----------> PATIENT LOCATION
+ ;
+ I $L(OCXDF(55)),(OCXDF(55)) S OCXDF(96)=$$ORDITEM(OCXDF(34)),OCXDF(147)=$P($$PATLOC(OCXDF(37)),"^",2),OCXOERR=$$FILE(DFN,109,"9,96,147") Q:OCXOERR 
  Q
  ;
 CHK347 ; Look through the current environment for valid Event/Elements for this patient.
@@ -26,9 +99,9 @@ CHK347 ; Look through the current environment for valid Event/Elements for this 
  ;      Local Extrinsic Functions
  ;
  S OCXDF(137)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",3),";",2) I $L(OCXDF(137)) D CHK349
- S OCXDF(136)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",3),";",1) I $L(OCXDF(136)),'(OCXDF(136)) D CHK371
- S OCXDF(139)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",2),";",1) I $L(OCXDF(139)),'(OCXDF(139)) D CHK375
- S OCXDF(140)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",2),";",2) I $L(OCXDF(140)) D CHK378
+ S OCXDF(136)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",3),";",1) I $L(OCXDF(136)),'(OCXDF(136)) D CHK371^OCXOZ0D
+ S OCXDF(139)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",2),";",1) I $L(OCXDF(139)),'(OCXDF(139)) D CHK375^OCXOZ0D
+ S OCXDF(140)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",2),";",2) I $L(OCXDF(140)) D CHK378^OCXOZ0D
  Q
  ;
 CHK349 ; Look through the current environment for valid Event/Elements for this patient.
@@ -78,7 +151,7 @@ CHK355 ; Look through the current environment for valid Event/Elements for this 
  ;      Local Extrinsic Functions
  ;
  S OCXDF(136)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",3),";",1) I $L(OCXDF(136)),(OCXDF(136)) D CHK358
- I (OCXDF(137)<"2.0") S OCXDF(136)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",3),";",1) I $L(OCXDF(136)),(OCXDF(136)) D CHK506^OCXOZ0F
+ I (OCXDF(137)<"2.0") S OCXDF(136)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",3),";",1) I $L(OCXDF(136)),(OCXDF(136)) D CHK505^OCXOZ0G
  Q
  ;
 CHK358 ; Look through the current environment for valid Event/Elements for this patient.
@@ -97,91 +170,6 @@ CHK358 ; Look through the current environment for valid Event/Elements for this 
  S OCXDF(130)=$P($$CLOZLABS^ORKLR(OCXDF(37),"",OCXDF(131)),"^",4),OCXOERR=$$FILE(DFN,115,"130") Q:OCXOERR 
  Q
  ;
-CHK360 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK198+9^OCXOZ09.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK360 Variables
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(43) ---> Data Field: OI NATIONAL ID (FREE TEXT)
- ; OCXDF(74) ---> Data Field: VA DRUG CLASS (FREE TEXT)
- ; OCXDF(131) --> Data Field: PHARMACY LOCAL ID (FREE TEXT)
- ; OCXDF(132) --> Data Field: CLOZAPINE MED (BOOLEAN)
- ;
- ;      Local Extrinsic Functions
- ;
- S OCXDF(131)=$P($P($G(OCXPSD),"|",3),"^",4) I $L(OCXDF(131)) S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) S OCXDF(132)=$P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",1) D CHK365
- S OCXDF(43)=$P($P($G(OCXPSD),"|",3),"^",1) I $L(OCXDF(43)) S OCXDF(74)=$P($$ENVAC^PSJORUT2(OCXDF(43)),"^",2) I $L(OCXDF(74)) D CHK498^OCXOZ0F
- Q
- ;
-CHK365 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK360+14.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK365 Variables
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(130) --> Data Field: CLOZAPINE LAB RESULTS (FREE TEXT)
- ; OCXDF(131) --> Data Field: PHARMACY LOCAL ID (FREE TEXT)
- ; OCXDF(132) --> Data Field: CLOZAPINE MED (BOOLEAN)
- ;
- ;      Local Extrinsic Functions
- ; FILE(DFN,116, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: CLOZAPINE DRUG SELECTED)
- ;
- I $L(OCXDF(132)),(OCXDF(132)) S OCXDF(130)=$P($$CLOZLABS^ORKLR(OCXDF(37),"",OCXDF(131)),"^",4),OCXOERR=$$FILE(DFN,116,"130") Q:OCXOERR 
- Q
- ;
-CHK371 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK347+16.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK371 Variables
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(130) --> Data Field: CLOZAPINE LAB RESULTS (FREE TEXT)
- ; OCXDF(131) --> Data Field: PHARMACY LOCAL ID (FREE TEXT)
- ;
- ;      Local Extrinsic Functions
- ; FILE(DFN,117, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: CLOZAPINE NO ANC W/IN 7 DAYS)
- ;
- S OCXDF(130)=$P($$CLOZLABS^ORKLR(OCXDF(37),"",OCXDF(131)),"^",4),OCXOERR=$$FILE(DFN,117,"130") Q:OCXOERR 
- Q
- ;
-CHK375 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK347+17.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK375 Variables
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(130) --> Data Field: CLOZAPINE LAB RESULTS (FREE TEXT)
- ; OCXDF(131) --> Data Field: PHARMACY LOCAL ID (FREE TEXT)
- ;
- ;      Local Extrinsic Functions
- ; FILE(DFN,118, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: CLOZAPINE NO WBC W/IN 7 DAYS)
- ;
- S OCXDF(130)=$P($$CLOZLABS^ORKLR(OCXDF(37),"",OCXDF(131)),"^",4),OCXOERR=$$FILE(DFN,118,"130") Q:OCXOERR 
- Q
- ;
-CHK378 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK347+18.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK378 Variables
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(131) --> Data Field: PHARMACY LOCAL ID (FREE TEXT)
- ; OCXDF(139) --> Data Field: CLOZAPINE WBC W/IN 7 FLAG (BOOLEAN)
- ; OCXDF(140) --> Data Field: CLOZAPINE WBC W/IN 7 RESULT (NUMERIC)
- ;
- ;      Local Extrinsic Functions
- ;
- I (OCXDF(140)<"3.0") S OCXDF(139)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",2),";",1) I $L(OCXDF(139)),(OCXDF(139)) D CHK382^OCXOZ0D
- I (OCXDF(140)>2.999),(OCXDF(140)<3.5) S OCXDF(139)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",2),";",1) I $L(OCXDF(139)),(OCXDF(139)) D CHK388^OCXOZ0D
- I (OCXDF(140)>3.499) S OCXDF(139)=$P($P($$CLOZLABS^ORKLR(OCXDF(37),7,OCXDF(131)),"^",2),";",1) I $L(OCXDF(139)),(OCXDF(139)) D CHK393^OCXOZ0D
- Q
- ;
 FILE(DFN,OCXELE,OCXDFL) ;     This Local Extrinsic Function logs a validated event/element.
  ;
  N OCXTIMN,OCXTIML,OCXTIMT1,OCXTIMT2,OCXDATA,OCXPC,OCXPC,OCXVAL,OCXSUB,OCXDFI
@@ -196,4 +184,27 @@ FILE(DFN,OCXELE,OCXDFL) ;     This Local Extrinsic Function logs a validated eve
  M ^TMP("OCXCHK",$J,DFN)=OCXDATA(DFN)
  ;
  Q 0
+ ;
+ORDITEM(OIEN) ;  Compiler Function: GET ORDERABLE ITEM FROM ORDER NUMBER
+ Q:'$G(OIEN) ""
+ ;
+ N OITXT,X S OITXT=$$OI^ORQOR2(OIEN) Q:'OITXT "No orderable item found."
+ S X=$G(^ORD(101.43,+OITXT,0)) Q:'$L(X) "No orderable item found."
+ Q $P(X,U,1)
+ ;
+PATLOC(DFN) ;  Compiler Function: PATIENT LOCATION
+ ;
+ N OCXP1,OCXP2
+ S OCXP1=$G(^TMP("OCXSWAP",$J,"OCXODATA","PV1",2))
+ S OCXP2=$P($G(^TMP("OCXSWAP",$J,"OCXODATA","PV1",3)),"^",1)
+ I OCXP2 D
+ .S OCXP2=$P($G(^SC(+OCXP2,0)),"^",1,2)
+ .I $L($P(OCXP2,"^",2)) S OCXP2=$P(OCXP2,"^",2)
+ .E  S OCXP2=$P(OCXP2,"^",1)
+ .S:'$L(OCXP2) OCXP2="NO LOC"
+ I $L(OCXP1),$L(OCXP2) Q OCXP1_"^"_OCXP2
+ ;
+ S OCXP2=$G(^DPT(+$G(DFN),.1))
+ I $L(OCXP2) Q "I^"_OCXP2
+ Q "O^OUTPT"
  ;

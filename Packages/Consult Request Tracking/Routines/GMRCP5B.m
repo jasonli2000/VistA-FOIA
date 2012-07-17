@@ -1,5 +1,5 @@
-GMRCP5B ;SLC/DCM,RJS,WAT - Print Consult form 513 (Gather Data - Footers, Provisional Diagnosis and Reason For Request) ;03/04/09  11:42
- ;;3.0;CONSULT/REQUEST TRACKING;**4,13,12,15,24,23,22,29,65,66**;Dec 27, 1997;Build 30
+GMRCP5B ;SLC/DCM,RJS,WAT - Print Consult form 513 (Gather Data - Footers, Provisional Diagnosis and Reason For Request) ;09/10/08
+ ;;3.0;CONSULT/REQUEST TRACKING;**4,13,12,15,24,23,22,29,65**;Dec 27, 1997;Build 7
  ;
  ; Patch #23 add "SERVICE RENDERED AS:" to SF513
  ; This routine invokes IA #1252 (SDUTL3),#10112 (VASITE)
@@ -7,10 +7,10 @@ GMRCP5B ;SLC/DCM,RJS,WAT - Print Consult form 513 (Gather Data - Footers, Provis
  ; DBIA 2849       ;PROTOCOL
  ; DBIA 10060      ;NEW PERSON
  ; DBIA 10061      ;VADPT
- ; 10103           ;FMTE^XLFDT
- ; 10003           ;%DT
- ; 2056            ;$$GET1^DIQ
- ; ICR 4156        ;REGISTRATION, COMBAT VETERAN STATUS
+ ; 10103                ;FMTE^XLFDT
+ ; 10003                ;%DT
+ ; 2056                  ;$$GET1^DIQ
+ ; ICR 4156           ;REGISTRATION, COMBAT VETERAN STATUS
  Q
  ;
 INIT(GMRCSG) ; Initialize the form
@@ -50,7 +50,7 @@ PDIAG ;
  .S GMRCQSTR=$P(GMRCRD,U,14)
  .S:'GMRCQSTR GMRCQSTR=$$GET1^DIQ(100,+$P(GMRCRD,U,3),1)
  .S GMRCPGR=$$GET1^DIQ(200,+$G(GMRCQSTR),.137) S:'$L(GMRCPGR) GMRCPGR=$$GET1^DIQ(200,+$G(GMRCQSTR),.138)
- .S GMRCIPH=$$GET1^DIQ(200,$G(GMRCQSTR),.132)
+ .S GMRCIPH=$$GET1^DIQ(200,+$G(GMRCQSTR),.132)
  .;
  .S GMRCQSTT=$$GET1^DIQ(200,+$G(GMRCQSTR),20.3)
  .S:'$L(GMRCQSTT) GMRCQSTT=$$GET1^DIQ(200,+$G(GMRCQSTR),8)
@@ -78,7 +78,6 @@ PDIAG ;
  .D BLD("PDIAG",1,0,59,"|")
  D BLD("PDIAG",1,1,0,GMRCPGR)
  D BLD("PDIAG",1,0,35,"|SERVICE RENDERED AS:")
- D BLD("PDIAG",1,0,59,"|EARLIEST DATE:") ;WAT/66
  D BLD("PDIAG",1,0,59,"|")
  S GMRCINOU=$S($P(GMRCRD,U,18)="O":"Outpatient",1:"Inpatient")
  I $D(GMRCIPH)>0 D
@@ -87,7 +86,6 @@ PDIAG ;
  E  D
  .D BLD("PDIAG",1,1,35,"|"_GMRCINOU)
  D BLD("PDIAG",1,0,59,"|")
- D BLD("PDIAG",1,0,59,"|"_$$FMTE^XLFDT($P(GMRCRD,U,24),1)) ;WAT/66
  K GMRCINOU
  ;***************************************************************
  D BLD("PDIAG",1,1,0,GMRCDVL)

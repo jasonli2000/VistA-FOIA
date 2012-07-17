@@ -1,5 +1,5 @@
-ORWOD1 ; SLC/GSS - Utility for Order Dialogs ; 10/01/09 11:28am
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243,296,280**;DEC 17, 1997;Build 85
+ORWOD1 ; SLC/GSS - Utility for Order Dialogs ; 11/07/07 11:28am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243,296**;DEC 17, 1997;Build 19
  ;
 NTRY ;Entry point
  N TXT
@@ -87,10 +87,6 @@ TXT ;Text for report follows
  ;;      code(s) for the Quick Order before setting the Quick Order back to
  ;;      an Auto-Accept Quick Order.
  ;;
- ;;H...Problem:  Continuous IV Quick Orders do not have an Additive Frequency assigned for every additives.
- ;;    Action:  These Quick Orders need to have an Additive Frequency value assigned for
- ;;      each additive in the quick order.
- ;;      
  ;;Note: QO Names and QO Display Names over 30 characters are truncated at 30
  ;;      characters.  If in doubt on the Name you can use the IEN to edit the
  ;;      Quick Order (see above).

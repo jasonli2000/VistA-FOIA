@@ -1,4 +1,4 @@
-OCXOZ13 ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
+OCXOZ13 ;SLC/RJS,CLA - Order Check Scan ;NOV 3,2010 at 19:22
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;**32,221,243**;Dec 17,1997;Build 242
  ;;  ;;ORDER CHECK EXPERT version 1.01 released OCT 29,1998
  ;
@@ -10,31 +10,70 @@ OCXOZ13 ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
  ;
  Q
  ;
-R71R1B ; Send Order Check, Notication messages and/or Execute code for  Rule #71 'OPIOID MEDICATIONS'  Relation #1 'OPIOID MED ORDER AND DUP OPIOID MEDS'
- ;  Called from R71R1A+12^OCXOZ12.
+R71R1A ; Verify all Event/Elements of  Rule #71 'OPIOID MEDICATIONS'  Relation #1 'OPIOID MED ORDER AND DUP OPIOID MEDS'
+ ;  Called from EL138+5^OCXOZ0I, and EL139+5^OCXOZ0I.
  ;
  Q:$G(OCXOERR)
  ;
  ;      Local Extrinsic Functions
- ; GETDATA( ---------> GET DATA FROM THE ACTIVE DATA FILE
+ ; MCE138( ---------->  Verify Event/Element: 'DUP OPIOID MEDS'
+ ; MCE139( ---------->  Verify Event/Element: 'OPIOID MED ORDER'
  ;
- Q:$D(OCXRULE("R71R1B"))
+ Q:$G(^OCXS(860.2,71,"INACT"))
  ;
- N OCXNMSG,OCXCMSG,OCXPORD,OCXFORD,OCXDATA,OCXNUM,OCXDUZ,OCXQUIT,OCXLOGS,OCXLOGD
- I ($G(OCXOSRC)="CPRS ORDER PRESCAN") S OCXCMSG=(+OCXPSD)_"^33^^Duplicate opioid medications: "_$$GETDATA(DFN,"138^139",158) I 1
- E  S OCXCMSG="Duplicate opioid medications: "_$$GETDATA(DFN,"138^139",158)
- S OCXNMSG=""
- ;
- Q:$G(OCXOERR)
- ;
- ; Send Order Check Message
- ;
- S OCXOCMSG($O(OCXOCMSG(999999),-1)+1)=OCXCMSG
+ I $$MCE139 D 
+ .I $$MCE138 D R71R1B^OCXOZ14
  Q
  ;
-GETDATA(DFN,OCXL,OCXDFI) ;     This Local Extrinsic Function returns runtime data
+MCE138() ; Verify Event/Element: DUP OPIOID MEDS
  ;
- N OCXE,VAL,PC S VAL=""
- F PC=1:1:$L(OCXL,U) S OCXE=$P(OCXL,U,PC) I OCXE S VAL=$G(^TMP("OCXCHK",$J,DFN,OCXE,OCXDFI)) Q:$L(VAL)
- Q VAL
+ ;  OCXDF(158) -> DUPLICATE OPIOID MEDICATIONS TEXT data field
+ ;  OCXDF(157) -> DUPLICATE OPIOID MEDICATIONS FLAG data field
+ ;  OCXDF(37) -> PATIENT IEN data field
+ ;
+ N OCXRES
+ S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) S OCXRES(138,37)=OCXDF(37)
+ Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),138)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),138))
+ S OCXRES(138)=0,OCXDF(157)=$P($$OPIOID(OCXDF(37)),"^",1) I $L(OCXDF(157)) S OCXRES(138,157)=OCXDF(157) I (OCXDF(157))
+ E  Q 0
+ S OCXDF(158)=$P($$OPIOID(OCXDF(37)),"^",2),OCXRES(138)=11 M ^TMP("OCXCHK",$J,OCXDF(37),138)=OCXRES(138)
+ Q +OCXRES(138)
+ ;
+MCE139() ; Verify Event/Element: OPIOID MED ORDER
+ ;
+ ;  OCXDF(37) -> PATIENT IEN data field
+ ;
+ N OCXRES
+ S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) S OCXRES(139,37)=OCXDF(37)
+ Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),139)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),139))
+ Q 0
+ ;
+OPIOID(ORPT) ;determine if pat is receiving opioid med
+ ; rtn 1^opioid drug 1, opioid drug 2, opioid drug3, ...
+ N ORDG,ORTN,ORNUM,ORDI,ORDCLAS,ORDERS,ORTEXT,DUP,DUPI,DUPJ,DUPLEN
+ S ORDG=0,ORTN=0,DUPI=0,DUPLEN=20
+ K ^TMP("ORR",$J)
+ S ORDG=$O(^ORD(100.98,"B","RX",ORDG))
+ D EN^ORQ1(ORPT_";DPT(",ORDG,2,"","","",0,0)
+ N J,HOR,SEQ,X S J=1,HOR=0,SEQ=0
+ S HOR=$O(^TMP("ORR",$J,HOR)) Q:+HOR<1 ORTN
+ F  S SEQ=$O(^TMP("ORR",$J,HOR,SEQ)) Q:+SEQ<1  D
+ .S X=^TMP("ORR",$J,HOR,SEQ)
+ .S ORNUM=+$P(X,";")
+ .Q:ORNUM=+$G(ORIFN)  ;quit if dup med order # = current order #
+ .S ORDI=$$VALUE^ORCSAVE2(ORNUM,"DRUG")
+ .I +$G(ORDI)>0 D
+ ..S ORDCLAS=$P(^PSDRUG(ORDI,0),U,2)  ;va drug class
+ ..I ($G(ORDCLAS)="CN101")!($G(ORDCLAS)="CN102") D  ;opioid classes
+ ...S ORTEXT=$$FULLTEXT^ORQOR1(ORNUM)
+ ...S ORTEXT=$P(ORTEXT,U)_" ["_$P(ORTEXT,U,2)_"]"
+ ...S DUPI=DUPI+1,DUP(DUPI)=" ["_DUPI_"] "_ORTEXT
+ ...S ORTN=1
+ I DUPI>0 D
+ .S DUPLEN=$P(215/DUPI,".")
+ .F DUPJ=1:1:DUPI D
+ ..I DUPJ=1 S ORDERS=$E(DUP(DUPJ),1,DUPLEN)
+ ..E  S ORDERS=ORDERS_", "_$E(DUP(DUPJ),1,DUPLEN)
+ K ^TMP("ORR",$J)
+ Q ORTN_U_$G(ORDERS)
  ;

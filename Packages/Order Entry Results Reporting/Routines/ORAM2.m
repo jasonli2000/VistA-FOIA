@@ -1,5 +1,5 @@
-ORAM2 ;POR/RSF - ANTICOAGULATION MANAGEMENT RPCS (3 of 4) ; 4/11/11 7:06am
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**307,339**;Dec 17, 1997;Build 7
+ORAM2 ;POR/RSF - ANTICOAGULATION MANAGEMENT RPCS (3 of 4) ;01/29/10  21:37
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**307**;Dec 17, 1997;Build 60
  ;;Per VHA Directive 2004-038, this routine should not be modified
  Q
  ;
@@ -188,11 +188,11 @@ RPT(ROOT,DFN,ID,ALPHA,OMEGA,DTRANGE,REMOTE,MAX,ORFHIE) ;
  ... N ORAMTP,ORAMTM,ORI
  ... S ORAMPS=$P(^ORAM(103,DFN,3,ORAMFSD,0),"^",5),(ORAMTP,ORAMTM)=0
  ... W !,"Current Dosing (using ",ORAMPS," mg tab):",!
- ... W ?6,$J("Sun",6),?12,$J("Mon",6),?18,$J("Tue",6),?24,$J("Wed",6),?30,$J("Thu",6),?36,$J("Fri",6),?42,$J("Sat",6),?48,$J("Tot",6),!
- ... W "Tab" F ORI=1:1:$L(ORAMDOSE,"|") S ORAMTP=ORAMTP+($P(ORAMDOSE,"|",ORI)/ORAMPS) W ?(6*ORI),$J(($P(ORAMDOSE,"|",ORI)/ORAMPS),6)
- ... W ?48,$J(ORAMTP,6),!
- ... W "mgs" F ORI=1:1:$L(ORAMDOSE,"|") S ORAMTM=ORAMTM+$P(ORAMDOSE,"|",ORI) W ?(6*ORI),$J($P(ORAMDOSE,"|",ORI),6)
- ... W ?48,$J(ORAMTM,6),!
+ ... W ?4,"Sun",?8,"Mon",?12,"Tue",?16,"Wed",?20,"Thu",?24,"Fri",?28,"Sat",?32,"Tot",!
+ ... W "Tab" F ORI=1:1:$L(ORAMDOSE,"|") S ORAMTP=ORAMTP+($P(ORAMDOSE,"|",ORI)/ORAMPS) W ?(4*ORI),$J(($P(ORAMDOSE,"|",ORI)/ORAMPS),3)
+ ... W ?32,$J(ORAMTP,3),!
+ ... W "mgs" F ORI=1:1:$L(ORAMDOSE,"|") S ORAMTM=ORAMTM+$P(ORAMDOSE,"|",ORI) W ?(4*ORI),$J($P(ORAMDOSE,"|",ORI),3)
+ ... W ?32,$J(ORAMTM,3),!
  .. ; Complications
  .. I +$P(^ORAM(103,DFN,3,ORAMFSD,0),"^",2) D
  ... N ORAMCTXT,ORAMCMPL

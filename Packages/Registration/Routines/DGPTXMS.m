@@ -1,4 +1,4 @@
-DGPTXMS ; GENERATED FROM 'DG PTF ADD MESSAGE' INPUT TEMPLATE(#454), FILE 45.5;06/13/96
+DGPTXMS ; GENERATED FROM 'DG PTF ADD MESSAGE' INPUT TEMPLATE(#1106), FILE 45.5;12/20/96
  D DE G BEGIN
 DE S DIE="^DGM(",DIC=DIE,DP=45.5,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DGM(DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(1)=% S %=$P(%Z,U,3) S:%]"" DE(2)=% S %=$P(%Z,U,4) S:%]"" DE(3)=%
@@ -18,7 +18,7 @@ N I X="" G A:DV'["R",X:'DV,X:D'>0,A
 RD G QS:X?."?" I X["^" D D G ^DIE17
  I X="@" D D G Z^DIE2
  I X=" ",DV["d",DV'["P",$D(^DISV(DUZ,"DIE",DLB)) S X=^(DLB) I DV'["D",DV'["S" W "  "_X
-T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
+T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) I X?.ANP D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
  K DDER G X
 P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
@@ -38,20 +38,19 @@ RP D O I X="" S X=DE(DQ) G A:'DV,A:DC<2,N^DIE17
 I I DV'["I",DV'["#" G RD
  D E^DIE0 G RD:$D(X),PR
  Q
-SET I X'?.ANP S DDER=1 Q 
- N DIR S DIR(0)="SMV^"_DU,DIR("V")=1
+SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  I $D(DB(DQ)),'$D(DIQUIET) N DIQUIET S DIQUIET=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="DGPTXMS",DQ=1
- S:$D(DTIME)[0 DTIME=300 S D0=DA,DIEZ=454,U="^"
+ S:$D(DTIME)[0 DTIME=300 S D0=DA,DIEZ=1106,U="^"
 1 S DW="0;2",DV="RP2'",DU="",DLB="PATIENT",DIFLD=1
  S DE(DW)="C1^DGPTXMS"
  S DU="DPT("
  S X=DFN
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
+ G RD:X="@",Z
 C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
  K ^DGM("PT",$E(X,1,30),DA)
 C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
@@ -63,7 +62,7 @@ X1 Q
  S X=DUZ
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
+ G RD:X="@",Z
 X2 Q
 3 S DW="0;4",DV="D",DU="",DLB="ENTRY DATE/TIME",DIFLD=3
  S Y="NOW"

@@ -1,6 +1,6 @@
 PRCB0B ;WISC/PLT-utility recalculate fcp balance ; 12/12/94  8:56 AM
-V ;;5.1;IFCAP;**145**;Oct 20, 2000;Build 3
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  QUIT  ;invalid entry
  ;
  ;prca=station #,prcb=fcp #, prcc=running balance fy (2-digit), prcd=quarter #
@@ -12,15 +12,14 @@ FCP(PRCA,PRCB,PRCC,PRCD) ;EF value: 1^=fcp bal (uncommited), 2^=fiscal bal (unob
  S PRCC=$P($$YEAR^PRC0C(PRCC),"^",2) F A=1:1:3 S PRCT(A)=""
  S PRCB=$P(PRCB," ")
  S PRCE=$P($$QTRDATE^PRC0D(PRCC,PRCD),"^",7)_"-"_PRCA_"-"_PRCB_"-",PRCH=PRCE_"~"
- F  S PRCE=$O(^PRCS(410,"RB",PRCE)),PRCRI(410)=0 QUIT:PRCE]PRCH!'PRCE  W:'$D(ZTQUEUED) !,PRCE D
- . F  S PRCRI(410)=$O(^PRCS(410,"RB",PRCE,PRCRI(410))) QUIT:'PRCRI(410)  S PRCF=$G(^PRCS(410,PRCRI(410),0)),PRCG=$P(PRCF,"^",2),PRCF=$P(PRCF,"^",4) I PRCG'="CA"  S A=$G(^(4)),B=$G(^(7)) D
- .. S PRCACP=$P($G(^PRCS(410,PRCRI(410),4)),"^",14)
- .. I PRCG="O" S:$P(B,"^",6)]"" PRCT(1)=PRCT(1)+$J($P(A,"^",8),0,2) S:$P(A,"^",10)]"" PRCT(2)=PRCT(2)+$J($P(A,"^",3),0,2) QUIT
- .. I PRCG="C" S PRCT(3)=PRCT(3)+$J($P(A,"^",3),0,2) QUIT
- .. I PRCG="A",PRCF=1 S:$P(B,"^",6)]"" PRCT(1)=PRCT(1)+$J($P(A,"^",8),0,2) S:$P(A,"^",10)]"" PRCT(2)=PRCT(2)+$J($P(A,"^",3),0,2) QUIT
- .. ;txn from option: enter fcp adjustment data or post issue book
- .. I PRCG="A" S PRCT(1)=PRCT(1)+$J($P(A,"^",8),0,2) S:PRCACP'="Y" PRCT(2)=PRCT(2)+$J($P(A,"^",3),0,2) QUIT
- .. QUIT
+ F  S PRCE=$O(^PRCS(410,"RB",PRCE)) QUIT:PRCE]PRCH!'PRCE  W:'$D(ZTQUEUED) !,PRCE S PRCRI(410)=$O(^(PRCE,"")) QUIT:'PRCRI(410)  S PRCF=$G(^PRCS(410,PRCRI(410),0)),PRCG=$P(PRCF,"^",2),PRCF=$P(PRCF,"^",4) I PRCG'="CA"  S A=$G(^(4)),B=$G(^(7)) D
+ . S PRCACP=$P($G(^PRCS(410,PRCRI(410),4)),"^",14)
+ . I PRCG="O" S:$P(B,"^",6)]"" PRCT(1)=PRCT(1)+$J($P(A,"^",8),0,2) S:$P(A,"^",10)]"" PRCT(2)=PRCT(2)+$J($P(A,"^",3),0,2) QUIT
+ . I PRCG="C" S PRCT(3)=PRCT(3)+$J($P(A,"^",3),0,2) QUIT
+ . I PRCG="A",PRCF=1 S:$P(B,"^",6)]"" PRCT(1)=PRCT(1)+$J($P(A,"^",8),0,2) S:$P(A,"^",10)]"" PRCT(2)=PRCT(2)+$J($P(A,"^",3),0,2) QUIT
+ . ;txn from option: enter fcp adjustment data or post issue book
+ . I PRCG="A" S PRCT(1)=PRCT(1)+$J($P(A,"^",8),0,2) S:PRCACP'="Y" PRCT(2)=PRCT(2)+$J($P(A,"^",3),0,2) QUIT
+ . QUIT
  S A=PRCT(3)-PRCT(1),B=PRCT(3)-PRCT(2)
  QUIT A_"^"_B_"^"_PRCT(1)_"^"_PRCT(2)_"^"_PRCT(3)
  ;

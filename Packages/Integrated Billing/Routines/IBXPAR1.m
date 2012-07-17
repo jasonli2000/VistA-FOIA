@@ -1,4 +1,4 @@
-IBXPAR1 ; ;09/24/03
+IBXPAR1 ; ;05/04/04
  D DE G BEGIN
 DE S DIE="^IBE(350.9,",DIC=DIE,DP=350.9,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^IBE(350.9,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,9) S:%]"" DE(3)=% S %=$P(%Z,U,11) S:%]"" DE(4)=%

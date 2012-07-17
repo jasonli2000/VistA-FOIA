@@ -1,4 +1,4 @@
-YSCEN21 ;ALB/ASF-TEAM FACE SHEET ;8/19/91  15:46 ;
+YSCEN21 ;ALB/ASF-TEAM FACE SHEET ;8/19/91  15:46 ; [ 06/23/95  10:49 AM ]
  ;;5.01;MENTAL HEALTH;;Dec 30, 1994
 1 ;
  S (P1,P)=0,YSOPT2="LT^YSCEN21" D FS0^YSCEN W !!,W2,?$X+3,$P(^YSG("CEN",W1,0),U,2) Q
@@ -42,4 +42,4 @@ WAIT ;
 H1 ;
  S:'$D(Q3) Q3=0 Q:Q3  U IO W @IOF,!?IOM-$L("M H   T E A M   C E N S U S")\2,"M H   T E A M   C E N S U S"
  K Y D ENDTM^YSUTL W ?55,YSDT(1)," ",YSTM
- W !,"Ward",?22,"current",?32,"operating",?44,"team",!?3,"team",?22,"patients",?34,"beds",?44,"leader",?67,"rotation",! F ZZ=1:1:11 W "-------"
+ B  W !,"Ward",?22,"current",?32,"operating",?44,"team",!?3,"team",?22,"patients",?34,"beds",?44,"leader",?67,"rotation",! F ZZ=1:1:11 W "-------"

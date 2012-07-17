@@ -1,5 +1,5 @@
 RORUPD50 ;HCIOFO/SG - UPDATE THE PATIENT IN THE REGISTRIES ;8/2/05 9:14am
- ;;1.5;CLINICAL CASE REGISTRIES;**10,14**;Feb 17, 2006;Build 24
+ ;;1.5;CLINICAL CASE REGISTRIES;**10**;Feb 17, 2006;Build 32
  ;
  ; This routine uses the following IAs:
  ;
@@ -9,17 +9,6 @@ RORUPD50 ;HCIOFO/SG - UPDATE THE PATIENT IN THE REGISTRIES ;8/2/05 9:14am
  ; #2055  $$ROOT^DILFD (supported)
  ; #2053  UPDATE^DIE (supported)
  Q
- ;******************************************************************************
- ;******************************************************************************
- ;                       --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*14   APR  2011   A SAUNDERS   ADD: add patient as confirmed if they 
- ;                                      are in the "ROR HCV CONFIRM" array, 
- ;                                      created in HCV^RORUPD04.
- ;******************************************************************************
- ;******************************************************************************
  ;
  ;***** ADDS THE PATIENT TO THE REGISTRY
  ;
@@ -45,10 +34,6 @@ RORUPD50 ;HCIOFO/SG - UPDATE THE PATIENT IN THE REGISTRIES ;8/2/05 9:14am
  ;        0  Ok
  ;        1  Patient has already existed in the registry
  ;
- ;NOTE: Patch 14 includes functionality to automatically confirm a HEPC patient
- ;into the registry if the patient had a positive test result for any 1 of
- ;the 9 new HCV LOINCS added with the patch.
- ;
 ADD(PATIEN,REGIEN,ROR8RULS,DOD) ;
  N I,IENS,IENS01,RC,RORFDA,RORIEN,RORMSG,RULEIEN,TMP
  ;--- Quit if the patient is already in the registry
@@ -59,8 +44,6 @@ ADD(PATIEN,REGIEN,ROR8RULS,DOD) ;
  S RORFDA(798,IENS,.01)=PATIEN           ; Patient Name
  S RORFDA(798,IENS,.02)=REGIEN           ; Registry
  S RORFDA(798,IENS,3)=4                  ; Pending
- ;add patient as "confirmed" if patient had + HCV test (HEPC registry only)
- I REGIEN=1,$D(^TMP("ROR HCV CONFIRM",$J,PATIEN)) S RORFDA(798,IENS,3)=0 ;Confirmed
  S RORFDA(798,IENS,4)=1                  ; Update Demographics
  S RORFDA(798,IENS,5)=1                  ; Update Local Data
  I $$TESTPAT^RORUTL01(PATIEN) S RORFDA(798,IENS,11)=1 ; Don't Send = 1 if test patient

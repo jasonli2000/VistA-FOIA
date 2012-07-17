@@ -1,17 +1,7 @@
 RORX020A ;BPOIFO/ACS - RENAL FUNCTION BY RANGE (CONT.) ;11/1/09
- ;;1.5;CLINICAL CASE REGISTRIES;**10,14**;Feb 17, 2006;Build 24
+ ;;1.5;CLINICAL CASE REGISTRIES;**10**;Feb 17, 2006;Build 32
  ;
  Q
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*14   APR  2011   A SAUNDERS   HEADER: Added LOINCs to report header
- ;                                      
- ;******************************************************************************
- ;******************************************************************************
  ;
  ;************************************************************************
  ;ADD THE HEADERS TO THE REPORT (EXTRINSIC FUNCTION)
@@ -46,10 +36,6 @@ HEADER(PARTAG,RORTSK) ;
  I RORDATA("IDLST")[2 D
  . S TMP=$$ADDVAL^RORTSK11(RORTSK,"COLUMN",,COLUMNS)
  . D ADDATTR^RORTSK11(RORTSK,TMP,"NAME","EGFR")
- ;--- LOINC codes
- N LTAG S LTAG=$$ADDVAL^RORTSK11(RORTSK,"LOINC_CODES",,PARTAG)
- N CTAG S CTAG=$$ADDVAL^RORTSK11(RORTSK,"CODE",,LTAG)
- D ADDATTR^RORTSK11(RORTSK,CTAG,"CODE","Creatinine: 15045-8, 21232-4, 2160-0")
  ;---
  Q $S(RC<0:RC,1:HEADER)
  ;

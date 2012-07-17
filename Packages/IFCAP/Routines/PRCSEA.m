@@ -1,6 +1,6 @@
 PRCSEA ;WISC/SAW/DXH/BM/SC/DAP - CONTROL POINT ACTIVITY EDITS ; 3/31/05 2:59pm
-V ;;5.1;IFCAP;**81,147**;Oct 20, 2000;Build 3
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;**81**;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;PRC*5.1*81 BMM 3/23/05 when a 2237 is canceled, in CT1, add code 
  ;to update Audit file (#414.02), and send update message to 
@@ -78,7 +78,7 @@ EDRS ;EDIT REQ
  S PRC("CP")=$P(^PRCS(410,PDA,3),"^")
  I $P(^PRCS(410,PDA,0),"^",6)="" D  ; prc*5*197
  . N PRCSIP D IP^PRCSUT
- . I $D(PRCSIP) S $P(^PRCS(410,DA,0),U,6)=PRCSIP  ;PRC*5.1*147 modified file set from ^PRC(410 to ^PRCS(410
+ . I $D(PRCSIP) S $P(^PRC(410,DA,0),U,6)=PRCSIP
  S X=+$P(^PRCS(410,DA,0),"^",4) I X<1 D FORM
  ;*81 Check site parameter to see if Issue Books are allowed
  D CKPRM

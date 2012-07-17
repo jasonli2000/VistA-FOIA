@@ -1,5 +1,5 @@
 ECRRPT ;ALB/JAM - Event Capture Report RPC Broker ; 10 JUL 2008
- ;;2.0; EVENT CAPTURE ;**25,32,41,56,61,82,94,95,108**;8 May 96;Build 3
+ ;;2.0; EVENT CAPTURE ;**25,32,41,56,61,82,94,95**;8 May 96;Build 26
  ;
 REQCHK(ECV) ;Required data check
  N I,C
@@ -44,8 +44,6 @@ ECPAT ;Patient Summary Report for RPC Call
  N ECDATE,ECPAT,ECV,DIC,X,Y,ECROU,ECDESC
  S ECV="ECDFN^ECSD^ECED" D REQCHK(ECV) I ECERR Q
  S DIC=2,DIC(0)="QNMZX",X=ECDFN D ^DIC Q:Y<0  S ECPAT=$P(Y,U,2)
- ;EC*2.0*108 - Convert Date/Time to Date only
- S ECSD=$P(ECSD,"."),ECED=$P(ECED,".")
  D DATECHK(.ECSD,.ECED)
  S ECSD=ECSD-.0001,ECED=ECED+.9999
  I $E($G(ECRY))'="Y" K ECRY

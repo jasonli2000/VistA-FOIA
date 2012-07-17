@@ -1,5 +1,5 @@
 MAGGSIV1 ;WOIFO/GEK - Imaging Validate Data ; [ 08/15/2004 08:57 ]
- ;;3.0;IMAGING;**8,20,59**;Nov 27, 2007;Build 20
+ ;;3.0;IMAGING;**8,20,59**;Mar 27, 2007;Build 15
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |

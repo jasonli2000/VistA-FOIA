@@ -1,5 +1,5 @@
-PSIVCHK ;BIR/PR,MLM-CHECK ORDER FOR INTEGRITY ; 10/1/10 8:48am
- ;;5.0; INPATIENT MEDICATIONS ;**54,58,81,111,213,113,179**;16 DEC 97;Build 45
+PSIVCHK ;BIR/PR,MLM-CHECK ORDER FOR INTEGRITY ;12 DEC 97 / 10:16 AM
+ ;;5.0; INPATIENT MEDICATIONS ;**54,58,81,111,213,113**;16 DEC 97;Build 63
  ;
  ; Reference to ^PS(51.1 supported by DBIA# 2177.
  ; Reference to ^DIE supported by DBIA# 2053.
@@ -22,17 +22,13 @@ PSIVCHK ;BIR/PR,MLM-CHECK ORDER FOR INTEGRITY ; 10/1/10 8:48am
  .I $$ODD^PSGS0($G(P(15)))!($$PRNOK^PSGS0($G(P(9)))) S P(11)="" Q
  .I $G(P(15))]"" I XC<2,'$$PRNOK^PSGS0(P(9)),'$G(P(11)),($G(P(15))'="O"),'$$ONCALL^PSIVEDT1($G(P(9))),'$$ONETIME^PSIVEDT1($G(P(9))) S ERR=1 W !,"*** There are no administration times defined for this order!"
 M I P(15)<0 S ERR=1 W !,"*** Time interval between doses is less than zero !"
- NEW X,PSJLDD S X=0 S:P(9)]"" X=$O(^PS(51.1,"APPSJ",P(9),0))
+ NEW X S X=0 S:P(9)]"" X=$O(^PS(51.1,"APPSJ",P(9),0))
  N XX F XX=2,3 I $P(P(XX),".",2)=""!($L(P(XX))>12) S ERR=1 W !,"*** ",$S(XX=2:"Start",1:"Stop")," date is in an invalid format or must contain time !"
  I P(2)>P(3) S ERR=1 W !,"*** Start date/time CANNOT be greater than the stop date/time"
  I $$SCHREQ^PSJLIVFD(.P),'X D
  .N PSJXSTMP S PSJXSTMP=P(9) I PSJXSTMP="" S ERR=1 Q
  .N X,Y,PSGS0XT,PSGS0Y,PSGOES S PSGOES=2,X=PSJXSTMP D ENOS^PSGS0 I $G(X)]""&($G(X)=$G(PSJXSTMP)) Q
  .W !," *** WARNING -- Missing or Invalid Schedule ...",! S ERR=1
- ;179 Add Error for before dose if given.
- I $G(ON)&$G(DFN)&$G(PSIVCHG) D  ;179 xtra Protection.
- .S PSJLDD=$P($$EN^PSBAPIPM(DFN,ON),"^")
- .I PSJLDD>P(2) S ERR=1 W !,"*** Start date/time CANNOT be before given last dose due ("_$$ENDTC1^PSGMI(PSJLDD)_") ***"
 INF I P(8)="","AH"[P("TYP") S ERR=1 W !,"*** You have no infusion rate defined !"
  I "AH"[P("TYP"),P(8)'?1N.N.1".".1N1" ml/hr",P(8)'?.E1"@"1N.N,P(8)'?1"0."1N1" ml/hr" S ERR=1 W !,"*** Your infusion rate is in an invalid format !"
  I P(8)="",P("TYP")="P" S:'ERR ERR=2 W !,"*** WARNING -- You have not specified an infusion rate. "

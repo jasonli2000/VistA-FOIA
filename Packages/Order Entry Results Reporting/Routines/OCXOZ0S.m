@@ -1,4 +1,4 @@
-OCXOZ0S ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
+OCXOZ0S ;SLC/RJS,CLA - Order Check Scan ;NOV 3,2010 at 19:22
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;**32,221,243**;Dec 17,1997;Build 242
  ;;  ;;ORDER CHECK EXPERT version 1.01 released OCT 29,1998
  ;
@@ -10,21 +10,19 @@ OCXOZ0S ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
  ;
  Q
  ;
-R48R2B ; Send Order Check, Notication messages and/or Execute code for  Rule #48 'SITE FLAGGED ORDER'  Relation #2 'NEW SITE FLAGGED ORDER AND OUTPATIENT'
- ;  Called from R48R2A+12^OCXOZ0R.
+R44R1B ; Send Order Check, Notication messages and/or Execute code for  Rule #44 'ORDER REQUIRES ELECTRONIC SIGNATURE'  Relation #1 'ELECTRONIC SIGNATURE'
+ ;  Called from R44R1A+10^OCXOZ0R.
  ;
  Q:$G(OCXOERR)
  ;
  ;      Local Extrinsic Functions
- ; GETDATA( ---------> GET DATA FROM THE ACTIVE DATA FILE
- ; INT2DT( ----------> CONVERT DATE FROM OCX FORMAT TO READABLE FORMAT
  ; NEWRULE( ---------> NEW RULE MESSAGE
  ;
- Q:$D(OCXRULE("R48R2B"))
+ Q:$D(OCXRULE("R44R1B"))
  ;
  N OCXNMSG,OCXCMSG,OCXPORD,OCXFORD,OCXDATA,OCXNUM,OCXDUZ,OCXQUIT,OCXLOGS,OCXLOGD
  S OCXCMSG=""
- S OCXNMSG="["_$$GETDATA(DFN,"58^128",147)_"] Order placed: "_$$GETDATA(DFN,"58^128",96)_" "_$$INT2DT($$GETDATA(DFN,"58^128",9),0)_"."
+ S OCXNMSG="Order requires electronic signature."
  ;
  Q:$G(OCXOERR)
  ;
@@ -38,32 +36,28 @@ R48R2B ; Send Order Check, Notication messages and/or Execute code for  Rule #48
  .I $P($G(OCXORD),U,3) S OCXDUZ(+$P(OCXORD,U,3))=""
  .S OCXNUM=+$P(OCXORD,U,2)
  S:($G(OCXOSRC)="CPRS ORDER PRESCAN") OCXNUM=+$P(OCXPSD,"|",5)
- S OCXRULE("R48R2B")=""
- I $$NEWRULE(DFN,OCXNUM,48,2,61,OCXNMSG) D  I 1
- .D:($G(OCXTRACE)<5) EN^ORB3(61,DFN,OCXNUM,.OCXDUZ,OCXNMSG,.OCXDATA)
+ S OCXRULE("R44R1B")=""
+ I $$NEWRULE(DFN,OCXNUM,44,1,12,OCXNMSG) D  I 1
+ .D:($G(OCXTRACE)<5) EN^ORB3(12,DFN,OCXNUM,.OCXDUZ,OCXNMSG,.OCXDATA)
  Q
  ;
-R49R1A ; Verify all Event/Elements of  Rule #49 'SITE FLAGGED RESULT'  Relation #1 'INPATIENT AND (SITE FLAGGED LAB RESULT OR SITE FLA...'
- ;  Called from EL127+6^OCXOZ0G, and EL59+5^OCXOZ0G, and EL102+5^OCXOZ0G, and EL109+5^OCXOZ0G.
+R48R1A ; Verify all Event/Elements of  Rule #48 'SITE FLAGGED ORDER'  Relation #1 'NEW SITE FLAGGED ORDER AND INPATIENT'
+ ;  Called from EL58+5^OCXOZ0H, and EL127+5^OCXOZ0H.
  ;
  Q:$G(OCXOERR)
  ;
  ;      Local Extrinsic Functions
- ; MCE102( ---------->  Verify Event/Element: 'SITE FLAGGED FINAL IMAGING RESULT'
- ; MCE109( ---------->  Verify Event/Element: 'SITE FLAGGED FINAL CONSULT RESULT'
  ; MCE127( ---------->  Verify Event/Element: 'INPATIENT'
- ; MCE59( ----------->  Verify Event/Element: 'SITE FLAGGED FINAL LAB RESULT'
+ ; MCE58( ----------->  Verify Event/Element: 'NEW SITE FLAGGED ORDER'
  ;
- Q:$G(^OCXS(860.2,49,"INACT"))
+ Q:$G(^OCXS(860.2,48,"INACT"))
  ;
- I $$MCE127 D 
- .I $$MCE59 D R49R1B
- .I $$MCE102 D R49R1B
- .I $$MCE109 D R49R1B
+ I $$MCE58 D 
+ .I $$MCE127 D R48R1B
  Q
  ;
-R49R1B ; Send Order Check, Notication messages and/or Execute code for  Rule #49 'SITE FLAGGED RESULT'  Relation #1 'INPATIENT AND (SITE FLAGGED LAB RESULT OR SITE FLA...'
- ;  Called from R49R1A+14.
+R48R1B ; Send Order Check, Notication messages and/or Execute code for  Rule #48 'SITE FLAGGED ORDER'  Relation #1 'NEW SITE FLAGGED ORDER AND INPATIENT'
+ ;  Called from R48R1A+12.
  ;
  Q:$G(OCXOERR)
  ;
@@ -72,11 +66,11 @@ R49R1B ; Send Order Check, Notication messages and/or Execute code for  Rule #49
  ; INT2DT( ----------> CONVERT DATE FROM OCX FORMAT TO READABLE FORMAT
  ; NEWRULE( ---------> NEW RULE MESSAGE
  ;
- Q:$D(OCXRULE("R49R1B"))
+ Q:$D(OCXRULE("R48R1B"))
  ;
  N OCXNMSG,OCXCMSG,OCXPORD,OCXFORD,OCXDATA,OCXNUM,OCXDUZ,OCXQUIT,OCXLOGS,OCXLOGD
  S OCXCMSG=""
- S OCXNMSG="["_$$GETDATA(DFN,"59^102^109^127",147)_"] Result available: "_$$GETDATA(DFN,"59^102^109^127",96)_" "_$$INT2DT($$GETDATA(DFN,"59^102^109^127",9),0)_" "
+ S OCXNMSG="["_$$GETDATA(DFN,"58^127",147)_"] Order placed: "_$$GETDATA(DFN,"58^127",96)_" "_$$INT2DT($$GETDATA(DFN,"58^127",9),0)_"."
  ;
  Q:$G(OCXOERR)
  ;
@@ -90,9 +84,24 @@ R49R1B ; Send Order Check, Notication messages and/or Execute code for  Rule #49
  .I $P($G(OCXORD),U,3) S OCXDUZ(+$P(OCXORD,U,3))=""
  .S OCXNUM=+$P(OCXORD,U,2)
  S:($G(OCXOSRC)="CPRS ORDER PRESCAN") OCXNUM=+$P(OCXPSD,"|",5)
- S OCXRULE("R49R1B")=""
- I $$NEWRULE(DFN,OCXNUM,49,1,32,OCXNMSG) D  I 1
- .D:($G(OCXTRACE)<5) EN^ORB3(32,DFN,OCXNUM,.OCXDUZ,OCXNMSG,.OCXDATA)
+ S OCXRULE("R48R1B")=""
+ I $$NEWRULE(DFN,OCXNUM,48,1,41,OCXNMSG) D  I 1
+ .D:($G(OCXTRACE)<5) EN^ORB3(41,DFN,OCXNUM,.OCXDUZ,OCXNMSG,.OCXDATA)
+ Q
+ ;
+R48R2A ; Verify all Event/Elements of  Rule #48 'SITE FLAGGED ORDER'  Relation #2 'NEW SITE FLAGGED ORDER AND OUTPATIENT'
+ ;  Called from EL58+6^OCXOZ0H, and EL128+5^OCXOZ0H.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;      Local Extrinsic Functions
+ ; MCE128( ---------->  Verify Event/Element: 'OUTPATIENT'
+ ; MCE58( ----------->  Verify Event/Element: 'NEW SITE FLAGGED ORDER'
+ ;
+ Q:$G(^OCXS(860.2,48,"INACT"))
+ ;
+ I $$MCE58 D 
+ .I $$MCE128 D R48R2B^OCXOZ0T
  Q
  ;
 CKSUM(STR) ;  Compiler Function: GENERATE STRING CHECKSUM
@@ -132,22 +141,6 @@ INT2DT(OCXDT,OCXF) ;      This Local Extrinsic Function converts an OCX internal
  Q:(OCXHR+OCXMIN+OCXSEC) OCXMON_" "_OCXDAY_","_OCXYR_" at "_OCXHR_":"_OCXMIN_"."_OCXSEC_" "_OCXAP
  Q OCXMON_" "_OCXDAY_","_OCXYR
  ;
-MCE102() ; Verify Event/Element: SITE FLAGGED FINAL IMAGING RESULT
- ;
- ;
- N OCXRES
- I $L(OCXDF(37)) S OCXRES(102,37)=OCXDF(37)
- Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),102)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),102))
- Q 0
- ;
-MCE109() ; Verify Event/Element: SITE FLAGGED FINAL CONSULT RESULT
- ;
- ;
- N OCXRES
- I $L(OCXDF(37)) S OCXRES(109,37)=OCXDF(37)
- Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),109)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),109))
- Q 0
- ;
 MCE127() ; Verify Event/Element: INPATIENT
  ;
  ;
@@ -156,12 +149,20 @@ MCE127() ; Verify Event/Element: INPATIENT
  Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),127)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),127))
  Q 0
  ;
-MCE59() ; Verify Event/Element: SITE FLAGGED FINAL LAB RESULT
+MCE128() ; Verify Event/Element: OUTPATIENT
  ;
  ;
  N OCXRES
- I $L(OCXDF(37)) S OCXRES(59,37)=OCXDF(37)
- Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),59)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),59))
+ I $L(OCXDF(37)) S OCXRES(128,37)=OCXDF(37)
+ Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),128)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),128))
+ Q 0
+ ;
+MCE58() ; Verify Event/Element: NEW SITE FLAGGED ORDER
+ ;
+ ;
+ N OCXRES
+ I $L(OCXDF(37)) S OCXRES(58,37)=OCXDF(37)
+ Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),58)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),58))
  Q 0
  ;
 NEWRULE(OCXDFN,OCXORD,OCXRUL,OCXREL,OCXNOTF,OCXMESS) ; Has this rule already been triggered for this order number

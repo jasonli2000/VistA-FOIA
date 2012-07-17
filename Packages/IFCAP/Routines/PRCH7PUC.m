@@ -1,6 +1,6 @@
 PRCH7PUC ;Hines OIFO/RVD - GUI PURCHASE CARD PROS ORDER INTERFACE ;8/13/03  09:50
- ;;5.1;IFCAP;**68,123,141**;Oct 20, 2000;Build 11
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;5.1;IFCAP;**68,123**;Oct 20, 2000;Build 6
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ;This routine is for Obligating and canceling a PO using a GUI interface.
  ;Line label UP1 is for MUMPS entry point.
@@ -25,7 +25,7 @@ UP1(X,PRCA,PRCB,PRCC,PRCSITE,PRCVEN,PRCRMPR) ;ENTRY FOR GUI PURCHASING
  S PRCRI(442)=PRCB
  S PRCHPO=PRCRI(442),PRCHTOT=PRCC
  S A=^PRC(440.5,$P(^PRC(442,PRCRI(442),23),"^",8),0),PRCHBOC1=$P(A,U,4)
- S DIE="^PRC(442,",DA=PRCHPO,DR="60////"_PRCHTOT_";91////"_PRCHTOT_";65////RMPR"_";7////"_RMPRDLVD D ^DIE K DR
+ S DIE="^PRC(442,",DA=PRCHPO,DR="60////"_PRCHTOT_";91////"_PRCHTOT_";65////RMPR" D ^DIE K DR
  S PRCHN("SFC")=+$P(^PRC(442,PRCRI(442),0),U,19)
  S:'$D(^PRC(442,PRCHPO,2,0)) $P(^PRC(442,PRCHPO,2,0),U,2)=$P(^DD(442,40,0),U,2)
  S DA(1)=PRCHPO,DIE="^PRC(442,"_DA(1)_",2,",DA=1

@@ -1,5 +1,5 @@
-PXRMDLG4 ; SLC/PJH - Reminder Dialog Edit/Inquiry ;01/18/2010
- ;;2.0;CLINICAL REMINDERS;**4,6,12,16**;Feb 04, 2005;Build 119
+PXRMDLG4 ; SLC/PJH - Reminder Dialog Edit/Inquiry ;06/12/2009
+ ;;2.0;CLINICAL REMINDERS;**4,6,12**;Feb 04, 2005;Build 73
  ;
 WP(SUB,SUB1,WIDTH,SEQ,VALMCNT) ;Format WP text
  N DIWF,DIWL,DIWR,IC,TEXT,X,TXTCNT,DTXT,CNT,SUB2
@@ -60,9 +60,7 @@ DETAIL(DIEN,LEV,VIEW,NODE) ;;Build listman global for all components
  .S DSUB=$O(^PXRMD(801.41,DIEN,10,"B",DSEQ,"")) Q:'DSUB
  .;Get ien of prompt/component
  .S DCIEN=$P($G(^PXRMD(801.41,DIEN,10,DSUB,0)),U,2) Q:'DCIEN
- .I "PF"[$P($G(^PXRMD(801.41,DCIEN,0)),U,4) D  Q
- ..S ^TMP("PXRMDLG4",$J,"IEN",NSEL)=DIEN_U_DSEQ
- ..S ^TMP("PXRMDLG4",$J,"SEQ",LEV_DSEQ)=DCIEN
+ .I "PF"[$P($G(^PXRMD(801.41,DCIEN,0)),U,4) Q
  .;Save line in workfile
  .D DLINE(DCIEN,LEV,DSEQ,NODE)
  .;Build pointers back to parent

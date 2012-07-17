@@ -1,5 +1,5 @@
 EASEZLM ;ALB/jap - 1010EZ List Manager Processing Screens ;10/12/00  13:07
- ;;1.0;ENROLLMENT APPLICATION SYSTEM;;Mar 15, 2001
+ ;;1.0;ENROLLMENT APPLICATION SYSTEM;**1**;Mar 15, 2001
  ;
 EN ;Main entry point for 1010EZ processing
  ;Ask user to select processing status
@@ -8,11 +8,12 @@ EN ;Main entry point for 1010EZ processing
  K DIR,DTOUT,DUOUT,DIRUT,Y
  S DIR(0)="SMO^1:New;2:In Review;3:Printed, Pending Signature;4:Signed;5:Filed;6:Inactivated"
  S DIR("A")="Select Applications to View"
+ ;interface to Help Frames
+ S DIR("??")="EAS EZ OPTION PROCESS"
  D ^DIR K DIR
  I $D(DIRUT) K DIR,DTOUT,DUOUT,DIRUT,Y  Q
  ;
  S EASVIEW=0
- ;I Y,"^1^2^3^4^5^"[(U_Y_U) S EASVIEW=Y
  I Y,"^1^2^3^4^5^6^"[(U_Y_U) S EASVIEW=Y
  Q:'EASVIEW
  S EASPSTAT=""
@@ -157,4 +158,27 @@ NOACT(STAT,ACTION) ;action not allowed
  W !!,$C(7),ACTION_" not allowed for this "_STAT_" Application."
  S VALMBCK="R"
  D PAUSE^VALM1
+ Q
+ ;
+SELRNGE ;Select multiple items from range
+ N J,JJ,BG,LST,X,Y,DIR,DTOUT,DUOUT,DIRUT
+ S BG=VALMBG
+ S LST=VALMLST
+ K EASSEL S EASSEL=0,EASERR=0
+ I 'BG D  Q
+ .W !!,*7,"There are no '",VALM("ENTITY"),"s' to select.",!
+ .S EASERR=1
+ .S DIR(0)="E" D ^DIR K DIR
+ S Y=+$P($P($G(XQORNOD(0)),U,4),"=",2)
+ I 'Y D
+ .S DIR(0)="L^"_BG_":"_LST,DIR("A")="Select "_VALM("ENTITY")_"(s)"
+ .D ^DIR K DIR I $D(DIRUT) S EASERR=1,EASSEL=0
+ Q:EASERR
+ ;check for valid entries
+ S EASSEL=Y I EASSEL=0 S EASERR=1 Q
+ F J=1:1:99 S X=$P(EASSEL,",",J) Q:'X  S EASSEL(X)=X
+ S JJ=$O(EASSEL(0)),EASSEL("BG")=JJ,JJ=$O(EASSEL(999999),-1),EASSEL("LST")=JJ
+ I (EASSEL("BG")<BG)!(EASSEL("LST")>LST)!(EASSEL("LST")="") D
+ .W !,*7,"Selection '",EASSEL,"' is not a valid range."
+ .S EASERR=1,EASSEL=0 D PAUSE^VALM1
  Q

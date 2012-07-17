@@ -1,4 +1,4 @@
-PSOUTL ;BHAM ISC/SAB - pso utility routine ;4/28/09 4:14pm
+PSOUTL ;BHAM ISC/SAB - pso utility routine ; 4/29/10 6:13am
  ;;7.0;OUTPATIENT PHARMACY;**1,21,126,174,218,259,324**;DEC 1997;Build 6
  ;External reference SERV^IBARX1 supported by DBIA 2245
  ;External reference ^PS(55,     supported by DBIA 2228
@@ -69,9 +69,9 @@ KILL N DFN
  S ^PSRX(DA(1),"A",CNT,0)=^PSRX(DA(1),"A",CNT,0)_$S($G(RESK):"returned to stock.",$G(PSOPSDAL):"deleted during Controlled Subs release.",$G(PSOXX)=1:"Partial deleted from suspense file.",1:"deleted during Rx edit.") K CNT,SUB
  Q
 CID ;calculates six months limit on issue dates
- S PSID=X,X="T-6M",%DT="X" D ^%DT S %DT(0)=Y,X=PSID,%DT="EX" D ^%DT K PSID
+ S PSID=X,X="T-120M",%DT="X" D ^%DT S %DT(0)=Y,X=PSID,%DT="EX" D ^%DT K PSID
  Q
-CIDH S X="T-6M",%DT="X" D ^%DT X ^DD("DD") D EN^DDIOL("Issue Date must be greater or equal to "_Y,"","!")
+CIDH S X="T-120M",%DT="X" D ^%DT X ^DD("DD") D EN^DDIOL("Issue Date must be greater or equal to "_Y,"","!")
  Q
 SPR F RF=0:0 S RF=$O(^PSRX(DA(1),1,RF)) Q:'RF  S NODE=RF
  I NODE=1 S $P(^PSRX(DA(1),3),"^",4)=$P(^PSRX(DA(1),2),"^",2) Q

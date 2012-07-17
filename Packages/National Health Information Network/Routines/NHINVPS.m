@@ -1,5 +1,5 @@
 NHINVPS ;SLC/MKB -- Pharmacy extract
- ;;1.0;NHIN;**1**;Dec 01, 2009;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -51,7 +51,7 @@ NDF(DRUG,I) ; -- Set NDF data for dispense DRUG ien
  ;
 XML(MED) ; -- Return patient meds as XML
  N ATT,X,Y,I,NAMES
- D ADD("<med>") S NHINTOTL=$G(NHINTOTL)+1
+ D ADD("<med>")
  S ATT="" F  S ATT=$O(MED(ATT)) Q:ATT=""  D  I $L(Y) D ADD(Y)
  . I $O(MED(ATT,0)) D  S Y="" Q  ;multiples
  .. D ADD("<"_ATT_"s>")

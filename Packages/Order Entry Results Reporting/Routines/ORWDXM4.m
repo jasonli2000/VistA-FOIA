@@ -1,5 +1,5 @@
 ORWDXM4 ; SLC/KCM - Order Dialogs, Menus;10:42 AM  6 Sep 1998
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,215,296,280**;Dec 17, 1997;Build 85
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,215,296**;Dec 17, 1997;Build 19
  ;
 SETUP ; -- setup dialog (continued from ORWDXM1)
  ;    if xfer med order, setup ORDIALOG differently
@@ -115,26 +115,12 @@ VB ; setup environment for VBECS
  D GETIMES^ORCDLR1
  ; -- setup ORCOMP, ORTEST, and ORTAS
  S (ORCOMP,ORTEST,ORTAS)=""
- N P,PROMPT,I,X,X0
- S P=+$O(^ORD(101.41,"AB","OR GTX ORDERABLE ITEM",0))
+ N P,I,X,X0 S P=+$O(^ORD(101.41,"AB","OR GTX ORDERABLE ITEM",0))
  S I=0 F  S I=$O(ORDIALOG(P,I)) Q:I<1  S X=+$G(ORDIALOG(P,I)) D
  . S X0=$G(^ORD(101.43,X,"VB")),X=+$P($G(^(0)),U,2)
  . I $P(X0,U) S ORCOMP=ORCOMP_$S($L(ORCOMP):U,1:"")_X Q
  . S ORTEST=ORTEST_$S($L(ORTEST):U,1:"")_X
  . I X=2 S ORTAS=1
- I '$D(ORTEST("Lab CollSamp")) D
- . N I,V,T,LC S LC=1
- . F I=1:1:$L(ORTEST,U) S V=+$P(ORTEST,U,I) D  Q:'LC  ;no LC samp
- .. S T=$$LAB60^ORCDVBEC(V) ;VBECS ID -> #60 ien
- .. I '$P($G(^LAB(60,T,0)),U,9) S LC=0 Q
- . S ORTEST("Lab CollSamp")=LC
- I '$D(ORTIME),'$D(ORIMTIME) D GETIMES^ORCDLR1
- S PROMPT=$O(^ORD(101.41,"B","OR GTX COLLECTION TYPE",0))
- I $D(ORDIALOG(PROMPT,1)) S ORCOLLCT=ORDIALOG(PROMPT,1) I 1
- E  S EDITONLY=0,ORCOLLCT=$$COLLTYPE^ORCDLR1
- I ORCOLLCT="I" D
- . S PROMPT=$O(^ORD(101.41,"B","OR GTX START DATE/TIME",0))
- . D LRICTMOK^ORWDXM2
  Q
 VBASK(I) ; set the ORASK variable for child component prompts in VBECS order
  I ORDIALOG'=$O(^ORD(101.41,"B","VBEC BLOOD BANK",0)) Q

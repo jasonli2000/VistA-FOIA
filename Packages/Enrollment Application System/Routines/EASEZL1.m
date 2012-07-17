@@ -1,5 +1,5 @@
 EASEZL1 ;ALB/jap - 1010EZ List Manager Processing Screens (cont.) ;10/12/00  13:07
- ;;1.0;ENROLLMENT APPLICATION SYSTEM;;Mar 15, 2001
+ ;;1.0;ENROLLMENT APPLICATION SYSTEM**1**;Mar 15, 2001
  ;
 EN ;Entry point to build list area for EAS EZ Applications processing
  ;
@@ -15,7 +15,8 @@ EXPND ;
  D SEL^EASEZLM
  Q:$G(EASERR)
  Q:'$G(EASSEL)
- S EASAPP=$O(^TMP("EASEZ",$J,"IDX",EASSEL,0))
+ S EASAPP=$O(^TMP("EASEZ",$J,"IDX",EASSEL,0)) I 'EASAPP K ^TMP("EASEZ",$J,"IDX",EASSEL)
+ Q:'EASAPP
  S EASLOCK=1 L +^EAS(712,EASAPP,0):5 I '$T S EASLOCK=0
  I 'EASLOCK D  Q
  .W !,"Another user is processing that Application... try later.",!
@@ -36,6 +37,7 @@ EXPND ;
  ;
 INIT2 ;
  ;generate ^TMP("EZDISP",$J, in order to build display
+ I '$G(EASAPP) S VALMCNT=0 D NOLINES^EASEZLM
  S EASDFN=+$P(^EAS(712,EASAPP,0),U,10)
  D EN^EASEZC1(EASAPP,EASDFN)
  D HDR2

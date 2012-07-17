@@ -1,5 +1,5 @@
 OOPSUTL2 ;HINES/WAA-Utilities Routines ;3/24/98
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**7,8,11**;Jun 01, 1998
  ;;
 CARE2(IEN) ; Update location field
  N LOC,GEN
@@ -182,17 +182,3 @@ MKNUM(INSTR) ; Strip/Convert num numerics from a string - Patch 11
  S NUMOUT=""
  F K=1:1:$L(INSTR) I ($A(INSTR,K)>47)&($A(INSTR,K)<58) S NUMOUT=NUMOUT_$E(INSTR,K)
  Q NUMOUT
-RWSOT ;Regular Work Schedule output transform
- N I,HOLD
- S HOLD=""
- F I=1:1:($L(Y)/2) S HOLD=HOLD_$P("Sun,Mon,Tue,Wed,Thu,Fri,Sat",",",$P(Y,",",I))_","
- S Y=$E(HOLD,1,($L(HOLD)-1))
- Q 
-UNION(IEN) ;
- ; Input: IEN   = Internal Entry Number of entry in file 2260
- ; Output VALID = 1 Valid to be seen by Union
- ;              = 0 Not Valid to be seen by Union
- N VALID
- S VALID=0
- I $$EDSTA^OOPSUTL1(IEN,"O"),$P($$EDSTA^OOPSUTL1(IEN,"S"),U,3) S VALID=1
- Q VALID

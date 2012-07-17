@@ -1,4 +1,4 @@
-DGPTXX12 ; COMPILED XREF FOR FILE #45.05 ; 04/23/09
+DGPTXX12 ; COMPILED XREF FOR FILE #45.05 ; 04/12/09
  ; 
  S DA=0
 A1 ;
@@ -17,7 +17,7 @@ A S DA=$O(^DGPT(DA(1),"P",DA)) I DA'>0 S DA=0 G END
  I X'="" S ^DGPT(DA(1),"P","AP6",$E(X,1,30),DA)=""
  S X=$P(DIKZ(0),U,9)
  I X'="" S ^DGPT(DA(1),"P","AP6",$E(X,1,30),DA)=""
-CR1 S DIXR=427
+CR1 S DIXR=415
  K X
  S X(1)=$P(DIKZ(0),U,1)
  S X(2)=$P(DIKZ(0),U,5)
@@ -25,7 +25,7 @@ CR1 S DIXR=427
  I $G(X(1))]"",$G(X(2))]"" D
  . K X1,X2 M X1=X,X2=X
  . D SDGPT0^DGPTDDCR(.X,.DA,"P",1)
-CR2 S DIXR=428
+CR2 S DIXR=416
  K X
  S DIKZ(0)=$G(^DGPT(DA(1),"P",DA,0))
  S X(1)=$P(DIKZ(0),U,1)
@@ -34,7 +34,7 @@ CR2 S DIXR=428
  I $G(X(1))]"",$G(X(2))]"" D
  . K X1,X2 M X1=X,X2=X
  . D SDGPT0^DGPTDDCR(.X,.DA,"P",2)
-CR3 S DIXR=429
+CR3 S DIXR=417
  K X
  S DIKZ(0)=$G(^DGPT(DA(1),"P",DA,0))
  S X(1)=$P(DIKZ(0),U,1)
@@ -43,7 +43,7 @@ CR3 S DIXR=429
  I $G(X(1))]"",$G(X(2))]"" D
  . K X1,X2 M X1=X,X2=X
  . D SDGPT0^DGPTDDCR(.X,.DA,"P",3)
-CR4 S DIXR=430
+CR4 S DIXR=418
  K X
  S DIKZ(0)=$G(^DGPT(DA(1),"P",DA,0))
  S X(1)=$P(DIKZ(0),U,1)
@@ -52,7 +52,7 @@ CR4 S DIXR=430
  I $G(X(1))]"",$G(X(2))]"" D
  . K X1,X2 M X1=X,X2=X
  . D SDGPT0^DGPTDDCR(.X,.DA,"P",4)
-CR5 S DIXR=431
+CR5 S DIXR=419
  K X
  S DIKZ(0)=$G(^DGPT(DA(1),"P",DA,0))
  S X(1)=$P(DIKZ(0),U,1)

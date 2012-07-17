@@ -1,4 +1,4 @@
-OCXOZ0A ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
+OCXOZ0A ;SLC/RJS,CLA - Order Check Scan ;NOV 3,2010 at 19:22
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;**32,221,243**;Dec 17,1997;Build 242
  ;;  ;;ORDER CHECK EXPERT version 1.01 released OCT 29,1998
  ;
@@ -10,8 +10,27 @@ OCXOZ0A ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
  ;
  Q
  ;
+CHK217 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK201+16^OCXOZ09.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK217 Variables
+ ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
+ ; OCXDF(67) ---> Data Field: CONTRAST MEDIA CODE (FREE TEXT)
+ ; OCXDF(70) ---> Data Field: RECENT BARIUM STUDY TEXT (FREE TEXT)
+ ; OCXDF(121) --> Data Field: RECENT BARIUM STUDY ORDER STATUS (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; FILE(DFN,67, -----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: RECENT BARIUM STUDY ORDERED)
+ ; RECBAR( ----------> RECENT BARIUM STUDY
+ ; RECBARST( --------> RECENT BARIUM ORDER STATUS
+ ;
+ I $L(OCXDF(67)),(OCXDF(67)["B") S OCXDF(70)=$P($$RECBAR(OCXDF(37),48),"^",3),OCXDF(121)=$P($$RECBARST(OCXDF(37),48),"^",2),OCXOERR=$$FILE(DFN,67,"70,121") Q:OCXOERR 
+ Q
+ ;
 CHK227 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK163+20^OCXOZ07.
+ ;  Called from CHK163+14^OCXOZ07.
  ;
  Q:$G(OCXOERR)
  ;
@@ -59,42 +78,8 @@ CHK236 ; Look through the current environment for valid Event/Elements for this 
  ; CTMRI( -----------> CT MRI PHYSICAL LIMITS
  ; FILE(DFN,106, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: RADIOLOGY PROCEDURE CONTAINS NON-BARIUM CONTRAST MEDIA)
  ;
- S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) S OCXDF(78)=$P($$CTMRI(OCXDF(37),OCXDF(73)),"^",1) I $L(OCXDF(78)),(OCXDF(78)) D CHK241
+ S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) S OCXDF(78)=$P($$CTMRI(OCXDF(37),OCXDF(73)),"^",1) I $L(OCXDF(78)),(OCXDF(78)) D CHK241^OCXOZ0B
  S OCXDF(67)=$$CM^ORQQRA(OCXDF(73)) I $L(OCXDF(67)),$$CLIST(OCXDF(67),"M,I,N") S OCXOERR=$$FILE(DFN,106,"") Q:OCXOERR 
- Q
- ;
-CHK241 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK236+16.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK241 Variables
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(73) ---> Data Field: ORDERABLE ITEM IEN (NUMERIC)
- ; OCXDF(79) ---> Data Field: PATIENT TOO BIG FOR SCANNER TEXT (FREE TEXT)
- ; OCXDF(80) ---> Data Field: PATIENT TOO BIG FOR SCANNER DEVICE (FREE TEXT)
- ;
- ;      Local Extrinsic Functions
- ; CTMRI( -----------> CT MRI PHYSICAL LIMITS
- ; FILE(DFN,72, -----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: PATIENT OVER CT OR MRI DEVICE LIMITATIONS)
- ;
- S OCXDF(79)=$P($$CTMRI(OCXDF(37),OCXDF(73)),"^",2),OCXDF(80)=$P($$CTMRI(OCXDF(37),OCXDF(73)),"^",3),OCXOERR=$$FILE(DFN,72,"79,80") Q:OCXOERR 
- Q
- ;
-CHK247 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK182+19^OCXOZ08.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK247 Variables
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(64) ---> Data Field: FORMATTED RENAL LAB RESULTS (FREE TEXT)
- ;
- ;      Local Extrinsic Functions
- ; FILE(DFN,73, -----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: CREATININE CLEARANCE ESTIMATE)
- ; FLAB( ------------> FORMATTED LAB RESULTS
- ;
- S OCXDF(64)=$$FLAB(OCXDF(37),"SERUM CREATININE^SERUM UREA NITROGEN","SERUM SPECIMEN"),OCXOERR=$$FILE(DFN,73,"64,76") Q:OCXOERR 
  Q
  ;
 CLIST(DATA,LIST) ;   DOES THE DATA FIELD CONTAIN AN ELEMENT IN THE LIST
@@ -194,6 +179,18 @@ FLAB(DFN,OCXLIST,OCXSPEC) ;  Compiler Function: FORMATTED LAB RESULTS
  ..I $L($P(OCXX,U,7)) S OCXY=OCXY_" "_$$FMTE^XLFDT($P(OCXX,U,7),"2P")
  .S:$L(OCXOUT) OCXOUT=OCXOUT_"   " S OCXOUT=OCXOUT_$G(OCXY)
  Q:'$L(OCXOUT) "<Results Not Found>" Q OCXOUT
+ ;
+RECBAR(DFN,HOURS) ;  Compiler Function: RECENT BARIUM STUDY
+ ;
+ Q:'$G(DFN) 0 Q:'$G(HOURS) 0 N OUT S OUT=$$RECENTBA^ORKRA(DFN,HOURS) Q:'$L(OUT) 0 Q 1_U_OUT
+ ;  
+ ;
+RECBARST(DFN,HOURS)    ;  Compiler Function: RECENT BARIUM ORDER STATUS
+ ;
+ Q:'$G(DFN) 0 Q:'$G(HOURS) 0
+ N ORDER S ORDER=$P($$RECENTBA^ORKRA(DFN,HOURS),U) Q:'$L(ORDER) 0
+ N STATUS S STATUS=$P($$STATUS^ORQOR2(ORDER),U,2) Q:'$L(STATUS) 0
+ Q 1_U_STATUS
  ;
 TERMLKUP(OCXTERM,OCXLIST) ;
  Q $$TERM^OCXOZ01(OCXTERM,.OCXLIST)

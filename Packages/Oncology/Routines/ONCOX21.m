@@ -1,4 +1,4 @@
-ONCOX21 ; GENERATED FROM 'ONCOX2' PRINT TEMPLATE (#843) ; 06/30/97 ; (continued)
+ONCOX21 ; GENERATED FROM 'ONCOX2' PRINT TEMPLATE (#1273) ; 08/11/99 ; (continued)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -14,7 +14,7 @@ BEGIN ;
  S I(100)="^ONCO(160,",J(100)=160 S I(0,0)=D0 S DIP(1)=$S($D(^ONCO(165.5,D0,0)):^(0),1:"") S X=$P(DIP(1),U,2),X=X S D(0)=+X S D0=D(0) I D0>0 D H1
  G H1R
 H1 ;
- S X=$G(^ONCO(160,D0,0)) S Y=$P(X,U,7) W:Y]"" $S($D(DXS(10,Y)):DXS(10,Y),1:Y)
+ S X=$G(^ONCO(160,D0,0)) S Y=$P(X,U,7) W:Y]"" $S($D(DXS(11,Y)):DXS(11,Y),1:Y)
  Q
 H1R ;
  K J(100),I(100) S:$D(I(0,0)) D0=I(0,0)
@@ -31,7 +31,7 @@ I1 ;
 I1R ;
  K J(100),I(100) S:$D(I(0,0)) D0=I(0,0)
  D N:$X>82 Q:'DN  W ?82 W "Marital Status at Dx:  "
- S X=$G(^ONCO(165.5,D0,1)) S Y=$P(X,U,5) W:Y]"" $S($D(DXS(11,Y)):DXS(11,Y),1:Y)
+ S X=$G(^ONCO(165.5,D0,1)) S Y=$P(X,U,5) W:Y]"" $S($D(DXS(12,Y)):DXS(12,Y),1:Y)
  D T Q:'DN  D N W ?0 X DXS(3,9) K DIP K:DN Y W X
  D T Q:'DN  D N W ?0 W " "
  S I(100)="^ONCO(160,",J(100)=160 S I(0,0)=D0 S DIP(1)=$S($D(^ONCO(165.5,D0,0)):^(0),1:"") S X=$P(DIP(1),U,2),X=X S D(0)=+X S D0=D(0) I D0>0 D J1

@@ -1,9 +1,7 @@
-SDAMXOE ; GENERATED FROM 'SD ENCOUNTER ENTRY' INPUT TEMPLATE(#493), FILE 409.68;07/25/98
+SDAMXOE ; GENERATED FROM 'SD ENCOUNTER ENTRY' INPUT TEMPLATE(#1430), FILE 409.68;01/04/99
  D DE G BEGIN
 DE S DIE="^SCE(",DIC=DIE,DP=409.68,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^SCE(DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(2)=% S %=$P(%Z,U,3) S:%]"" DE(3)=% S %=$P(%Z,U,4) S:%]"" DE(4)=% S %=$P(%Z,U,5) S:%]"" DE(5)=% S %=$P(%Z,U,6) S:%]"" DE(6)=% S %=$P(%Z,U,8) S:%]"" DE(7)=% S %=$P(%Z,U,9) S:%]"" DE(8)=%
- I  S %=$P(%Z,U,10) S:%]"" DE(9)=% S %=$P(%Z,U,11) S:%]"" DE(10)=% S %=$P(%Z,U,12) S:%]"" DE(1)=% S %=$P(%Z,U,13) S:%]"" DE(11)=%
- I $D(^("USER")) S %Z=^("USER") S %=$P(%Z,U,3) S:%]"" DE(12)=% S %=$P(%Z,U,4) S:%]"" DE(13)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(2)=% S %=$P(%Z,U,3) S:%]"" DE(3)=% S %=$P(%Z,U,4) S:%]"" DE(4)=% S %=$P(%Z,U,5) S:%]"" DE(5)=% S %=$P(%Z,U,6) S:%]"" DE(6)=% S %=$P(%Z,U,12) S:%]"" DE(1)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -45,7 +43,7 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="SDAMXOE",DQ=1
- S:$D(DTIME)[0 DTIME=300 S D0=DA,DIEZ=493,U="^"
+ S:$D(DTIME)[0 DTIME=300 S D0=DA,DIEZ=1430,U="^"
 1 S DW="0;12",DV="P409.63'",DU="",DLB="STATUS",DIFLD=.12
  S DU="SD(409.63,"
  S X=$G(SDVSIT("STA"))
@@ -122,57 +120,4 @@ C6S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(1)=$S($D(^SCE(D0,0)):^(0),1:"") S X=$P(Y(1),U,7),X=X S DIU=X K Y S X=DIV S X=$P($G(^SCE(+X,0)),U,7) X ^DD(409.68,.06,1,2,1.4)
  Q
 X6 Q
-7 D:$D(DG)>9 F^DIE17,DE S DQ=7,DW="0;8",DV="RSI",DU="",DLB="ORIGINATING PROCESS TYPE",DIFLD=.08
- S DU="1:APPOINTMENT;2:STOP CODE ADDITION;3:DISPOSITION;4:CREDIT STOP CODE;"
- S X=$G(SDVSIT("ORG"))
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X7 Q
-8 S DW="0;9",DV="FI",DU="",DLB="EXTENDED REFERENCE",DIFLD=.09
- S X=$G(SDVSIT("REF"))
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X8 Q
-9 S DW="0;10",DV="RP409.1'",DU="",DLB="APPOINTMENT TYPE",DIFLD=.1
- S DE(DW)="C9^SDAMXOE"
- S DU="SD(409.1,"
- S X=$G(SDVSIT("TYP"))
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-C9 G C9S:$D(DE(9))[0 K DB S X=DE(9),DIC=DIE
- N SD0 S SD0=$G(^SCE(DA,0)) IF +SD0,X=10 K ^SCE("ACG",+SD0,DA)
-C9S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
- N SD0 S SD0=$G(^SCE(DA,0)) IF +SD0,X=10 S ^SCE("ACG",+SD0,DA)=""
- Q
-X9 Q
-10 D:$D(DG)>9 F^DIE17,DE S DQ=10,DW="0;11",DV="RP40.8'I",DU="",DLB="MEDICAL CENTER DIVISION",DIFLD=.11
- S DU="DG(40.8,"
- S X=$G(SDVSIT("DIV"))
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X10 Q
-11 S DW="0;13",DV="RP8'I",DU="",DLB="ELIGIBILITY OF ENCOUNTER",DIFLD=.13
- S DU="DIC(8,"
- S X=$G(SDVSIT("ELG"))
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X11 Q
-12 S DW="USER;3",DV="P200'",DU="",DLB="CREATED BY",DIFLD=103
- S DU="VA(200,"
- S X=$S(+$G(SDUZ):+SDUZ,1:$G(DUZ))
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X12 Q
-13 S DW="USER;4",DV="D",DU="",DLB="DATE/TIME CREATED",DIFLD=104
- S X=$$NOW^XLFDT
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X13 Q
-14 G 0^DIE17
+7 D:$D(DG)>9 F^DIE17 G ^SDAMXOE1

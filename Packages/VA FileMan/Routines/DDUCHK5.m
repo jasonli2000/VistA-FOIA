@@ -1,5 +1,5 @@
-DDUCHK5 ;SFISC/MKO-CHECK KEYS ON FILE ;8/8/03  06:26
- ;;22.0;VA FileMan;*130*;Mar 30, 1999
+DDUCHK5 ;SFISC/MKO-CHECK KEYS ON FILE ;2:45 PM  11 Aug 1998
+ ;;22.0;VA FileMan;;Mar 30, 1999
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 KEY(DDUCFI,DDUCFIX) ;Check and optionally fix structure of Key file entry
@@ -186,12 +186,12 @@ SET(GL,VAL) ;Set a global and print a message
  Q
  ;
  ;Write messages
-WCHK Q  ;D WRITE("Checking Keys.",5) Q
+WCHK D WRITE("Checking Keys.",5) Q
 WNOKEY D WRITE(DDUCKID_" does not exist.",7) Q
 WMS(S,N) D WRITE(S_" is missing."_$S($G(N):" Nothing done.",1:""),7) Q
 WINC D WRITE("Field information in "_DDUCKEY_" is incomplete. Nothing done.",7) Q
-WFMS D WRITE("*File #"_DDUCFIL_", Field #"_DDUCFLD_" referenced in "_DDUCKEY_" is missing.",7) Q  ;22*130
-WNE D WRITE("*Fields in "_DDUCKID_" don't match fields in Uniqueness Index.",7) Q  ;22*130
+WFMS D WRITE("File #"_DDUCFIL_", Field #"_DDUCFLD_" referenced in "_DDUCKEY_" is missing. Nothing done.",7) Q
+WNE D WRITE("Fields in "_DDUCKID_" don't match fields in Uniqueness Index. Nothing done.",7) Q
 WEN(GL) D WRITE("Erroneous node "_GL_" is set.",7) Q
 WNM D WRITE("NAME for "_DDUCKID_" looks like it should be '"_DDUCNM_"'.",7) Q
 WPRI D WRITE("PRIORITY for "_DDUCKID_" looks like it should be '"_DDUCPRI_"'.",7) Q

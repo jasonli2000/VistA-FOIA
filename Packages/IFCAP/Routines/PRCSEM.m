@@ -1,15 +1,10 @@
 PRCSEM ;WISC/KMB-DELIVERY RECEIVING,OBLIGATION DATA ;6-6-95 12:00
-V ;;5.1;IFCAP;**148**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  S PRCSEM=1 D EDTD^PRCSEB0 K PRCSEM
  ;
  Q
 ENOD ;ENTER OBLIGATION DATA
- ; The option to execute this entry (Obligation Data [PRCSENOD]) was
- ; was removed with PRC*5.1*148 to enforce segregation of duties.  This
- ; entry point should no longer be used.
- W !!,"This option is no longer available!" Q
- ;
  D EN3^PRCSUT G W2:'$D(PRC("SITE")),EXIT:Y<0
  S DIC="^PRCS(410,",DIE=DIC,DIC(0)="AEQM",DIC("S")="I +^(0),$D(^(3)),+^(3)=+PRC(""CP""),$P(^(0),""^"",5)=PRC(""SITE""),$P(^(0),""^"",2)=""O"" I $D(^PRC(420,""A"",DUZ,PRC(""SITE""),+PRC(""CP""),1))!($D(^(2)))"
  D ^PRCSDIC G EXIT:Y<0 K DIC("S") S (DA,PRCS)=+Y L +^PRCS(410,DA):5 G ENOD:$T=0

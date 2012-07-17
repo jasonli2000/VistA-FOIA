@@ -1,5 +1,5 @@
-PSOLBL4 ;BIR/RTR - Set up routine for HL7 interface ;10/9/08 11:37am
- ;;7.0;OUTPATIENT PHARMACY;**26,70,156,244,233,246,319,387**;DEC 1997;Build 13
+PSOLBL4 ;BIR/RTR-Set up routine for HL7 interface ; 10/9/08 11:37am
+ ;;7.0;OUTPATIENT PHARMACY;**26,70,156,244,233,246,319**;DEC 1997;Build 1
  ;External reference to ^PSDRUG supported by DBIA 221
  ;
  ;*244 - ignore RX's with a status > 11
@@ -22,7 +22,7 @@ HL N PSODTM,HHHH,PSOQUE,HLFLAG,HLFOUR,HLINGF,HLINRX,HLINRX0,II,HLNEXT,HLRR,HLRX,
  .S HLNEXT=$P(PPLHL,",",(II+1)) I HLNEXT=""!(HLNEXT=",") S HLFLAG=1
  .Q:'$G(HLRX)
  .Q:'$D(^PSRX(HLRX,0))
- .I $P($G(^PSRX(HLRX,"STA")),"^")=4!($P($G(^PSRX(HLRX,"STA")),"^")=1) Q
+ .Q:$P($G(^PSRX(HLRX,"STA")),"^")=4
  .Q:$G(RXRP(HLRX,"RP"))
  .I $P($G(^PSRX(HLRX,"STA")),"^")>11!('$P(^PSRX(HLRX,0),"^",2)) Q
  .I $G(PSODBQ) S HLRR=$O(^PS(52.5,"B",HLRX,0)) Q:'HLRR  I $G(^PS(52.5,+HLRR,"P"))=1 Q

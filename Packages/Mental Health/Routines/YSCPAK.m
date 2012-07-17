@@ -1,4 +1,4 @@
-YSCPAK ; GENERATED FROM 'YSSR NURSE MGT PRINT' PRINT TEMPLATE (#558) ; 08/21/96 ; (FILE 615.2, MARGIN=80)
+YSCPAK ; GENERATED FROM 'YSSR NURSE MGT PRINT' PRINT TEMPLATE (#913) ; 03/10/95 ; (FILE 615.2, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(558,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(913,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  S DIWF="W"
  D T Q:'DN  D N D N:$X>0 Q:'DN  W ?0 S DIP(1)=$S($D(^YS(615.2,D0,0)):^(0),1:"") S X="NURSING SHIFT: "_$S('$D(^NURSF(211.6,+$P(DIP(1),U,6),0)):"",1:$P(^(0),U,1)) K DIP K:DN Y W X
  D N:$X>0 Q:'DN  W ?0 S DIP(1)=$S($D(^YS(615.2,D0,0)):^(0),1:"") S X="NAME:  "_$S('$D(^DPT(+$P(DIP(1),U,2),0)):"",1:$P(^(0),U,1)) K DIP K:DN Y W X
@@ -25,7 +25,7 @@ BEGIN ;
  W ?28 D PARSE^YSSRU K DIP K:DN Y
  D N:$X>29 Q:'DN  W ?29 S X="YSTT",X=$S(X=""!(X'?.ANP):"",$D(YSDIPA($E(X,1,30))):YSDIPA($E(X,1,30)),1:"") K DIP K:DN Y W X
  D N:$X>0 Q:'DN  W ?0 W "ORDERED BY:  "
- S X=$G(^YS(615.2,D0,25)) W ?15 S Y=$P(X,U,1) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,35)
+ S X=$G(^YS(615.2,D0,25)) W ?15 S Y=$P(X,U,1) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
  D N:$X>0 Q:'DN  W ?0 W "REASON:  "
  S I(1)=10,J(1)=615.21 F D1=0:0 Q:$O(^YS(615.2,D0,10,D1))'>0  X:$D(DSC(615.21)) DSC(615.21) S D1=$O(^(D1)) Q:D1'>0  D:$X>11 T Q:'DN  D A1
  G A1R

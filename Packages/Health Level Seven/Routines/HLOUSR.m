@@ -1,5 +1,5 @@
-HLOUSR ;ALB/CJM/OAK/PIJ/RBN -ListManager Screen for viewing system status;12 JUN 1997 10:00 am ;12/01/2010
- ;;1.6;HEALTH LEVEL SEVEN;**126,130,134,137,138,139,146,147,153**;Oct 13, 1995;Build 11
+HLOUSR ;ALB/CJM/OAK/PIJ/RBN -ListManager Screen for viewing system status;12 JUN 1997 10:00 am ;08/23/2010
+ ;;1.6;HEALTH LEVEL SEVEN;**126,130,134,137,138,139,146,147**;Oct 13, 1995;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
 EN ;
@@ -57,7 +57,7 @@ BRIEF ;
  S @VALMAR@(3,0)="STANDARD LISTENER:         "_$S(STATUS:"RUNNING",1:"STOPPED   ")_$G(LNKMSG)
  ;** P139 end **
  ;
- S @VALMAR@(4,0)="TASKMAN:                   "_$S($$TM^%ZTLOAD:"RUNNING",1:"STOPPED")
+ S @VALMAR@(4,0)="TASKMAN:                   "_$S($$TM^%ZTLOAD:"RUNNING",1:"STOPPPED")
  ;
  S (LIST,LINK)=""
  F  S LINK=$O(^HLTMP("FAILING LINKS",LINK)) Q:LINK=""  D  I $L(LIST)>60 S LIST=LIST_",..." Q

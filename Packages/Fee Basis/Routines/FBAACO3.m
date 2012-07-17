@@ -1,5 +1,5 @@
 FBAACO3 ;AISC/GRR-ENTER PAYMENT CONTINUED ;7/7/2003
- ;;3.5;FEE BASIS;**4,38,55,61,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**4,38,55,61**;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 DOEDIT ;
  N FB1725,FBFPPSC
@@ -41,9 +41,7 @@ DOEDIT ;
  ; now edit remaining fields
  D SETO K DR
  S DR="48;47;S FBUNITS=X;42R;S FBZIP=X;S:$$ANES^FBAAFS($$CPT^FBAAUTL4(FBAACP)) Y=""@2"";43///@;S FBTIME=X;S Y=""@3"";@2;43R;S FBTIME=X;@3"
- ; fb*3.5*116 remove edit of interest indicator (162.03,34) to prevent different interest indicator values at line item level; interest indicator set at invoice level only
- ;S DR(1,162.03,1)="S FBAAMM=$S(FBAAPTC=""R"":"""",1:1);D PPT^FBAACO1(FBAAMM1);34///@;34////^S X=FBAAMM1;30R;S FBHCFA(30)=X;1;S J=X;Q"
- S DR(1,162.03,1)="30R;S FBHCFA(30)=X;1;S J=X;Q"
+ S DR(1,162.03,1)="S FBAAMM=$S(FBAAPTC=""R"":"""",1:1);D PPT^FBAACO1(FBAAMM1);34///@;34////^S X=FBAAMM1;30R;S FBHCFA(30)=X;1;S J=X;Q"
  S DR(1,162.03,2)="D FEEDT^FBAACO3;44///@;44///^S X=FBFSAMT;45///@;45///^S X=FBFSUSD;S:FBAMTPD'>0!(FBAMTPD=FBAMTPD(0)) Y=""@4"";2///^S X=FBAMTPD;@4;2//^S X=FBAMTPD;D CHKIT^FBAACO3;S K=X"
  ;S DR(1,162.03,3)="3//^S X=$S(J-K:J-K,1:"""");4;S:X'=4 Y=6;22;6////^S X=DUZ;13;33"
  S DR(1,162.03,3)="K FBADJD;M FBADJD=FBADJ;S FBX=$$ADJ^FBUTL2(J-K,.FBADJ,2,,.FBADJD,1)"
@@ -63,10 +61,7 @@ DOEDIT ;
  Q
 SETO S FY=$E(FBAADT,1,3)+1700+$S($E(FBAADT,4,5)>9:1,1:0)
  Q
-OUT ;
- ; FB*3.5*116 count line items that have 0.00 amount paid
- ;I K>0 S Z1=$P(^FBAA(161.7,FBAABE,0),"^",11)+1,$P(^(0),"^",11)=Z1,FBINTOT=FBINTOT+K
- S Z1=$P(^FBAA(161.7,FBAABE,0),"^",11)+1,$P(^(0),"^",11)=Z1,FBINTOT=FBINTOT+K
+OUT I K>0 S Z1=$P(^FBAA(161.7,FBAABE,0),"^",11)+1,$P(^(0),"^",11)=Z1,FBINTOT=FBINTOT+K
  Q
 CKMAX S (FBAOT,A)=0,O="" F Z=S-.1:0 S Z=$O(^FBAAC(DFN,"AB",Z)) Q:Z'>0!(Z>R)  F Q=0:0 S Q=$O(^FBAAC(DFN,"AB",Z,Q)) Q:Q'>0  S W=$O(^FBAAC(DFN,"AB",Z,Q,0)) I $D(^FBAAC(DFN,1,Q,1,W,0)) D SMORE
  I A>$P(FBSITE(1),"^",9) G NO

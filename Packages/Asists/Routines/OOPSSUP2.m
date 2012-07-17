@@ -1,5 +1,5 @@
 OOPSSUP2 ;HINES/WAA-S/E Supervisor Edit routine ;04/15/1998
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**3,5,7,8**;Jun 01, 1998
  ;;
  ; Note:  this routine became too big and had to be split.  The original
  ; routine is OOPSSUP2 and had the logic for both the Supervisor

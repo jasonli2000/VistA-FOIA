@@ -1,6 +1,6 @@
-PRCS58OB ;WISC/CLH-OBLIGATION PROCESSING ;07/21/93
-V ;;5.1;IFCAP;**148**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCS58OB ;WISC/CLH-OBLIGATION PROCESSING ; 07/21/93  2:11 PM
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 OB(DA) ;Obligation edits
 SC N DIE,DR
  S DIE="^PRCS(410,",DIE("NO^")=""
@@ -47,7 +47,7 @@ ENA2 S DIC(0)="AEMQ",DIE="^PRCS(410,",DR="[PRCE 1358 ADJUSTMENT]" D ^DIE
 ENA3 D:$O(^PRCS(410,DA,12,0)) SCPC0^PRCSED D W1^PRCSEB I $D(PRCS2),+^PRCS(410,DA,0) D W6^PRCSEB
  Q
 NODE(DA,TRNODE) ;get transaction node information from 410
- K TRNODE F I=0,1,2,3,4,7,10,11,14 S TRNODE(I)="" S:$D(^PRCS(410,DA,I)) TRNODE(I)=^(I)
+ K TRNODE F I=0,1,2,3,4,7,10,14 S TRNODE(I)="" S:$D(^PRCS(410,DA,I)) TRNODE(I)=^(I)
  S:$P(TRNODE(3),"^",11)="" $P(TRNODE(3),"^",11)=$P(TRNODE(0),"-",2)+200_"0000"
  S I=0 F  S I=$O(^PRCS(410,DA,8,I)) Q:'I  S:$D(^(I,0)) TRNODE(8,I)=^(0)
  Q

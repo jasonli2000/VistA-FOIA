@@ -1,4 +1,4 @@
-YSCPAM ; GENERATED FROM 'YSSR PT INQ PRINT' PRINT TEMPLATE (#564) ; 08/21/96 ; (FILE 615.2, MARGIN=80)
+YSCPAM ; GENERATED FROM 'YSSR PT INQ PRINT' PRINT TEMPLATE (#919) ; 03/10/95 ; (FILE 615.2, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,12 +11,12 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(564,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(919,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  W ?0 D PARSE^YSSRU K DIP K:DN Y
  D N:$X>0 Q:'DN  W ?0 W "EPISODE"
  D N:$X>0 Q:'DN  W ?0 W "-------"
  D N:$X>0 Q:'DN  W ?0 W "ORDERED BY: "
- S X=$G(^YS(615.2,D0,25)) W ?14 S Y=$P(X,U,1) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,35)
+ S X=$G(^YS(615.2,D0,25)) W ?14 S Y=$P(X,U,1) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
  D T Q:'DN  D N D N:$X>0 Q:'DN  W ?0 W "REASONS for S/R:"
  S I(1)=10,J(1)=615.21 F D1=0:0 Q:$O(^YS(615.2,D0,10,D1))'>0  X:$D(DSC(615.21)) DSC(615.21) S D1=$O(^(D1)) Q:D1'>0  D:$X>18 T Q:'DN  D A1
  G A1R

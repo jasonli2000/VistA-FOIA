@@ -1,10 +1,6 @@
-YTRPWRP ;DALOI/YH - Report Calls ; 8/2/10 2:44pm
- ;;5.01;MENTAL HEALTH;**71,76,96**;Dec 30, 1994;Build 46
- ;Reference to VADPT APIs supported by DBIA #10061
- ;Reference to ^XLFDT APIs supported by DBIA #10103
- ;Reference to ^%ZISC supported by IA #10089
- ;Reference to ^%ZIS supported by IA #10086
- ;Reference to %ZISH supported by DBIA #2320
+YTRPWRP ;DALOI/YH- Report Calls ;5/27/03  13:34
+ ;;5.01;MENTAL HEALTH;**71,76**;Dec 30, 1994
+ ;
 INTRMNT(ROOT,YSDFN,YSXT) ; -- return report text
  ;ROOT=Where you want it
  ;YSDFN=Patient DFN
@@ -80,7 +76,6 @@ STRIP ; -- strip off control chars
  .. I $L(X,$C(8))=$L(X,$C(95)) S (X,@ROOT@(I))=$TR(X,$C(8,95),"") Q  ;BS & _
  .. S (X,@ROOT@(I))=$TR(X,$C(8),"")
  . I X[$C(7)!(X[$C(12)) S @ROOT@(I)=$TR(X,$C(7,12),"") ;BEL or FF
- . I X[$C(12)&(I>7) S @ROOT@(I+.5)="***eop***"_$C(10) ;asf 4/18/08
  Q
  ;
 TESTCODE(ROOT) ;YTRP LIST TEST/CODE

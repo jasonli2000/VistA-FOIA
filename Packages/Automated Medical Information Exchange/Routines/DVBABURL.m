@@ -1,5 +1,5 @@
-DVBABURL ;ALB/SPH - CAPRI URL ;24/MAR/2011
- ;;2.7;AMIE;**104,136,143,149,168**;Apr 10, 1995;Build 3
+DVBABURL ;ALB/SPH - CAPRI URL ;10/08/2009
+ ;;2.7;AMIE;**104,136,143**;Apr 10, 1995;Build 4
  ;
 URL(Y,WHICH) ; 
  S Y=""
@@ -9,7 +9,7 @@ URL(Y,WHICH) ;
  ; 5=HIA download website
  ; 999=Debug/Test Code
  I WHICH=1 S Y="http://152.124.238.193/bl/21/rating/Medical/exams/index.htm"
- I WHICH=2 S Y="http://vaww.demo.va.gov/"
+ I WHICH=2 S Y="http://vaww.cpep.med.va.gov/capri/"
  I WHICH=3 D
  . I '$$PROD^XUPROD S Y="-1^VistAWeb disabled for non-production systems." Q
  . S Y="https://vistaweb.med.va.gov/CapriPage.aspx"

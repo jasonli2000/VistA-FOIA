@@ -1,5 +1,5 @@
-HLCSFMN ;ALB/JRP - INCOMING/OUTGOING FILER MONITOR;19-MAY-95 ;06/25/97  15:03
- ;;1.6;HEALTH LEVEL SEVEN;**15,30**;Oct 13, 1995
+HLCSFMN ;ALB/JRP - INCOMING/OUTGOING FILER MONITOR;19-MAY-95 ;01/16/97  09:53
+ ;;1.6;HEALTH LEVEL SEVEN;**15**;Oct 13, 1995
 MONITOR ;Main entry point
  ;Declare variables
  N INFILER,OUTFILER,INCOUNT,OUTCOUNT,INTOP,OUTTOP,STOP
@@ -129,7 +129,7 @@ DISPLAY(FLRTYPE,ARRAY,COUNT,PTRTOP) ;Display filer information
  .;Task still running - determine if time difference is within
  .; tolerance level
  .S PASTTOL=0
- .S:((DAY)!(HOUR)!(MIN>9)) PASTTOL=1
+ .S:((DAY)!(HOUR)!(MIN>5)) PASTTOL=1
  .;Bold on (if outside tolerance level)
  .W:(PASTTOL) IOINHI
  .;Print last known $H

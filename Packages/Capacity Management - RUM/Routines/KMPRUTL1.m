@@ -1,58 +1,5 @@
-KMPRUTL1 ;OAK/KAK/RAK - Resource Usage Monitor Utility ;11/19/04  10:32
- ;;2.0;CAPACITY MANAGEMENT - RUM;**1**;May 28, 2003
- ;
-DATERNG(KMPUY,KMPUSTR,KMPUEND) ;-- date range
- ;---------------------------------------------------------------------
- ; KMPUY..... Value returned in four pieces:
- ;            fmstartdate^fmenddate^ouputstartdate^outputenddate
- ;
- ;            Piece one and two are the date ranges in fileman format.
- ;            Piece three and four are the same dates in output format:
- ;                             dy-Mon-yr
- ;
- ;                               ********
- ;                               * NOTE *
- ;                               ********
- ;          - The first piece will always be the earliest date entered.
- ;
- ;  Optional Parameters:
- ;
- ; KMPUSTR... If defined, the earliest date that may be selected.
- ;            (must be in fileman format)
- ;
- ; KMPUEND... If defined, the latest date that may be selected.
- ;            (must be in fileman format)
- ;-----------------------------------------------------------------------
- ;
- N DATE1,DATE2,DIR,DIRUT,LINE,X,Y
- ;
- S KMPUY="",KMPUSTR=$G(KMPUSTR),KMPUEND=$G(KMPUEND)
- ;
-RANGE ;-- Ask date ranges
- S DIR(0)="DOA^"_$S(KMPUSTR:KMPUSTR,1:"")_":"_$S(KMPUEND:KMPUEND,1:"")_":E)"
- S DIR("A")="Start with Date: "
- S:KMPUSTR DIR("B")=$$FMTE^XLFDT(KMPUSTR,2)
- S DIR("?")=" "
- S DIR("?",1)="Enter the starting date.",LINE=2
- ; if starting date.
- I KMPUSTR D 
- .S DIR("?",LINE)="Date must not precede "_$$FMTE^XLFDT(KMPUSTR)
- .S LINE=LINE+1
- ; if ending date.
- I KMPUEND S DIR("?",LINE)="Date must not follow "_$$FMTE^XLFDT(KMPUEND)
- W ! D ^DIR I $D(DIRUT) S KMPUY="" Q
- S DATE1=Y
- S DIR("A")="  End with Date: "
- S:KMPUEND DIR("B")=$$FMTE^XLFDT(KMPUEND,2)
- S DIR("?",1)="Enter the ending date."
- D ^DIR G:Y="" RANGE I Y="^" S KMPUY="" Q
- S DATE2=Y
- ; Set earliest date into first piece.
- S KMPUY=$S(DATE2<DATE1:DATE2,1:DATE1)_U_$S(DATE2>DATE1:DATE2,1:DATE1)
- S $P(KMPUY,U,3)=$$FMTE^XLFDT($P(KMPUY,U))
- S $P(KMPUY,U,4)=$$FMTE^XLFDT($P(KMPUY,U,2))
- ;
- Q
+KMPRUTL1 ;SFISC/KAK/RAK - Resource Usage Monitor Utility ;3/3/00  13:47
+ ;;1.0;CAPACITY MANAGEMENT - RUM;**1**;Dec 09, 1998
  ;
 ENVCHECK(KMPRENV,KMPRQIET) ;-- environment check.
  ;-----------------------------------------------------------------------
@@ -82,7 +29,7 @@ ENVCHECK(KMPRENV,KMPRQIET) ;-- environment check.
  ;
  ; check for operating system availability.
  S TEXT=$P($G(^%ZOSF("OS")),U)
- I TEXT'["DSM"&(TEXT'["OpenM") D  Q
+ I TEXT'["DSM" D  Q
  .S KMPRENV="100^RUM not available for '"_TEXT_"' at this time"
  .D:'KMPRQIET ENVOUTPT(KMPRENV,1,1)
  ;

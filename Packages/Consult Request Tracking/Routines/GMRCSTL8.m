@@ -1,10 +1,9 @@
-GMRCSTL8 ;SLC/JFR/WAT - Totals format for CPM ;06/01/09  12:57
- ;;3.0;CONSULT/REQUEST TRACKING;**41,60,66**;DEC 27, 1997;Build 30
+GMRCSTL8 ;SLC/JFR/WAT - Totals format for CPM ; 4/05/05 10:39
+ ;;3.0;CONSULT/REQUEST TRACKING;**41,60**;DEC 27, 1997;Build 9
  ; This routine invokes ICRs
  ; 875 (file 100.01), 2638 (file 100.01),10104 (XLFSTR),10103 (XLFDT),3744 (VADPT)
  ;
  ; portions copied from GMRCSTL1 & GMRCSTL2
- ;patch 66 - CHKRNG updated location referenced for Earliest Appropriate Date field; this was changed during v28 development.
  Q  ; can't start here
 PRTTOT(GEN,INDEX,NAME,ARRN) ; totals for printed report
  N QUIT S QUIT=0 D NOACTVT Q:QUIT=1
@@ -109,7 +108,7 @@ ONESTAT(ARRN,SVCN,STAT,DT1,DT2,STR) ;Process one status
  F  S GMRCXDT=$O(^GMR(123,"AE",GMRCSVC,STAT,GMRCXDT)) Q:GMRCXDT=""!(GMRCXDT>(9999999-DT1))  D
  .S GMRCPT=0
  .;Loop for one consult at a time
- .F  S GMRCPT=$O(^GMR(123,"AE",GMRCSVC,STAT,GMRCXDT,GMRCPT)) Q:GMRCPT=""  D
+ .F  S GMRCPT=$O(^GMR(123,"AE",GMRCSVC,STAT,GMRCXDT,GMRCPT)) Q:GMRCPT=""  D 
  ..S FLG=0 D EXCLUDE Q:$G(FLG)=1
  ..S TYPE="" D REQTYPE
  ..I TYPE="LOCAL" D  ;set totals for 30 and 60 day range
@@ -175,7 +174,7 @@ EXCLUDE ;exclude these request types from the count
 CHKRNG ;check if request is complete within 30/60 days of Desired Date or Date of Request
  N DTOR,DTCMPL S DTOR="",DTCMPL=""
  Q:'$O(^GMR(123,+$G(GMRCPT),50,0))&('$O(^GMR(123,+$G(GMRCPT),51,0)))
- I $P(^GMR(123,+$G(GMRCPT),0),U,24)>0 S DTOR=$P(^GMR(123,+$G(GMRCPT),0),U,24) ;check for desired date CPRS GUI v28
+ I $D(^GMR(123,+$G(GMRCPT),60))=1 S DTOR=$P(^GMR(123,+$G(GMRCPT),60),U,1) ;check for desired date CPRS GUI v28
  S:$G(DTOR)="" DTOR=$P(^GMR(123,+$G(GMRCPT),0),U,7)
  ; if request is completed and has results, was it completed within 30 or 60 days of the Date of Request, field 3 in 123 [0;7]
  ;order through activity multiple (40) and find the entry for completed 40, [0:2] - value of 10 is complete/update

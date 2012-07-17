@@ -1,5 +1,5 @@
-MAGUXRF ;WOIFO/SRR/SG/NST - Imaging MUMPS cross-references ; 29 Oct 2010 2:23 PM
- ;;3.0;IMAGING;**51,93,106**;Mar 19, 2002;Build 2002;Feb 28, 2011
+MAGUXRF ;WOIFO/SRR/SG - Imaging MUMPS cross-references ; 4/7/09 1:57pm
+ ;;3.0;IMAGING;**51,93**;Dec 02, 2009;Build 163
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -8,6 +8,7 @@ MAGUXRF ;WOIFO/SRR/SG/NST - Imaging MUMPS cross-references ; 29 Oct 2010 2:23 PM
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -109,7 +110,7 @@ SETPPXD5 ;#5:SET (PATIENT=X=DFN); #6:PX(PROCEDURE); #15:DT(PROCEDURE DATE/TIME)
  S ^MAG(2005,"APDTPX",DFN,RDT,PX,DA)=""
  Q
  ;
-SETUP5 ; Set up for date/time procedure field #15
+SETUP5 ; Set up for for date/time procedure field#15
  S DFN=$P(^MAG(2005,DA,0),U,7),PX=$P(^(0),U,8)
  I PX="" S ER=1 Q
  I DFN="" S ER=1 Q
@@ -154,6 +155,23 @@ BOTHNUM(MAGDSN,MAGDIN) ;
  I ((MAGDIN="")!(MAGDSN="")) Q 0
  Q 1
  ;
+ ;*****
+ACVN1KIL(X1) ;
+ N APP,SEQ,SV
+ S SV=+$G(X1(1))   Q:SV'>0   ; SERVER VERSION (.01)
+ S SEQ=+$G(X1(2))  Q:SEQ'>0  ; SEQ# (.02)
+ S APP=""
+ F  S APP=$O(^MAG(2005.89,"ACVN",APP))  Q:APP=""  K ^(APP,SV,SEQ)
+ Q
+ ;
+ ;*****
+ACVN1SET(X2,IEN) ;
+ Q:($G(IEN)'>0)!($G(X2(1))'>0)!($G(X2(2))'>0)
+ N DA,DIK
+ S DIK=$$ROOT^DILFD(2005.891,","_IEN_",")
+ S DIK(1)=".02^ACVN",DA(1)=IEN  D ENALL^DIK
+ Q
+ ;
  ;***** SAVES OLD FIELD VALUES TO THE AUDIT MULTIPLE
  ;
  ; FILE          Number of the file that audited fields belong to.
@@ -185,7 +203,7 @@ BOTHNUM(MAGDSN,MAGDIN) ;
  ;               is not performed. You can use this variable to
  ;               disable audit during creation of a record when a
  ;               basic record is created first and then its fields
- ;               are populated by separate VA FileMan call(s).
+ ;               are populated by separate FileMan call(s).
  ;
  ; Notes
  ; =====
@@ -228,4 +246,37 @@ AUDIT(FILE,IENS,FLDLST,SUBFILE,X1,X2) ;
  . Q
  ;===
  D:$D(MAGFDA)>1 UPDATE^DIE(,"MAGFDA",,"MAGMSG")
+ Q
+ ;
+ ;***** POPULATES THE CAPTURE APPLICATION FIELD (8.1)
+ ;
+ ; FILE          Number of the file (2005 or 2005.1)
+ ;
+ ; IEN           Internal Entry Number of the image record
+ ;
+ ; .X1           Reference to a local array that stores old values
+ ;               of the fields:
+ ;
+ ;                 X1(1)  TRACKING ID (#108)
+ ;                 X1(2)  PACS UID (#60)
+ ;                 X1(3)  RADIOLOGY REPORT (#61)
+ ;                 X1(4)  PACS PROCEDURE (#62)
+ ;                 X1(5)  OBJECT NAME (#.01)
+ ;
+ ; .X2           Reference to a local array that stores new values
+ ;               of the fields (see above).
+ ;
+SETCAPP(FILE,IEN,X1,X2) ;
+ ;--- Do not do anything if the record is being deleted
+ ;--- (value of the OBJECT NAME field (#.01) is not defined)
+ Q:$G(X2(5))=""
+ ;--- Local variables
+ N DIERR,MAGFDA,MAGMSG,TMP
+ ;--- Calculate the value of the CAPTURE APPLICATION field (8.1)
+ ;--- and quit if the field already has the same value.
+ S TMP=$S($G(X2(1))'="":"I",$G(X2(2))'="":"D",$G(X2(3))'="":"D",$G(X2(4))'="":"D",1:"C")
+ Q:TMP=$P($G(^MAG(FILE,IEN,2)),U,12)
+ ;--- Store the value of the field
+ S MAGFDA(FILE,IEN_",",8.1)=TMP
+ D FILE^DIE(,"MAGFDA","MAGMSG")
  Q

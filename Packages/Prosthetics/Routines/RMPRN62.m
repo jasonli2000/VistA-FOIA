@@ -1,7 +1,8 @@
 RMPRN62 ;Hines OIFO/HNC -NPPD CALCULATIONS ;02/14/98
- ;;3.0;PROSTHETICS;**31,39,48,50,57,70,84,91,103,134,144,153,159,164**;Feb 09, 1996;Build 3
+ ;;3.0;PROSTHETICS;**31,39,48,50,57,70,84,91,103,134,144,153,159**;Feb 09, 1996;Build 2
  ;
- ; ODJ - patch 50 - 7/28/00 - add line label REP to mark start of repair lines.
+ ; ODJ - patch 50 - 7/28/00 - add line label REP to mark start of
+ ;                            repair lines.
  ; HNC - patch 57 - 4/5/01 - add Dental Implant
  ;
  ; AAC - Patch 84 - 02-25-04; additions, deletions and change descriptions for Groups and lines
@@ -16,10 +17,6 @@ RMPRN62 ;Hines OIFO/HNC -NPPD CALCULATIONS ;02/14/98
  ;
  ; AAC - patch 144 - 03/03/08 - NPPD Categories/lines - New and Repair
  ;
- ; AAC - patch 159 - 05/01/10 - NPPD Categories/lines - New and Repair
- ;
- ; AAC - patch 164 - 01/24/11 - NPPD Categories/lines - New and Repair
- ;
  ;build array or tmp
 DES ;description of line numbers
  ;;100 A;MOTORIZED
@@ -29,7 +26,7 @@ DES ;description of line numbers
  ;;100 D;WC ACCESSORIES
  ;;100 E;CUSHION
  ;;100 F;CUSHION CUSTOM
- ;;100 G;LIFTS(INCLUDES WC,SCOOTERS)
+ ;;100 G;LIFTS(INCLUDING WC,SCOOTERS)
  ;;100 H;NSC VAN MOD
  ;;100 I;SCOOTER ACCESSORIES
  ;;200 A;LEG IPOP
@@ -50,17 +47,17 @@ DES ;description of line numbers
  ;;400 B;ORTHOSIS LEG AK
  ;;400 C;ORTHOSIS, SPINAL
  ;;400 D;ORTHOSIS AL/OTH
- ;;400 E;COMP HOSE/BURN GARMENT
+ ;;400 E;ELAS HOSE, EA
  ;;400 F;ORTHOSIS, KNEE
- ;;400 G;* NO LONGER USED *
+ ;;400 G;CORSET/BELT
  ;;400 H;ORTHOSIS,WHO
  ;;400 X;ORTHOSIS UNKNOWN
- ;;500 A;FOOT ORTHOSIS/INSERTS/ARCH SUPPORTS
- ;;500 B;SHOE NON CUSTOM
- ;;500 C;SHOE CUSTOM
- ;;500 D;* NO LONGER USED *
- ;;500 E;* NO LONGER USED *
- ;;500 F;* NO LONGER USED *
+ ;;500 A;ARCH SUPT, EA
+ ;;500 B;SHOE INLAY, EA
+ ;;500 C;SHOE MOLDED, EA
+ ;;500 D;SHOE ORTH OTH
+ ;;500 E;INSERTS, SHOE
+ ;;500 F;SHOES A/O, EA
  ;;600 1;EYEGLASSES PR
  ;;600 A;* NO LONGER USED *
  ;;600 B;HEAR AID & ACCESS
@@ -95,8 +92,6 @@ DES ;description of line numbers
  ;;900 L;RECREATIONAL EQUIPMENT
  ;;900 M;COMPUTER EQUIP
  ;;900 N;TELEHEALTH
- ;;900 O;EXERCISE EQUIPMENT
- ;;900 P;HEALING/RESTORATIVE EQUIPMENT
  ;;910 A;MED SUP AL/OTH
  ;;910 B;BATTERIES
  ;;920 A;HOME DIAL EQP
@@ -160,7 +155,6 @@ REP ;;R10;* NO LONGER USED *
  ;;R80 C;MED EQUIP A/O
  ;;R80 D;HME DELIVERY/PU
  ;;R80 E;TELEHEALTH
- ;;R80 F;COMPUTERS
  ;;R90;ALL OTHER
  ;;R90 A;RECREATIONAL EQUIPMENT
  ;;R90 B;TRAINING

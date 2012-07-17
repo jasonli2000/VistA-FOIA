@@ -1,5 +1,5 @@
 OOPSSUP1 ;HINES/WAA-S/E Supervisor Edit routine ;04/17/1998
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**1,3,5,8,11**;Jun 01, 1998
  ;;
 EN1(CALLER) ;  Main Entry Point
  S CALLER=$G(CALLER,"S") ; check CALLER
@@ -22,7 +22,7 @@ SELECT ; Select a form
  ; Get the type of incident
  ; If the supporting global doesn't exist force the 
  ; Supervisor to fill both the 2162 and supporting form.
- N SIGN,INC,SAFE,CAT,INCTYP
+ N SIGN,INC,SAFE,CAT
  S EDIT=""
  S SIGN=$$EDSTA^OOPSUTL1(IEN,"S")
  S INC=$$GET1^DIQ(2260,IEN,52,"I")
@@ -112,7 +112,7 @@ FORMS ; Process Form
  S PAY=$S(PAY="PER ANNUM":"ANNUAL",PAY="PER HOUR":"HOURLY","PER DIEM":"DAILY","BIWEEKLY":"BI-WEEKLY",1:"")
  F I=1:1 S FORM=$P(EDIT,U,I) Q:FORM=""  D  Q:OUT
  .N DR,DIE,SIGN,EDIT,I
- .I (CALLER="S"),($$GET1^DIQ(2260,IEN,53,"I")=DUZ!($$GET1^DIQ(2260,IEN,53.1,"I")=DUZ)) D CLRES^OOPSUTL1(IEN,"S",FORM)
+ .I ($$GET1^DIQ(2260,IEN,53,"I")=DUZ!($$GET1^DIQ(2260,IEN,53.1,"I")=DUZ)) D CLRES^OOPSUTL1(IEN,"S",FORM)
  .I FORM="2162" D ASIST^OOPSSUP3 Q:OUT
  .I FORM="CA1" D CA1^OOPSSUPB Q:OUT
  .I FORM="CA2" D CA2^OOPSSUP2 Q:OUT
@@ -136,15 +136,11 @@ SIGNS(FORM) ; Sign/validate Document
  I FORM'="2162",'$P(EMP,U,INC) D  Q  ;Employee has not signed yet
  .W !,?10,"The employee has not signed the ",FORM,"." Q
  .Q
- I FORM=2162,CALLER="O",('$P($$EDSTA^OOPSUTL1(IEN,"S"),U,3)) D  Q
- .W !?10,"Supervisor must sign before Safety Officer"
  I 'VALID Q
  S SIGN=$$SIG^OOPSESIG(DUZ,IEN)
  Q
 FILE ;File the ES and send a bull
- I FORM="2162" D
- . I CALLER="S" S $P(^OOPS(2260,IEN,"2162ES"),U,1,3)=SIGN D SAFETY^OOPSMBUL(IEN)
- . I CALLER="O" S $P(^OOPS(2260,IEN,"2162ES"),U,4,6)=SIGN
+ I FORM="2162" S $P(^OOPS(2260,IEN,"2162ES"),U,1,3)=SIGN D SAFETY^OOPSMBUL(IEN)
  I FORM="CA1" S $P(^OOPS(2260,IEN,"CA1ES"),U,4,6)=SIGN D SUPS^OOPSMBUL(IEN),UNION^OOPSMBUL(IEN)
  I FORM="CA2" S $P(^OOPS(2260,IEN,"CA2ES"),U,4,6)=SIGN D SUPS^OOPSMBUL(IEN),UNION^OOPSMBUL(IEN)
  Q

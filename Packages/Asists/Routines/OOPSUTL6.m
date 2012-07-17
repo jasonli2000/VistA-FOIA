@@ -1,5 +1,5 @@
-OOPSUTL6 ;WOIFO/LLH-Utilities Routines ;11/21/00
- ;;2.0;ASISTS;;Jun 03, 2002
+OOPSUTL6 ;WOIFO/LLH -Utilities Routines ;11/21/00
+ ;;1.0;ASISTS;**8**;Jun 01, 1998
  ;;
  Q
 VERIFY(IEN) ; Verify Employee data has not been altered since thier signing
@@ -68,25 +68,6 @@ CA2SUM() ; Calculate Checksum for CA2
  F OPFLD=216,217,218,219,220 D WP
  S SUM=0 F K=1:1:J I $D(STR(K)) F I=1:1:$L(STR(K)) S SUM=$A(STR(K),I)*I+SUM
  Q SUM
-VALEMP() ; check to make sure claim is ok to send to DOL if pay plan = "OT"
- ; this subroutine assumes that the variable FORM will be defined
- N IEN450,LP,NA,SAL,VALID
- S VALID=1,LP=0
- S NA=$$GET1^DIQ(2260,IEN,1)
- S SAL=$$GET1^DIQ(2260,IEN,166)
- I $$GET1^DIQ(2260,IEN,60,"I")'=3 S VALID=0
- I $$GET1^DIQ(2260,IEN,16,"I")'="00" S VALID=0
- I $$GET1^DIQ(2260,IEN,17,"I")'="N" S VALID=0
- I (FORM="CA1")&(('SAL)!(SAL>999.99)) S VALID=0
- D FIND^DIC(450,,"@;8","MPS",NA,100)
- I $G(DIERR) D CLEAN^DILF S VALID=0 Q VALID
- F  S LP=$O(^TMP("DILIST",$J,LP)) Q:LP=""  D
- .I $$GET1^DIQ(2260,IEN,5)=$P(^TMP("DILIST",$J,LP,0),U,2) D
- ..S IEN450=$P(^TMP("DILIST",$J,LP,0),U)
- ..I '$G(IEN450) S VALID=0 Q
- ..I $$GET1^DIQ(450,IEN450,20,"I")'="F" S VALID=0
- Q VALID
- ;
 WP ;Process Word Processing Fields
  N DIWL,DIWR,DIWF,OPGLB,OPI,OPNODE,OPT,OPC,X
  K ^UTILITY($J,"W")

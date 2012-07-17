@@ -1,22 +1,17 @@
-PSOCAN2 ;BHAM ISC/JMB - rx cancel with speed ability drug check ;10/23/06 11:30am
- ;;7.0;OUTPATIENT PHARMACY;**8,18,62,46,88,164,235,148,259,281,287,251,375**;DEC 1997;Build 17
+PSOCAN2 ;BHAM ISC/JMB - modular rx cancel with speed ability drug check ; 10/23/06 11:30am
+ ;;7.0;OUTPATIENT PHARMACY;**8,18,62,46,88,164,235,148,259,281,287**;DEC 1997;Build 77
  ;External reference to ^PSDRUG supported by dbia 221
- ;External reference to $$DS^PSSDSAPI supported by DBIA 5424
-REINS N DODR,ORN
+REINS N DODR
  I $P(^PSRX(DA,2),"^",6)<DT D  Q
  .S Y=$P(^PSRX(DA,2),"^",6) X ^DD("DD")
  .W !!,"Rx: "_$P(^PSRX(DA,0),"^")_" Drug: "_$S($D(^PSDRUG($P(^PSRX(DA,0),"^",6),0)):$P(^(0),"^"),1:""),!,"Expired "_Y_" and cannot be Reinstated!",!
  .D PAUSE^VALM1
  I $D(^PSRX("APSOD",$P(^PSRX(DA,0),"^",2),DA)) S PSCAN($P(^PSRX(DA,0),"^"))=DA_"^R",DODR=1 D AUTOD G ACT
- I $P(PSOPAR,"^",2),'$D(^XUSEC("PSORPH",DUZ)) N PSOVODA S PSOVODA=DA D DRGDRG S DA=PSOVODA Q:PSORX("DFLG")  D VERIFY D  D AREC^PSOCAN1 Q
+ I $P(PSOPAR,"^",2),'$D(^XUSEC("PSORPH",DUZ)) D VERIFY D  D AREC^PSOCAN1 Q
  .S RX1=$P(^PSRX(DA,0),"^") S:'$D(PSCAN(RX1)) PSCAN(RX1)=DA_"^R" K RX1
 ACT W ! F I=1:1:80 W "="
  D ^PSOBUILD S DRG=+$P(^PSRX(DA,0),"^",6),DRG=$S($D(^PSDRUG(DRG,0)):$P(^(0),"^"),1:""),HOLDRX=RX
- W !!,RX_"  "_DRG I $G(POERR) S HPOERR=POERR
- D DRGDRG
- S:$G(HPOERR) POERR=HPOERR S:$G(PSORX("DFLG"))'=1 PSORX("DFLG")=0
- S RX=HOLDRX K HOLDRX,HPOERR Q:$P(^PSRX(+PSCAN(RX),"STA"),"^")'=12!($G(PSORX("DFLG")))
- S DA=+PSCAN(RX),REA=$P(PSCAN(RX),"^",2) D CAN^PSOCAN W !
+ W !!,RX_"  "_DRG D DRGDRG S RX=HOLDRX K HOLDRX Q:$P(^PSRX(+PSCAN(RX),"STA"),"^")'=12!($G(PSORX("DFLG")))  S DA=+PSCAN(RX),REA=$P(PSCAN(RX),"^",2) D CAN^PSOCAN W !
  N RXIEN S RXIEN=DA
  ;Takes action on reinstated Rx's
  S RFCNT=0 F RF=0:0 S RF=$O(^PSRX(DA,1,RF)) Q:'RF  S RFCNT=RF
@@ -38,7 +33,7 @@ ACT W ! F I=1:1:80 W "="
  W !?6,$S('RFCNT:"  Filled",1:"  Refilled # "_LREF)_": "_XFDT,"  Printed: "_$S(LREF=RFCNT:XLPDT,1:""),"  Released: "_$G(XRELDT),!
  I FDT<DT D
  .Q:$$FIND^PSOREJUT(RXIEN)  ;No label for Rx's with claims rejects
- .Q:PSOTRIC&($$STATUS^PSOBPSUT(RXIEN,RFCNT)'["PAYABLE")  ;No labels for Tricare non-payable/in progress Rx
+ .Q:PSOTRIC&($$STATUS^PSOBPSUT(RXIEN,RFCNT)'["PAYABLE")  ;No labels for Tricare non-payable/in progess Rx
  .S DIR("A")="     ** Do you want to print the label now",DIR("B")="N",DIR(0)="Y",DIR("?")="Enter 'Y' to print the label now.  If 'N' is entered, the label may be reprinted through reprint at a later date."
  .D ^DIR K DIR Q:$G(DIRUT)!('Y)  S PPL=RXIEN D Q^PSORXL Q
  I FDT=DT D
@@ -58,17 +53,13 @@ SUS ;Adds rec to suspense
  Q
 DRGDRG ;Checks for drug/drug interaction, duplicate drug and class
  Q:$P(^PSRX(DA,2),"^",6)<DT
- S (PSORX("DFLG"),PSORXED("DFLG"))=0
  S STA="ACTIVE^NON-VERIFIED^R^HOLD^NON-VERIFIED^ACTIVE^^^^^^ACTIVE^DISCONTINUED^^DISCONTINUED^DISCONTINUED^HOLD"
  S STAT=$P(STA,"^",$P(^PSRX(DA,"STA"),"^")+1)
  S X=$P(^PSRX(DA,0),"^",6),DIC="^PSDRUG(",DIC(0)="MZO" D ^DIC K DIC Q:$D(DTOUT)!(Y<0)
  K HOLD S NAME=$P(Y(0),"^") I +$G(PSOSD(STAT,NAME))=+PSCAN(RX) S HOLD(STAT,NAME)=$G(PSOSD(STAT,NAME)) K PSOSD(STAT,NAME)
  S:$G(PSONEW("OLD VAL"))=+Y PSODRG("QFLG")=1
- K PSOY,PSOTECCK S PSOY=Y,PSOY(0)=Y(0)
- I '$D(^XUSEC("PSORPH",DUZ)) S PSOTECCK=1
- S PSORENW("OIRXN")=DA D SET^PSODRG,POST^PSODRG
- D:$$DS^PSSDSAPI&('$G(PSORX("DFLG"))) DOSCK^PSODOSUT("C")
- S REA=$P(PSCAN($P(^PSRX(PSORENW("OIRXN"),0),"^")),"^",2)
+ K PSOY S PSOY=Y,PSOY(0)=Y(0)
+ S PSORENW("OIRXN")=DA D SET^PSODRG,POST^PSODRG S REA=$P(PSCAN($P(^PSRX(PSORENW("OIRXN"),0),"^")),"^",2)
  W ! S:$G(HOLD(STAT,NAME))]"" PSOSD(STAT,NAME)=$G(HOLD(STAT,NAME)) K HOLD,STA,STAT,PSORENW("OIRXN")
  Q
 VERIFY ;Put in non-verify file
@@ -135,7 +126,6 @@ AUTOD ;reinstates Rxs dc'd by date of death
  .D LOG,EN^PSOHLSN1(DA,"OH","",ACOM) K ACOM
  .K ^PSRX("APSOD",PSODFN,DA),^PSRX(DA,"DDSTA")
  S ACOM="Date of Death Deleted. Prescription Reinstated." D EN^PSOHLSN1(DA,"SC","CM",ACOM),LOG K ACOM
- K ^PSRX("APSOD",PSODFN,DA),^PSRX(DA,"DDSTA")
  Q
 LOG K ACNT F SUB=0:0 S SUB=$O(^PSRX(DA,"A",SUB)) Q:'SUB  S ACNT=$G(ACNT)+1
  S RFCNT=0 F RF=0:0 S RF=$O(^PSRX(DA,1,RF)) Q:'RF  S RFCNT=$G(RFCNT)+1 S:RF>5 RFCNT=$G(RFCNT)+1
@@ -158,4 +148,3 @@ RMB(IDX) ;remove Rx if found in array BBRX() (Bingo Board)
  . S:ST6]"" BBRX(IDX)=ST6_"," K:ST6="" BBRX(IDX)
  I '$D(BBRX) K BINGCRT
  Q
- ;

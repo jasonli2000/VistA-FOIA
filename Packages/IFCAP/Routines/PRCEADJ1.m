@@ -1,5 +1,5 @@
 PRCEADJ1 ;WISC/CLH/LDB/SJG-FISCAL 1358 ADJUSTMENTS ; 04/21/93  4:20 PM
-V ;;5.1;IFCAP;**23**;Oct 20, 2000
+V ;;5.1;IFCAP;;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ; Adjustment processing FISCAL
  N PRC410,PRC442,DA,I,PO,PRC,PRCB,PRCF,PRCFA,DIC,TRNODE,X,Y,FSO,PX,TRDA,X1,PODA,NOGO
@@ -16,13 +16,12 @@ RETRAN ; Entry point for rebuild/transmit
  D PO^PRCH58OB(PODA,.PO) S PO=PODA
  D HILO^PRCFQ
 FMSCHK ;
- ;  Patch 23, disable obligation process for SO with "Q" & "T" status
- I $D(PRCFA("RETRAN")),PRCFA("RETRAN")=0 D FMSTAT I $D(SOSTAT),("^Q^T^R^E^")[$E(SOSTAT,1),SOSTAT'="CALM" D  G V1
+ I $D(PRCFA("RETRAN")),PRCFA("RETRAN")=0 D FMSTAT I $D(SOSTAT),("^R^E^")[$E(SOSTAT,1),SOSTAT'="CALM" D  G V1
  .W !! K MSG S MSG(1)="    One of the previous documents has not been accepted in FMS."
  .S MSG(2)="    The adjustment to this 1358 cannot be obligated at this time."
  .S MSG(3)="    In order for the obligation of this adjustment to proceed, the"
- .S MSG(4)="    previous document cannot have a status of 'REJECTED', 'ERROR"
- .S MSG(5)="    IN TRANSMISSION', 'QUEUED FOR TRANSMISSION', or 'TRANSMITTED'.",MSG(6)="  "
+ .S MSG(4)="    previous document cannot have a status of 'REJECTED' or 'ERROR"
+ .S MSG(5)="    IN TRANSMISSION'.",MSG(6)="  "
  .S MSG(7)="    FMS Document: "_SODOC,MSG(8)="    Status: "_SOSTAT,MSG(9)="  "
  .S MSG(10)="    No further action is being taken on this obligation."
  .D EN^DDIOL(.MSG) K MSG W !
@@ -45,9 +44,7 @@ CHECK ; Check adjustment amount with obligation/liquidation/authorization amount
  D EN^PRCFFU14(TRDA) I ACCEDIT G SC
  D AUTACC^PRCFFU6 S PRCFA("ACCEDIT")=1
  N Y S PRCFA("IDES")="1358 Obligation Adjustment" W ! D OKAY^PRCFFU
- ; Patch 23, fix Y undef error
- ;I Y K DIR,Y D ^PRCESOM I $D(PRCFA("RETRAN")),PRCFA("RETRAN")=0 G V1
- I Y K DIR,Y D ^PRCESOM G:'$G(PRCFA("RETRAN")) V1 S Y=0    ; patch 23
+ I Y K DIR,Y D ^PRCESOM I $D(PRCFA("RETRAN")),PRCFA("RETRAN")=0 G V1
  I 'Y!($D(DIRUT)) W ! D EN^DDIOL("No further processing is being taken on this adjustment.")
 OUT K DTOUT,DIR,DUOUT,DIRUT,DIROUT
 OUT1 K DA,D0,ACCEDIT,BBFY,BEGDATE,CONT,CONTEND,CONTIEN,ENDDATE,ESIGMSG,EXIT

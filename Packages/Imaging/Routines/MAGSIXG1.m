@@ -1,6 +1,6 @@
-MAGSIXG1 ;WOIFO/EdM/GEK/SEB/SG/NST - LIST OF IMAGES RPCS ; 22 Oct 2010 11:43 AM
- ;;3.0;IMAGING;**8,48,59,93,117**;Mar 19, 2002;Build 2238;Jul 15, 2011
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGSIXG1 ;WOIFO/EdM/GEK/SEB/SG - LIST OF IMAGES RPCS ; 2/23/09 9:51am
+ ;;3.0;IMAGING;**8,48,59,93**;Dec 02, 2009;Build 163
+ ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +8,7 @@ MAGSIXG1 ;WOIFO/EdM/GEK/SEB/SG/NST - LIST OF IMAGES RPCS ; 22 Oct 2010 11:43 AM
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -47,15 +48,6 @@ ERRORS(RESULTS,RC) ;
  ;                    the user defined by the MISCPRMS("SAVEDBY").
  ;                    The latter becomes required in this case.
  ;
- ;                 G  Include Group Images in the list of images returned. 
- ;                    If any image in a group has an image that matches the 
- ;                    status provided in the search criteria then 
- ;                    the group will be returned.
- ;                    
- ;                    If the G flag is not set then only the status of the 
- ;                    Group entry will be checked and the group will be 
- ;                    returned if it passes.
- ;
  ;                    See description of the MAG4 IMAGE LIST remote
  ;                    procedure for details.
  ;
@@ -70,7 +62,7 @@ ERRORS(RESULTS,RC) ;
  ;               Time parts of parameter values are ignored and both
  ;               ends of the date range are included in the search.
  ;               For example, in order to search images for May 21,
- ;               2008, the internal value of both parameters should
+ ;               2008, the inernal value of both parameters should
  ;               be 3080521.
  ;
  ;               If the FROMDATE is after the TODATE, then values of
@@ -98,7 +90,7 @@ ERRORS(RESULTS,RC) ;
  ; =============
  ;     
  ; If MAGOUT(0) is defined and its 1st '^'-piece is 0, then an error
- ; occurred during execution of the procedure. In this case, the array
+ ; occured during execution of the procedure. In this case, the array
  ; is formatted as described in the comments to the RPCERRS^MAGUERR1.
  ;  
  ; See description of the MAG4 IMAGE LIST remote procedure for more
@@ -131,7 +123,7 @@ GETIMGS(MAGOUT,FLAGS,FROMDATE,TODATE,MAXNUM,MISCPRMS) ;RPC [MAG4 IMAGE LIST]
  . N MISCDEFS
  . ;--- Control flags
  . S FLAGS=$G(FLAGS)
- . I $TR(FLAGS,"CDESG")'=""  D  S ERROR=1
+ . I $TR(FLAGS,"CDES")'=""  D  S ERROR=1
  . . D IPVE^MAGUERR("FLAGS")     ; Unknown/Unsupported flag(s)
  . . Q
  . I $TR(FLAGS,"DE")=FLAGS  D  S ERROR=1
@@ -166,7 +158,7 @@ GETIMGS(MAGOUT,FLAGS,FROMDATE,TODATE,MAXNUM,MISCPRMS) ;RPC [MAG4 IMAGE LIST]
  ;=== Query the image file(s)
  S MAGDATA("FLAGS")=FLAGS,MAGDATA("MAXNUM")=MAXNUM
  S TMP=$S(TODATE<9999999:$$FMADD^XLFDT(TODATE,1),1:TODATE)
- S QF=$$TRFLAGS^MAGUTL05(FLAGS,"CDEG")
+ S QF=$$TRFLAGS^MAGUTL05(FLAGS,"CDE")
  S RC=$$QUERY^MAGGI13("$$QRYCBK^MAGSIXG3",QF,.MAGDATA,FROMDATE,TMP,+$G(MAGDATA("IDFN")))
  I RC<0  D ERRORS(.MAGOUT,RC)  Q
  ;
@@ -232,6 +224,6 @@ PGI(MAGOUT,DFN,PKG,CLASS,TYPE,EVENT,SPEC,FROMDATE,TODATE,ORIGIN,DATA,FLAGS) ;RPC
  S:$G(EVENT)'="" I=I+1,MISCPRMS(I)="IXPROC^^"_$TR(EVENT,",","^")
  S:$G(SPEC)'="" I=I+1,MISCPRMS(I)="IXSPEC^^"_$TR(SPEC,",","^")
  S:$G(ORIGIN)'="" I=I+1,MISCPRMS(I)="IXORIGIN^^"_$TR(ORIGIN,",","^")
- ;--- Call the new remote procedure implementation
+ ;--- Call the new remote procedure implementaion
  D GETIMGS(.MAGOUT,FLAGS,.FROMDATE,.TODATE,,.MISCPRMS)
  Q

@@ -1,4 +1,4 @@
-DGPTX81 ; ;04/23/09
+DGPTX81 ; ;04/12/09
  D DE G BEGIN
 DE S DIE="^DGICD9(46.1,",DIC=DIE,DP=46.1,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DGICD9(46.1,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,6) S:%]"" DE(1)=%,DE(4)=% S %=$P(%Z,U,7) S:%]"" DE(7)=%,DE(10)=%

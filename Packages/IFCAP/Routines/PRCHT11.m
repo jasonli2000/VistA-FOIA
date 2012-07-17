@@ -1,11 +1,9 @@
-PRCHT11 ; ;10/06/97
+PRCHT11 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442,",DIC=DIE,DP=442,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRC(442,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(2)=%
- I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,15) S:%]"" DE(1)=%
- I $D(^(7)) S %Z=^(7) S %=$P(%Z,U,3) S:%]"" DE(8)=%
- I $D(^(12)) S %Z=^(12) S %=$P(%Z,U,6) S:%]"" DE(9)=%
- I $D(^(23)) S %Z=^(23) S %=$P(%Z,U,8) S:%]"" DE(7)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(6)=%
+ I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,15) S:%]"" DE(5)=%
+ I $D(^(23)) S %Z=^(23) S %=$P(%Z,U,7) S:%]"" DE(1)=% S %=$P(%Z,U,8) S:%]"" DE(10)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -47,70 +45,65 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="PRCHT11",DQ=1
-1 S DW="1;15",DV="RDX",DU="",DLB="P.O. DATE",DIFLD=.1
- S DE(DW)="C1^PRCHT11"
- S Y="TODAY"
- G Y
-C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
- K ^PRC(442,"AB",$E(X,1,30),DA)
-C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
- S ^PRC(442,"AB",$E(X,1,30),DA)=""
- Q
-X1 S %DT="EX" D ^%DT S X=Y K:Y<1 X I $D(X) D EN1^PRCHNPO6
+1 S DW="23;7",DV="*P411'XR",DU="",DLB="SUBSTATION",DIFLD=31
+ S DU="PRC(411,"
+ G RE
+X1 S DIC("S")="I $E($G(^PRC(411,+Y,0)),1,3)=PRC(""SITE"")" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
  Q
  ;
-2 D:$D(DG)>9 F^DIE17,DE S DQ=2,DW="0;2",DV="R*P442.5'X",DU="",DLB="METHOD OF PROCESSING",DIFLD=.02
- S DE(DW)="C2^PRCHT11"
+2 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=2 D X2 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X2 I $D(^PRCS(410,+$P(^PRC(442,DA,0),"^",12),0)),X'=OSUB W !,?5,"Sub-station cannot be changed because the attached 2237",!,?5,"would then have a different sub-station.",!
+ Q
+3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X3 S PRCX=$O(^PRC(411,X,1,0)) S:$G(PRCX)]"" PRCY=$P($G(^PRC(411,X,1,PRCX,0)),U) K PRCX
+ Q
+4 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=4 G A
+5 S DW="1;15",DV="RDX",DU="",DLB="P.O. DATE",DIFLD=.1
+ S DE(DW)="C5^PRCHT11"
+ S Y="TODAY"
+ G Y
+C5 G C5S:$D(DE(5))[0 K DB S X=DE(5),DIC=DIE
+ K ^PRC(442,"AB",$E(X,1,30),DA)
+C5S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+ S ^PRC(442,"AB",$E(X,1,30),DA)=""
+ Q
+X5 S %DT="EX" D ^%DT S X=Y K:Y<1 X I $D(X) D EN1^PRCHNPO6
+ Q
+ ;
+6 D:$D(DG)>9 F^DIE17,DE S DQ=6,DW="0;2",DV="R*P442.5'X",DU="",DLB="METHOD OF PROCESSING",DIFLD=.02
+ S DE(DW)="C6^PRCHT11"
  S DU="PRCD(442.5,"
  S X="INVOICE/RECEIVING REPORT"
  S Y=X
  G Y
-C2 G C2S:$D(DE(2))[0 K DB S X=DE(2),DIC=DIE
+C6 G C6S:$D(DE(6))[0 K DB S X=DE(6),DIC=DIE
  K ^PRC(442,"F",$E(X,1,30),DA)
-C2S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+C6S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  S ^PRC(442,"F",$E(X,1,30),DA)=""
  Q
-X2 S DIC("S")="I $P(^(0),U,5)=1,"_$S($D(PRCHNRQ):"Y=8!(Y=25)",1:"Y'=8") S:$D(PRCHDELV) DIC("S")="I Y=1!(Y=26)" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
+X6 S DIC("S")="I $P(^(0),U,5)=1,"_$S($D(PRCHNRQ):"Y=8!(Y=25)",1:"Y'=8") S:$D(PRCHDELV) DIC("S")="I Y=1!(Y=26)" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
  Q
  ;
-3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X3 S PRCHN("MP")=$S($D(^PRCD(442.5,+X,0)):$P(^(0),U,3),1:""),PRCHN("INV")=$S(PRCHN("MP")=2:"FISCAL",PRCHN("MP")=12:"",PRCHN("INV")]"":PRCHN("INV"),1:"FMS")
+7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X7 S PRCHN("MP")=$S($D(^PRCD(442.5,+X,0)):$P(^(0),U,3),1:""),PRCHN("INV")=$S(PRCHN("MP")=2:"FISCAL",PRCHN("MP")=12:"",PRCHN("INV")]"":PRCHN("INV"),1:"FMS")
  Q
-4 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=4 D X4 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X4 S PRCHCTPO=$S(PRCHN("MP")=2:"Y",1:"N")
+8 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=8 D X8 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X8 S:PRCHN("MP")'=25 Y=.08
  Q
-5 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=5 D X5 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X5 S:PRCHN("MP")'=25 Y=.08
+9 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=9 D X9 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X9 D LOOK^PRCSPC
  Q
-6 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=6 D X6 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X6 D LOOK^PRCSPC
- Q
-7 D:$D(DG)>9 F^DIE17,DE S DQ=7,DW="23;8",DV="R*P440.5'X",DU="",DLB="PURCHASE CARD NUMBER",DIFLD=46
- S DE(DW)="C7^PRCHT11"
+10 D:$D(DG)>9 F^DIE17,DE S DQ=10,DW="23;8",DV="R*P440.5'X",DU="",DLB="PURCHASE CARD NUMBER",DIFLD=46
+ S DE(DW)="C10^PRCHT11"
  S DU="PRC(440.5,"
  S X=$G(PRCHXXX)
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
  G RD:X="@",Z
-C7 G C7S:$D(DE(7))[0 K DB S X=DE(7),DIC=DIE
+C10 G C10S:$D(DE(10))[0 K DB S X=DE(10),DIC=DIE
  K ^PRC(442,"AM",$E(X,1,30),DA)
-C7S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+C10S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  S ^PRC(442,"AM",$E(X,1,30),DA)=""
  Q
-X7 Q
-8 D:$D(DG)>9 F^DIE17,DE S DQ=8,DW="7;3",DV="S",DU="",DLB="ESTIMATED ORDER?",DIFLD=.08
- S DU="Y:YES;N:NO;"
- S X=$S(PRCHN("MP")=2:"Y",PRCHN("MP")=12:"Y",1:"N")
- S Y=X
- G Y
-X8 Q
-9 S DW="12;6",DV="FXO",DU="",DLB="INVOICE ADDRESS",DIFLD=.04
- S DQ(9,2)="S Y(0)=Y Q:Y=""""  S Z0=$S($P($G(^PRC(442,D0,23)),U,7)]"""":$P($G(^PRC(442,D0,23)),U,7),1:+^PRC(442,D0,0)) Q:'Z0  S Y=$P($S($D(^PRC(411,Z0,4,Y,0)):^(0),1:""""),U,1) K Z0"
- S X=PRCHN("INV")
- S Y=X
- G Y
-X9 S Z0=$S($P($G(^PRC(442,D0,23)),U,7)]"":$P($G(^PRC(442,D0,23)),U,7),1:+^PRC(442,D0,0)) K:'Z0 X Q:'Z0  S DIC="^PRC(411,Z0,4,",DIC(0)="QEMO" D ^DIC S X=+Y K:Y'>0 X K Z0,DIC
- I $D(X),X'?.ANP K X
- Q
- ;
-10 D:$D(DG)>9 F^DIE17 G ^PRCHT12
+X10 Q
+11 D:$D(DG)>9 F^DIE17 G ^PRCHT12

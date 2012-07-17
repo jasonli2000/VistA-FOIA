@@ -1,5 +1,5 @@
-ORMGMRC ; SLC/MKB - Process Consult ORM msgs ;03/17/09  10:58
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**3,26,68,92,153,174,195,255,243,280**;Dec 17, 1997;Build 85
+ORMGMRC ; SLC/MKB - Process Consult ORM msgs ;12/13/2006
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**3,26,68,92,153,174,195,255,243**;Dec 17, 1997;Build 242
 EN ; -- entry point for GMRC messges
  I '$L($T(@ORDCNTRL)) Q  ;S ORERR="Invalid order control code" Q
  I ORDCNTRL'="SN",ORDCNTRL'="ZP",'ORIFN!('$D(^OR(100,+ORIFN,0))) S ORERR="Invalid OE/RR order number" Q
@@ -76,8 +76,6 @@ DLG ; -- Build ORDIALOG(),ORDG from msg
  S ORDIALOG=$O(^ORD(101.41,"AB","GMRCOR "_TYPE,0))
  D GETDLG1^ORCD(ORDIALOG)
  S ORDIALOG($$PTR("URGENCY"),1)=ORURG
- ;ORSTRT defined in routine ORM before coming here ;WAT/280
- S ORDIALOG($$PTR("EARLIEST DATE"),1)=ORSTRT ;WAT/280
  S OI=$$ORDITEM^ORM(USID) I 'OI S ORERR="Invalid consult or procedure" Q
  S ORDIALOG($$PTR("ORDERABLE ITEM"),1)=OI
  S ZSV=$O(@ORMSG@(OBR)) I ZSV,$E(@ORMSG@(ZSV),1,3)="ZSV" D

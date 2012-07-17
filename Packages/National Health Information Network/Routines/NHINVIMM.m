@@ -1,5 +1,5 @@
 NHINVIMM ;SLC/MKB -- Immunizations extract
- ;;1.0;NHIN;**1**;Oct 25, 2010;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -13,7 +13,7 @@ NHINVIMM ;SLC/MKB -- Immunizations extract
  ; ------------ Get immunizations from VistA ------------
  ;
 EN(DFN,BEG,END,MAX,IFN) ; -- find patient's immunizations
- N NHITM,NHICNT,NM,IDT,X
+ N NHITM,NHICNT,NM,IDT
  S DFN=+$G(DFN) Q:DFN<1  ;invalid patient
  S BEG=$G(BEG,1410101),END=$G(END,9999998),MAX=$G(MAX,999999),NHICNT=0
  K ^TMP("PXI",$J) D IMMUN^PXRHS03(DFN)
@@ -28,9 +28,8 @@ EN(DFN,BEG,END,MAX,IFN) ; -- find patient's immunizations
  . K ^TMP("PXI",$J)
  ;
  ; get all immunizations
- S X=BEG,BEG=9999999-END-.000001,END=9999999-X I $L(END,".")<2 S END=END_".2359"
  S NM="" F  S NM=$O(^TMP("PXI",$J,NM)) Q:NM=""  D
- . S IDT=BEG F  S IDT=$O(^TMP("PXI",$J,NM,IDT)) Q:IDT<1!(IDT>END)  D
+ . S IDT=0 F  S IDT=$O(^TMP("PXI",$J,NM,IDT)) Q:IDT<1  D
  .. S IFN=0 F  S IFN=$O(^TMP("PXI",$J,NM,IDT,IFN)) Q:IFN<1  D  Q:NHICNT'<MAX
  ... K NHITM D EN1(.NHITM),XML(.NHITM)
  ... S NHICNT=NHICNT+1
@@ -52,7 +51,6 @@ EN1(IMM) ; -- return an immunization in IMM("attribute")=value
  . S Y=$$LKUP^XUAF4(X) ;ien
  . I Y<1 S Y=+$O(^DIC(4,"B",X,0)) ;dupl -> get 1st
  . S IMM("facility")=$$STA^XUAF4(Y)_U_X
- I '$D(IMM("facility")) S IMM("facility")=$$FAC^NHINV
  S X=$P(X0,U,9) S:'$L(X) X=$P(X0,U,8)
  I $L(X) S IMM("provider")=+$O(^VA(200,"B",X,0))_U_X
  ; 
@@ -67,7 +65,7 @@ EN1(IMM) ; -- return an immunization in IMM("attribute")=value
  ;
 XML(IMM) ; -- Return immunizations as XML
  N ATT,X,Y,I,P,NAMES,TAG
- D ADD("<immunization>") S NHINTOTL=$G(NHINTOTL)+1
+ D ADD("<immunization>")
  S ATT="" F  S ATT=$O(IMM(ATT)) Q:ATT=""  D
  . S X=$G(IMM(ATT)),Y="" Q:'$L(X)
  . I X'["^" S Y="<"_ATT_" value='"_$$ESC^NHINV(X)_"' />" D ADD(Y) Q

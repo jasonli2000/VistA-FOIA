@@ -1,5 +1,5 @@
 PRCHNPO7 ;WISC/RHD-MISCELLANEOUS ROUTINES FROM P.O.ADD/EDIT 442 ; 7/27/05 10:16am
-V ;;5.1;IFCAP;**79,100**;Oct 20, 2000
+V ;;5.1;IFCAP;**79**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 EN1 ;INPUT TRANSFORM-FILE 442, NSN #9.5
@@ -77,18 +77,11 @@ EN104 ;Stop user if commodity code is missing.
  D EN^DDIOL(.A)
  Q
  ;
-EN105 ;Stop a PO if a line item does not contain an FSC or PSC. This tag is
+EN105 ;Stop a PC user if a line item does not contain an FSC or PSC. This tag is
  ;called from the routine PRCHNP04. Do not clean up variables here.
- ;This check is for all POs that may be required by FPDS. PRC*5.1*100.
- I $P(^PRC(442,PRCHPO,1),U,7)]"" D
- . S PRCHITM=0 F  S PRCHITM=$O(^PRC(442,PRCHPO,2,PRCHITM)) Q:'PRCHITM  I $P($G(^PRC(442,PRCHPO,2,PRCHITM,2)),U,3)="" D EN^DDIOL("Line item "_PRCHITM_" on this PO does not contain an FSC or PSC.","","!!?5") S ERROR=1
+ I $P($G(^PRC(442,PRCHPO,23)),U,11)="P"&("256"'[U_$P(^PRC(442,PRCHPO,1),U,7)_U) D
+ . S PRCHITM=0 F  S PRCHITM=$O(^PRC(442,PRCHPO,2,PRCHITM)) Q:'PRCHITM  I $P($G(^PRC(442,PRCHPO,2,PRCHITM,2)),U,3)="" D EN^DDIOL("Line item "_PRCHITM_" on this PO does not contain an FSC or PSC","","!!?5") S ERROR=1
  ;End of changes for PRC*5.1*79
- Q
- ;
-EN106 ;PRC*5.1*100: stop amended PO with line items lacking an FSC or PSC.
- I $P(^PRC(443.6,PRCHPO,1),U,7)]"" D
- . S PRCHITM=0 F  S PRCHITM=$O(^PRC(443.6,PRCHPO,2,PRCHITM)) Q:'PRCHITM  I $P($G(^PRC(443.6,PRCHPO,2,PRCHITM,2)),U,3)="" D EN^DDIOL("Line item "_PRCHITM_" on this PO does not contain an FSC or PSC.","","!!?5") S ERROR=1
- Q
  ;
 EN2 ;IF 'ESTIMATED P.O.' MOVE VERBAGE INTO COMMENTS
  D EN2A

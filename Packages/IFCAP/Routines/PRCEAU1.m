@@ -1,24 +1,22 @@
 PRCEAU1 ;WISC/CLH/LDB/BGJ-AUTHORIZATION EDITS ; 07/08/93  12:00 PM
-V ;;5.1;IFCAP;**23**;Oct 20, 2000
+V ;;5.1;IFCAP;;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
-ADJ N DIR,X,Y,ACT,DIFF,UAAMT,IN
+ADJ N DIR,X,Y,ACT,DIFF,UAAMT
 AMT S DIR(0)="N^0.01:999999999.99:2",DIR("A")="Change AUTHORIZATION amount",DIR("B")=$P(^PRC(424,DA,0),U,12),DIR("?",1)="Enter NEW amount of the authorization or '^' to quit"
  S DIR("?",2)="I will do the calculations to update the authorization and",DIR("?",4)="obligations balances.",DIR("?",5)="  "
  D ^DIR S AMT=X G:$D(DIRUT) ZEROQ
  S ABAL=$P(^PRC(424,DA,0),U,5)
  D  G:AMT="" AMT Q
- . S DIFF=X-$P($G(^PRC(424,DA,0)),U,12)
- . I +BAL-$P(BAL,U,3)-DIFF<0 S PRCADJ=0 D  Q:PRCADJ
- .. W !,$C(7),"This amount EXCEEDS the balance remaining on this",!,"obligation by ",$FN(+BAL-($P(BAL,U,3)+DIFF),",",2),"."
- .. W !!,?20,"AVAILABLE FUNDS: ",$FN((+BAL-$P(BAL,U,3)),",",2),!!,"An increase adjustment to the obligation must be submitted." D ASK^PRCEADJ S PRCADJ=1 Q
- . I $P($G(^PRC(424,DA,0)),U,12)-ABAL>AMT W !,$C(7),"This amount will cause a negative balance on this",!,"authorization." S AMT="" Q
- . S PRCADJ=0,AAMT=DIFF D ADJ^PRCEDRE0 Q:PRCADJ
- . S BAL2=$P($G(^PRC(424,DA,0)),U,12)+DIFF,BAL1=+DIFF,ABAL=ABAL+DIFF,DR=".05////^S X=ABAL;.12////^S X=BAL2;.1;1.1",DIE="^PRC(424," D WAIT^PRCFYN,^DIE,BUPDT
- . W !!,"NEW BALANCES: " S BAL=$$BAL^PRCH58(PODA) D BALDIS W !!,?15,"Authorization Amount: $",$FN($P($G(^PRC(424,DA,0)),U,12),",P",2),!,?28,"Balance: $",$FN($P($G(^(0)),U,5),",P",2),!! H 2
- . ; if remaining authorized balance is smaller than 5% of obligated
- . ;   balance, send mail to alert user.
- . I $D(^PRC(424,DA,0)),$P(^(0),U,5)<($P(BAL,U)*.05) S IN="EDIT" D ^PRCEBL
- . Q
+  . S DIFF=X-$P($G(^PRC(424,DA,0)),U,12)
+  . I +BAL-$P(BAL,U,3)-DIFF<0 S PRCADJ=0 D  Q:PRCADJ
+    .. W !,$C(7),"This amount EXCEEDS the balance remaining on this",!,"obligation by ",$FN(+BAL-($P(BAL,U,3)+DIFF),",",2),"."
+    .. W !!,?20,"AVAILABLE FUNDS: ",$FN((+BAL-$P(BAL,U,3)),",",2),!!,"An increase adjustment to the obligation must be submitted." D ASK^PRCEADJ S PRCADJ=1 Q
+  . I $P($G(^PRC(424,DA,0)),U,12)-ABAL>AMT W !,$C(7),"This amount will cause a negative balance on this",!,"authorization." S AMT="" Q
+  . I BAL-$P(BAL,U,3)-DIFF<($P(BAL,U)*.05) S IN=2 D ^PRCEBL
+  . S PRCADJ=0,AAMT=DIFF D ADJ^PRCEDRE0 Q:PRCADJ
+  . S BAL2=$P($G(^PRC(424,DA,0)),U,12)+DIFF,BAL1=+DIFF,ABAL=ABAL+DIFF,DR=".05////^S X=ABAL;.12////^S X=BAL2;.1;1.1",DIE="^PRC(424," D WAIT^PRCFYN,^DIE,BUPDT
+  . W !!,"NEW BALANCES: " S BAL=$$BAL^PRCH58(PODA) D BALDIS W !!,?15,"Authorization Amount: $",$FN($P($G(^PRC(424,DA,0)),U,12),",P",2),!,?28,"Balance: $",$FN($P($G(^(0)),U,5),",P",2),!! H 2
+  . Q
 ZERO ;zero out authorization balance, mark authorization as complete and
  ;and return left over monies to obligation
  ;PODA MUST be defined and equal to internal obligation nuber

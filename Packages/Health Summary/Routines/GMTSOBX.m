@@ -1,26 +1,25 @@
-GMTSOBX ; CIO/SLC - HS Exported Object          ; 07/30/2003
- ;;2.7;Health Summary;**68**;Oct 20, 1995
+GMTSOBX ; CIO/SLC - HS Exported Object          ; 02/04/2009
+ ;;2.7;Health Summary;;Oct 20, 1995
  ;                   
- ; Object:  TIU TPBN FUTURE APPTS
- ; From:    SALT LAKE CITY OIFO
- ; Sender:  BAKKE,ANDREW
+ ; Object:  CLINIC VISITS PAST 10
+ ; From:    VA PACIFIC ISLANDS HCS
+ ; Sender:  LYSELL,KATHLEEN M
  ;                   
  Q
 TYPE ; Health Summary Type
- ;TIU TPBN FUTURE APPTS
- ;Future Appointments (TPBN)
- ;0;TIU TPBN FUTURE APPTS^^^^
- ;1,0;^142.01IA^^0
- ;1,5,0;5^9^^^Future Clinic Visits
+ ;CLINIC VISITS PAST 10
+ ;PAST 10 CLINIC VISITS
+ ;0;CLINIC VISITS PAST 10^^^^
+ ;1,0;^142.01IA^0^0
+ ;1,5,0;5^14^10^6M^Past Clinic Visits
  ;1,"B",5,5;
- ;1,"C",9,5;
- ;99;59380,35947
- ;"T";Future Appointments (TPBN)
+ ;1,"C",14,5;
+ ;99;61396,54433
+ ;"T";PAST 10 CLINIC VISITS
  Q
 OBJ ; Health Summary Object
- ;TIU TPBN FUTURE APPTS
- ;0;TIU TPBN FUTURE APPTS^^^^1^1^0^0^0^0^0^0^0^0^0^0^^^^0
- ;1,0;^^2^2^3030730^
- ;1,1,0;This Health Summary Object is designed for use with Transitional Pharmacy 
- ;1,2,0;Benefit Note.
+ ;CLINIC VISITS PAST 10
+ ;0;CLINIC VISITS PAST 10^^^^0^1^0^0^0^0^0^1^0^1^0^0^^^^0
+ ;1,0;^^1^1^3090204^
+ ;1,1,0;HS Object for past 10 clinic visits; occurrence limit 10, time limit 6M
  Q

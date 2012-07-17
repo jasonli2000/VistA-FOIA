@@ -1,6 +1,6 @@
-TIUEDS14 ; ;04/21/09
+TIUEDS14 ; ;09/17/08
  ;;
-1 N X,X1,X2 S DIXR=247 D X1(U) K X2 M X2=X D X1("F") K X1 M X1=X
+1 N X,X1,X2 S DIXR=355 D X1(U) K X2 M X2=X D X1("F") K X1 M X1=X
  I $G(X(1))]"",$G(X(2))]"",$G(X(3))]"",$G(X(4))]"" D
  . K ^TIU(8925,"ADIV",X(1),X(2),X(3),X(4),DA)
  K X M X=X2 I $G(X(1))]"",$G(X(2))]"",$G(X(3))]"",$G(X(4))]"" D

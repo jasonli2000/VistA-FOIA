@@ -1,5 +1,5 @@
 ORWDX2 ; SLC/JM/AGP - Order dialog utilities ;11/09/2006
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**246,243,280**;Dec 17, 1997;Build 85
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**246,243**;Dec 17, 1997;Build 242
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  Q
@@ -90,17 +90,4 @@ DCREASON(LST)   ; Return a list of DC reasons
  I $D(ARRAY)'>0 Q
  S NAME="" F  S NAME=$O(ARRAY(NAME)) Q:NAME=""  D
  .S ILST=ILST+1,LST(ILST)=ARRAY(NAME)
- Q
-SM(ERROR) ; Send message to Radiology users
- K XMY N XMDUZ,XMSUB,XMTEXT,OR0,ORIFN,DFN,OIP,OI,ORERR,MG
- S XMDUZ="CPRS,ORDERS",MG=$$GET^XPAR("SYS","OR RADIOLOGY ISSUES") I MG="" Q
- S XMY("G."_MG)="",XMSUB="CPRS Order Error on Radiology Order"
- S XMTEXT="ORERR(",ORIFN=+ERROR
- S OR0=$G(^OR(100,ORIFN,0)),DFN=+$P(OR0,"^",2),OIP=$O(^OR(100,ORIFN,4.5,"ID","ORDERABLE",0)),OI=$G(^OR(100,ORIFN,4.5,OIP,1))
- S ORERR(1,0)="Patient: "_$P($G(^DPT(DFN,0)),"^")
- S ORERR(2,0)="CPRS Order Number: "_ORIFN
- S ORERR(3,0)="CPRS Orderable Item: "_OI_" - "_$P($G(^ORD(101.43,OI,0)),"^")
- S ORERR(4,0)=" "
- S ORERR(5,0)="Error from Radiology: "_$P(ERROR,"^",4)
- D ^XMD
  Q

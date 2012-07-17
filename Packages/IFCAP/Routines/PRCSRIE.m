@@ -1,5 +1,5 @@
 PRCSRIE ;WISC/SAW/DXH - BUILD AND MAINTAIN REPETITIVE ITEM LIST FILE ;7.26.99
-V ;;5.1;IFCAP;**13,53**;Oct 20, 2000
+V ;;5.1;IFCAP;**13**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;ENTER REP ITEM
  N CC S CC=0
@@ -39,8 +39,7 @@ VENDOR ;INPUT TRANS VENDOR FIELD-410.3
  S DIC="^PRC(441,Z0,2,",DIC(0)="QEMNZ" D ^DIC K DIC("S") I Y'>0 K X G EX1
  I '$D(^PRC(440,+Y,0)) K X G EX1
  S X=$P(^PRC(440,+Y,0),"^"),$P(^PRCS(410.3,DA(1),1,DA,0),"^",5)=+Y
-VENDOR1 S Z=$P(Y(0),"^",2) I Z="" D VENDOR2 Q
- I Z=0 W !,"NOTE: This item has a unit cost of $0.00" ;HEH-0502-40043
+VENDOR1 S Z=$P(Y(0),"^",2) I Z=""!(Z=0) D VENDOR2 Q
  S $P(^PRCS(410.3,DA(1),1,DA,0),"^",4)=Z
 EX I $P(Y(0),"^",12) W $C(7),!,"NOTE: This item has a minimum order quantity of ",$P(Y(0),"^",12)
  I $P(Y(0),"^",11) W $C(7),!,"NOTE: This item must be ordered in multiples of ",$P(Y(0),"^",11)

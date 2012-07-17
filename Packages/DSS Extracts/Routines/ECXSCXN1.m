@@ -1,5 +1,5 @@
-ECXSCXN1 ;ALB/JAP  Clinic Extract No Shows; 8/28/02 1:11pm ;9/10/10  10:13
- ;;3.0;DSS EXTRACTS;**71,105,127,132**;Dec 22, 1997;Build 18
+ECXSCXN1 ;ALB/JAP  Clinic Extract No Shows; 8/28/02 1:11pm ; 9/6/07 3:17pm
+ ;;3.0;DSS EXTRACTS;**71,105**;Dec 22, 1997;Build 70
 NOSHOW(ECXSD,ECXED) ;get noshows from file #44
  ;      ECXSD  = start date, ECXED  = end date
  N ALEN,CLIN,JDATE,JJ,NODE,NOSHOW,PP,STAT,MDIV
@@ -20,10 +20,8 @@ NOSHOW(ECXSD,ECXED) ;get noshows from file #44
  ...S K=0
  ...F  S K=$O(^SC(CLIN,"S",JDATE,JJ,K)) Q:'K  D
  ....S PP=$G(^SC(CLIN,"S",JDATE,JJ,K,0)),ECXDFN=$P(PP,U) Q:ECXDFN=""
- ....S ECXPATCAT=$$PATCAT^ECXUTL(ECXDFN) ;added in patch 127
  ....S NODE=$G(^DPT(ECXDFN,"S",JDATE,0)),MDIV=$P($G(^SC(CLIN,0)),U,15)
  ....Q:(NODE="")!($P(NODE,U)'=CLIN)
- ....S ECXSHAD=$$GETSHAD ;added in patch 127, finds shad status for appt
  ....S ECXOBI=$G(^SC(CLIN,"S",JDATE,JJ,K,"OB")),STAT=$P(NODE,U,2)
  ....S NOSHOW=$S(STAT="N":"N",STAT="NA":"N",1:"")
  ....Q:NOSHOW=""  D INTPAT^ECXSCX2 S ECXERR=0
@@ -36,7 +34,6 @@ NOSHOW(ECXSD,ECXED) ;get noshows from file #44
  ....S:ECXCPT1="" ECXCPT1="9919901"
  ....S ECXCBOC=$S(MDIV'="":$$CBOC^ECXSCX2(.MDIV),1:"")
  ....S (ECXDSSD,ECXENEL,ECXIR,ECXAO,ECXMIL,ECXPROV,ECXPROVP,ECXPROVN)=""
- ....F I=1:1:5 S (@("ECSP"_I),@("ECSPPC"_I),@("ECSPNPI"_I))=""
  ....I TOSEND'=3 D
  .....S ECXKEY=P1_P2_ALEN_P3_NOSHOW,ECXOBS=$$OBSPAT^ECXUTL4(ECXA,ECXTS,ECXKEY)
  .....S ECXENC=$$ENCNUM^ECXUTL4(ECXA,ECXSSN,ECXADMDT,ECXDATE,ECXTS,ECXOBS,ECHEAD,ECXKEY,) D:ECXENC'="" FILE^ECXSCXN
@@ -48,15 +45,3 @@ NOSHOW(ECXSD,ECXED) ;get noshows from file #44
  .....S ECXENC=$$ENCNUM^ECXUTL4(ECXA,ECXSSN,ECXADMDT,ECXDATE,ECXTS,ECXOBS,ECHEAD,ECXKEY,) D:ECXENC'="" FILE^ECXSCXN
  ....;create a record for noshow appended ekg. The code was removed for CTX-0604-70970 CLI Extract Problem EXPANDED to NoShows
  Q
- ;GETSHAD section added with patch 127
-GETSHAD() ;Function returns shad value
- N DIC,LOCARR,DA,DR,SHAD,ECXERR,ECXVIST
- S SHAD=""
- I '+$P($G(NODE),U,20) Q SHAD  ;Quit if no visit pointer
- S DIC=409.68,DA=$P(NODE,U,20),DR=.05,DIQ(0)="I",DIQ="LOCARR"
- D EN^DIQ1
- I $G(LOCARR(409.68,DA,.05,"I")) D
- .S ECXERR=0
- .D VISIT^ECXSCX1(ECXDFN,LOCARR(409.68,DA,.05,"I"),.ECXVIST,.ECXERR)
- .I 'ECXERR S SHAD=ECXVIST("SHAD")
- Q SHAD

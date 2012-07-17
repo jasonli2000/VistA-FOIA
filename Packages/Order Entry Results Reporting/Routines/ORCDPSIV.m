@@ -1,5 +1,5 @@
-ORCDPSIV ;SLC/MKB-Pharmacy IV dialog utilities ;06/17/10
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**4,38,48,158,195,243,296,280**;Dec 17, 1997;Build 85
+ORCDPSIV ;SLC/MKB-Pharmacy IV dialog utilities ;09/26/08
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**4,38,48,158,195,243,296**;Dec 17, 1997;Build 19
  ;Per VHA Directive 2004-038, this routine should not be modified.
 CKSCH ; -- validate schedule [Called from P-S Action]
  N ORX S ORX=ORDIALOG(PROMPT,ORI) Q:ORX=$G(ORESET)  K ORSD
@@ -12,7 +12,7 @@ ISONETIM(SCH) ;
  I SCH="" Q 0
  K ^TMP($J,"ORCDPSIV GETSCHTYP")
  D ZERO^PSS51P1(,SCH,"PSJ","O","ORCDPSIV GETSCHTYP")
- I $D(^TMP($J,"ORCDPSIV GETSCHTYP","B",SCH)) D  Q 1
+ I +^TMP($J,"ORCDPSIV GETSCHTYP",0)>0 D  Q 1
  .S DUR=$$PTR^ORCD("OR GTX DURATION")
  .I $G(ORDIALOG(DUR,1))="" Q
  .S ORDIALOG(DUR,1)=""
@@ -20,35 +20,6 @@ ISONETIM(SCH) ;
  .W !,"The duration has been deleted from this quick order." H 1
  K ^TMP($J,"ORCDPSIV GETSCHTYP")
  Q 0
- ;
-ADDFRD(ORDIALOG,INST,PROMPT) ;
- N ADDFRIEN,ADDIEN,OI,PSOI,RESULT
- S RESULT=""
- I $G(ORIVTYPE)'="C" Q RESULT
- S ADDFRIEN=$O(^ORD(101.41,"AB","OR GTX ADDITIVE FREQUENCY","")) I 'ADDFRIEN Q RESULT
- S ADDIEN=$O(^ORD(101.41,"AB","OR GTX ADDITIVE","")) I 'ADDIEN Q RESULT
- S RESULT=$$RECALL^ORCD(PROMPT,INST) I RESULT'="" Q RESULT
- S OI=$G(ORDIALOG(ADDIEN,INST)) I OI="" Q RESULT
- S PSOI=+$P($G(^ORD(101.43,OI,0)),U,2) I +PSOI'>0 Q RESULT
- S RESULT=$$IV^PSSDSAPA(+PSOI)
- S RESULT=$S(RESULT="A":"All Bags",RESULT=1:"1 Bag/Day",1:"")
- Q RESULT
- ;
-ADDFRQC ;
- I $G(ORIVTYPE)'="C" Q
- W !,"Select from the list of the codes below to assign an additive frequency for this additive."
- W !,"A = All Bags"
- W !,"1 = 1 Bag/Day"
- W !,"S = See Comments"
- W !
- Q
-ADDFRQI ;
- S X=$$UP^XLFSTR(X)
- I X'="A",X'=1,X'="S" D ADDFRQC K X Q
- I X="A" S X="All Bags" Q
- I X=1 S X="1 Bag/Day" Q
- I X="S" S X="See Comments"
- Q
  ;
 PROVIDER ; -- Check provider, if authorized to write med orders
  I $D(^XUSEC("OREMAS",DUZ)),'$$GET^XPAR("ALL","OR OREMAS MED ORDERS") W $C(7),!!,"OREMAS key holders may not enter medication orders." S ORQUIT=1 Q
@@ -71,11 +42,7 @@ CHANGED(TYPE) ; -- Kill dependent values when OI changes
  Q:'$L($G(TYPE))  S PROMPTS=""
  S:TYPE="B" PROMPTS="VOLUME"
  S:TYPE="A" PROMPTS="STRENGTH PSIV^UNITS"
- I TYPE="T" D
- .S PROMPTS="INFUSION RATE^SCHEDULE^ADDITIVE FREQUENCY"
- .S PTR=$O(^ORD(101.41,"AB","OR GTX DURATION","")) Q:'PTR
- .I $G(ORDIALOG(PTR,1))["DOSES" S PROMPTS=PROMPTS_U_"DURATION"
- ;
+ S:TYPE="T" PROMPTS="INFUSION RATE^SCHEDULE"
  F P=1:1:$L(PROMPTS,U) S NAME=$P(PROMPTS,U,P) D
  . S PTR=$O(^ORD(101.41,"AB","OR GTX "_NAME,0)) Q:'PTR
  . S I=0 F  S I=$O(ORDIALOG(PTR,I)) Q:I'>0  K ORDIALOG(PTR,I)
@@ -153,7 +120,7 @@ BIVOI(ARRAY) ;
 LVROUTES ;
  N ARRAY,ROUTES
  D BIVOI(.ARRAY)
- D IVDOSFRM^ORWDPS33(.ROUTES,.ARRAY,1)
+ D IVDOSFRM^ORWDPS33(.ROUTES,.ARRAY,0,1)
  D RTEDISP(.ROUTES)
  Q
  ;
@@ -264,7 +231,7 @@ IVPSI ;INPUT-TRANSFORM
  Q
  ;
 IVPSI1 ; ASK ON CONDITION
- N DURI,DURV,TEMPX
+ N DURI,DURV
  I $G(OROTSCH)=1 Q
  S DURI=$P($G(ORDIALOG("B","LIMITATION")),U,2)
  I DURI>0 S DURV=$G(ORDIALOG(DURI,1))
@@ -272,30 +239,13 @@ IVPSI1 ; ASK ON CONDITION
  .S TEMPX=$P(DURV," ",5)_"DOSES"
  .I TEMPX'="",TEMPX'=DURV S ORDIALOG(DURI,1)=TEMPX
  N INT,IVTYPE,ONETIME,TYPE,SCH,SCHNAME
- D IVDURT($G(ORIVTYPE))
- ;I $G(ORIVTYPE)'="I" D  G IVPS1X
- ;.W !,!,"Enter the length of administrative time or total volume for IV fluid order followed by ML or CC for milliliters, L for liters, D for days, H for hours to set limitation."
- ;.W !,"(Examples: 1500ML, 1000CC, 1L, 3D, or 72H)",!
- ;W !,"This field is optional a value does not need to be entered."
- ;W !,!,"Enter the length of administrative time or total volume for IV fluid order followed by ML or CC for milliliters, L for liters, D for days, H for hours or DOSES to set limitation."
- ;W !,"(Examples: 1500ML, 1000CC, 1L, 3D, 72H, or 10DOSES)",!
-IVPS1X ;
- ;W !,"This field is optional a value does not need to be entered."
- I 1
- Q
- ;
-IVDURT(TYPE) ;
- I TYPE'="I" D  G IVDURX
+ I $G(ORIVTYPE)'="I" D  G IVPS1X
  .W !,!,"Enter the length of administrative time or total volume for IV fluid order followed by ML or CC for milliliters, L for liters, D for days, H for hours to set limitation."
  .W !,"(Examples: 1500ML, 1000CC, 1L, 3D, or 72H)",!
  W !,"This field is optional a value does not need to be entered."
  W !,!,"Enter the length of administrative time or total volume for IV fluid order followed by ML or CC for milliliters, L for liters, D for days, H for hours or DOSES to set limitation."
  W !,"(Examples: 1500ML, 1000CC, 1L, 3D, 72H, or 10DOSES)",!
-IVDURX ;
+IVPS1X ;
  W !,"This field is optional a value does not need to be entered."
+ I 1
  Q
- ;
-IVDURH ;
- D IVDURT($G(ORIVTYPE))
- Q
- ;

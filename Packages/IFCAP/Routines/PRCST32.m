@@ -1,9 +1,8 @@
-PRCST32 ; ;10/11/96
+PRCST32 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRCS(410,",DIC=DIE,DP=410,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRCS(410,DA,""))=""
  I $D(^(2)) S %Z=^(2) S %=$P(%Z,U,10) S:%]"" DE(1)=%
  I $D(^(4)) S %Z=^(4) S %=$P(%Z,U,1) S:%]"" DE(6)=% S %=$P(%Z,U,2) S:%]"" DE(8)=%
- I $D(^(9)) S %Z=^(9) S %=$P(%Z,U,4) S:%]"" DE(12)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -72,8 +71,12 @@ X5 I $D(PRCSERR),PRCSERR S Y="@1" K PRCSERR,PRCSF,PRCSI
  G RE
 C6 G C6S:$D(DE(6))[0 K DB S X=DE(6),DIC=DIE
  X "Q:$P(^PRCS(410,DA,4),U,3)'=""""  S $P(^(4),""^"",8)="""" D TRANK^PRCSES"
+ S X=DE(6),DIC=DIE
+ X "Q:$P(^PRCS(410,DA,4),U,3)'=""""  S ^(4)=$S($D(^(4)):$P(^(4)_""^^^^^^"",U,1,7)_U,1:""^^^^^^^"") D TRANK^PRCSES"
 C6S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  X "Q:$P(^PRCS(410,DA,4),U,3)'=""""  S $P(^(4),""^"",8)=X D TRANS^PRCSES"
+ S X=DG(DQ),DIC=DIE
+ X "Q:$P(^PRCS(410,DA,4),U,3)'=""""  S ^(4)=$S($D(^(4)):$P(^(4)_""^^^^^^"",U,1,7)_U_X,1:""^^^^^^^""_X) D TRANS^PRCSES"
  Q
 X6 S:X["$" X=$P(X,"$",2) K:+X'=X&(X'?.N1"."2N)!(X>9999999)!(X<0) X I $D(X) W "  $ ",$J(X,0,2)
  Q
@@ -101,9 +104,4 @@ M11 I D>0 S DC=DC_D I $D(^PRCS(410,DA,12,+D,0)) S DE(11)=$P(^(0),U,1)
 R11 D DE
  S D=$S($D(^PRCS(410,DA,12,0)):$P(^(0),U,3,4),1:1) G 11+1
  ;
-12 S DW="9;4",DV="NJ7,2X",DU="",DLB="EST. SHIPPING AND/OR HANDLING",DIFLD=48.1
- G RE
-X12 S:X["$" X=$P(X,"$",2) K:X'?.N.1".".2N!(X>9999.99)!(X<1) X
- Q
- ;
-13 D:$D(DG)>9 F^DIE17 G ^PRCST35
+12 D:$D(DG)>9 F^DIE17 G ^PRCST35

@@ -1,4 +1,4 @@
-DGPMXAS1 ; ;06/26/96
+DGPMXAS1 ; ;12/20/96
  D DE G BEGIN
 DE S DIE="^DGPM(",DIC=DIE,DP=405,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DGPM(DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,7) S:%]"" DE(1)=% S %=$P(%Z,U,10) S:%]"" DE(6)=% S %=$P(%Z,U,11) S:%]"" DE(4)=% S %=$P(%Z,U,12) S:%]"" DE(2)=%
@@ -20,7 +20,7 @@ N I X="" G A:DV'["R",X:'DV,X:D'>0,A
 RD G QS:X?."?" I X["^" D D G ^DIE17
  I X="@" D D G Z^DIE2
  I X=" ",DV["d",DV'["P",$D(^DISV(DUZ,"DIE",DLB)) S X=^(DLB) I DV'["D",DV'["S" W "  "_X
-T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
+T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) I X?.ANP D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
  K DDER G X
 P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
@@ -40,8 +40,7 @@ RP D O I X="" S X=DE(DQ) G A:'DV,A:DC<2,N^DIE17
 I I DV'["I",DV'["#" G RD
  D E^DIE0 G RD:$D(X),PR
  Q
-SET I X'?.ANP S DDER=1 Q 
- N DIR S DIR(0)="SMV^"_DU,DIR("V")=1
+SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  I $D(DB(DQ)),'$D(DIQUIET) N DIQUIET S DIQUIET=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
@@ -52,7 +51,7 @@ BEGIN S DNM="DGPMXAS1",DQ=1
  S X=$P(DGPMA,"^",7)
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
+ G RD:X="@",Z
 C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
  S DGPMDDF=7,DGPMDDT=0 D ^DGPMDDCN
 C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
@@ -87,14 +86,14 @@ X8 D DFN^DGYZODS S:'DGODS Y=102
  S DU="1:YES;0:NO;"
  S Y="1"
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
+ G RD:X="@",Z
 X9 Q
 10 S DW="USR;3",DV="RP200'",DU="",DLB="LAST EDITED BY",DIFLD=102
  S DU="VA(200,"
  S X=DUZ
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
+ G RD:X="@",Z
 X10 Q
 11 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=11 G A
 12 S DW="USR;4",DV="RD",DU="",DLB="LAST EDITED ON",DIFLD=103

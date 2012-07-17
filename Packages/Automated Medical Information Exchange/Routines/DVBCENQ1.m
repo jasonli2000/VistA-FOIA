@@ -1,6 +1,5 @@
 DVBCENQ1 ;ALB/GTS,557/THM - 2507 INQUIRY DISPLAY ; 10/14/2009  1:00 PM
- ;;2.7;AMIE;**17,57,143,149**;Apr 10, 1995;Build 16
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.7;AMIE;**17,57,143**;Apr 10, 1995;Build 4
  ;
  G START
 CON K OUT I IOST?1"C-".E W !,"Press [RETURN] to continue or ""^"" to stop   " R ANS:DTIME S:ANS=U!('$T) OUT=1 Q:$D(OUT)  D HDR
@@ -26,6 +25,7 @@ START S PGHD="COMPENSATION AND PENSION EXAM INQUIRY",PG=0
  . W !?4,"Country: ",$$GETCNTRY^DVBCUTIL(COUNTRY),!
  E  D
  . W !
+ S EDTA=$S($D(^DPT(DFN,.32)):^(.32),1:""),EOD=$P(EDTA,U,6),RAD=$P(EDTA,U,7)
  W !,"Entered active service: " S Y=EOD X ^DD("DD") S:Y="" Y="Not specified" W Y,! S Y=RAD X ^DD("DD") S:Y="" Y="Not specified" W "Released active service: " W Y,!
  F LINE=1:1:80 W "="
  W !! D CON Q:$D(OUT)  D ^DVBCENQ2,CON Q:$D(OUT)  D ^DVBCEEXM,CON Q:$D(OUT)  S REQDT=$P(^DVB(396.3,REQDA,0),U,2)

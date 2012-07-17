@@ -1,5 +1,5 @@
-PRCPHLSO ;WISC/CC/DWA-build HL7 messages for distribution order ;4/00
-V ;;5.1;IFCAP;**1,52**;Oct 20, 2000
+PRCPHLSO ;WISC/CC - build HL7 messages for distribution order;4/00
+V ;;5.1;IFCAP;**1**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
 BLDSEG(ORDRDA) ;
@@ -12,7 +12,7 @@ BLDSEG(ORDRDA) ;
  I $G(HL) D  Q  ; error occurred
  . W !,"The system can't build an HL7 message now to send your order to"
  . W !,"the supply station.  Please use the 'SO - Send Order' option later."
- . W !,"Error: "_$P(HL,"^",2)
+ . W !,"Error: "_$P(HL,2)
  S HLFS=$G(HL("FS")) I HLFS="" S HLFS="|"
  S HLCS=$E(HL("ECH"),1)
  ;

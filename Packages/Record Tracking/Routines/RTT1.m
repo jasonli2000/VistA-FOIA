@@ -1,4 +1,4 @@
-RTT1 ;MJK/TROY ISC;Record Transaction Option; ; 5/7/87  12:02 PM ;
+RTT1 ;MJK/TROY ISC;Record Transaction Option; ; 5/7/87  12:02 PM ; [ 02/28/94  2:05 PM ]
  ;;v 2.0;Record Tracking;;10/22/91 
 2 ;;New Volume Creation
  S RTA=+RTAPL D ASK^RTB K RTA G Q2:$D(RTESC),2:Y<0 S RTE=X D NEW G 2

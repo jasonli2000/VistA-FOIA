@@ -1,5 +1,5 @@
-MAGDQR03 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 17 Feb 2010 11:18 AM
- ;;3.0;IMAGING;**51,54,66**;Mar 19, 2002;Build 1836;Sep 02, 2010
+MAGDQR03 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 01 Dec 2008 11:18 AM
+ ;;3.0;IMAGING;**51,54**;03-July-2009;;Build 1424
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -51,36 +51,14 @@ RESULT(TYPE,RESULT,MAGIEN,MAGDFN,MAGRORD,MAGINTERP) ;
  ;
  N E,L,OK,V,X,T
  N SENSEMP ; ----- sensitive/employee flag
- N ACCESSION ; --- accession number
  S SENSEMP=0,OK=1
  ;
  ; new specs for sens/emp patients 3/20/09 - data will be picked up, but scrubbed
  ;
  S SENSEMP=SENSEMP+($$EMPL^DGSEC4(MAGDFN)=1) ; IA #3646
  S SENSEMP=SENSEMP+($P($G(^DGSL(38.1,MAGDFN,0)),"^",2)=1) ; IA #767
- S SENSEMP=0 ; sensitive/employee data suppression to be suspended as of Jan 2010
  ; increment (static) dummy Study Instance UID if sensitive/employee
  S:SENSEMP ^("DUMMY SIUID")=^TMP("MAG",$J,"DICOMQR","DUMMY SIUID")+1
- ;
- ; calculate accession number here 2/17/10, moved from Q0080050^MAGDQR06
- ;
- D:TYPE="R"
- . S X=$P($G(^RADPT(MAGDFN,"DT",MAGRORD,"P",MAGINTERP,0)),"^",17) ; IA # 1172
- . S ACCESSION=$P($G(^RARPT(+X,0)),"^",1) ; IA # 1171
- . Q
- D:TYPE="C"
- . N R2,TIUNUM,CONSIX
- . S R2=$G(^MAG(2005,MAGIEN,2)) Q:R2=""
- . I $P(R2,"^",6)=2006.5839 D  Q
- . . S CONSIX=$P(R2,"^",7)
- . . S ACCESSION="GMRC-"_CONSIX
- . . Q
- . I $P(R2,"^",6)=8925 D  Q
- . . S TIUNUM=$P(R2,"^",7) Q:'TIUNUM
- . . S CONSIX=$P($G(^TIU(8925,TIUNUM,14)),"^",5)
- . . S:$P(CONSIX,";",2)="GMR(123," ACCESSION="GMRC-"_$P(CONSIX,";",1)
- . . Q
- . Q
  ;
  ; retrieve element values, indicate unsupported elements
  S T="" F  S T=$O(REQ(T)) Q:T=""  D
@@ -209,7 +187,6 @@ Q0080050 D Q0080050^MAGDQR06 ;R  Accession Number
 Q0100010 ;R  Patient's Name
  ; No IA needed, PIMS 5.3
  S V(T)=$S('SENSEMP:$P($G(^DPT(MAGDFN,0)),"^",1),1:"IMAGPATIENT,SENSITIVE")
- S V(T)=$$VA2DCM^MAGDQR01(V(T))
  Q
  ;
 Q0100020 ;R  Patient ID

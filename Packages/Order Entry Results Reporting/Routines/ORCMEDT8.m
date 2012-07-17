@@ -1,5 +1,5 @@
-ORCMEDT8 ;SLC/JM-QO, Generate quick order CRC ;04/14/09  08:41
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**245,243,280**;Dec 17, 1997;Build 85
+ORCMEDT8 ;SLC/JM-QO, Generate quick order CRC ;10/18/07
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**245,243**;Dec 17, 1997;Build 242
  Q
  ;
 UPDQNAME(ORIEN) ; Rename personal quick order name if needed
@@ -188,11 +188,11 @@ SUBID05 ; Diet
  I FORMID="TBF" S SUBFORM=$G(FORMINFO("TBL"))
  Q
 FORMTBL ; Form Table - Forms allowing personal quick orders, as of CPRS GUI v26 (OR*3*215)
- ;;Consult         ;110;CS2;00.ORD.CLS.URG.PLA.MSC.COD.PRV.COM.ERD.
- ;;                ;CS2;   ;00.ORD.CLS.URG.PLA.MSC.COD.COM.PRV.ERD.
- ;;Procedure       ;112;PR2;00.SER.ORD.CLS.URG.PLA.MSC.COD.PRV.COM.ERD.
- ;;                ;PR2;PR3;00.SER.ORD.COM.CLS.URG.PLA.MSC.COD.PRV.ERD.
- ;;                ;PR3;   ;00.SER.ORD.CLS.URG.PLA.MSC.COD.COM.PRV.ERD.
+ ;;Consult         ;110;CS2;00.ORD.CLS.URG.PLA.MSC.COD.PRV.COM.
+ ;;                ;CS2;   ;00.ORD.CLS.URG.PLA.MSC.COD.COM.PRV.
+ ;;Procedure       ;112;PR2;00.SER.ORD.CLS.URG.PLA.MSC.COD.PRV.COM.
+ ;;                ;PR2;PR3;00.SER.ORD.COM.CLS.URG.PLA.MSC.COD.PRV.
+ ;;                ;PR3;   ;00.SER.ORD.CLS.URG.PLA.MSC.COD.COM.PRV.
  ;;Diet            ;117;TBF;05.STT.STP.ZZZ.COM.DEL.CAN.
  ;;                ;TBF;OPM;05.ZZZ.COM.CAN.
  ;;                ;OPM;   ;00.ORD.MEL.STT.STP.SCH.COM.DEL.
@@ -230,7 +230,6 @@ IDTABLE ; ID table - returns codes used in the form table IDINFO("LONGNAME")=SHO
  ;;DEL;DELIVERY
  ;;DOS;DOSE
  ;;DRG;DRUG
- ;;ERD;EARLIEST
  ;;IML;IMLOC
  ;;INS;INSTR
  ;;ISO;ISOLATION
@@ -279,4 +278,4 @@ IDTABLE ; ID table - returns codes used in the form table IDINFO("LONGNAME")=SHO
  ;;YN0;YN
  ;;XXX;XXX
  ;;ZZZ;ZZZ
- ;;
+ ;;              

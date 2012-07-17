@@ -1,5 +1,5 @@
 ORWDPS3 ; SLC/KCM/JLI - Order Dialogs, Menus;01/18/2006
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**85,94,116,132,187,195,215,280**;Dec 17, 1997;Build 85
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**85,94,116,132,187,195,215**;Dec 17, 1997
 MEDXFER ; -- setup ORDIALOG for a med that is transferred (from SETUP^ORWDXM4)
  N IVDIALOG,OI K ^TMP("PS",$J)
  S IVDIALOG=$O(^ORD(101.41,"AB","PSJI OR PAT FLUID OE",0))
@@ -74,7 +74,6 @@ AUTHMED ; sets ORQUIT if not authorized to write meds
  I +NOAUTH D
  . S ORQUIT=1
  . S LST(0)="8^0"
- . I $P(NOAUTH,U,2)'="" S LST(.5)=$P(NOAUTH,U,2) Q
  . S NAME=$P($G(^VA(200,+ORNP,20)),U,2)
  . I '$L(NAME) S NAME=$P($G(^VA(200,+ORNP,0)),U,1)
  . S LST(.5)=NAME_" is not authorized to write med orders."

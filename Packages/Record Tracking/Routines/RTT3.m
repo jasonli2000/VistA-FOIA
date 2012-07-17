@@ -1,4 +1,4 @@
-RTT3 ;MJK/TROY ISC;Record Transaction Selection Utility; ; 5/18/87  9:44 AM ;
+RTT3 ;MJK/TROY ISC;Record Transaction Selection Utility; ; 5/18/87  9:44 AM ; [ 10/01/92  2:59 PM ]
  ;;v 2.0;Record Tracking;;10/22/91 
  ;
 SEL S DIC("S")="I $P(^(0),U,4)=+RTAPL,$S('$D(RTTY):1,$P(^RT(+Y,0),U,3)=+RTTY:1,1:0)",Y=$P(RTMV0,"^")

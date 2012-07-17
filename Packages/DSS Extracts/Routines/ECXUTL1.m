@@ -1,5 +1,5 @@
 ECXUTL1 ;ALB/GTS - Utilities for DSS Extracts ;July 16, 1998
- ;;3.0;DSS EXTRACTS;**9,49**;Dec 22, 1997
+ ;;3.0;DSS EXTRACTS;**9**;Dec 22, 1997
  ;
 CYFY(ECXFMDT) ;** Return the calandar and fiscal years for a FM date
  ;
@@ -17,17 +17,6 @@ CYFY(ECXFMDT) ;** Return the calandar and fiscal years for a FM date
  .I $E(ECXFMDT,4,5)>9 S Y2=Y+1
  .S X=Y_"0101^"_Y_"1231^"_(Y2-1)_"1001^"_Y2_"0930"
  Q X
- ;
-FISCAL(DATE)    ;Return fiscal year
- ; Input: DATE = Date (FileMan format) (defaults to today)
- ;Output: YYYY = Fiscal year that input date falls within
- ;
- N YEAR
- I '$G(DATE) S DATE=$$DT^XLFDT()
- S DATE=$$ECXYM^ECXUTL(DATE)
- S YEAR=$E(DATE,1,4)
- I $E(DATE,5,6)>9 S YEAR=YEAR+1
- Q YEAR
  ;
 DTRNG() ;** Prompt the user for a date range
  ;

@@ -1,5 +1,5 @@
 MAGDQR04 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 08 Aug 2008 9:26 AM
- ;;3.0;IMAGING;**51,54,66**;Mar 19, 2002;Build 1836;Sep 02, 2010
+ ;;3.0;IMAGING;**51,54**;03-July-2009;;Build 1424
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -218,15 +218,6 @@ INFO(OUT,IMAGE) ; RPC = MAG IMAGE CURRENT INFO
  . S:LOC V=LOC
  . Q
  S:V'="" TAG("0032,1020")=V ; Acquisition Site
- ;
- ; return names in DICOM format
- S:$G(TAG("0010,0010"))'="" TAG("0010,0010")=$$VA2DCM^MAGDQR01(TAG("0010,0010"))
- F I="0008,0090","0008,1050","0032,1032" D
- . N J S J=""
- . F  S J=$O(TAG(I,J)) Q:'J  D
- . . S:$G(TAG(I,J))'="" TAG(I,J)=$$VA2DCM^MAGDQR01(TAG(I,J))
- . . Q
- . Q
  ;
  S N=1,T="" F  S T=$O(TAG(T)) Q:T=""  D
  . S V=""

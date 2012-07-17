@@ -1,17 +1,16 @@
 PSJLIACT ;BIR/MV-IV ACTION ;28 Jul 98 / 8:50 AM
- ;;5.0; INPATIENT MEDICATIONS ;**15,47,62,58,82,97,80,110,111,134,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**15,47,62,58,82,97,80,110,111,134**;16 DEC 97;Build 124
  ;
  ; Reference to ^PS(55 is supported by DBIA 2191.
  ; Reference to MAIN^TIUEDIT is supported by DBIA 2410.
  ;
 DC ; Discontinue order
- K PSGORQF
  D HOLDHDR^PSJOE
  S PSJCOM=+$S(PSJORD["V":$P($G(^PS(55,DFN,"IV",+PSJORD,.2)),"^",8),1:$P($G(^PS(53.1,+PSJORD,.2)),"^",8))
  I PSJCOM W !!,"This order is part of a complex order. If you discontinue this order the",!,"following orders will be discontinued too (unless the stop date has already",!,"been reached)." D CMPLX^PSJCOM1(PSGP,PSJCOM,PSJORD)
  I PSJCOM F  W !!,"Do you want to discontinue this order" S %=1 D YN^DICN Q:%  D ENCOM^PSGOEM
  I PSJCOM,%'=1 S VALMBK="" Q
- I PSJORD["V" D DC^PSIVORA D:'$G(PSJOCFLG) EN^PSJLIORD(DFN,ON) Q
+ I PSJORD["V" D DC^PSIVORA,EN^PSJLIORD(DFN,ON) Q
  D:PSJORD["P" DISCONT^PSIVORC
  S VALMBCK="Q"
  Q
@@ -20,7 +19,6 @@ ACEDIT ; Display LM screen and AC and EDit actions
  S VALMBCK=$S($G(PSIVACEP):"Q",1:"R")
  Q
 AEEXIT ; Call for EXIT CODE in PSJ LM IV AC/EDIT
- K PSGORQF
  D:ON["V" GT55^PSIVORFB
  I ON["P" D GT531^PSIVORFA(DFN,ON) D:P("OT")'="I" GTDATA^PSJLIFN
  D EN^PSJLIVMD
@@ -35,7 +33,6 @@ EDIT ; Edit order
  S VALMBCK=$S($G(PSIVFN1):"Q",1:"R")
  Q
 EDIT1 ;
- K PSGORQF
  ;Ensure P() is defined
  I $D(P)<10 S XQORQUIT=1,P("PON")="",PSIVNBD=1 D  Q
  .W !,"WARNING: An error has occurred. Changes will not be saved"
@@ -59,14 +56,12 @@ ACCEPT ; Accept order
  D HOLDHDR^PSJOE
  ;Accept IV from back door.
  I $G(PSJIVBD) K PSJIVBD D OK^PSIVORE S VALMBCK="Q" Q
- ;D:'$G(PSGORQF) IN^PSJOCDS($G(ON),"IV","") Q:$G(PSGORQF)
  I ON["V" D ACCEPT^PSIVOPT1 Q
  S PSIVFN1=1
  D COMPLTE^PSIVORC1
  S VALMBCK="Q"
  Q
 R ; Renewal
- K PSGORQF
  S PSJREN=1
  D HOLDHDR^PSJOE
  NEW PSIVAC S PSIVAC="PR" K PSGFDX
@@ -75,7 +70,6 @@ R ; Renewal
  K PSJREN
  Q
 H ; Hold
- K PSGORQF
  NEW TEX S TEX="Active order ***"
  D HOLDHDR^PSJOE
  D H^PSIVOPT(DFN,ON,P(17),P(3))
@@ -89,7 +83,6 @@ L ; Activity Log
  S VALMBCK="R"
  Q
 O ; On Call
- K PSGORQF
  NEW TEX S TEX="Active order ***"
  D HOLDHDR^PSJOE
  D O^PSIVOPT(DFN,ON,P(17),P(3))
@@ -106,7 +99,6 @@ VF1(PSIVREA,PSIVAL,PSIVLOG) ;
  ;PSIVREA: the reason use by LOG^PSIVORAL
  ;PSIVAL : the description reason
  ;PSIVLOG: Log an activity if = 1
- K PSGORQF
  I '+$G(OD)!($L($G(OD))>16) K OD
  D:+PSJSYSU=3 ^PSIVORE1
  NEW DIE,DA,DR,PSJX,XX,PSIVACT,PSJRQND

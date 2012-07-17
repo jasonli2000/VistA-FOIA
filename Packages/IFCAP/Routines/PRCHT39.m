@@ -1,4 +1,4 @@
-PRCHT39 ; ;10/06/97
+PRCHT39 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442,",DIC=DIE,DP=442,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRC(442,DA,""))=""
  I $D(^(17)) S %Z=^(17) S %=$P(%Z,U,2) S:%]"" DE(1)=% S %=$P(%Z,U,3) S:%]"" DE(2)=% S %=$P(%Z,U,4) S:%]"" DE(5)=% S %=$P(%Z,U,5) S:%]"" DE(8)=% S %=$P(%Z,U,6) S:%]"" DE(9)=% S %=$P(%Z,U,7) S:%]"" DE(10)=% S %=$P(%Z,U,8) S:%]"" DE(11)=%

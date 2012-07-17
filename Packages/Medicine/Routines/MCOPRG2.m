@@ -1,4 +1,4 @@
-MCOPRG2 ; ;08/19/97
+MCOPRG2 ; ;08/21/97
  D DE G BEGIN
 DE S DIE="^MCAR(697.2,D0,""CPT"",",DIC=DIE,DP=697.21,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^MCAR(697.2,D0,"CPT",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=%

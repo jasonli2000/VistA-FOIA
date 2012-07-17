@@ -1,11 +1,9 @@
 FBAAV3 ;AISC/GRR-CREATE & ELECTRONICALLY TRANSMIT TRANSACTIONS FOR TRAVEL PAYMENTS ;2/8/2005
- ;;3.5;FEE BASIS;**3,89,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**3,89**;JAN 30, 1995
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 DETT ; process a travel batch
  S FBTXT=0
- ; HIPAA 5010 - line items that have 0.00 amount paid are now required to go to Central Fee
- ;F K=0:0 S K=$O(^FBAAC("AD",J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAAC("AD",J,K,L)) Q:L'>0  S Y(0)=$G(^FBAAC(K,3,L,0)) I Y(0)]"",+$P(Y(0),U,3) D
- F K=0:0 S K=$O(^FBAAC("AD",J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAAC("AD",J,K,L)) Q:L'>0  S Y(0)=$G(^FBAAC(K,3,L,0)) I Y(0)]"" D
+ F K=0:0 S K=$O(^FBAAC("AD",J,K)) Q:K'>0  F L=0:0 S L=$O(^FBAAC("AD",J,K,L)) Q:L'>0  S Y(0)=$G(^FBAAC(K,3,L,0)) I Y(0)]"",+$P(Y(0),U,3) D
  .S FBPICN=K_U_L
  .I 'FBTXT S FBTXT=1 D NEWMSG^FBAAV01,STORE^FBAAV01,UPD^FBAAV0
  .D GOT

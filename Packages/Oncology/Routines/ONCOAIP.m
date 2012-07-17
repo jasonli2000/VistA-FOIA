@@ -1,5 +1,5 @@
-ONCOAIP ;Hines OIFO/GWB - [EE Abstract Edit Primary] ;03/08/11
- ;;2.11;ONCOLOGY;**1,5,6,7,11,13,15,16,18,19,22,24,27,28,32,33,34,35,36,37,38,39,40,42,43,44,45,46,47,48,49,50,51,52,53**;Mar 07, 1995;Build 31
+ONCOAIP ;Hines OIFO/GWB - [EE Abstract Edit Primary] ;06/23/10
+ ;;2.11;ONCOLOGY;**1,5,6,7,11,13,15,16,18,19,22,24,27,28,32,33,34,35,36,37,38,39,40,42,43,44,45,46,47,48,49,50,51**;Mar 07, 1995;Build 65
  ;
 ED ;[EE Abstract Edit Primary]
  W @IOF,!
@@ -17,7 +17,7 @@ EN N CHECKVER
  S CHECKSUM=$P($G(^ONCO(165.5,ONCOD0P,"EDITS")),U,1)
  S CHECKVER=$P($G(^ONCO(165.5,ONCOD0P,"EDITS")),U,2)
  I ABSTAT=3,((CHECKSUM="")!(CHECKVER<12)) D
- .W !,"Recalculating checksum..."
+ .W !,"Recalculating checksum for NAACCR v12..."
  .S EDITS="NO" S D0=ONCOD0P D NAACCR^ONCGENED K EDITS
  .S CHECKSUM=$$CRC32^ONCSNACR(.ONCDST)
  .S $P(^ONCO(165.5,ONCOD0P,"EDITS"),U,1)=CHECKSUM
@@ -26,7 +26,6 @@ EN N CHECKVER
  L +^ONCO(165.5,DA):0 I $T D ^DIE L -^ONCO(165.5,DA) S ONCOL1=1
  I 'ONCOL1 W !!,"This primary is being edited by another user" H 3 Q:'$D(ONCOEDIT)  K ONCOL1 G ED
  ;I $D(Y) G EN
- S ABSTAT=$P($G(^ONCO(165.5,ONCOD0P,7)),U,2)
  I ABSTAT'=3 D
  .S DIE="^ONCO(165.5,"
  .S DA=ONCOD0P
@@ -221,13 +220,12 @@ AB ;Abstract Status
  S SECTION="Case Administration" D SECTION
  N DI,DIC,DR,DA,DIQ,ONC
  S DIC="^ONCO(165.5,"
- S DR="90:92;198;199;155;157.1;236;244"
+ S DR="90:92;198;199;155;157.1;236"
  S DA=D0,DIQ="ONC" D EN^DIQ1
  S X=ONC(165.5,D0,91) D UCASE^ONCPCI S ONC(165.5,D0,91)=X
  S X=ONC(165.5,D0,157.1) D UCASE^ONCPCI S ONC(165.5,D0,157.1)=X
  W !," Abstract Status.............: ",ONC(165.5,D0,91)
  W:ONC(165.5,D0,236)'="" !," Date Case Initiated.........: ",ONC(165.5,D0,236)
- W:ONC(165.5,D0,244)'="" !," Initiated By................: ",ONC(165.5,D0,244)
  W !," Date of First Contact.......: ",ONC(165.5,D0,155)
  W !," Date Case Completed.........: ",ONC(165.5,D0,90)
  W !," Elapsed Months to Completion: ",ONC(165.5,D0,157.1)

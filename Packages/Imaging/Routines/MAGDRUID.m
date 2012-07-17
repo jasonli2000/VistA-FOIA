@@ -1,5 +1,5 @@
-MAGDRUID ;WOIFO/PMK - Program to read a DICOM file ; 02/04/2004  08:04
- ;;3.0;IMAGING;**54,49**;Mar 19, 2002;Build 2033;Apr 07, 2011
+MAGDRUID ;WOIFO/PMK - Program to read a DICOM file ; 04/23/2007 14:43
+ ;;3.0;IMAGING;**54**;03-July-2009;;Build 1424
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -28,11 +28,10 @@ INIT ; run this to initialize the VA's UID root
  ; standard (www.nema.org/dicom) PS 3.8 Annex A for instructions on how
  ; to do this.
  ;
- ;  Or try: ftp://medical.nema.org/medical/dicom/2011/11_08pu.pdf
- ;
  K ^MAGD(2006.15)
  S ^MAGD(2006.15,0)="DICOM UID ROOT^2006.15^1^1"
- S ^MAGD(2006.15,1,0)="<Your Agency Name goes Here>"
- S ^MAGD(2006.15,1,"UID ROOT")="<Your Agency UID Root goes Here>"
- S ^MAGD(2006.15,"B","<Your Agency Name goes Here>",1)=""
+ S ^MAGD(2006.15,1,0)="Veterans' Administration"
+ S ^MAGD(2006.15,1,"UID ROOT")="1.2.840.113754"
+ S ^MAGD(2006.15,"B","Veterans' Administration",1)=""
  Q
+ ;

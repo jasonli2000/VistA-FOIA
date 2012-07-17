@@ -1,5 +1,5 @@
-PRCHLO3 ;WOIFO/RLL-EXTRACT ROUTINE CLO REPORT SERVER ; 10/8/10 9:08am
- ;;5.1;IFCAP;**83,130,151**;Oct 20, 2000;Build 4
+PRCHLO3 ;WOIFO/RLL-EXTRACT ROUTINE CLO REPORT SERVER ;5/22/09  14:13
+ ;;5.1;IFCAP;**83,130**;Oct 20, 2000;Build 25
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ; Continuation of PRCHLO2
  ;
@@ -261,10 +261,7 @@ CONTRPH ; Write File 410 header (Control Point Activities)
  W "ApprovOfficialSVCint^ApprovOfficialSVCext^ApprovOfficialTitle^"
  W "DateSigned^ESCodeDateTime^"
  W "Justification^SortGroup^StationPONoIEN^StationPONoEXT^PoDate^Status^"
- W "Comments^ReasonForReturn^"
- ;added by patch 151 to support new fields
- W "AuthIEN^AuthCode^AuthDesc^SubAuthIEN^SubAuthCode^SubAuthDesc^"
- W "ServiceStartDate^ServiceEndDate",!
+ W "Comments^ReasonForReturn",!
  Q
 CONTRPW ; Write File 410 data (Control Point Activities)
  N GPOID,GPOND

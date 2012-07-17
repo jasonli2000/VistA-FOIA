@@ -1,5 +1,5 @@
-DDUCHK4 ;SFISC/MKO-CHECK INDEXES ON FILE ;6:36 AM  28 Dec 2004
- ;;22.0;VA FileMan;*130*;Mar 30, 1999
+DDUCHK4 ;SFISC/MKO-CHECK INDEXES ON FILE ;9:39 AM  8 Sep 1998
+ ;;22.0;VA FileMan;;Mar 30, 1999
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
 INDEX(DDUCFI,DDUCFIX) ;Check and optionally fix structure of Index file entry
@@ -189,11 +189,11 @@ SET(GL,VAL) ;Set a global and print a message
  Q
  ;
  ;Write messages
-WCHK Q  ;D WRITE("Checking Indexes.",5) Q
+WCHK D WRITE("Checking Indexes.",5) Q
 WNOIX D WRITE(DDUCIXID_" does not exist.",7) Q
-WMS(S,N) D WRITE("*"_S_" is missing."_$S($G(N):" ",1:""),7) Q
-WNE D WRITE("*FILE does not equal ROOT FILE in "_DDUCOID_".",7) Q  ;22*130
-WFMS D WRITE("*File/Sub-file #"_$S($G(FIL)'="":FIL,1:DDUCFIL)_", Field #"_$S($G(FLD)'="":FLD,1:DDUCFLD)_" referenced in "_DDUCOID_" is missing.",7) Q  ;22*130
+WMS(S,N) D WRITE(S_" is missing."_$S($G(N):" Nothing done.",1:""),7) Q
+WNE D WRITE("FILE does not equal ROOT FILE in "_DDUCOID_". Nothing done.",7) Q
+WFMS D WRITE("File #"_FIL_", Field #"_FLD_" referenced in "_DDUCOID_" is missing. Nothing done.",7) Q
 WEN(GL) D WRITE("Erroneous node "_GL_" is set.",7) Q
 WNM D WRITE("NAME for "_DDUCIXID_" looks like it should be '"_DDUCNM_"'.",7) Q
  ;

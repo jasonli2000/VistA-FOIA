@@ -1,5 +1,5 @@
-PSORXED ;IHS/DSD/JCM-edit rx utility ; 8/18/10 3:16pm
- ;;7.0;OUTPATIENT PHARMACY;**2,16,21,26,56,71,125,201,246,289,298,366**;DEC 1997;Build 2
+PSORXED ;IHS/DSD/JCM-edit rx utility ; 7/22/09 7:17am
+ ;;7.0;OUTPATIENT PHARMACY;**2,16,21,26,56,71,125,201,246,289,298**;DEC 1997;Build 3
  ;External reference to ^PSXEDIT supported by DBIA 2209
  ;External reference to ^DD(52 supported by DBIA 999
  ;External reference to ^PSDRUG supported by DBIA 221
@@ -49,9 +49,7 @@ LOG K PSFROM S DA=PSORXED("IRXN"),(PSRX0,RX0)=PSORXED("RX0"),QTY=$P(RX0,"^",7),Q
  D LBL D:$G(PSOEDITL)=2&($P($G(^PSRX(DA,"STA")),"^")'=5)&('$G(RXRP(DA)))&('$G(PSOSIGFL)) ASKL
  S K=1,D1=0 F Z=0:0 S Z=$O(^PSRX(DA,"A",Z)) Q:'Z  S D1=Z,K=K+1
  S D1=D1+1 S:'($D(^PSRX(DA,"A",0))#2) ^(0)="^52.3DA^^^" S ^(0)=$P(^(0),"^",1,2)_"^"_D1_"^"_K
- ;
- ;PSO*7*366
- D NOW^%DTC S ^PSRX(DA,"A",D1,0)=%_"^E^"_$G(DUZ)_"^0^"_COM
+ S ^PSRX(DA,"A",D1,0)=DT_"^E^"_$G(DUZ)_"^0^"_COM
 LOG1 ;
  I QTY,$P(^PSRX(DA,2),"^",13) S ^PSDRUG($P(^PSRX(DA,0),"^",6),660.1)=$S($D(^PSDRUG(+$P(^PSRX(DA,0),"^",6),660.1)):^(660.1)+QTY,1:QTY)
  S:$P(RX0,"^",6)'=$P(^PSRX(DA,0),"^",6) ^PSDRUG(+$P(^PSRX(DA,0),"^",6),660.1)=$S($D(^PSDRUG(+$P(RX0,"^",6),660.1)):^(660.1)+$P(RX0,"^",7),1:$P(RX0,"^",7))

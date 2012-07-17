@@ -1,5 +1,5 @@
-DGRODEBR ;DJH/AMA,TDM - ROM DATA ELEMENT BUSINESS RULES ; 4/7/10 4:16pm
- ;;5.3;Registration;**533,572,754**;Aug 13, 1993;Build 46
+DGRODEBR ;DJH/AMA - ROM DATA ELEMENT BUSINESS RULES ; 27 Apr 2004  12:57 PM
+ ;;5.3;Registration;**533,572**;Aug 13, 1993
  ;
  ;BUSINESS RULES TO BE CHECKED JUST BEFORE FILING THE
  ;PATIENT DATA RETRIEVED FROM THE LAST SITE TREATED (LST)
@@ -49,35 +49,6 @@ IR(DGDATA,DFN,LSTDFN) ;RADIATION EXPOSURE INDICATED?
  I (RSIR="NO")!(LSTIR="NO") D
  . N FIELD
  . F FIELD=.32103,.32111,.3212 K @DGDATA@(2,LSTDFN_",",FIELD)
- Q
- ;
-INC(DGDATA,DFN,LSTDFN) ;RATED INCOMPETENT (Y/N)
- ;   DGDATA - Data element array from LST, ^TMP("DGROFDA",$J)
- ;      DFN - Pointer to the PATIENT (#2) file
- ;   LSTDFN - Pointer to the patient data from the LST, in DGDATA
- N RSIN    ;RATED INCOMPETENT (Y/N)
- N LSTIN   ;LST RATED INCOMPETENT (Y/N)
- S RSIN=$$GET1^DIQ(2,DFN,.293)
- S LSTIN=$G(@DGDATA@(2,LSTDFN_",",.293,"E"))
- ;If either of the RATED INCOMPETENT
- ;flags are "N"o, delete the IR data elements
- I (RSIN="NO")!(LSTIN="NO") D
- . N FIELD
- . F FIELD=.292,.293 K @DGDATA@(2,LSTDFN_",",FIELD)
- Q
- ;
-INE(DGDATA,DFN,LSTDFN) ;INELIGIBLE DATA
- ;   DGDATA - Data element array from LST, ^TMP("DGROFDA",$J)
- ;      DFN - Pointer to the PATIENT (#2) file
- ;   LSTDFN - Pointer to the patient data from the LST, in DGDATA
- ;
- N LSTID ;INELIGIBLE DATE
- S LSTID=$G(@DGDATA@(2,LSTDFN_",",.152,"E"))
- ;
- ;If no INELIGIBLE DATE from LST don't upload ineligible fields.
- I LSTID="" D
- . N FIELD
- . F FIELD=.152,.307,.1651,.1653,.1654,.1656 K @DGDATA@(2,LSTDFN_",",FIELD)
  Q
  ;
 DOD(DGDATA,DFN,LSTDFN) ;DATE OF DEATH
@@ -153,21 +124,6 @@ SP(DGDATA,DFN,LSTDFN) ;SENSITIVE PATIENT
  . D EN^DDIOL(.DGMSG) R A:5
  Q
  ;
-SWA(DGDATA,DFN,LSTDFN) ;SOUTHWEST ASIA CONDITIONS
- ;   DGDATA - Data element array from LST, ^TMP("DGROFDA",$J)
- ;      DFN - Pointer to the PATIENT (#2) file
- ;   LSTDFN - Pointer to the patient data from the LST, in DGDATA
- N RSSWA    ;REQUESTING SITE SOUTHWEST ASIA CONDITIONS
- N LSTSWA   ;LAST SITE TREATED SOUTHWEST ASIA CONDITIONS
- S RSSWA=$$GET1^DIQ(2,DFN,.322013)
- S LSTSWA=$G(@DGDATA@(2,LSTDFN_",",.322013,"E"))
- ;If either of the SOUTHWEST ASIA CONDITIONS flags
- ;are "N"o, don't file the SOUTWEST ASIA CONDITION data element(s)
- I (RSSWA="NO")!(LSTSWA="NO") D
- . N FIELD
- . F FIELD=.322013,322014,322015 K @DGDATA@(2,LSTDFN_",",FIELD)
- Q
- ;
 RE ;RACE AND ETHNICITY
  ;If the RACE AND ETHNICITY data not already
  ;populated, file it (already the basic rule)
@@ -183,7 +139,7 @@ CA(DGDATA,LSTDFN) ;CONFIDENTIAL ADDRESS
  S LSTCAED=$G(@DGDATA@(2,LSTDFN_",",.1418,"E"))
  ;*Convert LSTCAED to Fileman format date for compare (DG*5.3*572)
  S X=LSTCAED
- S %DT="SN"
+ S %DT="RSN"
  D ^%DT
  S LSTCAEDF=Y
  ;If the CONFIDENTIAL ADDRESS FLAG from the Last Site Treated is "N"o,
@@ -191,7 +147,7 @@ CA(DGDATA,LSTDFN) ;CONFIDENTIAL ADDRESS
  ;delete the C.A. data elements
  I (LSTCAAF'="YES")!((LSTCAEDF>0)&(LSTCAEDF<DT)) D
  . N FIELD
- . F FIELD=.1315,.14105,.14111:.00001:.14116,.1411:.0001:.1418 K @DGDATA@(2,LSTDFN_",",FIELD)
+ . F FIELD=.14105,.14111,.1411:.0001:.1418 K @DGDATA@(2,LSTDFN_",",FIELD)
  . K @DGDATA@(2.141)
  ;Else the Confidential Address information will be filed
  ;and a User Interface message will be displayed.
@@ -205,7 +161,7 @@ CA(DGDATA,LSTDFN) ;CONFIDENTIAL ADDRESS
  . ;* Convert DATE to FM format (DG*5.3*572)
  . K X,%DT,Y
  . S X=DATE
- . S %DT="SN"
+ . S %DT="RSN"
  . D ^%DT
  . S DATEFM=Y
  . I DATEFM>DT D
@@ -225,21 +181,4 @@ PA(DGDATA,LSTDFN) ;PERMANENT ADDRESS
  I LSTBAI'="" D
  . N FIELD
  . F FIELD=.1112,.111:.001:.119,.12,.121 K @DGDATA@(2,LSTDFN_",",FIELD)
- Q
- ;
-RDOC(DGDATA,DFN,LSTDFN) ;RECENT DATE(S) OF CARE
- ;   DGDATA - Data element array from LST, ^TMP("DGROFDA",$J)
- ;      DFN - Pointer to the PATIENT (#2) file
- ;   LSTDFN - Pointer to the patient data from the LST, in DGDATA
- N LSTRCP     ;LST RECEIVED VA CARE PREVIOUSLY?
- N LSTLOC1    ;LST MOST RECENT LOCATION OF CARE
- S LSTRCP=$G(@DGDATA@(2,LSTDFN_",",1010.15,"E"))
- S LSTLOC1=$G(@DGDATA@(2,LSTDFN_",",1010.152,"E"))
- ;
- ;If the RECEIVED VA CARE PREVIOUSLY? from LST is not YES,
- ;  OR  the MOST RECENT LOCATION OF CARE from LST is NULL,
- ;delete all the RDOC fields.
- I (LSTRCP'="YES")!(LSTLOC1="") D
- . N FIELD
- . F FIELD=1010.15,1010.151,1010.152,1010.153,1010.154 K @DGDATA@(2,LSTDFN_",",FIELD)
  Q

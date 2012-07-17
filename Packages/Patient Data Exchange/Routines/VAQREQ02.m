@@ -1,4 +1,4 @@
-VAQREQ02 ;ALB/JFP - PDX, REQUEST PATIENT DATA, REQUEST SCREEN;01MAR93
+VAQREQ02 ;ALB/JFP - PDX, REQUEST PATIENT DATA, REQUEST SCREEN;01MAR93 [ 11/14/94  3:36 PM ]
  ;;1.5;PATIENT DATA EXCHANGE;;NOV 17, 1993
 EP ; -- Main entry point for the list processor (called from protocol
  ;    vaq create request)

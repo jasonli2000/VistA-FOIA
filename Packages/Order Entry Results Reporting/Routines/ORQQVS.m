@@ -1,5 +1,5 @@
 ORQQVS ; slc/CLA,STAFF - Functions which return patient visits ;3/16/05  10:27
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,195,215,271**;Dec 17, 1997;Build 2
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,195,215**;Dec 17, 1997
  ;
  ; DBIA 2812   NOTES^TIUSRVLV   ^TMP("TIULIST",$J)
  ; DBIA 2944   TGET^TIUSRVR1    ^TMP("TIUVIEW",$J)
@@ -43,11 +43,8 @@ VSITAPPT(ORVY,PT,SDT,EDT,DUMMY) ; return past visits and future appointments for
  .I $P(YV(I),U,4)'="H" S ORVY(CNT)=ORVY(CNT)_U_"visited:"
  .S ORVY(CNT)=ORVY(CNT)_U_$P(YV(I),U,2)_U_$P(YV(I),U,8),CNT=CNT+1
  S:+$G(ORVY(1))<1 ORVY(1)="^No appts or visits found."
- S TSTDT=DT_".2359"
- D DT^DILF("T",EDT,.EDT,"","")
- I (EDT>TSTDT) D
- . I '$L($P($G(ORYA(1)),U)),$L($P($G(ORYA(1)),U,2)),'$L($O(ORYA(1))) D
- . . K ORVY S ORVY(1)=ORYA(1)
+ I '$L($P($G(ORYA(1)),U)),$L($P($G(ORYA(1)),U,2)),'$L($O(ORYA(1))) D
+ . K ORVY S ORVY(1)=ORYA(1)
  K ORYA,YV
  Q
 DETNOTE(ORVY,ORPT,ORVIEN) ;return progress notes for a patient's visit

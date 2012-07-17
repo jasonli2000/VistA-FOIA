@@ -1,5 +1,5 @@
 PRCHFPD2 ;SF/FKV,TKW/RHD-PROMPT WHETHER FPDS DATA IS TO BE ENTERED ;2/9/93  14:54
-V ;;5.1;IFCAP;**79,100**;Oct 20, 2000
+V ;;5.1;IFCAP;**79**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
 AMT ;
  S PRCHY=0 I PRCHEST>0,PRCHEC>0 S PRCHY=PRCHEST/PRCHEC,Y=$P(PRCHY,".",2) I $L(Y)>2 S PRCHY=$P(PRCHY,".",1)+$J("."_Y,2,2)
@@ -26,16 +26,14 @@ FPDS ;
  ; intended for Purchasing Agents and Delivery Orders menu users. Now a
  ; definition for delivery orders is in effect: if the PO uses source
  ; codes 4, 6, 7, or B, then it is a delivery order (DO).
- ; Check Detailed PO from a PC user if it has source codes 6 or B.
- ; PRC*5.1*100: for non-general post funds (GPF), when creating a PO
- ; PRCHN("SFC")=0. If using a GPF, PRCHN("SFC")=1.
- I PRCHTTT>25000&($P(^PRC(442,PRCHPO,23),U,11)="P")&($G(PRCHPC)=2)&("6B"[PRCHSC)&($G(PRCHN("SFC"))>1!($G(PRCHN("SFC"))=0)) D PC Q
+ ; Check Detailed PO from a PC user if it has source codes 6 or B
+ I PRCHTTT>25000&($P(^PRC(442,PRCHPO,23),U,11)="P")&($G(PRCHPC)=2)&("6"[PRCHSC) D PC Q
  ;
  ; Check PO from users of the separate Delivery Orders menu
- I PRCHTTT>25000&(($G(PRCHPHAM)=1)!($G(PRCHDELV)=1))&($G(PRCHN("SFC"))>1!($G(PRCHN("SFC"))=0)) D PC Q
+ I PRCHTTT>25000&(($G(PRCHPHAM)=1)!($G(PRCHDELV)=1)) D PC Q
  ;
- ; Check PO from the purchasing agent who can use any source code.
- I PRCHTTT>25000&("467B"[PRCHSC)&($D(^PRC(442,PRCHPO,14)))&($G(PRCHN("SFC"))>1!($G(PRCHN("SFC"))=0)) D DEL Q
+ ; Check PO from the purchasing agent who can use any source code
+ I PRCHTTT>25000&("467B"[PRCHSC)&($D(^PRC(442,PRCHPO,14))) D DEL Q
  ;
  S Y=$S(X>25000:0,"130"[PRCHSC:0,PRCHN("MP")=12:0,PRCHN("MP")=5:0,PRCHN("SFC")=1:0,1:1)
  I 'Y S X=$S(X>25000:"Total Amount "_$J(X,11,2)_" is greater than $25000.00",1:"") W !!!,"No FPDS Data to be Entered: "_X,!!,%B,!,%B(1),!,%B(2),!,%B(3),!,%B(4),! D AMT K %B Q

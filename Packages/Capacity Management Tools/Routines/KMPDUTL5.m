@@ -19,7 +19,9 @@ CPU(ARRAY) ;-- get cpu configuration information
  S U="^"
  I (ZV["DSM") D DSM(.ARRAY)
  I (ZV["CVMS") D CVMS(.ARRAY,1)
- I (ZV["CWINNT") D CWINNT(.ARRAY,1)
+ ;kjk - commented this line out in vehu db to prevent WINMSD
+ ; window pop-up on Innovations laptops.
+ ;I (ZV["CWINNT") D CWINNT(.ARRAY,1)
  Q
  ;
 DSM(CPUINFO) ;-- for DSM Platform
@@ -29,12 +31,12 @@ DSM(CPUINFO) ;-- for DSM Platform
  ;
  N CLSTRMEM,CSID,CSIDARRY,NODE,NODEARRY,X
  ;
- S CLSTRMEM=$ZC(%GETSYI,"CLUSTER_MEMBER")
+ ;S CLSTRMEM=$ZC(%GETSYI,"CLUSTER_MEMBER")
  ;
  ; not in cluster environment
  I 'CLSTRMEM D  Q
- .S NODE=$ZC(%GETSYI,"NODENAME")
- .S CPUINFO(NODE)=$ZC(%GETSYI,"HW_NAME")_U_$ZC(%GETSYI,"ACTIVECPU_CNT")
+ ;.S NODE=$ZC(%GETSYI,"NODENAME")
+ ;.S CPUINFO(NODE)=$ZC(%GETSYI,"HW_NAME")_U_$ZC(%GETSYI,"ACTIVECPU_CNT")
  ;
  ; in cluster environment
  D CLSTR
@@ -42,18 +44,18 @@ DSM(CPUINFO) ;-- for DSM Platform
  S NODE=""
  F  S NODE=$O(NODEARRY(NODE)) Q:NODE=""  D
  .S CSID=NODEARRY(NODE)
- .S CPUINFO(NODE)=$ZC(%GETSYI,"HW_NAME",CSID)_U_$ZC(%GETSYI,"ACTIVECPU_CNT",CSID)
+ ;.S CPUINFO(NODE)=$ZC(%GETSYI,"HW_NAME",CSID)_U_$ZC(%GETSYI,"ACTIVECPU_CNT",CSID)
  Q
 CLSTR ; get %GETSYI using wild card to get CSID and NODENAME for all nodes
  ;
  N X
  S X="ERRCLU^KMPDUTL5",@^%ZOSF("TRAP"),$ZE=""
- S CSIDARRY($ZC(%GETSYI,"NODE_CSID",-1))=""
- F  S CSIDARRY($ZC(%GETSYI,"NODE_CSID",""))=""
+ ;S CSIDARRY($ZC(%GETSYI,"NODE_CSID",-1))=""
+ ;F  S CSIDARRY($ZC(%GETSYI,"NODE_CSID",""))=""
 ERRCLU I $ZE'["NOMORENODE" ZQ
  N CSID
  S CSID=""
- F  S CSID=$O(CSIDARRY(CSID)) Q:CSID=""  S NODEARRY($ZC(%GETSYI,"NODENAME",CSID))=CSID
+ ;F  S CSID=$O(CSIDARRY(CSID)) Q:CSID=""  S NODEARRY($ZC(%GETSYI,"NODENAME",CSID))=CSID
  Q
  ;
 CVMS(CPUINFO,TYP) ;-- for Cache for OpenVMS Platform

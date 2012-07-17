@@ -53,7 +53,7 @@ EN ; Lookup (general)
  I $L(X),Y=-1,$G(GMTSDIC0)["L",+($G(GMTSLGO))=142 D
  . Q:$L(X)<3!($L(X)>30)  K Y(0) N DLAYGO,GMTSOD0,GMTSOX S GMTSOD0=DIC(0),GMTSOX=X
  . N X,DA,DIC,DIK S DIC(0)="LM",(DIK,DIC)="^GMT(142,",DLAYGO=142,X=GMTSOX
- . L +^GMT(142):2 W:'$T !,"  Can not add Health Summary Type, the file is in ",!,"  use by another user.  Please try again later."
+ . ;L +^GMT(142):2 W:'$T !,"  Can not add Health Summary Type, the file is in ",!,"  use by another user.  Please try again later."
  . D:$T ADD L -^GMT(142) S (GMTSDIC0,DIC(0))=GMTSOD0
  D RD,CLR
  Q

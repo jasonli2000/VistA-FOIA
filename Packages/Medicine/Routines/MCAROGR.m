@@ -1,4 +1,4 @@
-MCAROGR ; GENERATED FROM 'MCARGIRCLI' PRINT TEMPLATE (#981) ; 10/04/96 ; (FILE 699, MARGIN=80)
+MCAROGR ; GENERATED FROM 'MCARGIRCLI' PRINT TEMPLATE (#2049) ; 07/22/97 ; (FILE 699, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(981,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(2049,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D T Q:'DN  D N W ?0 W "Proc: "
  S X=$G(^MCAR(699,D0,0)) S Y=$P(X,U,12) S Y=$S(Y="":Y,$D(^MCAR(697.2,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,10)
  D N:$X>19 Q:'DN  W ?19 W "Patient:  "

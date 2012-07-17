@@ -1,19 +1,8 @@
 RORX014A ;HOIFO/BH,SG,VAC - REGISTRY MEDS REPORT (QUERY & SORT) ;4/7/09 2:09pm
- ;;1.5;CLINICAL CASE REGISTRIES;**8,13**;Feb 17, 2006;Build 27
+ ;;1.5;CLINICAL CASE REGISTRIES;**8**;Feb 17, 2006;Build 8
  ;
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*8    MAR  2010   V CARR       Modified to handle ICD9 filter for
- ;                                      'include' or 'exclude'.
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can select specific patients,
- ;                                      clinics, or divisions for the report.
- ;                                      
- ;******************************************************************************
- ;******************************************************************************
+ ; This routine modified March 2009 to handle ICD9 Filter for Include
+ ;   or Exclude
  Q
  ;
  ;***** ADDS THE DRUG COMBINATION TO THE REPORT
@@ -34,7 +23,7 @@ ADD(RXLST,PATIEN) ;
  . S ^TMP("RORX014",$J,"RXC",RXCIEN,1)=RXLST
  . S ^TMP("RORX014",$J,"RXC","B",RXCNDX,RXCIEN)=""
  ;--- Add new patient
- S ^("P")=$G(^TMP("RORX014",$J,"RXC",RXCIEN,"P"))+1 ;naked reference: ^TMP("RORX014",$J,"RXC",RXCIEN,"P")
+ S ^("P")=$G(^TMP("RORX014",$J,"RXC",RXCIEN,"P"))+1
  D VADEM^RORUTL05(PATIEN,1)
  S TMP=VA("BID")_U_VADM(1)_U_$$DATE^RORXU002(VADM(6)\1)
  S ^TMP("RORX014",$J,"RXC",RXCIEN,"P",PATIEN)=TMP
@@ -55,9 +44,6 @@ QUERY(FLAGS) ;
  ;
  N CNT,DRGIEN,ECNT,NAME,PATIEN,RC,RORIEN,RXFLAGS,STR,TMP,XREFNODE
  N RCC,FLAG
- N RORCDLIST     ; Flag to indicate whether a clinic or division list exists
- N RORCDSTDT     ; Start date for clinic/division utilization search
- N RORCDENDT     ; End date for clinic/division utilization search
  ;
  S XREFNODE=$NA(^RORDATA(798,"AC",+RORREG))
  S RORPTN=$$REGSIZE^RORUTL02(+RORREG)  S:RORPTN<0 RORPTN=0
@@ -72,9 +58,6 @@ QUERY(FLAGS) ;
  S:$$PARAM^RORTSK01("PATIENTS","OUTPATIENT") RXFLAGS=RXFLAGS_"O"
  Q:RXFLAGS="E" 0
  ;
- ;=== Set up Clinic/Division list parameters
- S RORCDLIST=$$CDPARMS^RORXU001(.RORTSK,.RORCDSTDT,.RORCDENDT)
- ;
  ;--- Browse through the registry records
  S RORIEN=0
  S FLAG=$G(RORTSK("PARAMS","ICD9FILT","A","FILTER"))
@@ -82,12 +65,11 @@ QUERY(FLAGS) ;
  . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . S CNT=CNT+1
- . ;--- Get patient DFN
- . S PATIEN=$$PTIEN^RORUTL01(RORIEN)  Q:PATIEN'>0
- . ;check for patient list and quit if not on list
- . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",PATIEN)) Q
  . ;--- Check if the patient should be skipped
  . Q:$$SKIP^RORXU005(RORIEN,FLAGS,RORSDT,ROREDT)
+ . ;
+ . ;--- Get the patient IEN (DFN)
+ . S PATIEN=$$PTIEN^RORUTL01(RORIEN)  Q:PATIEN'>0
  . ;--- Check the patient against the ICD9 Filter
  . S RCC=0
  . I FLAG'="ALL" D
@@ -95,9 +77,6 @@ QUERY(FLAGS) ;
  . I (FLAG="INCLUDE")&(RCC=0) Q
  . I (FLAG="EXCLUDE")&(RCC=1) Q
  . ;--- End of ICD9 check
- . ;
- . ;--- Check for Clinic or Division list and quit if not in list
- . I RORCDLIST,'$$CDUTIL^RORXU001(.RORTSK,PATIEN,RORCDSTDT,RORCDENDT) Q
  . ;
  . ;--- Search for pharmacy data
  . S TMP=$$RXSEARCH^RORUTL14(PATIEN,RORXL,.RORXDST,RXFLAGS,RORSDT,ROREDT1)

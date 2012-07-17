@@ -1,5 +1,5 @@
-PRCPSFSV ;WOIFO/RFJ,LKG-create fms sv adjustment code sheet ;7/8/05  10:11
- ;;5.1;IFCAP;**81,85**;Oct 20, 2000
+PRCPSFSV ;WOIFO/RFJ,LKG-create fms sv adjustment code sheet ;4/27/05  14:08
+ ;;5.1;IFCAP;**81**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
@@ -67,11 +67,10 @@ TRANTYPE(TYPE,ACCT) ;  return transaction type based on type (1-7) and acct
  ;  type=5:writeoff damaged stock
  ;  type=6:transfer transportation to stock
  ;  type=7:inventory refund adjustment
- I TYPE=1 Q $S(ACCT=1:"A",ACCT=2:"B",ACCT=3:"C",ACCT=8:"D",ACCT=6:"N",1:0)
- I TYPE=2 Q $S(ACCT=1:"E",ACCT=2:"F",ACCT=3:"G",ACCT=8:"H",ACCT=6:"N",1:0)
- I TYPE=3 Q $S(ACCT=1:"J",ACCT=2:"J",ACCT=3:"J",ACCT=8:"J",ACCT=6:"N",1:0)
- I TYPE=4 Q $S(ACCT=1:"M",ACCT=2:"N",ACCT=3:"N",ACCT=8:"N",ACCT=6:"N",1:0)
- I TYPE=5 Q $S(ACCT=1:"M",ACCT=2:"N",ACCT=3:"N",ACCT=8:"N",ACCT=6:"N",1:0)
- I TYPE=6 Q $S(ACCT=1:"Q",ACCT=2:"Q",ACCT=3:"Q",ACCT=8:"Q",ACCT=6:"N",1:0)
- I TYPE=7 Q $S(ACCT=1:"U",ACCT=2:"U",ACCT=3:"U",ACCT=8:"U",ACCT=6:"N",1:0)
+ I TYPE=1 Q $S(ACCT=1:"A",ACCT=2:"B",ACCT=3:"C",ACCT=8:"D",1:0)
+ I TYPE=2 Q $S(ACCT=1:"E",ACCT=2:"F",ACCT=3:"G",ACCT=8:"H",1:0)
+ I TYPE=3!(TYPE=4) Q $S(ACCT=1:"I",ACCT=2:"J",ACCT=3:"K",ACCT=8:"L",1:0)
+ I TYPE=5 Q $S(ACCT=1:"M",ACCT=2:"N",ACCT=3:"O",ACCT=8:"P",1:0)
+ I TYPE=6 Q $S(ACCT=1:"Q",ACCT=2:"R",ACCT=3:"S",ACCT=8:"T",1:0)
+ I TYPE=7 Q $S(ACCT=1:"U",ACCT=2:"W",ACCT=3:"X",ACCT=8:"Y",1:0)
  Q 0

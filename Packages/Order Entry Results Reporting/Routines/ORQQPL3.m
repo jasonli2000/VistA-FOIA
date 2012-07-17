@@ -1,5 +1,5 @@
-ORQQPL3 ; ALB/PDR/REV - Problem List RPCs ;11/19/09  10:15
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,148,173,243,280**;Dec 17, 1997;Build 85
+ORQQPL3 ; ALB/PDR/REV ; Problem List RPC's ; 8-OCT-1998 09:08:49.29
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,148,173,243**;Dec 17, 1997;Build 242
  ;
  ;---------------- LIST PATIENT PROBLEMS ------------------------
  ;
@@ -25,7 +25,7 @@ LIST(GMPL,GMPDFN,GMPSTAT)       ; -- Returns list of problems for patient GMPDFN
  ;    in GMPL(#)=ifn^status^description^ICD^onset^last modified^SC^SpExp^Condition^Loc^
  ;                          loc.type^prov^service
  ;     & GMPL(0)=number of problems returned
- ; This is virtually same as LIST^GMPLUTL2 except that it appends the
+ ; This is virtually same as LIST^GMPLUTL2 except that it appends the 
  ; condition - T)ranscribed or P)ermanent,location,loc type,provider, service.
  ;
  N I,IFN,CNT,GMPL0,GMPL1,SP,ST,NUM,ONSET,ICD,LASTMOD,PRIO,DTREC
@@ -206,12 +206,13 @@ PROB(TMP,GROUP) ; Get user problem list for given group
 ICDCODE(COD)    ; RETURN INTERNAL ICD FOR EXTERNAL CODE  (obsolete after CSV patches released - RV)
  N CODIEN
  I COD="" Q ""
- S CODIEN=$$CODEN^ICDCODE($P(COD,U),80) ;ICR #3990
+ S CODIEN=+$O(^ICD9("AB",$P(COD,U)_" ",0))
+ S:CODIEN'>0 CODIEN=+$O(^ICD9("AB",$P(COD,U)_"0 ",0))
  Q CODIEN
  ;
  ;------------------ Filter Providers ---------------------
  ;
-GETRPRV(RETURN,INP) ; GET LIST OF RESPONSIBLE PROVIDERS FROM PRBLM LIST
+GETRPRV(RETURN,INP) ; GET LIST OF RESPONSIBLE PROVIDERS FROM PRBLM LIST 
  ; RETURN - aa list of responsible providers from which to select for filtering
  ; INP - array of problem list providers to select from
  ;

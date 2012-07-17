@@ -1,5 +1,5 @@
-ECXSCX1 ;ALB/JAP,BIR/DMA-Clinic Extract Message ;9/29/10  17:26
- ;;3.0;DSS EXTRACTS;**8,28,24,27,29,30,31,33,84,92,105,127,132**;Dec 22, 1997;Build 18
+ECXSCX1 ;ALB/JAP,BIR/DMA-Clinic Extract Message ; 4/11/07 3:26pm
+ ;;3.0;DSS EXTRACTS;**8,28,24,27,29,30,31,33,84,92,105**;Dec 22, 1997;Build 70
 EN ;entry point from ecxscx
  N ECX
  ;send missing clinic message
@@ -118,14 +118,11 @@ VISIT(ECXDFN,ECXVISIT,ECXVIST,ECXERR) ;get visit specific data
  ;       ECXSVC  = sc percentage
  ;output ECXVSIT = data array
  ;       ECXERR  = 1 indicates error; otherwise, 0
- N AO,ARRAY,CM,CNT,CPT,DA,DATE,DA,DIQ,ICD,ICD9,IR,LEN,M,MOD,MST,NUM,NOD1,NODE
- N PROV,PROVPC,REC,VAL,VISIT,X,Y,HNC,PGE,CV,SHAD
+ N AO,ARRAY,CM,CNT,CPT,DA,DATE,DA,DIQ,ICD,ICD9,IR,LEN,M,MOD,MST,NUM
+ N PROV,PROVPC,REC,VAL,VISIT,X,Y,PGE
  S ECXERR=0,VISIT=ECXVISIT
  S (ECXVIST("AO"),ECXVIST("IR"),ECXVIST("PGE"),ECXVIST("HNC"))=""
- S (ECXVIST("MST"),ECXVIST("CV"),ECXVIST("SHAD"))=""
- ;MRY-2/4/2010, extracts don't seem to use encounter (visit) "CV".
- ;extracts use eligibility API for some reason.  Added "CV" anyway.
- S (ECXVIST("PROV"),ECXVIST("PROV CLASS"))=""
+ S (ECXVIST("MST"),ECXVIST("PROV"),ECXVIST("PROV CLASS"))=""
  S (ECXVIST("PROV NPI"),ECXVIST("SOURCE"))=""
  F I="P",1,2,3,4 S ECXVIST("ICD9"_I)=""
  F I=1:1:8 S ECXVIST("CPT"_I)=""
@@ -170,18 +167,6 @@ VISIT(ECXDFN,ECXVISIT,ECXVIST,ECXERR) ;get visit specific data
  .S:PROV]"" PROV="2"_PROV
  S ECXVIST("PROV")=PROV,ECXVIST("PROV CLASS")=PROVPC
  S ECXVIST("PROV NPI")=""
- ;get 1-5 secondary physicians
- F I=1:1:5 S ECXVIST("PROVS"_I)=""
- I $O(^TMP("PXKENC",$J,VISIT,"PRV",0)) D
- .S (REC,VAL,COUNTS)=0 D
- ..F  S REC=$O(^TMP("PXKENC",$J,VISIT,"PRV",REC)) Q:('REC)  D
- ...Q:$P(^(REC,0),U,4)'="S"
- ...S VAL=+^(0) I $E(PROV,2,99)=VAL Q  ;don't process, primary
- ...S COUNTS=COUNTS+1 Q:(COUNTS>5)
- ...S PROVS=VAL,PROVSPC=$$PRVCLASS^ECXUTL(PROVS,DATE)
- ...S PROVSNPI=$$NPI^XUSNPI("Individual_ID",PROVS,DATE)
- ...S:+PROVSNPI'>0 PROVSNPI="" S PROVSNPI=$P(PROVSNPI,U)
- ...S ECXVIST("PROVS"_COUNTS)="2"_PROVS_U_PROVSPC_U_PROVSNPI
  ;get cpt codes upto 8 & modifiers upto 5
  S CNT=1,PROV=$E(PROV,2,99)
  D:$O(^TMP("PXKENC",$J,VISIT,"CPT",0))
@@ -212,18 +197,15 @@ VISIT(ECXDFN,ECXVISIT,ECXVIST,ECXERR) ;get visit specific data
  ..K ^TMP("PXKENC",$J,VISIT,"CPT",REC)
  ..Q:CNT>8
  S:ECXVIST("CPT1")="" ECXVIST("CPT1")=9919901
- ;ao, ir, mst, pge, hnc, cv, shad
- S (AO,IR,MST,PGE,HNC,CV,SHAD)=""
+ ;ao, ir, mst, pge, hnc
+ S (AO,IR,MST,PGE,HNC)=""
  I $D(^TMP("PXKENC",$J,VISIT,"VST",VISIT,800)) D
  .S AO=$P(^TMP("PXKENC",$J,VISIT,"VST",VISIT,800),U,2)
  .S IR=$P(^TMP("PXKENC",$J,VISIT,"VST",VISIT,800),U,3),MST=$P(^(800),U,5)
  .S PGE=$P(^TMP("PXKENC",$J,VISIT,"VST",VISIT,800),U,4),HNC=$P(^(800),U,6)
- .S CV=$P(^TMP("PXKENC",$J,VISIT,"VST",VISIT,800),U,7),SHAD=$P(^(800),U,8)
  .S ECXVIST("AO")=$S(AO=0:"N",AO=1:"Y",1:"")
  .S ECXVIST("IR")=$S(IR=0:"N",IR=1:"Y",1:"")
  .S ECXVIST("MST")=$S(MST=0:"N",MST=1:"Y",1:"")
  .S ECXVIST("PGE")=$S(PGE=0:"N",PGE=1:"Y",1:"")
  .S ECXVIST("HNC")=$S(HNC=0:"N",HNC=1:"Y",1:"")
- .S ECXVIST("CV")=$S(CV=0:"N",CV=1:"Y",1:"")
- .S ECXVIST("SHAD")=$S(SHAD=0:"N",SHAD=1:"Y",1:"")
  Q

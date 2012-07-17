@@ -1,7 +1,8 @@
-SDAMXOE1 ; ;09/22/96
+SDAMXOE1 ; ;01/04/99
  D DE G BEGIN
 DE S DIE="^SCE(",DIC=DIE,DP=409.68,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^SCE(DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,6) S:%]"" DE(1)=% S %=$P(%Z,U,8) S:%]"" DE(2)=% S %=$P(%Z,U,9) S:%]"" DE(3)=% S %=$P(%Z,U,10) S:%]"" DE(4)=% S %=$P(%Z,U,11) S:%]"" DE(5)=% S %=$P(%Z,U,13) S:%]"" DE(6)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,8) S:%]"" DE(1)=% S %=$P(%Z,U,9) S:%]"" DE(2)=% S %=$P(%Z,U,10) S:%]"" DE(3)=% S %=$P(%Z,U,11) S:%]"" DE(4)=% S %=$P(%Z,U,13) S:%]"" DE(5)=%
+ I $D(^("USER")) S %Z=^("USER") S %=$P(%Z,U,3) S:%]"" DE(6)=% S %=$P(%Z,U,4) S:%]"" DE(7)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -18,7 +19,7 @@ N I X="" G A:DV'["R",X:'DV,X:D'>0,A
 RD G QS:X?."?" I X["^" D D G ^DIE17
  I X="@" D D G Z^DIE2
  I X=" ",DV["d",DV'["P",$D(^DISV(DUZ,"DIE",DLB)) S X=^(DLB) I DV'["D",DV'["S" W "  "_X
-T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
+T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) I X?.ANP D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
  K DDER G X
 P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
@@ -38,61 +39,62 @@ RP D O I X="" S X=DE(DQ) G A:'DV,A:DC<2,N^DIE17
 I I DV'["I",DV'["#" G RD
  D E^DIE0 G RD:$D(X),PR
  Q
-SET I X'?.ANP S DDER=1 Q 
- N DIR S DIR(0)="SMV^"_DU,DIR("V")=1
+SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  I $D(DB(DQ)),'$D(DIQUIET) N DIQUIET S DIQUIET=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="SDAMXOE1",DQ=1
-1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW="0;6",DV="P409.68'I",DU="",DLB="PARENT ENCOUNTER",DIFLD=.06
- S DE(DW)="C1^SDAMXOE1"
- S DU="SCE("
- S X=$G(SDVSIT("PAR"))
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
-C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
- K ^SCE("APAR",$E(X,1,30),DA)
- S X=DE(1),DIC=DIE
- K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(1)=$S($D(^SCE(D0,0)):^(0),1:"") S X=$P(Y(1),U,7),X=X S DIU=X K Y S X="" S DIH=$S($D(^SCE(DIV(0),0)):^(0),1:""),DIV=X S $P(^(0),U,7)=DIV,DIH=409.68,DIG=.07 D ^DICR:$N(^DD(DIH,DIG,1,0))>0
-C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
- S ^SCE("APAR",$E(X,1,30),DA)=""
- S X=DG(DQ),DIC=DIE
- K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(1)=$S($D(^SCE(D0,0)):^(0),1:"") S X=$P(Y(1),U,7),X=X S DIU=X K Y S X=DIV S X=$P($G(^SCE(+X,0)),U,7) X ^DD(409.68,.06,1,2,1.4)
- Q
-X1 Q
-2 D:$D(DG)>9 F^DIE17,DE S DQ=2,DW="0;8",DV="RSI",DU="",DLB="ORIGINATING PROCESS TYPE",DIFLD=.08
+1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW="0;8",DV="RSI",DU="",DLB="ORIGINATING PROCESS TYPE",DIFLD=.08
  S DU="1:APPOINTMENT;2:STOP CODE ADDITION;3:DISPOSITION;4:CREDIT STOP CODE;"
  S X=$G(SDVSIT("ORG"))
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
-X2 Q
-3 S DW="0;9",DV="FI",DU="",DLB="EXTENDED REFERENCE",DIFLD=.09
+ G RD:X="@",Z
+X1 Q
+2 S DW="0;9",DV="FI",DU="",DLB="EXTENDED REFERENCE",DIFLD=.09
  S X=$G(SDVSIT("REF"))
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
-X3 Q
-4 S DW="0;10",DV="RP409.1'I",DU="",DLB="APPOINTMENT TYPE",DIFLD=.1
+ G RD:X="@",Z
+X2 Q
+3 S DW="0;10",DV="RP409.1'",DU="",DLB="APPOINTMENT TYPE",DIFLD=.1
+ S DE(DW)="C3^SDAMXOE1"
  S DU="SD(409.1,"
  S X=$G(SDVSIT("TYP"))
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
-X4 Q
-5 S DW="0;11",DV="RP40.8'I",DU="",DLB="MEDICAL CENTER DIVISION",DIFLD=.11
+ G RD:X="@",Z
+C3 G C3S:$D(DE(3))[0 K DB S X=DE(3),DIC=DIE
+ N SD0 S SD0=$G(^SCE(DA,0)) IF +SD0,X=10 K ^SCE("ACG",+SD0,DA)
+C3S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+ N SD0 S SD0=$G(^SCE(DA,0)) IF +SD0,X=10 S ^SCE("ACG",+SD0,DA)=""
+ Q
+X3 Q
+4 D:$D(DG)>9 F^DIE17,DE S DQ=4,DW="0;11",DV="RP40.8'I",DU="",DLB="MEDICAL CENTER DIVISION",DIFLD=.11
  S DU="DG(40.8,"
  S X=$G(SDVSIT("DIV"))
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
-X5 Q
-6 S DW="0;13",DV="RP8'I",DU="",DLB="ELIGIBILITY OF ENCOUNTER",DIFLD=.13
+ G RD:X="@",Z
+X4 Q
+5 S DW="0;13",DV="RP8'I",DU="",DLB="ELIGIBILITY OF ENCOUNTER",DIFLD=.13
  S DU="DIC(8,"
  S X=$G(SDVSIT("ELG"))
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
+ G RD:X="@",Z
+X5 Q
+6 S DW="USER;3",DV="P200'",DU="",DLB="CREATED BY",DIFLD=103
+ S DU="VA(200,"
+ S X=$S(+$G(SDUZ):+SDUZ,1:$G(DUZ))
+ S Y=X
+ S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD:X="@",Z
 X6 Q
-7 G 0^DIE17
+7 S DW="USER;4",DV="D",DU="",DLB="DATE/TIME CREATED",DIFLD=104
+ S X=$$NOW^XLFDT
+ S Y=X
+ S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD:X="@",Z
+X7 Q
+8 G 0^DIE17

@@ -1,2 +1,4 @@
 ^RA
 ZWR
+^RA="0"
+^RA("VERSION")="4.0"

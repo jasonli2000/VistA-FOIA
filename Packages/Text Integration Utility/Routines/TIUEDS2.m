@@ -1,4 +1,4 @@
-TIUEDS2 ; ;04/21/09
+TIUEDS2 ; ;09/17/08
  S X=DG(DQ),DIC=DIE
  I $P($$DOCTYPE^TIULF(+DA),U)="DOC",$L($P(^TIU(8925,+DA,0),U)),(+$P(^(0),U,2)>0) S ^TIU(8925,"AA",$P(^(0),U,2),+$P(^(0),U),(9999999-$P(+$G(^AUPNVSIT(X,0)),".")),DA)=""
  S X=DG(DQ),DIC=DIE

@@ -1,5 +1,5 @@
-HLOUSR7 ;OIFO-ALB/CJM - Deleting HLO queues ;01/13/2011
- ;;1.6;HEALTH LEVEL SEVEN;**147,153**;Oct 13, 1995;Build 11
+HLOUSR7 ;OIFO-ALB/CJM - Deleting HLO queues ;01/07/2010
+ ;;1.6;HEALTH LEVEL SEVEN;**138,139,146,147**;Oct 13, 1995;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ;

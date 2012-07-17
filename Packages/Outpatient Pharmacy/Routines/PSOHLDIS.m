@@ -1,12 +1,11 @@
-PSOHLDIS ;BIR/PWC,SAB - Automated Dispense Completion HL7 v.2.4 ;8/28/07 5:00pm
- ;;7.0;OUTPATIENT PHARMACY;**156,189,193,209,148,259,200,330**;DEC 1997;Build 5
+PSOHLDIS ;BIR/PWC,SAB - Automated Dispense Completion HL7 v.2.4 ;10/20/06 3:39pm
+ ;;7.0;OUTPATIENT PHARMACY;**156,189,193,209,148,259,200**;DEC 1997;Build 7
  ;Reference to ^PSDRUG supported by DBIA #221
  ;Reference to $$NDCFMT^PSSNDCUT supported by IA 4707
  ;This routine is called by FACK1^PSOHLDS
  ;
  ;*209 add Drug accountability & fix Copay for refills
  ;*259 check for refill node to exist before updating the Release msg
- ;*330 send variable PSOSITE when updating drug accountability
  ;
 EN ;main entry and process
  N NONODE
@@ -20,7 +19,7 @@ EN ;main entry and process
  . D ACTLOG                            ;activity log
  . Q:$G(NONODE)                        ;quit, no refill node to update
  . I $D(BGRP),$D(BNAM),$D(BDIV) D BINGREL^PSOHLDI1    ;bingo board rel
- . D DRGACCT^PSOHLDI1(RXID,PSOSITE)     ;drug accountability *209,*330
+ . D DRGACCT^PSOHLDI1(RXID)            ;drug accountability *209
  . I '$G(PRT) D CHKADDR^PSODISPS(RXID)
  E  D                            ;else not dispensed
  . D ACTLOG                            ;activity log no release

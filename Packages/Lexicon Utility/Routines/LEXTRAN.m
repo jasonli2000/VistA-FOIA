@@ -1,5 +1,5 @@
-LEXTRAN ;ISL/FJF/KER - Lexicon code and text wrapper API's ;01/03/2011
- ;;2.0;LEXICON UTILITY;**41,59,73**;Sep 23, 1996;Build 10
+LEXTRAN ;ISL/FJF - Lexicon code and text wrapper API's ;07/16/2008
+ ;;2.0;LEXICON UTILITY;**41,59**;Sep 23, 1996;Build 6
  ; Per VHA Directive 2004-038, this routine should not be modified.
  ;
 CODE(LEXCODE,LEXSRC,LEXVDT,LEXRAY) ;
@@ -86,7 +86,7 @@ CODE(LEXCODE,LEXSRC,LEXVDT,LEXRAY) ;
  ;
  K LEXSTAT,LEX
  K ^TMP("LEXSCH",$J)
- S LEXSTAT=$$STATCHK^LEXSRC2(LEXCODE,LEXVDT,.LEXSTAT,$E($G(LEXSRC),1,3)) ; Pch 73 adds parameter LEXSRC
+ S LEXSTAT=$$STATCHK^LEXSRC2(LEXCODE,LEXVDT,.LEXSTAT)
  I +LEXSTAT=0 D  Q "-4^"_LEXSCNM_" code "_LEXCODE_" not active for "_LEXVDT
  .S LEXPIEN=$P(LEXSTAT(1),U)
  .;D INFO^LEXA(LEXPIEN)
@@ -181,7 +181,7 @@ TEXT(LEXTEXT,LEXVDT,LEXSUB,LEXSRC,LEXRAY) ;
  S LEXPIEN=+Y
  D INFO^LEXA(LEXPIEN)
  S LEXCODE=$O(LEX("SEL","SRC","C",""))
- S LEXSTAT=$$STATCHK^LEXSRC2(LEXCODE,LEXVDT,.LEXSTAT,$E(LEXSRC,1,3)) ; Pch 73 adds parameter LEXSRC
+ S LEXSTAT=$$STATCHK^LEXSRC2(LEXCODE,LEXVDT,.LEXSTAT)
  S LEXCIEN=$P(LEXSTAT,U,2)
  S LEXSRC=$P(LEXSTAT(2),U,2)
  D GETINFO
@@ -206,11 +206,10 @@ VERSION(LEXSRC,LEXCODE,LEXVDT) ;
  I $G(LEXVDT)'="" S LEXVDT=$$INTDAT(LEXVDT)
  I $G(LEXVDT)=-1 Q "-1^invalid date format"
  I $G(LEXVDT)="" S LEXVDT=$$DT^XLFDT
- I $G(LEXSRC)="" Q "-1^invalid source" ; Pch 73 adds quit if LEXSRC is missing
  N SIEN,VIEN,VDAT,LEXSTAT
  S SIEN=$O(^LEX(757.03,"B",LEXSRC,""))
  I '$D(^LEX(757.03,SIEN,1)) Q "-1^No source version data available"
- S LEXSTAT=$$STATCHK^LEXSRC2(LEXCODE,LEXVDT,.LEXSTAT,$E($G(LEXSRC),1,3)) ; Pch 73 adds parameter LEXSRC
+ S LEXSTAT=$$STATCHK^LEXSRC2(LEXCODE,LEXVDT,.LEXSTAT)
  I +LEXSTAT=0 Q "-1^Code not active for date specified"
  S VDAT=$O(^LEX(757.03,SIEN,1,"B",LEXVDT+1),-1)
  S VIEN=$O(^LEX(757.03,SIEN,1,"B",VDAT,""))
@@ -229,20 +228,17 @@ TXT4CS(LEXTEXT,LEXSRC,LEXRAY,LEXSUB) ; Is text valid for an SCT code
  ; Output
  ; 
  ;   1^no of finds
- ;   
  ;     plus
+ ;     LEX or passed array name    - an array containing discovered
+ ;                                   concept IDs and expression type
+ ;                                   for finds                              
+ ;     e.g. LEX(113912006)="MAJOR CONCEPT"
  ;     
- ;   LEX or passed array name - an array containing
- ;   
- ;          LEX(<code>,<seq>)= expression type ^ code IEN ^ expression IEN
- ;          
- ;     e.g. LEX(123.5,1)="MAJOR CONCEPT^119085^112525"
- ;          LEX(123.5,2)="SYNONYM^119094^112526"
  ;      or
  ;      
  ;   -1^error message
  ;   
- N CODEC,EXP,EXIEN,MCIEN,FOUND,CIEN,CODE,EXPTYP,FINDS,LAR,HIER,HIERNAM,LEXW ; Pch 73 adds variable CODEC
+ N EXP,EXIEN,MCIEN,FOUND,CIEN,CODE,EXPTYP,FINDS,LAR,HIER,HIERNAM,LEXW
  I $G(LEXTEXT)="" Q "-1^text not specified"
  I $G(LEXSRC)="" Q "-1^code system not specified"
  I $$CSYSIEN(LEXSRC)+$$CSYSMNEM(LEXSRC)=-2 Q "-1^code system unknown in Lexicon"
@@ -254,16 +250,17 @@ TXT4CS(LEXTEXT,LEXSRC,LEXRAY,LEXSUB) ; Is text valid for an SCT code
  I '$D(^LEX(757.01,"B",$E($$UP^XLFSTR(LEXTEXT),1,63))) Q "-1^expression unknown in Lexicon"
  ; build an array of expression IENs for text
  S EXIEN=""
- F  S EXIEN=$O(^LEX(757.01,"B",$E($$UP^XLFSTR(LEXTEXT),1,63),EXIEN)) Q:EXIEN=""  D   ; Pch 73 adds $Extract
- .S:$$UP^XLFSTR($G(^LEX(757.01,+EXIEN,0)))=$$UP^XLFSTR(LEXTEXT) EXP(EXIEN)="" ; Pch 73 adds exact match check
+ F  S EXIEN=$O(^LEX(757.01,"B",$$UP^XLFSTR(LEXTEXT),EXIEN)) Q:EXIEN=""  D
+ .S EXP(EXIEN)=""
  ; scan array to find code for expression (LEXTEXT) for code system (LEXSRC)
  S EXIEN=""
  K LEXW
  S (FOUND,FINDS)=0
  F  S EXIEN=$O(EXP(EXIEN)) Q:EXIEN=""  D
  .S MCIEN=$P(^LEX(757.01,EXIEN,1),U)
- .; Pch 73 moved EXPTYP into CIEN loop
- .S CIEN="" F  S CIEN=$O(^LEX(757.02,"AMC",MCIEN,CIEN)) Q:CIEN=""  D
+ .S EXPTYP=$P(^LEX(757.011,$P(^LEX(757.01,EXIEN,1),U,2),0),U)
+ .S CIEN=""
+ .F  S CIEN=$O(^LEX(757.02,"AMC",MCIEN,CIEN)) Q:CIEN=""  D
  ..I $P($$CSYSMNEM($P(^LEX(757.02,CIEN,0),U,3)),U,2)=LEXSRC D
  ...S CODE=$P(^LEX(757.02,CIEN,0),U,2)
  ...S (HIER,HIERNAM)=""
@@ -275,9 +272,7 @@ TXT4CS(LEXTEXT,LEXSRC,LEXRAY,LEXSUB) ; Is text valid for an SCT code
  ...I LEXSUB'="",HIER'=HIERNAM Q
  ...S FOUND=1
  ...S FINDS=FINDS+1
- ...S CODEC=$O(LEXW(CODE," "),-1)+1 ; Pch 73 adds counter for multiple entries for code
- ...S EXPTYP=$P(^LEX(757.011,$P(^LEX(757.01,+($G(^LEX(757.02,CIEN,0))),1),U,2),0),U) ; Pch 73 moved from EXIEN loop
- ...S LEXW(CODE,CODEC)=EXPTYP_"^"_CIEN_"^"_+($G(^LEX(757.02,CIEN,0))) ; Pch 73 adds code IEN and expression IEN to output
+ ...S LEXW(CODE)=EXPTYP
  M LEX=LEXW
  I $D(LEXRAY),LEXRAY'="LEX" M @LEXRAY=LEX K LEX
  Q FOUND_"^"_FINDS

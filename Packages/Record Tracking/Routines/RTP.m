@@ -1,4 +1,4 @@
-RTP ;MJK/TROY ISC;Pull List Option; ; 5/7/87  12:37 PM ;
+RTP ;MJK/TROY ISC;Pull List Option; ; 17 Sep 97  7:08 AM ;
  ;;v 2.0;Record Tracking;;10/22/91 
  D DT^DICRW S X=$T(+1),DIK="^DOPT("""_$P(X," ;",1)_""","
  G:$D(^DOPT($P(X," ;"),11)) A S ^DOPT($P(X," ;"),0)=$P(X,";",3)_"^1N^" F I=1:1 S Y=$T(@I) Q:Y=""  S ^DOPT($P(X," ;"),I,0)=$P(Y,";",3,99)

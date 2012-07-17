@@ -1,5 +1,5 @@
-DVBAB6 ;ALB/KLB,SBW - CAPRI PENDING 2507 REQUEST ; 5/MAR/2011
- ;;2.7;AMIE;**35,90,108,168**;Apr 10, 1995;Build 3
+DVBAB6 ;ALB/KLB - CAPRI PENDING 2507 REQUEST ;08/01/00
+ ;;2.7;AMIE;**35,90,108**;Apr 10, 1995
  ;
 STRT(MSG,DVBCSORT,RSTAT,ERDAYS,OLDAYS,ADIVNUM,ELTYP) ;
  I ADIVNUM'="" S X=$O(^DG(40.8,"C",ADIVNUM,"")) S:X]"" ADIVNUM=X
@@ -61,8 +61,7 @@ TST1 S TSTA1=""
  I $D(^DVB(396.4,DA,"CAN")) S TSTA1=$P(^DVB(396.4,DA,"CAN"),U,3)
  I $D(^DVB(396.4,DA,"TRAN")) S X=$P(^DVB(396.4,DA,"TRAN"),U,3)
  S:TSTA1]"" TSTA1=$P(^DVB(396.5,TSTA1,0),U,1)
- S ^TMP("CAPRI",MSGCNT)=$S(PRTNM]"":PRTNM,1:"Missing exam name")
- S ^TMP("CAPRI",MSGCNT)=^TMP("CAPRI",MSGCNT)_$S(TSTA1]"":" - cancelled ("_TSTA1_")",TSTAT="T":" - Transferred",TSTAT]"":" - "_$$EXTERNAL^DILFD(396.4,.04,,TSTAT),TSTAT="":" (Unknown status)",1:"")_"^"
- S MSGCNT=MSGCNT+1
+ S ^TMP("CAPRI",MSGCNT)=$S(PRTNM]"":PRTNM,1:"Missing exam name")_$S(TSTA1]"":" -cancelled ("_TSTA1_")",TSTAT="T":" - Transferred",TSTAT="":" (Unknown status)",1:"")_"^",MSGCNT=MSGCNT+1
  I TSTAT="T" S X=$S($D(^DIC(4.2,+X,0)):$P(^(0),U,1),1:"unknown site") S ^TMP("CAPRI",MSGCNT)=" to "_$P(X,".",1),MSGCNT=MSGCNT+1
+ ;S ^TMP("CAPRI",MSGCNT)=";",MSGCNT=MSGCNT+1
  Q

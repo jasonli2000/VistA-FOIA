@@ -1,5 +1,5 @@
 PXRMEXPD ; SLC/PKR - General packing driver. ;03/16/2010
- ;;2.0;CLINICAL REMINDERS;**12,17,16**;Feb 04, 2005;Build 119
+ ;;2.0;CLINICAL REMINDERS;**12,17**;Feb 04, 2005;Build 102
  ;==========================
 BLDDESC(USELLIST,TMPIND) ;If multiple entries have been selected
  ;then initialize the description with the selected list.
@@ -96,8 +96,9 @@ CRE ;Pack a reminder component and store it in the repository.
  S FILELST(9)=811.6_U_$$GET1^DID(811.6,"","","NAME")
  S FILELST(10)=811.2_U_$$GET1^DID(811.2,"","","NAME")
  S FILELST(11)=811.5_U_$$GET1^DID(811.5,"","","NAME")
- S FILELST(12)=801_U_$$GET1^DID(801,"","","NAME")
- S FILELST(0)=12
+ ;S FILELST(12)=801_U_$$GET1^DID(801,"","","NAME")
+ ;S FILELST(0)=12
+ S FILELST(0)=11
  D PACKORD(.RANK)
  ;
  ;Get the list to pack.

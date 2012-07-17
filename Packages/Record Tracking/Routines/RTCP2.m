@@ -1,4 +1,4 @@
-RTCP2 ; ;07/15/96
+RTCP2 ; ;09/18/95
  D DE G BEGIN
 DE S DIE="^RTV(194.2,",DIC=DIE,DP=194.2,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^RTV(194.2,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,6) S:%]"" DE(1)=% S %=$P(%Z,U,7) S:%]"" DE(2)=% S %=$P(%Z,U,8) S:%]"" DE(3)=%

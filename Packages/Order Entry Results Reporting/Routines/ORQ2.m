@@ -1,5 +1,5 @@
-ORQ2 ; SLC/MKB/GSS - Detailed Order Report ;03/14/11  09:33
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**12,56,75,94,141,213,195,243,282,293,280,346**;Dec 17, 1997;Build 5
+ORQ2 ; SLC/MKB/GSS - Detailed Order Report ;10/10/2006
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**12,56,75,94,141,213,195,243,282**;Dec 17, 1997;Build 6
  ;
  ;
  ;Reference to ^DIC(45.7 supported by IA #519
@@ -72,32 +72,19 @@ D4 S CNT=CNT+1,@ORY@(CNT)="Order:" D:$D(IOUON) SETVIDEO(CNT,1,6,IOUON,IOUOFF)
  S CNT=CNT+1,@ORY@(CNT)="   " ;blank
  D RAD^ORQ21(1):ORNMSP="RA",MED^ORQ21:ORNMSP="PS" ;add'l data
  D BA^ORQ21 ;call for CIDC data
-D5 K ^TMP($J,"OCDATA") I $$OCAPI^ORCHECK(+ORIFN,"OCDATA") D
+D5 I $O(^OR(100,+ORIFN,9,0)) D
  . N CK,OK,X0,X,CDL,I S CNT=CNT+1,@ORY@(CNT)="Order Checks:"
  . D:$D(IOUON) SETVIDEO(CNT,1,13,IOUON,IOUOFF)
- . S CK=0 F  S CK=$O(^TMP($J,"OCDATA",CK)) Q:CK'>0  D
- .. S X0=^TMP($J,"OCDATA",CK,"OC NUMBER")_U_^TMP($J,"OCDATA",CK,"OC LEVEL")_U_U_^TMP($J,"OCDATA",CK,"OR REASON")_U_^TMP($J,"OCDATA",CK,"OR PROVIDER")_U_^TMP($J,"OCDATA",CK,"OR DT")
- .. S X=^TMP($J,"OCDATA",CK,"OC TEXT",1,0)
+ . S CK=0 F  S CK=$O(^OR(100,+ORIFN,9,CK)) Q:CK'>0  S X0=$G(^(CK,0)),X=$G(^(1)) D
  .. S CDL=$$CDL($P(X0,U,2)) I $P(X0,U,6),'$D(OK) S OK=$P(X0,U,4,6)
- .. I $L(X)'>68 S CNT=CNT+1,@ORY@(CNT)=CDL_X D XTRA Q
+ .. I $L(X)'>68 S CNT=CNT+1,@ORY@(CNT)=CDL_X Q
  .. S DIWL=1,DIWR=68,DIWF="C68" K ^UTILITY($J,"W") D ^DIWP
  .. S I=0 F  S I=$O(^UTILITY($J,"W",DIWL,I)) Q:I'>0  S CNT=CNT+1,@ORY@(CNT)=CDL_^(I,0),CDL="            "
- .. D XTRA
- . K ^TMP($J,"OCDATA")
  . Q:'$L($G(OK))  S CNT=CNT+1,@ORY@(CNT)="Override:   "_$S($P(OK,U,2):$$USER^ORQ20($P(OK,U,2))_" on ",1:"")_$$DATE^ORQ20($P(OK,U,3))
  . I $L($P(OK,U))'>68 S CNT=CNT+1,@ORY@(CNT)="            "_$P(OK,U) Q
  . S DIWL=1,DIWR=68,DIWF="C68",X=$P(OK,U) K ^UTILITY($J,"W") D ^DIWP
  . S I=0 F  S I=$O(^UTILITY($J,"W",DIWL,I)) Q:I'>0  S CNT=CNT+1,@ORY@(CNT)="            "_^(I,0)
  K ^TMP("ORWORD",$J),^UTILITY($J,"W")
- Q
- ;
-XTRA ;
- I $O(^TMP($J,"OCDATA",CK,"OC TEXT",1)) N ORXT S ORXT=1 F  S ORXT=$O(^TMP($J,"OCDATA",CK,"OC TEXT",ORXT)) Q:'ORXT  D
- . S X=^TMP($J,"OCDATA",CK,"OC TEXT",ORXT,0),CDL="              "
- . I $L(X)'>68 S CNT=CNT+1,@ORY@(CNT)=CDL_X Q
- . S DIWL=1,DIWR=68,DIWF="C68" K ^UTILITY($J,"W") D ^DIWP
- . S I=0 F  S I=$O(^UTILITY($J,"W",DIWL,I)) Q:I'>0  S CNT=CNT+1,@ORY@(CNT)=CDL_^(I,0),CDL="              "
- I $O(^TMP($J,"OCDATA",CK,"OC TEXT",1)) S X="",CNT=CNT+1,@ORY@(CNT)="              "
  Q
  ;
 SUB(IFN) ; -- add suborder or parent

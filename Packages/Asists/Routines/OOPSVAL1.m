@@ -1,9 +1,6 @@
 OOPSVAL1 ;HINES/WAA,GTD-Validate and Sign data Routines ;3/25/98
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**1,3,5,8,10**;Jun 01, 1998
  ;;
- ;  Note:  At EMP+18 added check to see if code being executed from
- ;         the broker.  ASISTS V2.0
- ;
 EN1(CALLER) ;  Main Entry Point
  ;INPUT:
  ;     CALLER = "E" FOR EMPLOYEE
@@ -159,10 +156,10 @@ EMP ; Employee Sign off
  S X=$P($G(^VA(200,DUZ,20)),U,2)
  S X1=DUZ
  I FORM="CA1" D
- . I '$$BROKER^XWBLIB S $P(^OOPS(2260,IEN,"CA1ES"),U,1,3)=SIGN
+ . S $P(^OOPS(2260,IEN,"CA1ES"),U,1,3)=SIGN
  . S X2=$$CA1SUM^OOPSUTL6()
  I FORM="CA2" D
- . I '$$BROKER^XWBLIB S $P(^OOPS(2260,IEN,"CA2ES"),U,1,3)=SIGN
+ . S $P(^OOPS(2260,IEN,"CA2ES"),U,1,3)=SIGN
  . S X2=$$CA2SUM^OOPSUTL6()
  D EN^XUSHSHP
  S $P(RECORD,U,9)=1
@@ -170,7 +167,7 @@ EMP ; Employee Sign off
  S ^OOPS(2260,IEN,"CA")=RECORD
  D EMP^OOPSMBUL(IEN)
  ; patch 10 - bill of rights enhancement
- I (CALLER="E")&('$$BROKER^XWBLIB) D
+ I CALLER="E" D
  . D CONSENT
  . I $$GET1^DIQ(2260,IEN,72,"I")="Y" D UNION
  . I UNIREP D CONSENT^OOPSMBUL(IEN,UNIREP)

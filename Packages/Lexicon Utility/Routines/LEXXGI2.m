@@ -1,5 +1,5 @@
-LEXXGI2 ;ISL/KER - Global Import (Update Change File w/^LEXM) ;01/03/2011
- ;;2.0;LEXICON UTILITY;**25,26,28,29,46,49,50,73**;Sep 23, 1996;Build 10
+LEXXGI2 ;ISL/KER - Global Import (Update Change File w/^LEXM) ;06/06/2007
+ ;;2.0;LEXICON UTILITY;**25,26,28,29,46,49,50**;Sep 23, 1996
  ;             
  ; Variables NEWed or KILLed Elsewhere
  ;    XPDNM  NEWed by KIDS during Install
@@ -21,39 +21,38 @@ LEXXGI2 ;ISL/KER - Global Import (Update Change File w/^LEXM) ;01/03/2011
 NOTIFY ; Notify by Protocol - LEXICAL SERVICES UPDATE
  ;     Uses LEXSCHG() from the Post-Install
  ;     Sets ^LEXM(0,"PRO")=$$NOW^XLFDT
- Q:'$D(LEXSCHG("ICD"))&('$D(LEXSCHG("CPT")))&('$D(LEXSCHG("LEX")))
- S:$D(LEXSCHG("ICD")) LEXSCHG("ICD")=0,LEXSCHG("LEX")=0 S:$D(LEXSCHG("CPT")) LEXSCHG("CPT")=0,LEXSCHG("LEX")=0
- S:'$D(LEXSCHG("ICD"))&('$D(LEXSCHG("CPT")))&($D(LEXSCHG("LEX"))) LEXSCHG("ICD")=0,LEXSCHG("CPT")=0
- N X,LEXU,LEXF,LEXI,LEXL,LEX1,LEX2,LEX3,LEXN,LEXP,LEXUP,LEXPC S LEXUP="",LEXPC=0
- S:$D(LEXSCHG("ICD")) LEXUP=$G(LEXUP)_"ICD" S:$D(LEXSCHG("CPT")) LEXUP=$G(LEXUP)_"/CPT"
+ N X,LEXU,LEXT,LEXF,LEXI,LEXL,LEX1,LEX2,LEX3,LEXN,LEXP,LEXUP D:$O(LEXSCHG(0))'>0 SCHG
+ S LEXUP="" S:$D(LEXSCHG("C","ICD"))!($D(LEXSCHG(80)))!($D(LEXSCHG(80.1))) LEXUP=$G(LEXUP)_"ICD"
+ S:$D(LEXSCHG("C","CPT"))!($D(LEXSCHG(81)))!($D(LEXSCHG(81.3))) LEXUP=$G(LEXUP)_"/CPT"
  S:$E(LEXUP,1)="/" LEXUP=$E(LEXUP,2,$L(LEXUP)) S:$L(LEXUP) LEXUP=LEXUP_" "
- S:$D(LEXSCHG("LEX")) LEXF="Lexicon" S:$D(LEXSCHG("ICD")) LEXF=$G(LEXF)_", ICD" S:$D(LEXSCHG("CPT")) LEXF=$G(LEXF)_", CPT"
+ S LEXI=756.999999 F  S LEXI=$O(LEXSCHG(LEXI)) Q:+LEXI'>0!($P(LEXI,".",1)'="757")  S LEXT=$G(LEXT)_", "_LEXI
+ S LEXI=79.9990999 F  S LEXI=$O(LEXSCHG(LEXI)) Q:+LEXI'>0!($P(LEXI,".",1)'="80")  S LEXT=$G(LEXT)_", "_LEXI
+ S LEXI=80.9990999 F  S LEXI=$O(LEXSCHG(LEXI)) Q:+LEXI'>0!($P(LEXI,".",1)'="81")  S LEXT=$G(LEXT)_", "_LEXI
+ S:$E($G(LEXT),1,2)=", " LEXT=$E($G(LEXT),3,$L($G(LEXT))),LEXT=$$TRIM(LEXT)
+ I $L(LEXT) D
+ . S:$L(LEXT,", ")>1 LEXT=$P($G(LEXT),", ",1,($L($G(LEXT),", ")-1))_" and "_$P($G(LEXT),", ",$L($G(LEXT),", "))
+ S:$P($O(LEXSCHG(756.999999)),".",1)="757" LEXF="Lexicon" S:$P($O(LEXSCHG(79.999999)),".",1)=80 LEXF=$G(LEXF)_", ICD"
+ S:$P($O(LEXSCHG(80.999999)),".",1)=81 LEXF=$G(LEXF)_", CPT"
  S:$E($G(LEXF),1,2)=", " LEXF=$E($G(LEXF),3,$L($G(LEXF))),LEXF=$$TRIM(LEXF)
  I $L(LEXF) D
  . S:$L(LEXF,", ")>1 LEXF=$P($G(LEXF),", ",1,($L($G(LEXF),", ")-1))_" and "_$P($G(LEXF),", ",$L($G(LEXF),", "))
  . S:$L($P(LEXF,", ",1)) LEXF=$G(LEXF)_" File"_$S(LEXF[", ":"s",LEXF[" and ":"s",1:"")_" Updated"
- S LEXL=78-($L(LEXF)+4),LEXU="Lexical Files Updated"
- Q:'$D(LEXSCHG)  S LEXP=+($O(^ORD(101,"B","LEXICAL SERVICES UPDATE",0))) Q:LEXP=0  S X=LEXP_";ORD(101," D EN^XQOR
- S:$G(LEXSCHG("LEX"))>0!($G(LEXSCHG("ICD"))>0)!($G(LEXSCHG("CPT"))>0) ^LEXM(0,"PRO")=$$NOW^XLFDT
- S:$G(LEXSCHG("ICD"))>0!($G(LEXSCHG("CPT"))>0) LEXU="Lexicon/Code Sets Updated"
- Q:+($G(^LEXM(0,"PRO")))'>0  K LEXPROC D:$L($G(LEXU)) BL,TL($G(LEXU)),BL
- I +($G(LEXSCHG("LEX")))>0 D
- . N X,ED S X="  'LEXICAL SERVICES UPDATE' ",X=X_$J(" ",(30-$L(X)))
- . S ED=$$EDT($G(LEXSCHG("LEX"))) S:$L(ED) X=X_" "_ED S LEXPC=+($G(LEXPC))+1 S:$L(ED) LEXPROC((LEXPC+1))=X
- I +($G(LEXSCHG("ICD")))>0 D
- . N X,ED S X="  'ICD CODE UPDATE EVENT'   ",X=X_$J(" ",(30-$L(X)))
- . S ED=$$EDT($G(LEXSCHG("ICD"))) S:$L(ED) X=X_" "_ED S LEXPC=+($G(LEXPC))+1 S:$L(ED) LEXPROC((LEXPC+1))=X
- I +($G(LEXSCHG("CPT")))>0 D
- . N X,ED S X="  'CPT CODE UPDATE EVENT'   ",X=X_$J(" ",(30-$L(X)))
- . S ED=$$EDT($G(LEXSCHG("CPT"))) S:$L(ED) X=X_" "_ED S LEXPC=+($G(LEXPC))+1 S:$L(ED) LEXPROC((LEXPC+1))=X
- S:$O(LEXPROC(" "),-1)>1 LEXPROC(1)="Protocol invoked:" S:$O(LEXPROC(" "),-1)>2 LEXPROC(1)="Protocols invoked:"
- S LEXPC=0 F  S LEXPC=$O(LEXPROC(LEXPC)) Q:+LEXPC'>0  D
- . S X=$G(LEXPROC(LEXPC)) D TL(X) D:X["Protocol" BL
- S X="Subscribing applications were notified of the "_LEXUP_"update" D BL,TL(X),BL
+ S LEXL=78-($L(LEXF)+4),LEXU="Lexical Files Updated" I $L(LEXT)&($L(LEXF))&(LEXL>30) D
+ . S LEXU=LEXF N LEX S LEX=LEXT K LEXT S LEXT(1)=LEX D WP(.LEXT,LEXL)
+ S LEXP=+($O(^ORD(101,"B","LEXICAL SERVICES UPDATE",0))) Q:LEXP=0  S X=LEXP_";ORD(101," D EN^XQOR S:'$D(LEXSCHG) ^LEXM(0,"PRO")=$$NOW^XLFDT
+ Q:+($G(^LEXM(0,"PRO")))'>0
+ I $L($G(LEXU)) D
+ . N LEXI S LEXI=$L($G(LEXU))+3
+ . S X=$G(LEXU) D:$O(LEXT(0))'>0 BL,TL(X),BL I $O(LEXT(0))>0 D
+ . . D BL S X=$G(LEXU)_":  " N LEX S LEX=0 F  S LEX=$O(LEXT(LEX)) Q:+LEX'>0  D
+ . . . N LEXX S LEXX=$$TRIM($G(LEXT(LEX))) S:$L(LEXX) X=X_LEXX D TL(X) S X="",$P(X," ",+LEXI)=" "
+ . . D BL
+ S X="Protocol 'LEXICAL SERVICES UPDATE' was invoked" D TL(X)
+ S X="Subscribing applications were notified of the "_LEXUP_"update" D TL(X),BL
  Q
 UPCHG ;
- Q:+($G(LEXFI))'>0  N LEXID S LEXID=$S($P(LEXFI,".",1)="757":"LEX",$P(LEXFI,".",1)="80":"ICD",$P(LEXFI,".",1)="81":"CPT",1:"") Q:'$L(LEXID)
- S LEXSCHG(LEXID)=+($G(LEXSCHG(LEXID)))
+ Q:+($G(LEXFI))'>0  N LEXID S LEXID=$S($P(LEXFI,".",1)="757":"LEX",$P(LEXFI,".",1)="80":"ICD",$P(LEXFI,".",1)="81":"CPT",1:"UNK")
+ I $D(LEXSCHG) S LEXSCHG(LEXFI,0)="",LEXSCHG("B",LEXFI)="",LEXSCHG("C",LEXID,LEXFI)=""
  Q
 SCHG ; Change Array LEXSCHG (Some or all, but never nothing)
  N FI,ID K LEXSCHG S LEXCHG=0
@@ -163,9 +162,6 @@ CLR ;   Clear
  K LEXD,LEXE,LEXF,LEXFI,LEXFY,LEXGCS,LEXI,LEXID,LEXIGHF,LEXL,LEXLAST,LEXLC,LEXLREV,LEXN,LEXNC,LEXNDS,LEXP
  K LEXPTYPE,LEXQTR,LEXREQP,LEXS,LEXSCHG,LEXSTR,LEXT,LEXU,LEXUP,LEXVER,LEXX,TI,X,X1,X2,XMDUN,XMZ,Y,Z,ZTSK
  Q
-EDT(LEX) ;   External Date
- S LEX=$$FMTE^XLFDT($G(LEX),"1Z") S:LEX["@" LEX=$P(LEX,"@",1)_"  "_$P(LEX,"@",2,299)
- Q LEX
 TRIM(X) ;   Trim Spaces
  S X=$G(X) Q:X="" X F  Q:$E(X,1)'=" "  S X=$E(X,2,$L(X))
  F  Q:$E(X,$L(X))'=" "  S X=$E(X,1,($L(X)-1))

@@ -1,5 +1,5 @@
 OOPSPC51 ;HIRMFO/YH-SUPERVISOR'S REPORT,  CA2 FORM ;6/14/98
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**1,6,8**;Jun 01, 1998
  ;SUPERVISOR'S REPORT
  S OOPSDATA=$G(^OOPS(2260,IEN,"CA2H"))
  ; Patch 8 added agency code, 8/29/00 changed to pull from fld 70

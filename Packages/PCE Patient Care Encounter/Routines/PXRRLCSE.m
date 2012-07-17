@@ -1,4 +1,4 @@
-PXRRLCSE ;ISL/PKR - Sort encounters for location count report. ;10/10/96
+PXRRLCSE ;ISL/PKR - Sort encounters for location count report. ;10/10/96 [ 02/13/97  1:08 PM ]
  ;;1.0;PCE PATIENT CARE ENCOUNTER;**3,10**;Aug 12, 1996
  ;
  ;Sort the encounters according to the selection criteria.

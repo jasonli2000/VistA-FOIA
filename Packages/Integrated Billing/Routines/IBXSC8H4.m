@@ -1,4 +1,4 @@
-IBXSC8H4 ; ;10/29/04
+IBXSC8H4 ; ;12/13/04
  D DE G BEGIN
 DE S DIE="^DGCR(399,D0,""PRV"",",DIC=DIE,DP=399.0222,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^DGCR(399,D0,"PRV",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,5) S:%]"" DE(2)=%,DE(14)=% S %=$P(%Z,U,6) S:%]"" DE(6)=%,DE(18)=% S %=$P(%Z,U,7) S:%]"" DE(10)=%,DE(22)=% S %=$P(%Z,U,12) S:%]"" DE(1)=%,DE(13)=% S %=$P(%Z,U,13) S:%]"" DE(5)=%,DE(17)=%

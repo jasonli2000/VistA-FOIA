@@ -1,5 +1,5 @@
 NHINVIT ;SLC/MKB -- Vitals extract
- ;;1.0;NHIN;**1**;Oct 25, 2010;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -40,8 +40,7 @@ EN(DFN,BEG,END,MAX,IFN) ; -- find patient's vitals
  ... S X=$P(QUAL,";",I),Y=$$FIND1^DIC(120.52,,"QX",X)
  ... I Y S VIT("measurement",N,"qualifier",I)=X_U_$$VUID^NHINV(Y,120.52)
  . S VIT("entered")=$P($G(X0),U,4) ;use last one
- . S X=+$P($G(X0),U,5) S:X VIT("location")=$$LOC(X)
- . S VIT("facility")=$$FAC^NHINV(X)
+ . S VIT("facility")=$$FAC^NHINV($P($G(X0),U,5))
  . D XML(.VIT)
  K ^UTILITY($J,"GMRVD")
  Q
@@ -52,7 +51,7 @@ EN1(ID,VIT) ; -- return a vital/measurement in VIT("attribute")
  D EN^GMVPXRM(.NHY,ID,"B")
  S DFN=+$G(NHY(2)) Q:DFN<1
  S TYPE=$$GET1^DIQ(120.51,+NHY(3)_",",1)
- S VIT("facility")=$$FAC^NHINV(+NHY(5)),VIT("location")=NHY(5)
+ S VIT("facility")=$$FAC^NHINV(+NHY(5)),VIT("taken")=+NHY(1)
  S NAME=$P(NHY(3),U,2),VUID=$$VUID^NHINV(+NHY(3),120.51)
  S X=$P(NHY(7),U,2),RESULT=X,(UNIT,MRES,MUNT)=""
  I TYPE="T" S UNIT="F",MUNT="C" S MRES=$J(X-32*5/9,0,1)  ; EN1^GMRVUTL
@@ -60,12 +59,10 @@ EN1(ID,VIT) ; -- return a vital/measurement in VIT("attribute")
  I TYPE="WT" S UNIT="lb",MUNT="kg" S MRES=$J(X/2.2,0,2)  ; EN3^GMRVUTL
  I TYPE="CG" S UNIT="in",MUNT="cm" S MRES=$J(2.54*X,0,2)
  I TYPE="CVP" S UNIT="cmH2O"
- S VIT("taken")=+NHY(1),VIT("entered")=+NHY(4),(HIGH,LOW)=""
+ S VIT("entered")=+NHY(4),(HIGH,LOW)=""
  S X=$$RANGE(TYPE) I $L(X) S HIGH=$P(X,U),LOW=$P(X,U,2)
  S VIT("measurement",1)=ID_U_VUID_U_NAME_U_RESULT_U_UNIT_U_MRES_U_MUNT_U_HIGH_U_LOW
  S I=0 F  S I=$O(NHY(12,I)) Q:I<1  S X=$G(NHY(12,I)),VIT("measurement",1,"qualifier",I)=$P(X,U,2)_U_$$VUID^NHINV(+X,120.52)
- I $G(NHY(9)) D  ;entered in error/reasons
- . S I=0 F  S I=$O(NHY(11,I)) Q:I<1  S VIT("removed",I)=$P(NHY(11,I),U,2)
  Q
  ;
 USER(X) ; -- Return ien^name for person# X
@@ -101,7 +98,7 @@ NAME(X) ; -- Return name of measurement type X for XML element
  ;
 XML(VIT) ; -- Return vital measurement as XML in @NHIN@(#)
  N ATT,X,Y,I,J,P,NAMES,TAG
- D ADD("<vital>") S NHINTOTL=$G(NHINTOTL)+1
+ D ADD("<vital>")
  S ATT="" F  S ATT=$O(VIT(ATT)) Q:ATT=""  D
  . I ATT="measurement" D  Q
  .. D ADD("<measurements>")
@@ -117,10 +114,6 @@ XML(VIT) ; -- Return vital measurement as XML in @NHIN@(#)
  .... S Y=Y_"/>" D ADD(Y)
  ... D ADD("</qualifiers>"),ADD("</measurement>")
  .. D ADD("</measurements>")
- . I ATT="removed" D  Q
- .. D ADD("<removed>")
- .. S I=0 F  S I=$O(VIT(ATT,I)) Q:I<1  S Y="<reason value='"_$G(VIT(ATT,I))_"' />" D ADD(Y)
- .. D ADD("</removed>")
  . S X=$G(VIT(ATT)),Y="" Q:'$L(X)
  . I X'["^" S Y="<"_ATT_" value='"_$$ESC^NHINV(X)_"' />" D ADD(Y) Q
  . I $L(X)>1 D

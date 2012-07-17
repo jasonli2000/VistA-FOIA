@@ -1,10 +1,9 @@
-PSOCMOP ;BIR/HTW-Rx Order Entry Screen for CMOP ;6/28/07 7:35am
- ;;7.0;OUTPATIENT PHARMACY;**2,16,21,27,43,61,126,148,274,347,251**;DEC 1997;Build 202
+PSOCMOP ;BIR/HTW-Rx Order Entry Screen for CMOP ; 6/28/07 7:35am
+ ;;7.0;OUTPATIENT PHARMACY;**2,16,21,27,43,61,126,148,274,347**;DEC 1997;Build 5
  ;External reference to ^PS(55 supported by DBIA 2228
  ;External reference to ^PSDRUG supported by DBIA 221
  ;External reference to ^PSDRUG supported by DBIA 3165
  ;External reference to ^PSSHUIDG supported by DBIA 3621
- ;External reference to $$DS^PSSDSAPI supported by DBIA 5424
 TOP ;
  I $G(PSOFROM)="EDIT" S PPL=$G(PSORX("PSOL",1)) Q:$G(PPL)']""  G TEST
  I $G(PPL) G START
@@ -38,9 +37,6 @@ LOOP F CNT=1:1 S RX=$P($G(PPL),",",CNT) Q:RX']""  D  S:'FLAG $P(RX("PSO"),",",P1
  .Q:$P(^PSRX(RX,"STA"),"^")>9!($P(^("STA"),"^")=4)!($P(^("STA"),"^")=3)
  .;        Find last fill
  .S RFD=0 F X7=0:0 S X7=$O(^PSRX(RX,1,X7)) Q:'$G(X7)  S (RFD)=X7
- .;if original fill and a tech stop
- .I 'RFD,$P(^PSRX(RX,"STA"),"^")=4!($D(^PSRX(RX,"DRI"))&('$D(^XUSEC("PSORPH",DUZ)))) Q
- .I 'RFD,$$DS^PSSDSAPI,($G(^PS(52.4,RX,1))>0)&('$D(^XUSEC("PSORPH",DUZ))) Q
  .Q:$G(RXFL(RX))&(RFD)&($G(RXFL(RX))'=RFD)
  .I '$O(^PSRX(RX,1,0)),'$P($G(^PSRX(RX,2)),"^",13),$P($G(^(0)),"^",11)="W",$S($P($G(^PSRX(RX,2)),"^",2):$P($G(^(2)),"^",2),1:+$G(PSOX("FILL DATE")))>DT D
  ..S PSOCPDA=$G(DA) K DIE S DA=RX,DIE="^PSRX(",DR="11////M" D ^DIE K DIE S:$G(PSOCPDA) DA=$G(PSOCPDA) K PSOCPDA

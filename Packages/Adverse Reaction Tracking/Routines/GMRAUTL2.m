@@ -1,5 +1,5 @@
-GMRAUTL2 ;SLC/DAN - New style index utilities, update utility for 120.8 ;06/01/10  07:32
- ;;4.0;Adverse Reaction Tracking;**23,36,41,45**;Mar 29, 1996;Build 5
+GMRAUTL2 ;SLC/DAN - New style index utilities, update utility for 120.8 ;1/7/08  09:36
+ ;;4.0;Adverse Reaction Tracking;**23,36,41**;Mar 29, 1996;Build 8
  ;DBIA Section
  ;%ZTLOAD    - 10063
  ;DIE        - 10018
@@ -56,7 +56,7 @@ ADD(TYPE,ALENT,SUBENT,GMRAS) ;Adds entry to appropriate multiple
  N FILE,FDA,EM
  S GMRAS=1
  I $D(^GMR(120.8,ALENT,$S(TYPE="I":2,1:3),"B",SUBENT)) S GMRAS=0 Q  ;Entry already exists
- L +^GMR(120.8,ALENT):20 I '$T Q
+ L +^GMR(120.8,ALENT)
  S FILE=$S(TYPE="I":120.802,1:120.803)
  S FDA(FILE,"+1,"_ALENT_",",.01)=SUBENT
  D UPDATE^DIE("","FDA",,"EM")
@@ -67,7 +67,7 @@ DEL(TYPE,ALENT,SUBENT,GMRAS) ;Delete entry from multiple
  N FILE,FDA,EM,ENTRY
  S GMRAS=1
  I '$D(^GMR(120.8,ALENT,$S(TYPE="I":2,1:3),"B",SUBENT)) S GMRAS=0 Q  ;No entry to delete
- L +^GMR(120.8,ALENT):20 I '$T Q
+ L +^GMR(120.8,ALENT)
  S ENTRY=$O(^GMR(120.8,ALENT,$S(TYPE="I":2,1:3),"B",SUBENT,0)) Q:'+ENTRY
  S FILE=$S(TYPE="I":120.802,1:120.803)
  S FDA(FILE,ENTRY_","_ALENT_",",.01)="@"
@@ -89,21 +89,12 @@ CHKORD ;Check for orders that are now in conflict with existing allergy data
  .D EN^ORKCHK(.GMRAOC,DFN,.GMRAORX,"ACCEPT")
  .S GI=0,CNT=0 F  S GI=$O(GMRAOC(GI)) Q:'+GI  D
  ..Q:$P(GMRAOC(GI),U,2)'=3  ;Quit if not allergy related
- ..;Q:$D(^OR(100,$P(GMRAOC(GI),U),9,"B",3))  ;Quit if existing allergy order check, can't be for this new information
- ..Q:$$ANYARTOC^GMRAUTL2($P(GMRAOC(GI),U))  ;Quit if existing allergy order check, can't be for this new information
+ ..Q:$D(^OR(100,$P(GMRAOC(GI),U),9,"B",3))  ;Quit if existing allergy order check, can't be for this new information
  ..S CNT=CNT+1,^TMP($J,"ERR",DFN,CNT)=$P($$STATUS^ORQOR2($P(GMRAOC(GI),U)),U,2)_" order for "_$P($$OI^ORX8($P(GMRAOC(GI),U)),U,2)_",order #"_$P(GMRAOC(GI),U)
  .K GMRAORX ;Remove previous list of orders
  D MAIL K ^TMP("ORR",$J),^TMP($J,"ERR")
  Q
  ;
-ANYARTOC(GMRAIFN) ;check order to see if there are any allergy order checks
- N GMRARET,GMRAI
- S GMRARET=0
- K ^TMP($J,"GMRAOC")
- D OCAPI^ORCHECK(+GMRAIFN,"GMRAOC")
- S GMRAI=0 F  S GMRAI=$O(^TMP($J,"GMRAOC",GMRAI)) Q:'GMRAI  I $G(^TMP($J,"GMRAOC",GMRAI,"OC NUMBER"))=3 S GMRARET=1
- K ^TMP($J,"GMRAOC")
- Q GMRARET
 ADDCOM ;Add comment to updated allergy indicating changes
  D ADDCOM^GMRAUTL3 ;41 Moved section due to space considerations
  Q
@@ -176,7 +167,7 @@ REACT ;Update REACTANT field with name from 120.82.  Section added with patch 23
  .S DFN=$P(^GMR(120.8,IEN,0),U)
  .Q:$$DECEASED^GMRAFX(DFN)  ;Don't update if patient is deceased
  .Q:+$G(^GMR(120.8,IEN,"ER"))  ;Don't update if entered in error
- .L +^GMR(120.8,IEN):20 I '$T Q
+ .L +^GMR(120.8,IEN)
  .S FDA(120.8,IEN_",",.02)=NTERM
  .D FILE^DIE("","FDA","EM")
  .L -^GMR(120.8,IEN)

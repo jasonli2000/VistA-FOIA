@@ -1,5 +1,5 @@
-HLOSTRAC ;;OIFO-OAK/RBN/CJM ;02/22/2011
- ;;1.6;HEALTH LEVEL SEVEN;**146,147,153**;Oct 13, 1995;Build 11
+HLOSTRAC ;;OIFO-OAK/RBN/CJM ;03/23/2010
+ ;;1.6;HEALTH LEVEL SEVEN;**146,147**;Oct 13, 1995;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;;
  ;; HLO SERVER TRACE Tool
@@ -46,11 +46,6 @@ SETBREAKS ;
  ZB /CLEAR
  ZB /INTERRUPT:NORMAL
  ;
- ;!!!! for debuggng only
- ;ZB ERROR^HLOSTRAC
- ;!!!!!!
- ;
- ;
  ;report errors
  ZB ZB1^HLOSRVR:"N":1:"S $ETRAP=""G ZB3^HLOSTRAC"""
  ;
@@ -82,16 +77,12 @@ SETBREAKS ;
  ZB ZB19^HLOT:"N":1:"D ZB19^HLOSTRAC"
  ZB ZB25^HLOTCP:"N":1:"D ZB25^HLOSTRAC"
  ZB ZB26^HLOTCP:"N":1:"D ZB26^HLOSTRAC"
- ;
  ZB ZB27^HLOTCP:"N":1:"D ZB27^HLOSTRAC"
- ;
  ZB ZB28^HLOTCP:"N":1:"D ZB28^HLOSTRAC"
  ;set break ZB29 in the server(after parsing the message header)
  ZB ZB29^HLOSRVR1:"N":1:"D ZB29^HLOSTRAC"
  ;set break ZB30 in the server(afterchecking if duplicate)
  ZB ZB30^HLOSRVR1:"N":1:"D ZB30^HLOSTRAC"
- ZB ZB31^HLOTCP:"N":1:"D WRITE^HLOTRACE(""Beginning READ over TCP..."")"
- ZB ZB32^HLOTCP:"N":1:"D ZB32^HLOTRACE"
  Q
  ;
 WRITE(MSG) ;
@@ -145,8 +136,6 @@ CLOSE ;
  ;
 ERROR ;
  I ($ECODE["EDITED") Q:$QUIT "" Q
- I ($ECODE["ZINTERRUPT") Q:$QUIT "" Q
- D WRITE^HLOSTRAC("*** ERROR *** : "_$ECODE)
  S HLOTRACE("ERRORS")=HLOTRACE("ERRORS")+1
  I HLOTRACE("ERRORS")>5 Q:$QUIT "" Q
  S $ECODE=""
@@ -154,16 +143,16 @@ ERROR ;
  Q:$QUIT "" Q
  Q
 ZB10 ;
- D WRITE^HLOSTRAC("Getting message header...")
+ D WRITE^HLOSTRAC("Reading message header...")
  Q
-ZB11 I $D(HDR) D WRITE2^HLOSTRAC(" Header follows...",.HDR)
- D WRITE^HLOSTRAC($S(SUCCESS:"Got the header!",1:"**** FAILED TO COMPLETE *****"))
+ZB11 I $D(HDR) D WRITE2^HLOSTRAC("",.HDR)
+ D WRITE^HLOSTRAC($S(SUCCESS:"Completed!",1:"**** FAILED TO COMPLETE *****"))
  Q
 ZB12 ;
- D WRITE^HLOSTRAC("Getting next segment...")
+ D WRITE^HLOSTRAC("Reading next segment...")
  Q
-ZB13 I $D(SEG) D WRITE2^HLOSTRAC(" Segment follows...",.SEG)
- D WRITE^HLOSTRAC($S(RETURN:"Got the segment!",$G(HLCSTATE("MESSAGE ENDED")):"No more segments!",1:"**** FAILED TO COMPLETE *****"))
+ZB13 I $D(SEG) D WRITE2^HLOSTRAC("",.SEG)
+ D WRITE^HLOSTRAC($S(RETURN:"Completed!",$G(HLCSTATE("MESSAGE ENDED")):"No more segments!",1:"**** FAILED TO COMPLETE *****"))
  Q
 ZB14 ;
  D WRITE2^HLOSTRAC("Writing next segment...",.SEG)
@@ -187,7 +176,7 @@ ZB26 D WRITE^HLOSTRAC("Waiting for remote client to connect...")
  Q
 ZB27 D WRITE^HLOSTRAC("Remote client connected...")
  Q
-ZB28 D:'$G(HLCSTATE("CONNECTED")) WRITE^HLOSTRAC("**** UNABLE TO OPEN PORT *****")
+ZB28 D WRITE^HLOSTRAC("**** UNABLE TO OPEN PORT *****")
  Q
 ZB29 D WRITE3^HLOSTRAC("*** THE MESSAGE HEADER COULD NOT BE PARSED   ***")
  Q
@@ -209,8 +198,4 @@ ZB3 ;
  .;
  E  D
  .D ^%ZTER
- Q
-ZB32 D:('$G(RETURN)) WRITE^HLOTRACE("**** FAILED ****")
- D:$G(RETURN) WRITE3^HLOTRACE("")
- D:$G(RETURN) WRITE3^HLOTRACE($G(BUF))
  Q

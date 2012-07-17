@@ -1,5 +1,5 @@
 MAGGTSY1 ;WOIFO/GEK - Imaging Session Utilities ; [ 06/20/2001 08:57 ]
- ;;3.0;IMAGING;**7**;Jul 12, 2002
+ ;;3.0;IMAGING;;Mar 01, 2002
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -21,9 +21,8 @@ SESSION(MAGRY,DATA) ;RPC Call for MAGSYS utility.
  ; DATA is '^' delimited string
  ; IEN Workstatin File ^  From Date ^ To Date
  ;
- N I,J,I1,CT,X,Y,Z,MAGX,MAGWIEN,MAGTIEN
+ N I,I1,CT,X,Y,Z,MAGX,MAGWIEN,MAGTIEN
  N DTFR,DTTO
- S ^TMP("MAGGTSY1","DATA")=DATA
  S MAGWIEN=$P(DATA,U,1)
  S MAGRY=$NA(^TMP($J,"MAGWSESS"))
  K ^TMP($J,"MAGWSESS")
@@ -34,36 +33,34 @@ SESSION(MAGRY,DATA) ;RPC Call for MAGSYS utility.
  S DTTO=DTTO_".9999"
  S ACI="L"_DTTO
  F  S ACI=$O(^MAG(2006.82,"ACWRK",MAGWIEN,ACI),-1) S I1=$E(ACI,2,99) Q:I1<DTFR  D
- . S I="" F  S I=$O(^MAG(2006.82,"ACWRK",MAGWIEN,ACI,I),-1) Q:'I  D
- . . ;S I=$O(^MAG(2006.82,"ACWRK",MAGWIEN,ACI,""))
- . . D INFO(I,.Y) S CT=CT+1,@MAGRY@(CT)=Y
+ . S I=$O(^MAG(2006.82,"ACWRK",MAGWIEN,ACI,""))
+ . D INFO(I,.Y) S CT=CT+1,@MAGRY@(CT)=Y
  I CT=1 S @MAGRY@(0)="0^No Sessions in Date Range." Q
  S @MAGRY@(0)=(CT-1)_"^"_$P(^MAG(2006.81,MAGWIEN,0),U,1)_"  Workstation sessions "
- S @MAGRY@(1)="User^Service/Section^Last Logon^Logoff^Pat ct^Image ct^Cap ct^Actions^Error^TrkID"
+ S @MAGRY@(1)="User^Service/Section^Last Logon^Logoff^Pat ct^Image ct^Cap ct^Actions^Error"
  ;S @MAGRY@(1)="User^Workstation^Service/Section^Last Logon^Logoff^Pat ct^Image ct^Cap ct^Actions^Error"
  Q
 INFO(I,Y) ;
- N N1,N0,MDUZ,Z
- S N0=^MAG(2006.82,I,0) ; Imaging Windows Session file
+ N M,MDUZ,Z
+ S M=^MAG(2006.82,I,0) ; Imaging Windows Session file
  ; THIS WON'T BE NEEDED,I '$P(M,U,8) D SERV(I)
- S Y=$P(N0,U,1) ; User Name
+ S Y=$P(M,U,1) ; User Name
  ;S Y=Y_$P(^MAG(2006.81,$P(M,U,5),0),U,1) ; Workstation Name
  S X=""
- I $P(N0,U,8) D
- . D GETS^DIQ(49,$P(N0,U,8)_",",".01","E","Z","")
- . S X=Z(49,$P(N0,U,8)_",",".01","E")
+ I $P(M,U,8) D
+ . D GETS^DIQ(49,$P(M,U,8)_",",".01","E","Z","")
+ . S X=Z(49,$P(M,U,8)_",",".01","E")
  S Y=Y_U_X
- S Y=Y_U_$$OUTDT^MAGGTSY($P(N0,U,3)) ;Date of Last Logon, by a user.
- S Y=Y_U_$$OUTDT^MAGGTSY($P(N0,U,4)) ;Date/Time of Last Logoff.
+ S Y=Y_U_$$OUTDT^MAGGTSY($P(M,U,3)) ;Date of Last Logon, by a user.
+ S Y=Y_U_$$OUTDT^MAGGTSY($P(M,U,4)) ;Date/Time of Last Logoff.
  ;
- S N1=$G(^MAG(2006.82,I,1))
+ S M=$G(^MAG(2006.82,I,1))
  ;
- S Y=Y_U_$P(N1,U,1) ; patients viewed this session
- S Y=Y_U_$P(N1,U,2) ; images viewed this session.
- S Y=Y_U_$P(N1,U,3) ; Images captured this session
+ S Y=Y_U_$P(M,U,1) ; patients viewed this session
+ S Y=Y_U_$P(M,U,2) ; images viewed this session.
+ S Y=Y_U_$P(M,U,3) ; Images captured this session
  S Y=Y_U_$P($G(^MAG(2006.82,I,"ACT",0)),U,3) ; action count
  S Y=Y_U_$P($G(^MAG(2006.82,I,"ERR",0)),U,3) ; error count
- S Y=Y_U_$P(N0,U,9)
  S Y=Y_U_I ; session ien
  Q
 DISPLAY(MAGRY,MAGSIEN) ; RPC Call for MAGSYS utility. 

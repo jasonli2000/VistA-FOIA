@@ -1,5 +1,5 @@
 PSONEW ;BIR/SAB-new rx order main driver ;07/26/96
- ;;7.0;OUTPATIENT PHARMACY;**11,27,32,46,94,130,268,225,251**;DEC 1997;Build 202
+ ;;7.0;OUTPATIENT PHARMACY;**11,27,32,46,94,130,268,225**;DEC 1997;Build 29
  ;External references L and UL^PSSLOCK supported by DBIA 2789
  ;External reference to ^VA(200 supported by DBIA 224
  ;External reference to ^XUSEC supported by DBIA 10076
@@ -8,11 +8,10 @@ PSONEW ;BIR/SAB-new rx order main driver ;07/26/96
  ;External reference to ^TIUEDIT supported by DBIA 2410
  ;---------------------------------------------------------------
 OERR ;backdoor new rx for v7
- K PSOREEDT,COPY,SPEED,PSOEDIT,DUR,DRET N PSOCKCON
+ K PSOREEDT,COPY,SPEED,PSOEDIT,DUR,DRET
  S PSOPLCK=$$L^PSSLOCK(PSODFN,0) I '$G(PSOPLCK) D LOCK^PSOORCPY S VALMSG=$S($P($G(PSOPLCK),"^",2)'="":$P($G(PSOPLCK),"^",2)_" is working on this patient.",1:"Another person is entering orders for this patient.") K PSOPLCK S VALMBCK="" Q
  K PSOPLCK S X=PSODFN_";DPT(" D LK^ORX2 I 'Y S VALMSG="Another person is entering orders for this patient.",VALMBCK="" D UL^PSSLOCK(PSODFN) Q
-AGAIN N VALMCNT K PSODRUG,PSOCOU,PSOCOUU,PSONOOR,PSORX("FN"),PSORX("DFLG")
- W ! D HLDHDR^PSOLMUTL S (PSONEW("QFLG"),PSONEW("DFLG"))=0,PSOFROM="NEW",PSONOEDT=1
+AGAIN N VALMCNT K PSODRUG,PSOCOU,PSOCOUU,PSONOOR,PSORX("FN") W ! D HLDHDR^PSOLMUTL S (PSONEW("QFLG"),PSONEW("DFLG"))=0,PSOFROM="NEW",PSONOEDT=1
  K ORD D FULL^VALM1,^PSONEW1 ; Continue order entry
  I PSONEW("QFLG") G END
  I PSONEW("DFLG") W !,$C(7),"RX DELETED",! S:$G(POERR) POERR("DFLG")=1,VALMBCK="Q" G END
@@ -50,8 +49,7 @@ EOJ ;
  .I $P(^PSRX(RXN,"STA"),"^")=5 D EN^PSOHLSN1(RXN,"SC","ZS","")
  K RXN,RXN1,^TMP("PSORXN",$J)
  I $G(PSONOTE) D FULL^VALM1,MAIN^TIUEDIT(3,.TIUDA,PSODFN,"","","","",1)
- K PSONOTE,PSOCKCON
- ;W !! K DIR S DIR(0)="E",DIR("?")="Press Return to continue",DIR("A")="Press Return to Continue" D ^DIR K DIR,DTOUT,DUOUT
+ K PSONOTE
  Q
 NOOR ;asks nature of order
  N PSONOODF
@@ -62,7 +60,7 @@ NOOR ;asks nature of order
  .D DIR I $D(DIRUT) S PSONEW("DFLG")=1 Q
  .S PSONOOR=Y D:$D(^XUSEC("PSORPH",DUZ)) COUN K DIR,DTOUT,DTOUT,DIRUT
  ;backdoor order
- D DIR I $D(DIRUT) S PSONEW("DFLG")=1,VALMBCK="Q" Q
+ D DIR I $D(DIRUT) S PSONEW("DFLG")=1 Q
  S PSONOOR=Y K DIK,DA,DIE,DR,PSOI,DIR,DUOUT,DTOUT,DIRUT
  G:'$D(^XUSEC("PSORPH",DUZ)) NOORX
 COUN ;patient counseling

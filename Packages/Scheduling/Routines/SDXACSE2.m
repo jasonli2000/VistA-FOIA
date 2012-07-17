@@ -1,4 +1,4 @@
-SDXACSE2 ; ;05/28/97
+SDXACSE2 ; ;03/30/98
  D DE G BEGIN
 DE S DIE="^SDV(D0,""CS"",",DIC=DIE,DP=409.51,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^SDV(D0,"CS",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,6) S:%]"" DE(3)=%

@@ -1,5 +1,5 @@
 GMRAOR ;HIRMFO/WAA,RM-OERR UTILITIES ;4/1/09  13:55
- ;;4.0;Adverse Reaction Tracking;**2,13,26,37,41,42,44**;Mar 29, 1996;Build 1
+ ;;4.0;Adverse Reaction Tracking;**2,13,26,37,41,42**;Mar 29, 1996;Build 4
 ORCHK(DFN,TYP,PTR,LOC) ; Given a patient IEN (DFN), this function will
  ; return 1 (true) if the patient has an allergy to an agent defined
  ; by TYP and PTR, else it returns 0 (false). See table below.
@@ -103,8 +103,15 @@ GETDATA(DFN) ;Obtain local and HDR related allergy data for use in order checkin
  ;^TMP("GMRAOC",$J,"APC",K)="" where K is the drug class classification (e.g. MS105)
  ;
  F  L +^XTMP("GMRAOC",DFN):1 Q:$T
- K ^XTMP("GMRAOC",DFN) 
- D REMOTE(DFN),LOCAL(DFN)
+ N GMRRECDT,GMRCACHE,GMRFRESH,GMRNEW,GMRXTMP
+ S (GMRFRESH,GMRNEW,GMRXTMP)=0
+ S GMRRECDT=$P($G(^XTMP("ORRDI","ART",DFN,0)),U)
+ S GMRCACHE=$$GET^XPAR("SYS","OR RDI CACHE TIME")
+ I $$FMDIFF^XLFDT($$NOW^XLFDT,GMRRECDT,2)<(60*GMRCACHE),$P(^XTMP("ORRDI","ART",DFN,0),U,3)>-1 S GMRFRESH=1
+ S GMRXTMP=$D(^XTMP("GMRAOC",DFN))
+ S GMRNEW=$S($D(^XTMP("GMRAOC",DFN,"ERROR")):2,$D(^XTMP("GMRAOC",DFN,"NEW")):1,1:0)
+ I GMRFRESH&GMRXTMP&(GMRNEW=1) K ^XTMP("GMRAOC",DFN,"NEW") D LOCAL(DFN)
+ I 'GMRFRESH!'GMRXTMP!(GMRNEW=2) K ^XTMP("GMRAOC",DFN) D REMOTE(DFN),LOCAL(DFN)
  K ^TMP("GMRAOC",$J)
  M ^TMP("GMRAOC",$J)=^XTMP("GMRAOC",DFN)
  S ^XTMP("GMRAOC",DFN,0)=$$FMADD^XLFDT($$NOW^XLFDT,2)_U_$$NOW^XLFDT ;42

@@ -1,5 +1,5 @@
-PXRM ; SLC/PKR - Clinical Reminders entry points. ; 10/20/2009
- ;;2.0;CLINICAL REMINDERS;**4,11,12,16**;Feb 04, 2005;Build 119
+PXRM ; SLC/PKR - Clinical Reminders entry points. ; 09/01/2009
+ ;;2.0;CLINICAL REMINDERS;**4,11,12**;Feb 04, 2005;Build 73
  ;Entry points in this routine are listed in DBIA #2182.
  ;==========================================================
 MAIN(DFN,PXRMITEM,OUTTYPE,DISC) ;Main driver for clinical reminders.
@@ -15,7 +15,6 @@ MAIN(DFN,PXRMITEM,OUTTYPE,DISC) ;Main driver for clinical reminders.
  ;        10 - MyHealtheVet summary
  ;        11 - MyHealtheVet detailed
  ;        12 - MyHealtheVet combined
- ;        55 - Order check
  ;        DISC - (optional) if this is true then the disclaimer will
  ;             be loaded in ^TMP("PXRM",$J,"DISC").
  ;
@@ -57,7 +56,7 @@ EVAL(DFN,DEFARR,OUTTYPE,NODISC,FIEVAL,DATE) ;Reminder evaluation entry
  ;Make sure the reminder exists.
  I $D(DEFARR("DNE")) D NODEF^PXRMERRH(DEFARR("IEN")) Q
  ;PXRMRM is the right margin for output.
- S PXRMRM=80
+ S PXRMRM=72
  S PXRMDATE=$G(DATE)
  S PXRMITEM=DEFARR("IEN")
  S PXRMPID="PXRM"_PXRMITEM_$H

@@ -1,4 +1,4 @@
-ONCOXDI ; GENERATED FROM 'ONCO XDEATH INFO' PRINT TEMPLATE (#788) ; 09/06/11 ; (FILE 160, MARGIN=80)
+ONCOXDI ; GENERATED FROM 'ONCO XDEATH INFO' PRINT TEMPLATE (#1320) ; 03/30/10 ; (FILE 160, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 M DXS=^DIPT(788,"DXS")
+ I $D(DXS)<9 M DXS=^DIPT(1320,"DXS")
  S I(0)="^ONCO(160,",J(0)=160
  D N:$X>9 Q:'DN  W ?9 W "**********DEATH INFORMATION**********"
  D N:$X>19 Q:'DN  W ?19 W " "
@@ -21,8 +21,12 @@ BEGIN ;
  S X=$G(^ONCO(160,D0,1)) S Y=$P(X,U,5) S Y=$S(Y="":Y,$D(^ONCO(165.2,Y,0))#2:$P(^(0),U),1:Y) W $E(Y,1,40)
  D N:$X>4 Q:'DN  W ?4 W "Cause of Death/Cancer: "
  W ?4 S Y=$P(X,U,12) W:Y]"" $S($D(DXS(1,Y)):DXS(1,Y),1:Y)
+ D N:$X>4 Q:'DN  W ?4 W "Cause of Death: "
+ W ?4 S ICDCD=$P($G(^ONCO(160,D0,1)),U,3) K DIP K:DN Y
+ W ?15 I ICDCD'="" S IC=$$ICDDX^ICDCODE(ICDCD) I +IC'=-1 W $P(IC,U,4) K DIP K:DN Y
+ W ?26 I $P($G(^ONCO(160,D0,1)),"^",3)="" D WRTSDC^ONCOAI K DIP K:DN Y
  D N:$X>4 Q:'DN  W ?4 W "Care Center at Death: "
- S Y=$P(X,U,11) S Y(0)=Y S:Y'="" Y=$S($D(^ONCO(160.19,Y,0)):$P(^(0),U,2),1:Y) W $E(Y,1,30)
+ S X=$G(^ONCO(160,D0,1)) S Y=$P(X,U,11) S Y(0)=Y S:Y'="" Y=$S($D(^ONCO(160.19,Y,0)):$P(^(0),U,2),1:Y) W $E(Y,1,30)
  D N:$X>4 Q:'DN  W ?4 W "ICD Revision: "
  S X=$G(^ONCO(160,D0,1)) S Y=$P(X,U,4) W:Y]"" $S($D(DXS(2,Y)):DXS(2,Y),1:Y)
  D N:$X>4 Q:'DN  W ?4 W "Autopsy: "

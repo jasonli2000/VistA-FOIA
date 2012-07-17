@@ -1,8 +1,7 @@
 PSJLMUDE ;BIR/MLM-SHOW FIELDS FOR EDIT (LISTMAN STYLE) ;01 JUNE 00 / 2:40 PM
- ;;5.0; INPATIENT MEDICATIONS ;**7,47,50,63,64,58,80,116,110,111,164,175,201,181**;16 DEC 97;Build 190
- ;
- ;NFI-UD Fr#:2 chgs@init+4 to display non-formulary (N/F)
- ;also chgs @init+23
+ ;;5.0; INPATIENT MEDICATIONS ;**7,47,50,63,64,58,80,116,110,111,164,175,201**;16 DEC 97;Build 2
+  ;NFI-UD Fr#:2 chgs@init+4 to display non-formulary (N/F)
+  ;also chgs @init+23
  ;
  ; Reference to ^PS(55 is supported by DBIA# 2191
  ; Reference to ^PSDRUG is supported by DBIA 2192
@@ -73,11 +72,9 @@ INIT(PSGP,PSGORD) ;
  D SETTMP F Q=0:0 S Q=$O(^PS(53.45,PSJSYSP,1,Q)) Q:'Q  S PSJWPL=PSJL_$S($E(PSJL)=" ":"",1:" ")_$G(^(Q,0)),PSJL="" D DISPLAY
  D SETTMP
  I PSGORD["P",($P($G(^PS(53.1,+PSGORD,0)),U,9)="P"),$O(^PS(53.1,+PSGORD,10,0)) D
- .D SETTMP S PSJL="CPRS Order Checks:" D SETTMP
+ .D SETTMP S PSJL="Order Checks:" D SETTMP
  .F Q=0:0 S Q=$O(^PS(53.1,+PSGORD,10,Q)) Q:'Q  D
- ..;S PSJL="" D SETTMP S PSJL=$G(^PS(53.1,+PSGORD,10,Q,0)) D SETTMP
- ..S PSJL="" D SETTMP
- ..D FORMATTX($G(^PS(53.1,+PSGORD,10,Q,0)))
+ ..S PSJL="" D SETTMP S PSJL=$G(^PS(53.1,+PSGORD,10,Q,0)) D SETTMP
  ..S PSJL="Overriding Provider: "_$P($G(^PS(53.1,+PSGORD,10,Q,1)),U) D SETTMP
  ..S PSJL="Overriding Reason: " F X=0:0 S X=$O(^PS(53.1,+PSGORD,10,Q,2,X)) Q:'X   D
  ...S PSJL=PSJL_$G(^PS(53.1,+PSGORD,10,Q,2,X,0)) D SETTMP S PSJL="                   "
@@ -116,16 +113,6 @@ HILITE(FLD) ;
  ;D CNTRL^VALM10(LIN,COL,WID,IORVON_IOBON,IOINORM,0)
  I FLD=7 S LIN=+$G(PSJLN)-1 Q:LIN<13
  D CNTRL^VALM10(LIN,COL,WID,IORVON_IOBON,IORVOFF_IOBOFF,0)
- Q
- ;
-FORMATTX(PSJX) ;
- NEW PSJX1,Y,Y1
- S PSJX1=""
- F Y=1:1:$L(PSJX," ") S Y1=$P(PSJX," ",Y) D
- . I ($L(PSJX1)+$L(Y1)+1)>79 S:$E(PSJX1,1,1)=" " PSJX1=$E(PSJX1,2,$L(PSJX1)) S PSJL=PSJX1,PSJX1="" D SETTMP
- . S PSJX1=PSJX1_Y1_" "
- I PSJX1]"" S PSJL=PSJX1 D SETTMP
- K PSJX1
  Q
  ;
 1 ;;1,5,16,PSGPDN

@@ -1,16 +1,16 @@
 PRCPRTRA ;WISC/RFJ-transaction register report                      ;07 Sep 91
-V ;;5.1;IFCAP;**1,142**;Oct 20, 2000;Build 5
+V ;;5.1;IFCAP;**1,127**;Oct 20, 2000;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  D ^PRCPUSEL Q:'$G(PRCP("I"))
- N %,%H,%I,ALLITEMS,ITEMDA,PRCPDT,PRCPDATE,PRCPDATB,PRCPSUMM,X,Y
+ N %,%H,%I,ALLITEMS,ITEMDA,PRCPDATE,PRCPDATB,PRCPSUMM,X,Y
  ;
  K X S X(1)="The Transaction Register Report prints all activity for specified items, including the opening and closing balances."
  S X(2)="The current month-year balance on file appears under the calculated closing balance if the two values differ."
  D DISPLAY^PRCPUX2(40,79,.X)
  ;
- K X S X(1)="Enter the beginning/ending month-year for printing the transaction register. If printing 'ALL' items the beginning/ending dates MUST be the same."
+ K X S X(1)="Enter the month-year for printing the transaction register"
  D DISPLAY^PRCPUX2(2,40,.X)
-DAT S Y=$E(DT,1,5)_"00" S %DT(0)=-Y
+ S Y=$E(DT,1,5)_"00" S %DT(0)=-Y
  D DD^%DT
 DAT1 S %DT="AEP",%DT("B")=Y
  S %DT("A")="Print Transaction Register for beginning MONTH and YEAR: "
@@ -39,7 +39,7 @@ ITEMS ;return here after printing report
  D ITEMMAST^PRCPURS4(PRCPDATE)
  S PRCPDATE=HPRCPDT K HPRCPDT
  I '$O(^TMP($J,"PRCPITEMS",0)),'$D(ALLITEMS) Q
- I $D(ALLITEMS),(PRCPDATB'=PRCPDATE) W !,"** All Items selection MUST use same begin/end month and year **" K ALLITEMS G DAT
+ I $D(ALLITEMS),(PRCPDATB'=PRCPDATE) W !,"** All Items should ONLY be selected for current month **"
  ;
 DEVICE ;  ask device
  S %ZIS="Q" D ^%ZIS Q:POP 

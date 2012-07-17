@@ -1,27 +1,15 @@
 RORX004 ;HOIFO/BH,SG,VAC - CLINIC FOLLOW UP ;4/7/09 2:06pm
- ;;1.5;CLINICAL CASE REGISTRIES;**8,13**;Feb 17, 2006;Build 27
+ ;;1.5;CLINICAL CASE REGISTRIES;**8**;Feb 17, 2006;Build 8
  ;
  ; This routine uses the following IAs:
  ;
  ; #10061        2^VADPT (supported)
  ;
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*8    MAR  2010   V CARR       Modified to add panel 180 to GUI.  The
- ;                                      function is to permit a filter on ICD9 
- ;                                      codes to Include or Exclude specific 
- ;                                      ICD9 codes.  An extrinsic is called 
- ;                                      RORXU010 and it is evaluated on return 
- ;                                      as to whether or not to report the 
- ;                                      patient.
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can now select specific patients or
- ;                                      divisions for the report.
- ;******************************************************************************
- ;******************************************************************************
+ ;This routine modified in March 2009 to add panel 180 to GUI.  The
+ ;  function is to permit a filter on ICD9 codes to Include or Exclude
+ ;  specific ICD9 codes.  An extrinsic is called RORXU010 and it is
+ ;  evaluated on return as to whether or not to report the patient.
+ ;
  Q
  ;
  ;***** COMPILES THE "CLINIC FOLLOW UP" REPORT
@@ -37,11 +25,8 @@ CLNFLWUP(RORTSK) ;
  N ROREDT        ; End date
  N RORREG        ; Registry IEN
  N RORSDT        ; Start date
- N RORDLIST      ; Flag to indicate if a division list exists
- N RORDSTDT      ; Start date for division utilization search
- N RORDENDT      ; End date for division utilization search
  ;
- N CNT,ECNT,IEN,IENS,PATIENTS,RC,REPORT,RORPTN,SFLAGS,TMP,XREFNODE,DFN
+ N CNT,ECNT,IEN,IENS,PATIENTS,RC,REPORT,RORPTN,SFLAGS,TMP,XREFNODE
  ;--- Root node of the report
  S REPORT=$$ADDVAL^RORTSK11(RORTSK,"REPORT")
  Q:REPORT<0 REPORT
@@ -54,9 +39,6 @@ CLNFLWUP(RORTSK) ;
  ;--- Initialize constants and variables
  S RORPTN=$$REGSIZE^RORUTL02(+RORREG)  S:RORPTN<0 RORPTN=0
  S ECNT=0,XREFNODE=$NA(^RORDATA(798,"AC",RORREG))
- ;
- ;=== Set up Division list parameters
- I $D(RORTSK("PARAMS","DIVISIONS","C")) S RORDLIST=$$CDPARMS^RORXU001(.RORTSK,.RORDSTDT,.RORDENDT)
  ;
  D
  . ;--- Report header
@@ -72,14 +54,8 @@ CLNFLWUP(RORTSK) ;
  . . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . . S IENS=IEN_",",CNT=CNT+1
- . . ;--- Get patient DFN
- . . S DFN=$$PTIEN^RORUTL01(IEN) Q:DFN'>0
- . . ;--- Check for patient list and quit if not in list
- . . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",DFN)) Q
  . . ;--- Check if the patient should be skipped
  . . Q:$$SKIP^RORXU005(IEN,SFLAGS,RORSDT,ROREDT)
- . . ;--- Check for Division list and quit if not in list
- . . I $D(RORTSK("PARAMS","DIVISIONS","C")),'$$CDUTIL^RORXU001(.RORTSK,DFN,RORDSTDT,RORDENDT) Q
  . . ;--- Process the registry record
  . . S TMP=$$PATIENT(IENS,PATIENTS)
  . . I TMP<0  S ECNT=ECNT+1  Q
@@ -124,9 +100,8 @@ PARAMS(PARTAG,STDT,ENDT,FLAGS) ;
  S PARAMS=$$PARAMS^RORXU002(.RORTSK,PARTAG,.STDT,.ENDT,.FLAGS)
  Q:PARAMS<0 PARAMS
  ;--- Process the list of clinics
- ;patch 13: code from CLINLST has been incorporated into PARAMS^RORXU002
- ;S TMP=$$CLINLST^RORXU006(.RORTSK,PARAMS) ;removed in patch 13
- ;Q:TMP<0 TMP ;removed in patch 13
+ S TMP=$$CLINLST^RORXU006(.RORTSK,PARAMS)
+ Q:TMP<0 TMP
  ;---
  Q PARAMS
  ;
@@ -141,7 +116,7 @@ PARAMS(PARTAG,STDT,ENDT,FLAGS) ;
  ;       >0  Skip the patient
  ;
 PATIENT(IENS,PARTAG) ;
- N CHK,CLINAIDS,DFN,IEN,RC,RCC,RORBUF,RORMSG,SEEN,TMP,VA,VADM,VAHOW,VAROOT,FLAG,PTAG
+ N CHK,CLINAIDS,DFN,IEN,RC,RCC,RORBUF,RORMSG,SEEN,TMP,VA,VADM,VAHOW,VAROOT
  S RC=0
  S DFN=$$PTIEN^RORUTL01(+IENS)
  ;

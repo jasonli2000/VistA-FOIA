@@ -1,5 +1,5 @@
 PSGFILED ;BIR/CML3-VARIOUS FILES' UPKEEP ;16 Mar 99 / 10:22 AM
- ;;5.0; INPATIENT MEDICATIONS ;**20,50,63,119,110,111,112,154,184,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**20,50,63,119,110,111,112,154,184**;16 DEC 97;Build 12
  ;
  ; Reference to ^PS(50.606 supported by DBIA# 2174.
  ; Reference to ^PSDRUG supported by DBIA# 2192.
@@ -71,7 +71,7 @@ ENCPDD ; edit patient's default stop date (wall)
  ;
 ENSYS ; edit system file
  ;/S DIE="^PS(59.7,",DA=1,DR="21;26;26.3;26.4;26.2;20.412ALLOW THE CHANGE OF ORDER TYPES ON ORDERS FROM OERR;32"
- S DIE="^PS(59.7,",DA=1,DR="21;26;26.3;26.4;26.2;26.5;26.6;26.7;26.8;34;27;27.1"
+ S DIE="^PS(59.7,",DA=1,DR="21;26;26.3;26.4;26.2;26.5;26.6;26.7;34;27;27.1"
  W ! D ^DIE K DIE,DA,DR Q
  ;
 ENPLSP ; edit pick list site parameters

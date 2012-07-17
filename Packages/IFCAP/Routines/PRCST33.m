@@ -1,4 +1,4 @@
-PRCST33 ; ;10/11/96
+PRCST33 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRCS(410,D0,""IT"",",DIC=DIE,DP=410.02,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^PRCS(410,D0,"IT",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(3)=% S %=$P(%Z,U,2) S:%]"" DE(5)=% S %=$P(%Z,U,3) S:%]"" DE(6)=% S %=$P(%Z,U,6) S:%]"" DE(7)=% S %=$P(%Z,U,7) S:%]"" DE(8)=%
@@ -55,10 +55,14 @@ C3 G C3S:$D(DE(3))[0 K DB S X=DE(3),DIC=DIE
  K ^PRCS(410,DA(1),"IT","B",$E(X,1,30),DA)
  S X=DE(3),DIC=DIE
  K ^PRCS(410,DA(1),"IT","AB",$E(X,1,30),DA)
+ S X=DE(3),DIC=DIE
+ ;
 C3S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  S ^PRCS(410,DA(1),"IT","B",$E(X,1,30),DA)=""
  S X=DG(DQ),DIC=DIE
  S ^PRCS(410,DA(1),"IT","AB",$E(X,1,30),DA)=""
+ S X=DG(DQ),DIC=DIE
+ S Z(1)=$S($D(^PRCS(410,DA(1),3)):$P(^(3),U,3),1:"") S ^PRCS(410,DA(1),"IT",DA,0)=$P(^PRCS(410,DA(1),"IT",DA,0)_"^^^^^^^",U,1,7)_U_Z(1) K Z(1)
  Q
 X3 K:+X'=X!(X>999)!(X<1)!(X?.E1"."1N.N) X
  Q

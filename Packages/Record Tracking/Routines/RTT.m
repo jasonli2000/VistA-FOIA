@@ -1,5 +1,6 @@
 RTT ;MJK/TROY ISC;Record Transaction Option; ; 5/19/87  9:58 AM ;
- ;;v 2.0;Record Tracking;;10/22/91 
+ ;;v 2.0;Record Tracking;**13**;10/22/91 <<not verified>>
+ ;tag 3,4,5   CHECK $D(RTAPL)/PKE 
  D DT^DICRW S X=$T(+1),DIK="^DOPT("""_$P(X," ;",1)_""","
  G:$D(^DOPT($P(X," ;"),10)) A S ^DOPT($P(X," ;"),0)=$P(X,";",3)_"^1N^" F I=1:1 S Y=$T(@I) Q:Y=""  S ^DOPT($P(X," ;"),I,0)=$P(Y,";",3,99)
  D IXALL^DIK
@@ -13,6 +14,7 @@ A D OVERALL^RTPSET Q:$D(XQUIT)
  G ^RTDEL
  ;
 3 ;;Charge-Out Records
+ I '$D(RTAPL) D APL2^RTPSET I '$D(RTAPL) Q
  K RTB S X="CHARGE-OUT" D TYPE G Q:'$D(RTMV) D CO G 3:'$D(RTFIN) K RTFIN G Q
  ;
 CO I '$D(RTDIV) D DIV1^RTPSET I '$D(RTDIV) D MES^RTP4 S RTFIN="" G Q
@@ -27,9 +29,12 @@ Q K RTC,X1,RTESC,%DT,POP,RTA,I1,RTWND,RTMV,RTMV0,RTN,RTESC,RTPROVFL,Z0
  Q
  ;
 4 ;;Re-charge a Record
+ I '$D(RTAPL) D APL2^RTPSET I '$D(RTAPL) Q
 RC K RTB S X="RE-CHARGE" D TYPE G Q:'$D(RTMV) D CO G 4:'$D(RTFIN) K RTFIN G Q
  ;
 5 ;;Check-In Records
+ I '$D(RTAPL) D APL2^RTPSET I '$D(RTAPL) Q
+ I '$D(RTFR) D SET^RTPSET I '$D(RTFR) Q
  S X="CHECK-IN" D TYPE G Q:'$D(RTMV)
 CI S Y=$S($D(RTFR):+RTFR,1:"")
  I 'Y S DIC(0)="IAMEQ",DIC="^RTV(195.9,",DIC("A")="Select Check-In File Room: ",DIC("S")="I $P(^(0),U,3)=+RTAPL,$P(^(0),U,13)=""F"" D DICS^RTDPA31",DIC("V")="I $P(Y(0),U,4)=""L""" D ^DIC K DIC Q:Y<0

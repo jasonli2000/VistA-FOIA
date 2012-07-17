@@ -1,4 +1,4 @@
-EEOEOSE ;HISC/JWR - Security check ;11/11/92  13:35
+EEOEOSE ;HISC/JWR - Security check ;11/11/92  13:35 [2/9/10 3:17pm]
  ;;2.0;EEO Complaint Tracking;**1,8**;Apr 27, 1995
  S U="^" K FAIL
  I '$D(DUZ) D ERROR S FAIL=1 Q
@@ -36,6 +36,7 @@ DELL ;Checks for delete status
  I $G(EEOCOUNS)>0,+$G(^EEO(785,+Y,"SEC"))=DUZ G Q
  I $G(EEOCOUNS)'>0 I $P($G(^EEO(785,+Y,1)),U,3)>0!(+$G(^EEO(785,+Y,"SEC"))=DUZ) G Q
 NAY K EEOSEC I 0
+ S $T=0
 Q Q $T
 CASENO ;Calculates the case number
  Q:$G(DA)'>0&($G(XMZ)>0)

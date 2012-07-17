@@ -1,4 +1,4 @@
-DVBAXP ; GENERATED FROM 'DVBA STATUS' PRINT TEMPLATE (#517) ; 08/19/96 ; (FILE 396, MARGIN=80)
+DVBAXP ; GENERATED FROM 'DVBA STATUS' PRINT TEMPLATE (#1042) ; 04/27/95 ; (FILE 396, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(517,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(1042,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  F Y=0:0 Q:$Y>-1  W !
  W ?0 X DXS(1,9.2) S X=$E(DIP(3),DIP(4),X) S Y=X,X=DIP(1),X=X_Y K DIP K:DN Y W X
  F Y=0:0 Q:$Y>-1  W !
@@ -70,4 +70,12 @@ BEGIN ;
  F Y=0:0 Q:$Y>10  W !
  D N:$X>6 Q:'DN  W ?6 W "Form 21-2680:"
  S X=$G(^DVB(396,D0,0)) D N:$X>22 Q:'DN  W ?22 S Y=$P(X,U,21) W:Y]"" $S($D(DXS(12,Y)):DXS(12,Y),1:Y)
+ S X=$G(^DVB(396,D0,1)) D N:$X>34 Q:'DN  W ?34 S Y=$P(X,U,5) D DT
+ S X=$G(^DVB(396,D0,2)) D N:$X>49 Q:'DN  W ?49,$E($P(X,U,1),1,11)
+ S X=$G(^DVB(396,D0,6)) D N:$X>61 Q:'DN  W ?61 S Y=$P(X,U,21) S Y=$S(Y="":Y,$D(^DG(40.8,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,16)
+ F Y=0:0 Q:$Y>11  W !
+ D N:$X>1 Q:'DN  W ?1 W "Asset Information:"
+ S X=$G(^DVB(396,D0,0)) D N:$X>22 Q:'DN  W ?22 S Y=$P(X,U,23) W:Y]"" $S($D(DXS(13,Y)):DXS(13,Y),1:Y)
+ S X=$G(^DVB(396,D0,1)) D N:$X>34 Q:'DN  W ?34 S Y=$P(X,U,6) D DT
+ S X=$G(^DVB(396,D0,2)) D N:$X>49 Q:'DN  W ?49,$E($P(X,U,2),1,11)
  G ^DVBAXP1

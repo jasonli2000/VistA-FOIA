@@ -1,7 +1,7 @@
-GMRCHL7A ;SLC/DCM,MA - Receive HL-7 Message from OERR ;10/28/10  09:43
- ;;3.0;CONSULT/REQUEST TRACKING;**1,5,12,15,21,22,33,68,66**;DEC 27, 1997;Build 30
+GMRCHL7A ;SLC/DCM,MA - Receive HL-7 Message from OERR ; 6/2/10 3:21pm
+ ;;3.0;CONSULT/REQUEST TRACKING;**1,5,12,15,21,22,33,68**;DEC 27, 1997;Build 21
  ;
- ; This routine invokes IA #872(FILE 101 ^ORD(100)), #2053(DIE)
+ ; This routine invokes IA #2849
  ;
 URG(X) ;Return Urgency give Z-code from HL-7 segment; see ORC+9
  S X=$S(X="S":"STAT",X="R":"ROUTINE",X="ZT":"TODAY",X="Z24":"WITHIN 24 HOURS",X="Z48":"WITHIN 48 HOURS",X="Z72":"WITHIN 72 HOURS",X="ZW":"WITHIN 1 WEEK",X="ZM":"WITHIN 1 MONTH",X="ZNA":"NEXT AVAILABLE",1:X)
@@ -15,11 +15,9 @@ ORC(GMRCORC) ;Get fields from ORC segment and set into GMRC variables
  ;GMRCAD=date of request        GMRCOCR=order request reason
  ;GMRCORFN=oe/rr file number    GMRCO=file 123 IEN - if not a new order
  ;GMRCS38=order status - taken from Table 38, HL7 standard
- ;GMRCERDT=earliest date desired
  S GMRCTRLC=$P(GMRCORC,SEP1,2),GMRCORFN=$P(GMRCORC,SEP1,3),GMRCORFN=$P($P(GMRCORFN,SEP2,1),";",1),GMRCAPP=$P($P(GMRCORC,SEP1,3),SEP2,2)
  S GMRCS38=$P(GMRCORC,SEP1,6),GMRCURGI=$P($P(GMRCORC,SEP1,8),SEP2,6),GMRCPLCR=$P(GMRCORC,SEP1,11),GMRCORNP=$P(GMRCORC,SEP1,13)
  I $L(GMRCURGI) S GMRCURGI="GMRCURGENCY - "_$$URG(GMRCURGI),GMRCURGI=$O(^ORD(101,"B",GMRCURGI,0))
- S GMRCERDT=$P($P(GMRCORC,SEP1,8),SEP2,4),GMRCERDT=$$FMDATE^GMRCHL7($G(GMRCERDT)) ;WAT/66
  S GMRCO=+$P($P(GMRCORC,SEP1,4),SEP2,1)
  S GMRCODT=$P(GMRCORC,SEP1,16),GMRCAD=$$FMDATE^GMRCHL7(GMRCODT)
  S GMRCOCR=$P(GMRCORC,SEP1,17),GMRCNATO=$P(GMRCOCR,SEP2,5)
@@ -29,7 +27,7 @@ OBR(GMRCOBR) ;Get fields from OBR segment and set into GMRC variables
  ;GMRCPLI=place of consultation          GMRCODT=observation date/time
  ;GMRCATN=person to alert (attention)    GMRCSTDT=status change date/time
  ;GMRCS123=results status (table 123)    GMRCINTR=results interpreter
- ;GMRCPRI=procedure from file ^ORD(101,
+ ;GMRCPRI=procedure from file ^ORD(101,  
  ;GMRCXMF=foreign consult service
  ;        a flag that tells the HL7 routine that
  ;        consults does not need to return CPRS a file
@@ -86,7 +84,7 @@ EN(MSG) ;Entry point to routine
  N DFN,GMRCACT,GMRCADD,GMRCFAC,GMRCMTP,GMRCPNM,GMRCO,GMRCOCR,GMRCORNP
  N GMRCORFN,GMRCPLCR,GMRCRB,GMRCSEND,GMRCSTS,GMRCTRLC,GMRCWARD,ORIFN
  N GMRCTRLC,GMRCAD,ORC,GMRCSBR,GMRCZSS,GMRCSS,GMRCOTXT,GMRCPRCD
- N GMRCREJ,GMRCRECV,GMRCERDT
+ N GMRCREJ,GMRCRECV
  S GMRCMSG="",GMRCNOD=0 F  S GMRCNOD=$O(MSG(GMRCNOD)) Q:GMRCNOD=""  S GMRCMSG=MSG(GMRCNOD) I $E(GMRCMSG,1,3)="MSH" D INIT^GMRCHL7U(GMRCMSG) D  Q
  .S GMRCSEND=$P(GMRCMSG,SEP1,3),GMRCFAC=$P(GMRCMSG,SEP1,4)
  .S GMRCMTP=$P(GMRCMSG,SEP1,9),GMRCRECV=$P(GMRCMSG,SEP1,5)
@@ -116,8 +114,8 @@ EN(MSG) ;Entry point to routine
  ; If consults sends an XX, CPRS returns an NA.
  D EXIT^GMRCHL7U
  Q
-RTN(GMRCORN,DA) ;Put ^OR(100, ien for order into ^GMR(123,
+RTN(GMRCORN,DA) ;Put ^OR(100, ien for order into ^GMR(123, 
  S DIE="^GMR(123,",DR=".03////^S X=GMRCORN"
- L +^GMR(123,DA):$S($G(DILOCKTM)>0:DILOCKTM,1:5) D ^DIE L -^GMR(123,DA) ;wat/66 add lock timeout
+ L +^GMR(123,DA) D ^DIE L -^GMR(123,DA)
  K DIE,DR
  Q

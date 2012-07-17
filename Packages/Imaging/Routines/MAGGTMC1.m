@@ -1,5 +1,5 @@
 MAGGTMC1 ;WOIFO/GEK - RPC Calls for Imaging/Medicine procedures ; [ 06/20/2001 08:57 ]
- ;;3.0;IMAGING;**59**;Nov 27, 2007;Build 20
+ ;;3.0;IMAGING;**59**;Mar 27, 2007;Build 15
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |

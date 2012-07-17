@@ -1,5 +1,5 @@
 MAGGNTI1 ;WOIFO/GEK - Imaging interface to TIU. RPC Calls etc. ; 04 Apr 2002  2:37 PM
- ;;3.0;IMAGING;**46,59**;Nov 27, 2007;Build 20
+ ;;3.0;IMAGING;**46,59**;Mar 27, 2007;Build 15
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -96,8 +96,7 @@ NEW(MAGRY,MAGDFN,MAGTITLE,MAGADCL,MAGMODE,MAGES,MAGESBY,MAGLOC,MAGDATE,MAGCNSLT,
  ;       ;Put in the Date that was sent.
  I '$$VALID^MAGGSIV1(8925,1301,.MAGDATE,.MAGRES) S MAGRY=MAGRY_"  "_MAGRES
  E  S MTXT(1301)=MAGDATE
- ; - Fix in T30,  if DUZ isn't MAGESBY, we have Author different than User.
- I MAGESBY'=DUZ S MTXT("1202")=MAGESBY
+ ;
  ;               Update and LINK TO CONSULT if needed.
  I MAGISC S MTXT("1405")=MAGCNSLT_";GMR(123,"
  I $D(MTXT) D  I 'MUPD S MAGRY=MUPD Q
@@ -142,7 +141,7 @@ NEWADD(MAGRY,MAGDFN,MAGTIUDA,MAGADCL,MAGMODE,MAGES,MAGESBY,MAGDATE,MAGTEXT) ; RP
  S MAGDATE=$G(MAGDATE)
  ;
  I '$$VALDATA^MAGGNTI2(.MAGRY,MAGDFN,MAGTIUDA) Q
- N MAGXT,I,CT,NEWTIUDA,MAGY,MAGRES,MAGUPD
+ N MAGXT,I,CT,NEWTIUDA,MAGY,MAGRES
  S CT=1,I=""
  S MAGXT("TEXT",1,0)="VistA Imaging  Scanned Document - Addendum."
  I $D(MAGTEXT) F  S I=$O(MAGTEXT(I)) Q:I=""  D
@@ -159,15 +158,12 @@ NEWADD(MAGRY,MAGDFN,MAGTIUDA,MAGADCL,MAGMODE,MAGES,MAGESBY,MAGDATE,MAGTEXT) ; RP
  S MAGRY=MAGRY_"^Addendum was created."
  ;
  ;Put in the Date that was sent.
- K MAGUPD
  I '$$VALID^MAGGSIV1(8925,1301,.MAGDATE,.MAGRES) S MAGRY=MAGRY_"  "_MAGRES
  E  D
- . S MAGUPD(1301)=MAGDATE
- . S MAGUPD(1211)=$$GET1^DIQ(8925,1211,MAGTIUDA,"I")
- ; - Fix in T30,  if DUZ isn't MAGESBY, we have Author different than User.
- I MAGESBY'=DUZ S MAGUPD("1202")=MAGESBY
- I $D(MAGUPD) D
- . D UPDATE^TIUSRVP(.MAGY,NEWTIUDA,.MAGUPD)
+ . K X
+ . S X(1301)=MAGDATE
+ . S X(1211)=$$GET1^DIQ(8925,1211,MAGTIUDA,"I")
+ . D UPDATE^TIUSRVP(.MAGY,NEWTIUDA,.X)
  . I 'MAGY S MAGRY=MAGRY_" TIU Data was Not Correctly Filed."
  . Q
  ;

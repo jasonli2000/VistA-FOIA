@@ -1,8 +1,9 @@
-PRCHT313 ; ;10/06/97
+PRCHT313 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442,D0,2,",DIC=DIE,DP=442.01,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^PRC(442,D0,2,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,4) S:%]"" DE(14)=%,DE(17)=%
- I $D(^(4)) S %Z=^(4) S %=$P(%Z,U,1) S:%]"" DE(1)=% S %=$P(%Z,U,6) S:%]"" DE(3)=% S %=$P(%Z,U,7) S:%]"" DE(4)=% S %=$P(%Z,U,15) S:%]"" DE(7)=% S %=$P(%Z,U,16) S:%]"" DE(8)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,15) S:%]"" DE(1)=%
+ I $D(^(2)) S %Z=^(2) S %=$P(%Z,U,2) S:%]"" DE(8)=%
+ I $D(^(4)) S %Z=^(4) S %=$P(%Z,U,1) S:%]"" DE(11)=% S %=$P(%Z,U,6) S:%]"" DE(13)=% S %=$P(%Z,U,7) S:%]"" DE(14)=% S %=$P(%Z,U,11) S:%]"" DE(3)=% S %=$P(%Z,U,12) S:%]"" DE(5)=% S %=$P(%Z,U,13) S:%]"" DE(6)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -44,110 +45,71 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="PRCHT313",DQ=1
-1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW="4;1",DV="NJ4,0",DU="",DLB="SERIAL NO.(GSA/DLA)",DIFLD=30
+1 S DW="0;15",DV="FX",DU="",DLB="NATIONAL DRUG CODE",DIFLD=9.3
  G RE
-X1 K:+X'=X!(X>9999)!(X<1000)!(X?.E1"."1N.N) X
- Q
- ;
-2 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=2 D X2 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X2 I PRCHN("SC")=0 S Y="@5"
- Q
-3 S DW="4;6",DV="S",DU="",DLB="BACKORDER CONTROL",DIFLD=35
- S DU="-:ESTABLISH BACKORDER;"
- G RE
-X3 Q
-4 S DW="4;7",DV="S",DU="",DLB="SUBSTITUTE CONTROL",DIFLD=36
- S DU="-:NO SUBSTITUTE;"
- G RE
-X4 Q
-5 S DQ=6 ;@5
-6 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=6 D X6 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X6 S:'$D(PRCHEDI) Y="@88"
- Q
-7 S DW="4;15",DV="S",DU="",DLB="BACKORDER (EDI)",DIFLD=36.3
- S DU="Y:YES;N:NO;"
- G RE
-X7 Q
-8 S DW="4;16",DV="S",DU="",DLB="SUBSTITUTE (EDI)",DIFLD=36.6
- S DU="Y:YES;N:NO;"
- G RE
-X8 Q
-9 S DQ=10 ;@88
-10 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=10 D X10 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X10 S PRCHIDA=+$P(^PRC(442,DA(1),2,DA,0),U,5)
- Q
-11 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=11 D X11 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X11 I PRCHN("SFC")=2 S ACCT=$$ACCT^PRCPUX1($E($$NSN^PRCPUX1(PRCHIDA),1,4)) S PRCHBOCC=$S(ACCT=1:2697,ACCT=2:2698,ACCT=3:2699,ACCT=6:2699,ACCT=8:2696,1:2699)
- Q
-12 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=12 D X12 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X12 I '$G(PRCHBOCC) S Y="@8"
- Q
-13 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=13 D X13 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X13 S PRCHBOCC=$P($G(^PRCD(420.2,PRCHBOCC,0)),U)
- Q
-14 S DW="0;4",DV="RFX",DU="",DLB="BOC",DIFLD=3.5
- S DE(DW)="C14^PRCHT313"
- S X=PRCHBOCC
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-C14 G C14S:$D(DE(14))[0 K DB S X=DE(14),DIC=DIE
- K ^PRC(442,DA(1),2,"D",+$P(X," ",1),DA)
- S X=DE(14),DIC=DIE
- S ALN=$P(^PRC(442,DA(1),2,DA,0),"^") K:ALN>0 ^PRC(442,DA(1),2,"AH",+X,ALN,DA) K ALN
-C14S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
- S ^PRC(442,DA(1),2,"D",+$P(X," ",1),DA)=""
- S X=DG(DQ),DIC=DIE
- S ALN=$P(^PRC(442,DA(1),2,DA,0),"^") S:ALN>0 ^PRC(442,DA(1),2,"AH",+X,ALN,DA)="" K ALN
- Q
-X14 Q
-15 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=15 D X15 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X15 S Y="@89"
- Q
-16 S DQ=17 ;@8
-17 D:$D(DG)>9 F^DIE17,DE S DQ=17,DW="0;4",DV="RFX",DU="",DLB="BOC",DIFLD=3.5
- S DE(DW)="C17^PRCHT313"
- G RE
-C17 G C17S:$D(DE(17))[0 K DB S X=DE(17),DIC=DIE
- K ^PRC(442,DA(1),2,"D",+$P(X," ",1),DA)
- S X=DE(17),DIC=DIE
- S ALN=$P(^PRC(442,DA(1),2,DA,0),"^") K:ALN>0 ^PRC(442,DA(1),2,"AH",+X,ALN,DA) K ALN
-C17S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
- S ^PRC(442,DA(1),2,"D",+$P(X," ",1),DA)=""
- S X=DG(DQ),DIC=DIE
- S ALN=$P(^PRC(442,DA(1),2,DA,0),"^") S:ALN>0 ^PRC(442,DA(1),2,"AH",+X,ALN,DA)="" K ALN
- Q
-X17 S Z0=$P(^PRC(442,DA(1),0),"^",5) K:'Z0 X,Z0 I $D(X) K:'$D(^PRCD(420.1,Z0,0)) X,Z0 I $D(X) D EN8^PRCHNPO7
+X1 K:$L(X)>14!($L(X)<11)!'(X?1.6N1"-"1.4N1"-"1.2N) X I $D(X) D EN12^PRCHNPO7
  I $D(X),X'?.ANP K X
  Q
  ;
-18 S DQ=19 ;@89
-19 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=19 D X19 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X19 K PRCHBOCC
+2 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=2 D X2 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X2 D TSTREQ2^PRCHNPO9
  Q
-20 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=20 D X20 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X20 K PRCHLINO W !!,"Enter/Edit Delivery Schedule for this Item?  NO// " R X:DTIME S:'$T X="^" S:X="" X="N" S:X["?" Y="@6" S:"Yy?"'[$E(X) Y="" W "  "_$S("Yy"[$E(X):"(YES)","Nn"[$E(X):"(NO)",1:"")
+3 S DW="4;11",DV="RS",DU="",DLB="DRUG TYPE CODE",DIFLD=40
+ S DU="A:NARCOTIC;L:CONTROLLED SUBSTANCE;D:OTHER DRUGS;"
+ G RE
+X3 Q
+4 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=4 D X4 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X4 S Y=$S(PRCHN("SC")'=9:4,1:"@4")
  Q
-21 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=21 D X21 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X21 W !!,"** To DELETE a schedule, zero out the quantity to be delivered. To add a new",!,"delivery schedule do the following:",!!
+5 S DW="4;12",DV="RS",DU="",DLB="FOOD GROUP",DIFLD=41
+ S DU="1:Meat, Fish, Poultry, Eggs & Convenience Entrees;2:Milk, Milk Products;3:Fruits, Vegetables;4:Bread, Flour, Cereal, etc.;5:Commercial Nutritional Products, Tube feedings & supplements;6:Miscellaneous, Foods;"
+ S Z=$S($D(^PRC(441,+$P(^PRC(442,DA(1),2,DA,0),U,5),3)):^(3),1:""),X=$P(Z,U,7) K Z
+ S Y=X
+ G Y
+X5 Q
+6 S DW="4;13",DV="F",DU="",DLB="DIETETIC CONVERSION FACTOR",DIFLD=42
+ G RE
+X6 K:$L(X)>5!($L(X)<1) X
+ I $D(X),X'?.ANP K X
  Q
-22 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=22 D X22 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X22 W "a. If there is no delivery schedule already in file answer 'Yes' when asked if     you are adding a new delivery schedule."
- Q
-23 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=23 D X23 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X23 W !,"b. If there is only one delivery schedule already in the file you will see         'OK? YES//' answer 'No' and then answer 'Yes' when asked if you are adding a    new delivery schedule."
- Q
-24 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=24 D X24 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X24 W !,"c. If there is more than one delivery schedule in the file, hit <return> key at    'CHOOSE' prompt and answer 'Yes' when asked if you are adding a new delivery    schedule.",!
- Q
-25 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=25 D X25 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X25 S PRCHDA=DA,PRCHDA1=DA(1),PRCHLINO=$P(^PRC(442,DA(1),2,DA,0),U,1) W !,"  Item Quantity Ordered: "_$P(^(0),U,2),!
- Q
-26 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=26 X DR(99,1,9.2) S Y(101)=$S($D(^PRC(442.8,D0,0)):^(0),1:"") S X=$P(Y(101),U,1),Y(102)=X S X=$P(Y(101),U,1) S D0=I(0,0) S D1=I(1,0) S X=$S(D(0)>0:D(0),1:"")
- S DGO="^PRCHT314",DC="^442.8^PRC(442.8," G DIEZ^DIE0
-R26 D DE G A
  ;
-27 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=27 D X27 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X27 S Y="@6"
+7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X7 S Y=$S(PRCHN("SC")'=9:4,1:"@4")
  Q
-28 G 1^DIE17
+8 S DW="2;2",DV="FX",DU="",DLB="CONTRACT/BOA #",DIFLD=4
+ S DE(DW)="C8^PRCHT313"
+ G RE
+C8 G C8S:$D(DE(8))[0 K DB S X=DE(8),DIC=DIE
+ K ^PRC(442,DA(1),2,"AC",$E(X,1,30),DA)
+C8S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+ S ^PRC(442,DA(1),2,"AC",$E(X,1,30),DA)=""
+ Q
+X8 D EN8^PRCHNPO5
+ I $D(X),X'?.ANP K X
+ Q
+ ;
+9 S DQ=10 ;@4
+10 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=10 D X10 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X10 S Y=$S((PRCHN("SC")=0)!(PRCHN("SC")=3):30,PRCHN("SC")=1:35,1:"@5")
+ Q
+11 D:$D(DG)>9 F^DIE17,DE S DQ=11,DW="4;1",DV="NJ4,0",DU="",DLB="SERIAL NO.(GSA/DLA)",DIFLD=30
+ G RE
+X11 K:+X'=X!(X>9999)!(X<1000)!(X?.E1"."1N.N) X
+ Q
+ ;
+12 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=12 D X12 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X12 I PRCHN("SC")=0 S Y="@5"
+ Q
+13 S DW="4;6",DV="S",DU="",DLB="BACKORDER CONTROL",DIFLD=35
+ S DU="-:ESTABLISH BACKORDER;"
+ G RE
+X13 Q
+14 S DW="4;7",DV="S",DU="",DLB="SUBSTITUTE CONTROL",DIFLD=36
+ S DU="-:NO SUBSTITUTE;"
+ G RE
+X14 Q
+15 S DQ=16 ;@5
+16 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=16 D X16 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X16 S:'$D(PRCHEDI) Y="@88"
+ Q
+17 D:$D(DG)>9 F^DIE17 G ^PRCHT314

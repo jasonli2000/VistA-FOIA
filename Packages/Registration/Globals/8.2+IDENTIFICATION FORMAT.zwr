@@ -8,7 +8,7 @@ ZWR
 ^DIC(8.2,0,"RD")="d"
 ^DIC(8.2,0,"WR")="@"
 ^DIC(8.2,1,0)="VA STANDARD^0"
-^DIC(8.2,1,"DESCRIPTION",0)="^^5^5^2930428^^^^"
+^DIC(8.2,1,"DESCRIPTION",0)="^^5^5^2960103^^^"
 ^DIC(8.2,1,"DESCRIPTION",1,0)="This format represents the normal VA identification format.  The format"
 ^DIC(8.2,1,"DESCRIPTION",2,0)="uses the Social Security field to produce the following id format:"
 ^DIC(8.2,1,"DESCRIPTION",3,0)=" "

@@ -1,5 +1,5 @@
-PSJOEA2 ;BIR/MLM-INPATIENT ORDER ENTRY ; 5/11/09 7:50am
- ;;5.0; INPATIENT MEDICATIONS ;**127,133,200**;16 DEC 97;Build 14
+PSJOEA2 ;BIR/MLM-INPATIENT ORDER ENTRY ;23 Jun 98 / 1:46 PM
+ ;;5.0; INPATIENT MEDICATIONS ;**127,133**;16 DEC 97
  ;
  ; Reference to ^PS(55 is supported by DBIA #2191.
  ; Reference to ^PSSLOCK is supported by DBIA #2789.
@@ -13,14 +13,12 @@ CHK ;Check to be sure all the orders in the complex order series are completed, 
  ..D ACTLOG^PSJOEA(PSJO,PSGP,PSGORD)
  ..S VND4=$G(^PS(55,PSGP,5,+PSGORD,4))
  ..I PSJSYSL>1 S $P(^PS(55,PSGP,5,+PSGORD,7),U)=PSGDT S:$P(^(7),U,2)="" $P(^(7),U,2)="N"_$S($P(^PS(55,PSGP,5,+PSGORD,0),"^",24)="E":"E",1:"") S PSGTOL=2,PSGUOW=DUZ,PSGTOO=1,DA=+PSGORD D ENL^PSGVDS
- ..S:$P(VND4,"^",15)&'$P(VND4,"^",16) $P(VND4,"^",15)="" S:$P(VND4,"^",18)&'$P(VND4,"^",19) $P(VND4,"^",18)="" S:$P(VND4,"^",22)&'$P(VND4,"^",23) $P(VND4,"^",22)="" S $P(VND4,"^",PSJSYSU,PSJSYSU+1)=DUZ_"^"_PSGDT
- ..; Set PV and NV flag according to PSJSYSU  (PSJ*5*200)
- ..S $P(VND4,"^",+PSJSYSU=1+9)=1 S:'$P(VND4,U,+PSJSYSU=3+9) $P(VND4,U,+PSJSYSU=3+9)=+$P(VND4,U,+PSJSYSU=3+9) S ^PS(55,PSGP,5,+PSGORD,4)=VND4
+ ..S:$P(VND4,"^",15)&'$P(VND4,"^",16) $P(VND4,"^",15)="" S:$P(VND4,"^",18)&'$P(VND4,"^",19) $P(VND4,"^",18)="" S:$P(VND4,"^",22)&'$P(VND4,"^",23) $P(VND4,"^",22)="" S $P(VND4,"^",PSJSYSU,PSJSYSU+1)=DUZ_"^"_PSGDT,^PS(55,PSGP,5,+PSGORD,4)=VND4
  ..I '$P(VND4,U,10) S ^PS(55,"ANV",PSGP,+PSGORD)=""
  ..I $P(VND4,U,9) K ^PS(55,"APV",PSGP,+PSGORD)
  ..I $P(VND4,U,10) K ^PS(55,"ANV",PSGP,+PSGORD)
  ..S:+PSJSYSU=3 ^PS(55,"AUE",PSGP,+PSGORD)=""
- ..S PSJCOM=$P($G(^PS(55,PSGP,5,+PSGORD,.2)),"^",8) I PSJCOM]"" K ^PS(53.1,"ACX",PSJCOM,PSJO) ;S $P(^PS(55,PSGP,5,+PSGORD,4),"^",9)=1
+ ..S PSJCOM=$P($G(^PS(55,PSGP,5,+PSGORD,.2)),"^",8) I PSJCOM]"" K ^PS(53.1,"ACX",PSJCOM,PSJO) S $P(^PS(55,PSGP,5,+PSGORD,4),"^",9)=1
  ..D EN1^PSJHL2(PSGP,$S(+PSJSYSU=3:"SC",+PSJSYSU=1:"SC",1:"XX"),+PSGORD_"U")     ; allow status change to be sent for pharmacists & nurses
  ..D:+PSJSYSU=1 EN1^PSJHL2(PSGP,"ZV",+PSGORD_"U") L -^PS(55,PSGP,5,+PSGORD)
  ..S PSJPREX=1 D CMPLX2^PSJCOM1(PSGP,PSJORD,PSGORD) K PSJPREX

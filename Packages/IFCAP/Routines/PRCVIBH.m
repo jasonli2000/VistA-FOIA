@@ -1,5 +1,5 @@
-PRCVIBH ;WOIFO/DST - Issue Book Processing, from DynaMed to IFCAP ;7/26/05  17:10
- ;;5.1;IFCAP;**81,86**;Oct 20, 2000
+PRCVIBH ;WOIFO/DST - Issue Book Processing, from DynaMed to IFCAP ;1/25/05  9:17
+ ;;5.1;IFCAP;**81**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  ; IV - Internal Voucher, SV - Standard Voucher
@@ -160,10 +160,9 @@ FT1 ; Process FT1 segment
  I PRCVACC,((PRCVACC'?1N)!("12368"'[PRCVACC)) D ADDERR("PRCV2"_U_"Invalid Account Code: "_PRCVACC,9)
  I PRCVTCD="IV" D
  . S PRCVBOC=$P(PRCVND,PRCVFS,10)
- . I PRCVBOC=2696 D ADDERR("PRCV2"_U_"Invalid Buyer's Budget Object Code: "_PRCVBOC,10)
  . I 'PRCVBOC D ADDERR("PRCV2"_U_"Budget Object Code is missing.",10)
  . I '$D(^PRCD(420.1,PRCVCC_PRCVSCC,1,PRCVBOC)) D ADDERR("PRCV2"_U_"Invalid Budget Object Code for this Cost Center: "_PRCVBOC,10)
- . I $P($G(^PRCD(420.2,PRCVBOC,0)),"^",2)=1 D ADDERR("PRCV2"_U_"Inactivated Budget Object Code: "_PRCVBOC,10)
+ . I $P($G(^PRCD(420.2,PRCVBOC,0)),"^",2)=1 D ADDERR("PRCV2"_U_"Inactivated Budget Object Code."_PRCVBOC,10)
  . S PRCVSAL=$P(PRCVND,PRCVFS,13)
  . I 'PRCVSAL D ADDERR("PRCV2"_U_"Sale Value is missing.",13)
  . Q

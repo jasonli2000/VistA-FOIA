@@ -1,6 +1,6 @@
 SDRRRECP ;10N20/MAH;Recall Reminder Manual Printing; 09/20/2004
- ;;5.3;Scheduling;**536,569**;Aug 13, 1993;Build 3
- ;;This routine is called from SDRRLRP 
+ ;;5.3;Scheduling;**536**;Aug 13, 1993;Build 53
+ ;;This routine is called from SDRRCLRP 
  ;;If the site has set TYPE OF NOTIFICATION to CARDS this routine
  ;;will run.
  K TYPE
@@ -158,8 +158,6 @@ DQDD K ^TMP($J)
  N CHKDATE
  S PR=0 F  S PR=$O(^SD(403.5,"C",PR)) Q:PR=""  I $P($G(^SD(403.54,PR,0)),U,2)=+ZTEAM S D0=0 F  S D0=$O(^SD(403.5,"C",PR,D0)) Q:D0=""  S DTA=$G(^SD(403.5,D0,0)) D:DTA]""
  .I $P($G(^SD(403.5,D0,0)),"^",10)="" QUIT
- .; SD*569 - Prevent from printing more than ONE second card
- .I $P($G(^SD(403.5,D0,0)),"^",13)'="" QUIT
  .S CHKDATE=5 S RDATE=$P($G(^SD(403.5,D0,0)),"^",6) S CHECK=$$FMDIFF^XLFDT(RDATE,DT) I CHECK>CHKDATE K RDATE QUIT
  .S TIME=""
  .I $P(^SD(403.5,D0,0),"^",9)["60" S TIME=$P(^SD(403.5,D0,0),"^",9) S TIME="**"_TIME_"**"

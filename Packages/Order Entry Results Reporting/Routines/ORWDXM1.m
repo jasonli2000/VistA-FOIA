@@ -1,25 +1,25 @@
-ORWDXM1 ; SLC/KCM - Order Dialogs, Menus;5/12/08 6:14am ;9/10/2010
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,131,132,141,178,185,187,215,243,280**;Dec 17, 1997;Build 85
+ORWDXM1 ; SLC/KCM - Order Dialogs, Menus;2/19/03 ;5/27/2008
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,131,132,141,178,185,187,215,243**;Dec 17, 1997;Build 242
 BLDQRSP(LST,ORIT,FLDS,ISIMO,ENCLOC) ; Build responses for an order
  ; LST=QuickLevel^ResponseID(ORIT;$H)^Dialog^Type^FormID^DGrp
- ; LST(n)=verify or reject text
+ ; LST(n)=verify text or reject text
  ; ORIT= ptr to 101.41 for quick order, 100 for copy
  ;       1   2    3    4   5   6    7    8        11-20
  ; FLDS=DFN^LOC^ORNP^INPT^SEX^AGE^EVENT^SC%^^^Key Variables...
  ; ORIT=+ORIT: ptr to 101.41, $E(ORIT)=C: copy $E(ORIT)=X: change
  ; !! SHOULD CHECK for PRE-CPRS ORDERS (treat as text?)
  K ^TMP("ORWDXMQ",$J)
- N ORWMODE ; 0:Dlg,Quick 1:copy 2:change
- N TEMPCAT ; pt cat from DPT
- N ISXFER ; Trnsfr order?
- N ORIMO ;If IMO(inpt med on opt)
+ N ORWMODE ; 0:Dialog,Quick 1:copy order 2:change order
+ N TEMPCAT ; patient category from DPT file
+ N ISXFER ; Transfer order?
+ N ORIMO ;If IMO(inpatient medication on outpatient)
  N TEMPORIT
  N ADMLOC,PATLOC,ORDLOC,LEVEL,DELAY,SCHLOC,SCHTYP
  S PATLOC=$P(FLDS,U,2)
  S ORDLOC=$S(ORIT["C":+$P($G(^OR(100,+$P(ORIT,"C",2),0)),U,10),1:0)
  S ORIMO=$G(ISIMO)
  S ORWMODE=0,ISXFER=""
- S:$E(ORIT)="C" ORWMODE=1 S:$E(ORIT)="T" ORWMODE=1,ISXFER=";T" ;treat xfer as copy
+ S:$E(ORIT)="C" ORWMODE=1 S:$E(ORIT)="T" ORWMODE=1,ISXFER=";T" ;treat xfer as copy for now
  S:$E(ORIT)="X" ORWMODE=2
  S TEMPORIT=ORIT
  I ORWMODE S ORIT=$E(ORIT,2,999)
@@ -29,11 +29,21 @@ BLDQRSP(LST,ORIT,FLDS,ISIMO,ENCLOC) ; Build responses for an order
  I ORWMODE=1 D CHKCOPY^ORWDXM3(.LST,ORIT,FLDS) Q:+LST(0)=8  ;no copy
  I ORWMODE=2 D BLD4CHG^ORWDXM3(.LST,ORIT,FLDS) Q  ;change
  I 'ORWMODE,($P(^ORD(101.41,+ORIT,0),U,4)="D"),'($O(^DIC(9.4,"C","OR",0))[$P(^ORD(101.41,+ORIT,0),U,7)) S LST(0)="0^0^"_$$DLGINFO^ORWDXM3(ORIT,ORWMODE_ISXFER) Q
- N ORIMTYPE,ORCOMP,ORTAS,LRFZX,LRFSAMP,LRFSPEC,LRFDATE,LRFURG,LRFSCH
+ ;radilogy vars
+ N ORIMTYPE
+ ;blood bank vars
+ N ORCOMP,ORTAS
+ ;lab vars
+ N LRFZX,LRFSAMP,LRFSPEC,LRFDATE,LRFURG,LRFSCH
  N ORTIME,ORCOLLCT,ORMAX,ORTEST,ORIMTIME,ORSMAX,ORSTMS,ORSCH
+ ;pharmacy vars
  N PSJNOPC,ORMORE,ORINPT,ORXNP,ORSCHED,ORQTY,ORNOUNS,ORXNP,OREFILLS
  N ORCOMPLX,ORQTY,ORCOPAY,ORDRUG,ORWPSPIK,ORWPSWRG,ORSD,ORDSUP,ORWP94
- N ORPARAM,ORNPO,ORTIME,ORMEAL,ORTRAY,ORDATE,GMRCNOPD,GMRCNOAT,GMRCREAF
+ ;dietetics vars
+ N ORPARAM,ORNPO,ORTIME,ORMEAL,ORTRAY,ORDATE
+ ;consults vars
+ N GMRCNOPD,GMRCNOAT,GMRCREAF
+ ; setup general env
  N ORTYPE,ORVP,ORL,ORNP,ORSEX,ORAGE,ORWARD,OREVENT,ORDIV,ORSC,KEYVAR
  N ORDG,ORDIALOG,ORCAT,FIRST,ORQUIT,X,ORTRAIL,ORLEAD,RSPREF,AUTOACK
  N OREVNTYP
@@ -54,7 +64,7 @@ BLDQRSP(LST,ORIT,FLDS,ISIMO,ENCLOC) ; Build responses for an order
  . D SETKEYV^ORWDXM3(KEYVAR)
  K ^TMP("ORWORD",$J)
  ; init return record based on auto-accept
- I ORWMODE S LST(0)="2^"_ORIT ;verify on copy
+ I ORWMODE S LST(0)="2^"_ORIT ;verify on copy 
  E  S LST(0)=+$P($G(^ORD(101.41,ORIT,5)),U,8)_U_ORIT
  S TEMPCAT=$S($L($P($G(^DPT(+ORVP,.1)),U)):"I",1:"O")
  I TEMPCAT="I",+$P(FLDS,U,4)=1,$E(TEMPORIT)="C",$P($G(^ORD(100.98,$P($G(^OR(100,+ORIT,0)),U,11),0)),U)="OUTPATIENT MEDICATIONS" S TEMPCAT="O"
@@ -78,13 +88,13 @@ BLDQRSP(LST,ORIT,FLDS,ISIMO,ENCLOC) ; Build responses for an order
  S AUTOACK=$S($D(ORWPSWRG):0,1:1)
  S SEQ=0 F  S SEQ=$O(^ORD(101.41,+ORDIALOG,10,"B",SEQ)) Q:'SEQ  D
  . S DA=0 F  S DA=$O(^ORD(101.41,+ORDIALOG,10,"B",SEQ,DA)) Q:'DA  D
- . . ; skip if child prmpt
+ . . ; skip if this is a child prompt
  . . I $P(^ORD(101.41,+ORDIALOG,10,DA,0),U,11) Q
- . . ; set dflt for prmpt, chk if interactive
+ . . ; set default for prompt, see if needs to be interactive
  . . S PROMPT=$P(^ORD(101.41,+ORDIALOG,10,DA,0),U,2)
  . . D SETITEM(DA,PROMPT,1,.MUSTASK)
  . . I MUSTASK S AUTOACK=0 Q
- . . ; iterate through child items if parent & edit only
+ . . ; iterate through the child items if parent and edit only
  . . Q:'$D(^ORD(101.41,+ORDIALOG,10,"DAD",PROMPT))
  . . N CSEQ,CDA,CPROMPT,INST,ORQUIT
  . . S CSEQ=0 F  S CSEQ=$O(^ORD(101.41,+ORDIALOG,10,"DAD",PROMPT,CSEQ)) Q:'CSEQ  D  Q:$G(ORQUIT)
@@ -94,9 +104,9 @@ BLDQRSP(LST,ORIT,FLDS,ISIMO,ENCLOC) ; Build responses for an order
  . . . I $P(^ORD(101.41,+ORDIALOG,10,CDA,0),U,6),ORDIALOG'=IVFID,'$O(ORDIALOG(CPROMPT,0)) S AUTOACK=0
  . . . S INST=0 F  S INST=$O(ORDIALOG(CPROMPT,INST)) Q:'INST  D
  . . . . N ORASK D VBASK^ORWDXM4(INST) ; set ORASK for VBECS
- . . . . ; set dflt for each child prmpt
+ . . . . ; set default for each child prompt, if necessary
  . . . . D SETITEM(CDA,CPROMPT,INST,.MUSTASK)
- . . . . ; if no val & child prmpt req'd then need interaction
+ . . . . ; if no val & child prmpt required then need interaction
  . . . . I MUSTASK,$P(^ORD(101.41,+ORDIALOG,10,CDA,0),U,6) S AUTOACK=0
  N IVDLG
  S IVDLG=$O(^ORD(101.41,"AB","PSJI OR PAT FLUID OE",0))
@@ -108,23 +118,23 @@ BLDQRSP(LST,ORIT,FLDS,ISIMO,ENCLOC) ; Build responses for an order
  .I LEVEL=2!(ISIMO) D ADMTIME^ORWDXM2(ORDLOC,PATLOC,ENCLOC,DELAY,ISIMO)
  I ($$ISMED(ORIT)),'($$VALQO^ORWDXM3(ORIT)) S AUTOACK=0
  S PROMPT=0 F  S PROMPT=$O(ORDIALOG(PROMPT)) Q:'PROMPT  D
- . I '$D(^ORD(101.41,ORDIALOG,10,"D",PROMPT)) K ORDIALOG(PROMPT) Q
+ . I '$D(^ORD(101.41,ORDIALOG,10,"D",PROMPT)) K ORDIALOG(PROMPT) Q 
  . S INST=0 F  S INST=$O(ORDIALOG(PROMPT,INST)) Q:'INST  D
  . . S SEQ=SEQ+1,^TMP("ORWDXMQ",$J,KEY,SEQ,0)=U_PROMPT_U_INST
- . . ; save word proc val
+ . . ; save word processing value
  . . I $E(ORDIALOG(PROMPT,0))="W",$L(ORDIALOG(PROMPT,INST)) D
  . . .  M ^TMP("ORWDXMQ",$J,KEY,SEQ,2)=@ORDIALOG(PROMPT,INST)
- . . ; save other val types
+ . . ; save other value types
  . . E  S ^TMP("ORWDXMQ",$J,KEY,SEQ,1)=ORDIALOG(PROMPT,INST)
  I AUTOACK D
  . I ORWMODE S AUTOACK=2
  . I 'ORWMODE,($P(^ORD(101.41,ORIT,0),U,8)!'LST(0)) S AUTOACK=2
  ;I ($$ISMED(ORIT)),'($$VALQO^ORWDXM3(ORIT)) S AUTOACK=0
  I ORIMO,ORWMODE S AUTOACK=2
- ; accept Herbal/OTC/NonVA Med quick orders
+ ; added to accept Herbal/OTC/NonVA Med quick orders
  I $L($G(^ORD(101.41,+ORIT,0))),($P(^ORD(100.98,$P(^ORD(101.41,+ORIT,0),U,5),0),U,3)="NV RX"),($P($G(^ORD(101.41,+ORIT,5)),U,8)) S AUTOACK=1
- ;I AUTOACK=2,$$ISMED(ORIT),(ORDIALOG=IVDLG),$$VERORD^ORWDXM3=0 S AUTOACK=0
- I AUTOACK=2,$$ISMED(ORIT),$$VERORD^ORWDXM3(ORIT)=0 S AUTOACK=0
+ ;I $G(^OR(100,+ORIT,0)),$P($G(^ORD(101.41,+$P(^OR(100,+ORIT,0),U,5),0)),U,8),$D(ORDIALOG("B","HERBAL/OTC/NON VA MEDICATION")) S AUTOACK=1
+ I AUTOACK=2,$$ISMED(ORIT),(ORDIALOG=IVDLG),$$VERORD^ORWDXM3=0 S AUTOACK=0
  I AUTOACK=2 D VERTXT^ORWDXM2
  S LST(0)=AUTOACK_U_KEY_U_$$DLGINFO^ORWDXM3(ORIT,ORWMODE_ISXFER)_"^"_$G(KEYVAR)
  I $P(LST(0),U,4)="D" S $P(LST(0),U,4)="Q"
@@ -132,7 +142,7 @@ BLDQRSP(LST,ORIT,FLDS,ISIMO,ENCLOC) ; Build responses for an order
  K ^TMP("ORWORD",$J)
  K ^TMP("PSJINS",$J),^TMP("PSJMR",$J),^TMP("PSJNOUN",$J)
  Q
-SETITEM(DA,PROMPT,INST,MUSTASK) ; set dflt val & return if must prompt
+SETITEM(DA,PROMPT,INST,MUSTASK) ; set default value & return if must prompt
  N EDITONLY,Y,VALIV,XCODE
  S MUSTASK=0,EDITONLY=0,VALIV=0
  I $D(^TMP("ORWDHTM",$J,ORDIALOG,PROMPT)) D
@@ -193,7 +203,7 @@ ISMED(IFN) ; return 1 if pharmacy order dlg used
  E  S PKG=$P($G(^OR(100,+IFN,0)),U,14)
  Q $$NMSP^ORCD(PKG)="PS"
 SITEVAL() ;return 1 if site does want the reason for study to carry through from past orders of this ordering session
- I $$GET^XPAR("ALL^SRV.`"_+^VA(200,DUZ,5),"OR RA RFS CARRY ON")=0 Q 0
+ I $$GET^XPAR("ALL","OR RA RFS CARRY ON")=0 Q 0
  Q 1
 SVRPC(RET,X) ;RPC FOR SITEVAL
  S RET=$$SITEVAL

@@ -1,11 +1,11 @@
-ORCXPND3 ; SLC/MKB,dcm - Expanded display of Reports ;08/31/09  09:35
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**25,30,43,85,172,243,280**;Dec 17, 1997;Build 85
+ORCXPND3 ; SLC/MKB,dcm - Expanded display of Reports ;2/21/01  14:07
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**25,30,43,85,172,243**;Dec 17, 1997;Build 242
  ;
 AP ; -- Retrieve AP results for a specific date/time specimen taken
  ; [alert follow-up, from LABS^ORCXPND1]
- N ORLRSS,ORDTSTKN S ORLRSS=$P($G(XQADATA),U),ORDTSTKN=$P($G(XQADATA),U,3)
- I ORLRSS?1(1"SP",1"CY",1"EM",1"AU"),ORDTSTKN'="" D
- . N ORLRDFN S ORLRDFN=$$LRDFN^LR7OR1(DFN) ;DBIA/ICR #2503
+ N ORACCNO,ORDTSTKN S ORACCNO=$P(ID,"-"),ORDTSTKN=$P(ID,"-",2)
+ I (ORACCNO["CY"!(ORACCNO["SP")!(ORACCNO["EM")!(ORACCNO["AU"))&($L(ORACCNO)>0) D  ;check for valid accession #
+ . N ORLRDFN,ORLRSS S ORLRDFN=$$LRDFN^LR7OR1(DFN),ORLRSS=$P($G(XQADATA),U) ;DBIA/ICR #2503
  . K ^TMP("ORAP",$J) D EN^LR7OSAP4("^TMP(""ORAP"",$J)",ORLRDFN,ORLRSS,ORDTSTKN)
  . I '$O(^TMP("ORAP",$J,0)) S ^TMP("ORAP",$J,1,0)="",^TMP("ORAP",$J,2,0)="No Anatomic Pathology report available..."
  . N I S I=0 F  S I=$O(^TMP("ORAP",$J,I)) Q:I<1  S X=^(I,0),LCNT=LCNT+1,^TMP("ORXPND",$J,LCNT,0)=X

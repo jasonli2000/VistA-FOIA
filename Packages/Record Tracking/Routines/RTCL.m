@@ -1,17 +1,21 @@
-RTCL ; GENERATED FROM 'RT MISSING' PRINT TEMPLATE (#482) ; 07/15/96 ; (FILE 190.2, MARGIN=132)
+RTCL ; GENERATED FROM 'RT MISSING' PRINT TEMPLATE (#573) ; 08/25/94 ; (FILE 190.2, MARGIN=132)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
- S DISTP=DISTP+1,DILCT=DILCT+1 D:'(DISTP#100) CSTP^DIO2
+ S DISTP=DISTP+1 D:'(DISTP#100) CSTP
  Q
-DT I $G(DUZ("LANG"))>1,Y W $$OUT^DIALOGU(Y,"DD") Q
- I Y W $P("JAN^FEB^MAR^APR^MAY^JUN^JUL^AUG^SEP^OCT^NOV^DEC",U,$E(Y,4,5))_" " W:Y#100 $J(Y#100\1,2)_"," W Y\10000+1700 W:Y#1 "  "_$E(Y_0,9,10)_":"_$E(Y_"000",11,12) Q
+CSTP I '$D(ZTQUEUED) K DISTOP Q
+ Q:$G(DISTOP)=0  S:$G(DISTOP)="" DISTOP=1
+ I DISTOP'=1 X DISTOP K:'$T DISTOP S DISTOP=$T Q:'$T
+ Q:'$$S^%ZTLOAD
+ W:$G(IO)]"" !,"*** TASK "_ZTSK_" STOPPED BY USER - DURING "_$S($D(DPQ):"SORT",1:"PRINT")_" EXECUTION ***",!! S ZTSTOP=1,DN=0 Q
+DT I Y W $P("JAN^FEB^MAR^APR^MAY^JUN^JUL^AUG^SEP^OCT^NOV^DEC",U,$E(Y,4,5))_" " W:Y#100 $J(Y#100\1,2)_"," W Y\10000+1700 W:Y#1 "  "_$E(Y_0,9,10)_":"_$E(Y_"000",11,12) Q
  W Y Q
 M D @DIXX
  Q
 BEGIN ;
- S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(482,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ S:'$D(DN) DN=1 S DISTP=$G(DISTP)
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(573,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  S X=$G(^RTV(190.2,D0,0)) D N:$X>0 Q:'DN  W ?0 S Y=$P(X,U,1) S C=$P(^DD(190.2,.01,0),U,2) D Y^DIQ:Y S C="," W $E(Y,1,20)
  S I(100)="^RT(",J(100)=190 S I(0,0)=D0 S DIP(1)=$S($D(^RTV(190.2,D0,0)):^(0),1:"") S X=$P(DIP(1),U,1),X=X S D(0)=+X S D0=D(0) I D0>0 D A1
  G A1R
@@ -49,7 +53,7 @@ B1R ;
  D T Q:'DN  D N D N:$X>0 Q:'DN  W ?0 W "Entered as Missing : "
  S X=$G(^RTV(190.2,D0,0)) S Y=$P(X,U,2) D DT
  D N:$X>49 Q:'DN  W ?49 W "Entered By: "
- S Y=$P(X,U,3) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,35)
+ S Y=$P(X,U,3) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
  D T Q:'DN  D N D N:$X>0 Q:'DN  W ?0 W "Supervisor Comments: "
  S I(1)=1,J(1)=190.21 F D1=0:0 Q:$O(^RTV(190.2,D0,1,D1))'>0  S D1=$O(^(D1)) D:$X>23 T Q:'DN  D C1
  G C1R
@@ -63,7 +67,7 @@ C1R ;
  D T Q:'DN  D N D N:$X>0 Q:'DN  W ?0 W "Entered as Found   : "
  S X=$G(^RTV(190.2,D0,0)) S Y=$P(X,U,6) D DT
  D N:$X>49 Q:'DN  W ?49 W "Entered By: "
- S Y=$P(X,U,8) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,35)
+ S Y=$P(X,U,8) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
  D N:$X>89 Q:'DN  W ?89 W "Where it was found: "
  S Y=$P(X,U,5) S C=$P(^DD(190.2,5,0),U,2) D Y^DIQ:Y S C="," W $E(Y,1,30)
  D T Q:'DN  D N D N:$X>0 Q:'DN  W ?0 W "User Comments      : "

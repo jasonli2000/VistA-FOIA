@@ -1,8 +1,7 @@
-PRCATB1 ; ;05/28/97
+PRCATB1 ; ;06/01/98
  D DE G BEGIN
 DE S DIE="^PRCA(433,",DIC=DIE,DP=433,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRCA(433,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,9) S:%]"" DE(3)=%
- I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,5) S:%]"" DE(1)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,6) S:%]"" DE(1)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -44,21 +43,12 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="PRCATB1",DQ=1
-1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW="1;5",DV="RNJ9,2X",DU="",DLB="TRANS. AMOUNT",DIFLD=15
- S X=$G(PRCA("PAYMT"))
+1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW="0;6",DV="NJ3,0",DU="",DLB="SEGMENT",DIFLD=6
+ S X=$S($D(PRCA("SEG")):PRCA("SEG"),1:"")
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X1 Q
-2 S D=0 K DE(1) ;41
- S DE(1,0)="/^S X=$G(PRCACOM)"
- S Y="COMMENTS^W^^0;1^Q",DG="7",DC="^433.041" D DIEN^DIWE K DE(1) G A
+ G RD
+X1 K:+X'=X!(X>500)!(X<0)!(X?.E1"."1N.N) X
+ Q
  ;
-3 S DW="0;9",DV="P200'",DU="",DLB="PROCESSED BY",DIFLD=42
- S DU="VA(200,"
- S X=$G(PRCAPER)
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD:X="@",Z
-X3 Q
-4 G 0^DIE17
+2 D:$D(DG)>9 F^DIE17 G ^PRCATB2

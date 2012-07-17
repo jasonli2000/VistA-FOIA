@@ -1,5 +1,5 @@
-ORWDRA32 ; SLC/KCM/REV/JDL - Radiology calls to support windows [6/28/02] ;04/13/10  12:43
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,116,141,215,280**;Dec 17, 1997;Build 85
+ORWDRA32 ; SLC/KCM/REV/JDL - Radiology calls to support windows [6/28/02] ;1/25/06  12:18
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,116,141,215**;Dec 17, 1997
  ;
 DEF(LST,PATID,EVTDIV,IMGTYP) ; Get dialog data for radiology
  N ILST,I,ORX S ILST=0
@@ -44,7 +44,7 @@ TRNSPRT ; Get the modes of transport
  . S LST($$NXT)="i"_ORX
  ; figure default on windows side
  Q
-CATEGRY ; Get the categories of exam
+CATEGRY ; Get the categories of exam  
  F ORX="I^INPATIENT","O^OUTPATIENT","E^EMPLOYEE","C^CONTRACT","S^SHARING","R^RESEARCH" D
  . S LST($$NXT)="i"_ORX
  ; figure default on windows side
@@ -63,7 +63,7 @@ SUBMIT ; Get the locations to which the request may be submitted
  Q
 LAST7 ; Get exams for the last 7 days
  K ^TMP($J,"RAE7") D EN2^RAO7PC1(PATID)
- S I=0 F  S I=$O(^TMP($J,"RAE7",PATID,I)) Q:'I  D
+ S I=0 F  S I=$O(^TMP($J,"RAE7",PATID,I)) Q:'I  D 
  . S LST($$NXT)="i"_I_U_^TMP($J,"RAE7",PATID,I)
  K ^TMP($J,"RAE7")
  Q
@@ -132,7 +132,7 @@ RADSRC(Y,SRCTYPE) ; return list of available contract/sharing/research sources
  F I=1:1 S ORX=$O(^DIC(34,ORX)) Q:+ORX=0  D
  . Q:($P(^DIC(34,ORX,0),U,2)'=SRCTYPE)
  . I $D(^DIC(34,ORX,"I")),(^DIC(34,ORX,"I")<$$NOW^XLFDT) Q
- . S Y(I)=ORX_U_$P(^DIC(34,ORX,0),U,1)
+ . S Y(I)=I_U_$P(^DIC(34,ORX,0),U,1)
  Q
 LOCTYPE(Y,ORLOC) ; Returns type of location (C,W)
  S Y=-1

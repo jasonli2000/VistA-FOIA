@@ -1,4 +1,4 @@
-RACTRT ; GENERATED FROM 'RA REPORT PRINT STATUS' PRINT TEMPLATE (#612) ; 08/23/96 ; (FILE 74, MARGIN=80)
+RACTRT ; GENERATED FROM 'RA REPORT PRINT STATUS' PRINT TEMPLATE (#793) ; 03/11/96 ; (FILE 74, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(612,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(793,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D N:$X>0 Q:'DN  W ?0 W "Report   :"
  S X=$G(^RARPT(D0,0)) W ?12,$E($P(X,U,1),1,12)
  D N:$X>35 Q:'DN  W ?35 W "Patient :"

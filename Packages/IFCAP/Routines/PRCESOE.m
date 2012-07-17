@@ -1,8 +1,7 @@
-PRCESOE ;WISC/CLH/CTB/SJG/ASU - 1358 OBLIGATION ; 08/22/94  5:11 PM
-V ;;5.1;IFCAP;**148,153**;Oct 20, 2000;Build 10
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCESOE ;WISC/CLH/CTB/SJG-1358 OBLIGATION ; 08/22/94  5:11 PM
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  K PRC,PRCF,Y
- N PRCFSC S PRCFSC=1    ;PRC*5.1*148  ENTERED FROM 1358 OBLIGATE
  D OUT
  S PRCF("X")="AB"
  D ^PRCFSITE Q:'%
@@ -15,25 +14,6 @@ SC ; Entry point for rebuild/retransmit
  S PRCFA("TRDA")=OB
  D SCREEN^PRCEOB1 W !
  D VENCONO^PRCFFU15(OB) ; display vendor & contract info, if exists
- ; PRC*5.1*148 start
- ; if Obligator is a requestor, violation to segregation of duties
- I $P($G(TRNODE(7)),"^",1)=DUZ D  G OUT
- . W !!,"You are the CP Clerk (Requestor) on this 1358 transaction."
- . W !,"Per Segregation of Duties, the CP Clerk (Requestor)"
- . W " is not permitted to "
- . W $S($G(PRCFSC):"Obligate",1:"Rebuild/Retransmit")," the 1358."
- . I $G(PRCFSC) Q
- . W ! D EN^DDIOL("  ** Press RETURN to continue **")
- . R X:DTIME Q
- ; if Obligator is a approver, violation to segregation of duties
- I $P($G(TRNODE(7)),"^",3)=DUZ D  G OUT
- . W !!,"You are the Approver on this 1358 transaction."
- . W !,"Per Segregation of Duties, the Approver is not permitted to "
- . W $S($G(PRCFSC):"Obligate",1:"Rebuild/Retransmit")," the 1358."
- . I $G(PRCFSC) Q
- . W ! D EN^DDIOL("  ** Press RETURN to continue **")
- . R X:DTIME Q
- ; PRC*5.1*148 end
  S FLDCHK=0
  D EN^PRCFFU14(OB) ; edit auto accrual info
  I ACCEDIT=1 G SC
@@ -175,10 +155,6 @@ POBAL ; Enter Obligation Data into Purchase Order Record
  S X=AMT D  W !! G V
  . D TRANS^PRCSES
  . D BULLET^PRCEFIS1
- . ;Generate 1358 transaction message to OLCS. Messages will be generated
- . ;upon obligation of a new 1358 or an adjustment. Messages will not be
- . ;sent for a rebuild or retransmission to FMS.(PRC*5.1*153)
- . I $D(PRCFA("RETRAN")),'PRCFA("RETRAN") D OLCSMSG^PRCFDO
  . D OUT
  ;
 OUT D K1B^PRCFFUZ

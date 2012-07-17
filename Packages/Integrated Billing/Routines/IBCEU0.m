@@ -1,5 +1,5 @@
 IBCEU0 ;ALB/TMP - EDI UTILITIES ;02-OCT-96
- ;;2.0;INTEGRATED BILLING;**137,197,155,296,349,417,432**;21-MAR-94;Build 192
+ ;;2.0;INTEGRATED BILLING;**137,197,155,296,349,417**;21-MAR-94;Build 6
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
 NOTECHG(IBDA,IBNTEXT) ; Enter who/when review stat change was entered
@@ -130,13 +130,11 @@ MCRPAY(IBIFN) ; Calculate MRA total for the bill IBIFN
  N IBPAY,Q,Z0
  S IBPAY=0
  ;include eligible bill for process
- ; 432 - added MRA flag to IBCEU1 to not always screen out non-MRA's
- S Q=0 F  S Q=$O(^IBM(361.1,"B",IBIFN,Q)) Q:'Q  I $$EOBELIG^IBCEU1(Q,1) S IBPAY=IBPAY+$P($G(^IBM(361.1,Q,1)),U,1)
+ S Q=0 F  S Q=$O(^IBM(361.1,"B",IBIFN,Q)) Q:'Q  I $$EOBELIG^IBCEU1(Q) S IBPAY=IBPAY+$P($G(^IBM(361.1,Q,1)),U,1)
  Q IBPAY
  ;
-PREOBTOT(IBIFN,IBMRANOT) ; Function - Calculates Patient Responsibility Amount
+PREOBTOT(IBIFN) ; Function - Calculates Patient Responsibility Amount
  ; Input:  IBIFN - ien of Bill Number (ien of file 399)
- ;         IBMRANOT - flag to indicate that this is NOT and MRA
  ; Output Function returns: Patient Responsibility Amount for all EOB's for bill
  ;
  N FRMTYP,IBPTRES
@@ -153,8 +151,7 @@ PREOBTOT(IBIFN,IBMRANOT) ; Function - Calculates Patient Responsibility Amount
  . S (IBEOB,IBPRTOT,IBPTRES)=0
  . F  S IBEOB=$O(^IBM(361.1,"B",IBIFN,IBEOB)) Q:'IBEOB  D  ;
  . . S EOBREC=$G(^IBM(361.1,IBEOB,0)),EOBREC1=$G(^(1))
- .. ; IB*2.0*432 allow for non-MRA's
- . . I $G(IBMRANOT)'=1,$P(EOBREC,U,4)'=1 Q  ;make sure it's an MRA
+ . . I $P(EOBREC,U,4)'=1 Q  ;make sure it's an MRA
  . . Q:$D(^IBM(361.1,IBEOB,"ERR"))  ;no filing error
  . . ; Total up Pt Resp Amounts on all valid MRA's
  . . S IBPTRES=IBPTRES+$P(EOBREC1,U,2)
@@ -164,8 +161,7 @@ PREOBTOT(IBIFN,IBMRANOT) ; Function - Calculates Patient Responsibility Amount
  N EOBADJ,IBEOB,LNLVL
  S IBEOB=0
  F  S IBEOB=$O(^IBM(361.1,"B",IBIFN,IBEOB)) Q:'IBEOB  D  ;
- . ; IB*2.0*432 allow for non-MRA's
- . I $G(IBMRANOT)'=1,$P($G(^IBM(361.1,IBEOB,0)),U,4)'=1 Q    ; must be an MRA
+ . I $P($G(^IBM(361.1,IBEOB,0)),U,4)'=1 Q    ; must be an MRA
  . Q:$D(^IBM(361.1,IBEOB,"ERR"))  ; no filing error
  . ; get claim level adjustments
  . K EOBADJ M EOBADJ=^IBM(361.1,IBEOB,10)

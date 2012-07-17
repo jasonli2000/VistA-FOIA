@@ -1,4 +1,4 @@
-DVBAXS1 ; ;08/19/96
+DVBAXS1 ; ;04/27/95
  D DE G BEGIN
 DE S DIE="^DVB(396,",DIC=DIE,DP=396,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DVB(396,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,12) S:%]"" DE(2)=% S %=$P(%Z,U,13) S:%]"" DE(6)=% S %=$P(%Z,U,14) S:%]"" DE(9)=%,DE(13)=% S %=$P(%Z,U,15) S:%]"" DE(17)=%
@@ -23,7 +23,7 @@ T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) D SET I '
  K DDER G X
 P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
- I $P(DQ(DQ),U,5)'["$",X?.1"-".N.1".".N,$P(DQ(DQ),U,5,99)["+X'=X" S X=+X
+ I $P(DQ(DQ),U,5)'["$",X?.1"-".N.1".".N S X=+X
 V D @("X"_DQ) K YS
 Z K DIC("S"),DLAYGO I $D(X),X'=U S DG(DW)=X S:DV["d" ^DISV(DUZ,"DIE",DLB)=X G A
 X W:'$D(ZTQUEUED) $C(7),"??" I $D(DB(DQ)) G Z^DIE17

@@ -1,5 +1,5 @@
 OOPSUTL5 ;WIOFO/CAH-Utilities Routine ;4/6/00
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**8**;Jun 01,1998
 VAL(IEN) ; Validation for required fields for DOL transmission
  ;
  ; Input:  IEN = Internal Entry Number of entry in file 2260
@@ -7,7 +7,7 @@ VAL(IEN) ; Validation for required fields for DOL transmission
  ;             = "" Invalid to be transmitted
  ;      NULL(#)= List of invalid fields
  K NULL
- N DATA,NAM,WITN,WITN0,WITN1
+ N DATA,NAM
  S VAL=1
  F FLD=1,4,5,6,7,8,9,10,11,13,15,30,60,62,67,68,70,73 D
  .I $$GET1^DIQ(2260,IEN,FLD)="" S NULL(FLD)=$$GET1^DID(2260,FLD,"","LABEL")
@@ -18,7 +18,7 @@ VAL(IEN) ; Validation for required fields for DOL transmission
  ..I $$GET1^DIQ(2260,IEN,147)="" S NULL(147)=$$GET1^DID(2260,147,,"LABEL")
  .I $$GET1^DIQ(2260,IEN,148,"I")="Y" D
  ..I $$GET1^DIQ(2260,IEN,149)="" S NULL(149)=$$GET1^DID(2260,149,,"LABEL")
- .F FLD=108,110,111,112,114,120,126,130,131,132,133,134,140,162,169,170,171,172,173,174,175,176,177,180,181,183,184,185 D
+ .F FLD=108,110,111,112,114,120,126,130,131,132,133,134,140,156,162,169,170,171,172,173,174,175,176,177,180,181,183,184,185 D
  ..I $$GET1^DIQ(2260,IEN,FLD)="" S NULL(FLD)=$$GET1^DID(2260,FLD,,"LABEL")
  .I $$GET1^DIQ(2260,IEN,150,"I")="Y" F FLD=151:1:155 D
  ..I $$GET1^DIQ(2260,IEN,FLD)="" S NULL(FLD)=$$GET1^DID(2260,FLD,,"LABEL")

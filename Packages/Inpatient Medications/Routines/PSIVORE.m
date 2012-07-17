@@ -1,5 +1,5 @@
 PSIVORE ;BIR/PR,MLM-ORDER ENTRY ; 4/1/08 2:37pm
- ;;5.0; INPATIENT MEDICATIONS ;**18,29,50,56,58,81,110,127,133,157,203,213,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**18,29,50,56,58,81,110,127,133,157,203,213**;16 DEC 97;Build 8
  ;
  ; Reference to ^PS(55 is supported by DBIA 2191
  ; Reference to ^ORX2 is supported by DBIA #867
@@ -72,7 +72,6 @@ OK ;Print example label, run order through checker, ask if it is ok.
  W ! D ^PSIVORLB K PSIVEXAM S Y=P(2) W !,"Start date: " X ^DD("DD") W $P(Y,"@")," ",$P(Y,"@",2),?30," Stop date: " S Y=P(3) X ^DD("DD") W $P(Y,"@")," ",$P(Y,"@",2),!
  ;PSJ*5*157 EFD for IVs
  D EFDIV^PSJUTL($G(ZZND))
- D:'$G(PSGORQF) IN^PSJOCDS($G(ON55),"IV","") Q:$G(PSGORQF)
  W:$G(PSIVCHG) !,"*** This change will cause a new order to be created. ***"
  I '$G(PSIVCOPY) G:PSIVAC["R" OK1 S X="Is this O.K.: ^"_$S(ERR:"NO",1:"YES")_"^^NO"_$S(ERR'=1:",YES",1:"") D ENQ^PSIV
  S PSJIVBD=1 ;var use to indicate order enter from back door
@@ -109,7 +108,7 @@ ENIN ;Entry for Combined IV/UD order entry. Called by PSJOE0.
  W !
  N PSJOUT S (DONE,FLAG)=0,PSIVAC="PN"
 ENIN1 ;
- N DA,DIR,PSJOE,PSJPCAF,PSJSYSL,WSCHADM,PSJALLGY S:$G(VAIN(4)) WSCHADM=VAIN(4)
+ N DA,DIR,PSJOE,PSJPCAF,PSJSYSL,WSCHADM S:$G(VAIN(4)) WSCHADM=VAIN(4)
  K P,PSIVCHG,PSJCOM
  S PSJOE=1,DIR(0)="55.01,.04O",DIR("A")="Select IV TYPE" D ^DIR
  I X]"",X'="^",$P("^PROFILE",X)="" S PSJOEPF=X Q

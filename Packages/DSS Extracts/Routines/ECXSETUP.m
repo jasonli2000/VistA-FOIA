@@ -1,5 +1,5 @@
 ECXSETUP ;ALB/JAP,BIR/DMA,CML,PTD-Generate Patient Population for a Given Day ; [ 11/25/96  11:26 AM ]
- ;;3.0;DSS EXTRACTS;**11,8,24**;Dec 22, 1997
+ ;;3.0;DSS EXTRACTS;**11,8**;Dec 22, 1997
 EN ;entry point from option
  ;Pick a day, find everyone who was in the hospital on that day,
  ;find the corresponding admission and the last transfer and treating
@@ -38,10 +38,7 @@ END K DIR,ECD,ECDEX,X,Y,ECD0,DFN,DA,EC0
  Q
  ;
 GET ;
- Q:'$D(^DPT(DFN,0))
- S D0=^DPT(DFN,0)
- Q:$E($P(D0,U,9),1,5)="00000"
- S ECAD=$P(EC,U),^TMP($J,DFN,ECDA)=""
+ Q:'$D(^DPT(DFN,0))  S D0=^DPT(DFN,0),ECAD=$P(EC,U),^TMP($J,DFN,ECDA)=""
  S ECTM=$$ECXTIME^ECXUTL(ECAD),ECXYM=$$ECXYM^ECXUTL(ECED)
  S X=$$PRIMARY^ECXUTL2(DFN,ECD),ECPTTM=$P(X,U,1),ECPTPR=$P(X,U,2)
  S ECODE=DFN_U_$P(D0,U,9)_U_$E($P($P(D0,U),",")_"    ",1,4)_"^3^"_$$ECXDATE^ECXUTL(ECAD,ECXYM)_U_ECPTTM
@@ -56,14 +53,13 @@ GET ;
  ;get corresponding Treating specialty - should be the next one, but must be close
  S ECODE=FAC_U_ECODE_U_W_U_$P($G(^DIC(45.7,+$P(ECTS,U,9),0)),U,2)_U_ECPRO_$P(ECTS,U,19)_U_ECDA
  S (ECDRG,ECDIA)="",ECPTF=+$P(EC,U,16) I ECPTF,$D(^DGPT(ECPTF,"M")) D PTF S ECODE=ECODE_U_ECDRG_U_ECDIA
- S $P(ECODE,U,31)=ECTM,$P(ECODE,U,32)=ECPTPR,$P(ECODE,U,33)=$P($G(^DIC(10,+$P(D0,U,6),0)),U,2)_"^"
+ S $P(ECODE,U,31)=ECTM,$P(ECODE,U,32)=ECPTPR,$P(ECODE,U,33)=$P($G(^DIC(10,+$P(D0,U,6),0)),U,2)_"^^"
  ;facility^dfn^ssn^name^in/out^day^primary care team^sex^dob^religion^employment status^health ins^state^county^zip^eligibility^
  ;vet^vietnam^agent orange^radiation^pow^period of service^means test^marital status^ward^treating specialty^
  ;attending physician^mov #^DRG^diagnosis^time^primary care provider^race
 FILE ;file record
  S EC7=$O(^ECX(ECFILE,999999999),-1),EC7=EC7+1
  S ^ECX(ECFILE,EC7,0)=EC7_U_ECXYM_U_U_ECODE,ECRN=ECRN+1
- S $P(^ECX(ECFILE,EC7,1),U,12)=""
  S DA=EC7,DIK="^ECX("_ECFILE_"," D IX^DIK K DIK,DA
  I $D(ZTQUEUED),ECRN>499,'(ECRN#500),$$S^%ZTLOAD S QFLG=1
  Q

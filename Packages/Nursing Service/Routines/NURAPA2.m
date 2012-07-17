@@ -1,4 +1,4 @@
-NURAPA2 ; ;06/10/97
+NURAPA2 ; ;08/27/97
  D DE G BEGIN
 DE S DIE="^NURSA(213.2,",DIC=DIE,DP=213.2,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^NURSA(213.2,DA,""))=""
  I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,11) S:%]"" DE(1)=%

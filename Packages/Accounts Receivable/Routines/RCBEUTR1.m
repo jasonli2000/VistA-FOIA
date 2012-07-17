@@ -1,6 +1,6 @@
 RCBEUTR1 ;WISC/RFJ-add int,admin chg or increase,decrease principal  ;1 Jun 00
- ;;4.5;Accounts Receivable;**153,169,192,226,270**;Mar 20, 1995;Build 25
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;4.5;Accounts Receivable;**153,169,192,226**;Mar 20, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
  ;
@@ -48,10 +48,8 @@ INTADM(RCBILLDA,RCVALUE,RCCOMMNT,RCDATE) ;  add an intererst/admin charge (trans
  L -^PRCA(433,RCTRANDA)
  Q RCTRANDA
  ;
- ; PRCA*4.5*270 add CRD flag so FMS knows this is a corrected record
- ; INCDEC(RCBILLDA,RCVALUE,RCCOMMNT,RCDATE,RCPREPAY,RCONTADJ) ;  automatically
-INCDEC(RCBILLDA,RCVALUE,RCCOMMNT,RCDATE,RCPREPAY,RCONTADJ,RCCRD) ;
- ;  automatically create an increase or decrease adjustment for a bill
+INCDEC(RCBILLDA,RCVALUE,RCCOMMNT,RCDATE,RCPREPAY,RCONTADJ) ;  automatically
+ ;  create an increase or decrease adjustment for a bill
  ;  pass variables:
  ;      rcvalue  = principal value for the transaction.
  ;                 if rcvalue is less than zero, it will create a
@@ -66,8 +64,6 @@ INCDEC(RCBILLDA,RCVALUE,RCCOMMNT,RCDATE,RCPREPAY,RCONTADJ,RCCRD) ;
  ;                 stored in field 20 (file 433).
  ;      rcontadj = optional contract adjustment.  if 1 then this
  ;                 gets stored in field 88 (file 433).
- ;      rccrd    = optional corrected flag.  If 1, then FMS must 1st cancel or delete the
- ;                 original billing document before creating the new one.
  ;
  ;  returns transaction number added to 433 if successful.
  ;
@@ -140,9 +136,7 @@ INCDEC(RCBILLDA,RCVALUE,RCCOMMNT,RCDATE,RCPREPAY,RCONTADJ,RCCRD) ;
  .   ;  all other categories
  .   ;  pass trans amount(1;5),trans type(1;2),trans date(1;1)
  .   S DATA1=$G(^PRCA(433,RCTRANDA,1))
- .   ;
- .   ; PRCA*4.5*270 - pass CRD flag to FMS
- .   D EN^PRCAFBDM(RCBILLDA,$P(DATA1,"^",5),$P(DATA1,"^",2),$P(DATA1,"^",1),RCTRANDA,.ERR,$G(RCCRD))
+ .   D EN^PRCAFBDM(RCBILLDA,$P(DATA1,"^",5),$P(DATA1,"^",2),$P(DATA1,"^",1),RCTRANDA,.ERR)
  ;
  ;  clear the lock and return the transaction added
  L -^PRCA(433,RCTRANDA)

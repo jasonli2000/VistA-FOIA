@@ -1,6 +1,6 @@
-ORKCHK ; slc/CLA - Main routine called by OE/RR to initiate order checks ;09/17/10  09:42
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**6,32,94,105,123,232,267,243,280**;Dec 17, 1997;Build 85
-EN(ORKY,ORKDFN,ORKA,ORKMODE,OROIL) ;initiate order checking
+ORKCHK ; slc/CLA - Main routine called by OE/RR to initiate order checks ; 9/21/07 11:54am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**6,32,94,105,123,232,267,243**;Dec 17, 1997;Build 242
+EN(ORKY,ORKDFN,ORKA,ORKMODE) ;initiate order checking
  ;ORKY: array of returned msgs in format: ornum^orderchk ien^clin danger^msg
  ;ORKDFN: patient dfn
  ;ORKA: array of order information in the format:
@@ -12,7 +12,7 @@ EN(ORKY,ORKDFN,ORKA,ORKMODE,OROIL) ;initiate order checking
  ; filler data (LR: specimen ien, PS: meds prev ordered during this session in format med1^med2^...)
  ;ORKMODE: mode/event trigger (DISPLAY,SELECT,ACCEPT,SESSION,ALL,NOTIF)
  ; PS: meds previously ordered during this session med1^med2^...
- ;OROIL: array containing the order info passed in (oly for ACCEPT mode)
+ ;
  N ORKQ,ORKN S ORKQ=0,ORKN=1
  S:+$G(ORKDFN)<1 ORKY(ORKN)="^^^Order Checking Unavailable - invalid patient id",ORKQ=1,ORKN=ORKN+1
  S:'$L($G(ORKMODE)) ORKY(ORKN)="^^^Order Checking Unavailable - invalid mode/event",ORKQ=1,ORKN=ORKN+1
@@ -88,7 +88,7 @@ EN(ORKY,ORKDFN,ORKA,ORKMODE,OROIL) ;initiate order checking
  .I ORKMODE="NOTIF"!(ORKMODE="ALL") S ORKTMODE=ORKMODE D
  ..D EN^ORKCHK3(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE)  ;DISPLAY
  ..D EN^ORKCHK4(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE)  ;SELECT
- ..D EN^ORKCHK5(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE,.OROIL)  ;ACCEPT
+ ..D EN^ORKCHK5(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE)  ;ACCEPT
  ..I ORKMODE="NOTIF" D EN^ORKCHK6(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE)  ;SESSION
  ..S ORKMODE=ORKTMODE
  .;
@@ -96,14 +96,13 @@ EN(ORKY,ORKDFN,ORKA,ORKMODE,OROIL) ;initiate order checking
  .I '$L($G(ORKTMODE)) D
  ..I ORKMODE="DISPLAY" D EN^ORKCHK3(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE)
  ..I ORKMODE="SELECT" D EN^ORKCHK4(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE)
- ..I ORKMODE="ACCEPT" D EN^ORKCHK5(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE,.OROIL)
+ ..I ORKMODE="ACCEPT" D EN^ORKCHK5(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE)
  ..I ORKMODE="SESSION" D EN^ORKCHK6(.ORKS,ORKDFN,ORKA(ORKX),ORENT,ORKTMODE)
  ;
  ;set messages into sorting array then into ORKY ORKS("ORK",clinical danger level,oi,msg)=ornum^order check ien^clin danger level^message
  S ORKX="",ORKI=1
  F  S ORKX=$O(ORKS("ORK",ORKX)) Q:ORKX=""  D
- .S ORKY(ORKI)=ORKS("ORK",ORKX)
- .;S ORKY(ORKI)=$E(ORKS("ORK",ORKX),1,500)
+ .S ORKY(ORKI)=$E(ORKS("ORK",ORKX),1,250)
  .;
  .;log debug msgs if parameter is enabled:
  .I $G(ORKLOG)="E" D

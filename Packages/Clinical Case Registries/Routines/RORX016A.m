@@ -1,5 +1,5 @@
 RORX016A ;HOIFO/BH,SG,VAC - OUTPATIENT UTILIZATION (QUERY) ;4/7/09 2:10pm
- ;;1.5;CLINICAL CASE REGISTRIES;**8,13**;Feb 17, 2006;Build 27
+ ;;1.5;CLINICAL CASE REGISTRIES;**8**;Feb 17, 2006;Build 8
  ;
  ; This routine uses the following IAs:
  ;
@@ -7,18 +7,8 @@ RORX016A ;HOIFO/BH,SG,VAC - OUTPATIENT UTILIZATION (QUERY) ;4/7/09 2:10pm
  ; #2548         APIs in routine SDQ: ACRP Interface Toolkit (supported)
  ; #10103        FMADD^XLFDT (supported)
  ;
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*8    MAR  2010   V CARR       Modified to handle ICD9 filter for
- ;                                      'include' or 'exclude'.
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can select specific patients
- ;
- ;******************************************************************************
- ;******************************************************************************
+ ; This routine modified March 2009 for ICD9 Filter for Include or
+ ;    Exclude
  Q
  ;
  ;***** LOADS AND PROCESSES THE OUTPATIENT DATA
@@ -71,12 +61,11 @@ QUERY(FLAGS) ;
  . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . S IENS=IEN_",",CNT=CNT+1
- . ;--- Get the patient DFN
- . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
- . ;--- Check for patient list and quit if not in list
- . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",PATIEN)) Q
  . ;--- Check if the patient should be skipped
  . Q:$$SKIP^RORXU005(IEN,FLAGS,RORSDT,ROREDT)
+ . ;
+ . ;--- Get the patient IEN (DFN)
+ . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
  . ;--- Check the patient against the ICD9 Filter
  . S RCC=0
  . I FLAG'="ALL" D
@@ -102,7 +91,7 @@ QUERY(FLAGS) ;
  ;***** CALLBACK ENTRY POINT FOR ACRP API
 SCAN(Y,Y0) ;
  N DTX,STOP,TMP
- ;--- Check the division list
+ ;--- Check the division
  S TMP=$$PARAM^RORTSK01("DIVISIONS","ALL")
  I 'TMP  Q:'$D(RORTSK("PARAMS","DIVISIONS","C",+$P(Y0,U,11)))
  ;--- Data comes from the OUTPATIENT ENCOUNTER file (409.68)

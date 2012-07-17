@@ -1,4 +1,4 @@
-RTSM81 ;PKE/ISC-ALBANY-Retirement Data Routine; ; 11/7/90 ;
+RTSM81 ;PKE/ISC-ALBANY-Retirement Data Routine; ; 11/7/90 ; [ 05/17/93  11:16 AM ]
  ;;v 2.0;Record Tracking;;10/22/91 
 ASK D DIP W !!,"Record Type Retirement Parameters:",!,"----------------------------------"
 DIE S DIC("A")="Select RECORD TYPE: ",DIC="^DIC(195.2,",DIC(0)="AEMQ",DIC("S")="I $P(^(0),U,3)=+RTAPL" D ^DIC K DIC G Q:X="^" I Y>0 S DA=+Y,DR="[RT RETIREMENT PROFILE]",DIE="^DIC(195.2," D ^DIE K DE,DQ W ! G DIE
@@ -29,8 +29,8 @@ FLAG S RTAA=+RTAPL
  D DAT,TYP Q
  ;
 DAT D NOW^%DTC S %I(1)=%I(1)+1 I %I(1)>12 S %I(1)=1,%I(3)=%I(3)+1
- S X=$S(%I(1)?1N:"0"_%I(1),1:%I(1))_"01"_$E(%I(3),2,3),%DT="F" D ^%DT
- K %DT,%I S RTTM=$E(Y,1,5)_"01",RTTMM="["_$E(Y,4,5)_"/01/"_$E(Y,2,3)_"]"
+ S X=$S(%I(1)?1N:"0"_%I(1),1:%I(1))_"04"_$E(%I(3),2,3),%DT="F" D ^%DT
+ K %DT,%I S RTTM=$E(Y,1,5)_"04",RTTMM="["_$E(Y,4,5)_"/04/"_$E(Y,2,3)_"]"
  Q
 TYP S RTLSTM=0 F RTYPE=0:0 S RTYPE=$O(^DIC(195.2,RTYPE)) Q:'RTYPE  I $D(^(RTYPE,0)) S RTYPE0=^(0) I $P(RTYPE0,"^",3)=+RTAPL S RTFLAG(RTYPE)=0 I $D(^(1)) D SET:$P(^(1),"^",2)="y"
  K RTYPE,RTYPE0

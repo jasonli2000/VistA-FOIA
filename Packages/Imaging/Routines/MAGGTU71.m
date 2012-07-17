@@ -1,5 +1,5 @@
 MAGGTU71 ;WOIFO/GEK - Silent calls for Queing functions from GUI, cont ;  [ 06/20/2001 08:57 ]
- ;;3.0;IMAGING;**46,59**;Nov 27, 2007;Build 20
+ ;;3.0;IMAGING;**46,59**;Mar 27, 2007;Build 15
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -65,7 +65,7 @@ QERR ;
  S ^TMP($J,"MAGQ",2)=EMSG
  S ^TMP($J,"MAGQ",3)=" for Image IEN: "_MAGIENJB
  S ^TMP($J,"MAGQ",4)="You need to run the Verifier for this Image IEN"
- S XMY("G.IMAGING DEVELOPMENT@FORUM.DOMAIN.EXT")=""
+ S XMY("G.IMAGING DEVELOPMENT@FORUM.VA.GOV")=""
  D ^XMD
  S XMDUZ=DUZ D KLQ^XMA1B
  K ^TMP($J,"MAGQ")

@@ -1,5 +1,5 @@
 MAGGNLKP ;WOIFO/GEK - Lookup from delphi into any file ; [ 06/20/2001 08:56 ]
- ;;3.0;IMAGING;**8,92,46,59**;Nov 27, 2007;Build 20
+ ;;3.0;IMAGING;**8,92,46,59**;Mar 27, 2007;Build 15
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |

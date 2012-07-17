@@ -1,5 +1,5 @@
-ORAREN ;;SLC/JLC - Process Renewal Request from Non-CPRS System ; 11/2/10 11:39am
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**336**;Dec 17, 1997;Build 24
+ORAREN ;;SLC/JLC - Process Renewal Request from Non-CPRS System ; 5/12/10 8:04am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**290**;Dec 17, 1997;Build 19
  ;
  ;The purpose of this API is to process a request to renew an
  ;Outpatient Prescription
@@ -26,7 +26,7 @@ RENEW(ORRESULT,DFN,RX,PROVP,RENEWF) ;
  S A=$G(^OR(100,ORIFN,0)) I A="" D AE("Order missing from ORDERS file") S ORRESULT=0 G UNO
  I RENEWF="N" D AE("Drug not renewable"),EN^ORB3(73,DFN,ORIFN,"","Rx Renewal Request for "_DRUG) S ORRESULT=0 G UNLOCK
  S ORPROV=+$P(A,"^",4),ORL=+$P(A,"^",10)
- S PCPN=$$GETALL^SCAPMCA(DFN),PCP=+$G(^TMP("SC",$J,DFN,"PCPR",1))
+ S PCPN=$$GETALL^SCAPMCA(DFN),PCP=+$G(^TMP("SC",$J,DFN,"PCAP",1)) I PCP="" S PCP=+$G(^TMP("SC",$J,DFN,"PCPR",1))
  I PROVP="P",ORPROV'=PCP D AE("Ordering Provider not Primary Care") S ORRESULT=3 G UNO
  D ALLWORD^ORALWORD(.ORY,DFN,ORIFN,"E",ORPROV) I $G(ORY)>0 D AE("Clozapine Failed - details below",.ORY) S ORRESULT=0 G UNO
  S ORPVSTS=$$ACTIVE^XUSER(ORPROV) I '$G(ORPVSTS) D AE("Provider "_$S(ORPVSTS="":"NOT FOUND",1:"flagged as "_$P(ORPVSTS,"^",2))) S ORRESULT=0 G UNO

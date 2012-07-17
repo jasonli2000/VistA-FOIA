@@ -1,20 +1,17 @@
-DGROHLR1 ;GTS/PHH,TDM - ROM HL7 RECEIVE DRIVERS ; 9/29/09 2:08pm
- ;;5.3;Registration;**572,622,647,809,754**;Aug 13, 1993;Build 46
+DGROHLR1 ;GTS/PHH - ROM HL7 RECEIVE DRIVERS ; 4/13/09 12:19pm
+ ;;5.3;Registration;**572,622,647,809**;Aug 13, 1993;Build 1
  ;
 CONVFDA(DFN,DGDATA) ; LOOP THROUGH DATA TO FILE
- N DFNC,F,IEN,FIELD,DGROAR,FNUM,QVAR,INX,DGRONUPD
+ N DFNC,F,IEN,FIELD,DGROAR,FNUM,QVAR,INX
  ;
  ;*DGROAR: Indirect reference to DGROAYi where "i" is the ORDER INDEX
  ;* field value in 391.23.  ORDER INDEX defines order for a group of
  ;* fields loaded into the LST.
  ;* DGROAYi defined for each group maintaining proper order.
  ;*  DG*5.3*572
- ;* DGRONUPD flag used to suppress updating the 'CHANGE DT/TM' &
- ;*          'CHANGE SITE' fields for CONF & TEMP address data.
  ;
  S DFNC=DFN_","
  S INX=""
- S DGRONUPD=1
  F  S INX=$O(^DGRO(391.23,"D",INX)) Q:INX=""  D
  . S DGROAR="DGROAY"_INX
  . S QVAR=0
@@ -24,26 +21,13 @@ CONVFDA(DFN,DGDATA) ; LOOP THROUGH DATA TO FILE
  . . F  S IEN=$O(@DGDATA@(F,IEN)) Q:IEN=""  D
  . . . S FIELD=""
  . . . F  S FIELD=$O(@DGDATA@(F,IEN,FIELD)) Q:FIELD=""  D
- . . . . Q:$$DIS(F,FIELD)
  . . . . S ORDINX=$O(^DGRO(391.23,"E",F,FIELD,""))
  . . . . D:(ORDINX=INX) SETARY
  . . . . ;* Following line files Internal PEC, Rmv once Ext PEC is filed
  . . . . I (ORDINX=INX)&(F=2) DO
- . . . . .D:(FIELD=.1417) FILECSTD
  . . . . .D:(FIELD=.361) FILEPEC
  . . . . .D:((FIELD=.117)!(FIELD=.12111)!(FIELD=.14111)) FILECNTY
  . . I (+$O(@DGROAR@(""))>0) S QVAR=1 D FILE
- Q
- ;
-FILECSTD ;File CONFIDENTIAL START DATE bypassing FM restrictions
- ;Called from CONVFDA^DGROHLR1
- I $D(@DGROAR@(F,DFNC,FIELD)) D
- . S X=@DGROAR@(F,DFNC,FIELD)
- . S %DT="X" D ^%DT I Y D
- . . S DGROCST(F,DFNC,FIELD)=Y
- . . D FILE^DIE("U","DGROCST","ERR")
- . K @DGROAR@(F,DFNC,FIELD)
- . K DGROCST,X,%DT,Y
  Q
  ;
 FILECNTY ;*Retrieve county IEN and file county
@@ -91,7 +75,7 @@ FILE ;*Execute FILE or UPDATE per FNUM (1st subscpt) for file # according
  . D FILE^DIE("E","@DGROAR","ERR") ;*Add to existing Patient entry
  ;
  ;* Patient file multiples processing
- I (+FNUM=2.01)!(+FNUM=2.141)!(+FNUM=2.11) DO
+ I (+FNUM=2.01)!(+FNUM=2.141) DO
  . D UPDATE^DIE("E","@DGROAR","","ERR")
  I (+FNUM=2.02)!(+FNUM=2.06) DO
  . N DGRODNUM,DGIEN,DNUMDATA,DGIEN2,DGROIEN
@@ -152,7 +136,7 @@ SETARY ;* Setup arrays of data to be filed
  . K @DGDATA@(F,IEN,FIELD)
  ;
  ;SET ALIAS AND CONFIDENTIAL ADDRESS CAT. SUBFILE ARRAYS
- I (F=2.01)!(F=2.141)!(F=2.11) D  Q
+ I (F=2.01)!(F=2.141) D  Q
  . S NODE2="+"
  . S NODE2=NODE2_$P(IEN,",")_","_DFNC
  . S @DGROAR@(F,NODE2,FIELD)=DATA ;*Indirection to Patient Array
@@ -192,8 +176,3 @@ SETARY ;* Setup arrays of data to be filed
  . K @DGDATA@(F,IEN)
  . S FIELD=999999 ;*Skip to end of 38.1 field list in @DGDATA
  Q
- ;
-DIS(F,FIELD) ;Check for disabled
- N SUB S SUB=$O(^DGRO(391.23,"C",F,FIELD,0)) Q:'SUB 1
- I $P($G(^DGRO(391.23,SUB,0)),"^",5)=1 Q 1
- Q 0

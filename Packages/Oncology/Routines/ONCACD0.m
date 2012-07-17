@@ -1,13 +1,13 @@
-ONCACD0 ;Hines OIFO/GWB - NAACCR extract driver ;03/14/11
- ;;2.11;Oncology;**9,12,20,24,25,28,29,30,36,37,38,40,41,44,45,47,48,49,50,51,52,53**;Mar 07, 1995;Build 31
+ONCACD0 ;Hines OIFO/GWB - NAACCR extract driver ;06/23/10
+ ;;2.11;Oncology;**9,12,20,24,25,28,29,30,36,37,38,40,41,44,45,47,48,49,50,51**;Mar 07, 1995;Build 65
  ;
 EN1(DEVICE,STEXT) ;Entry point
-EN2 N ACO,BDT,DATE,DIAGYR,EDT,EXTRACT,NCDB,ONCSPIEN,QUEUE,SDT,STAT,STAT1,STAT2,YESNO
+EN2 N ACO,BDT,DATE,EDT,EXTRACT,NCDB,ONCSPIEN,QUEUE,SDT,STAT,STAT1,STAT2,YESNO
  K ^TMP($J),RQRS
  S DEVICE=$G(DEVICE,0),STEXT=$G(STEXT,0),EXT=""
  S (EDT,EXTRACT,DATE,OUT,QUEUE,SDT,STAT)=0
  ;D DISPLAY
- I (STEXT=0)!(STEXT=2)!(STEXT=3) S EXTRACT=$O(^ONCO(160.16,"B","NCDB EXTRACT V12.1",0))
+ I (STEXT=0)!(STEXT=2)!(STEXT=3) S EXTRACT=$O(^ONCO(160.16,"B","NCDB EXTRACT V12",0))
  I STEXT=1 D GETREC(.EXTRACT,.OUT)
  I 'OUT S STAT=$$GETHOSP
  I 'STAT S OUT=1
@@ -44,18 +44,18 @@ DISPLAY ;Display on-line instructions
  ;
 GETREC(EXTRACT,OUT) ;Select VACCR or STATE record layout
  W !!," Available record layouts:",!
- W !,"  1) VACCR Record Layout v12.1 (VA Registry)"
- W !,"  2) NAACCR State Record Layout v12.1"
+ W !,"  1) VACCR Record Layout v12 (VA Registry)"
+ W !,"  2) NAACCR State Record Layout v12"
  W !
  N DIR,X,Y
- S DIR(0)="SAO^1:VACCR Record Layout v12.1;2:NAACCR State Record Layout v12.1"
+ S DIR(0)="SAO^1:VACCR Record Layout v12;2:NAACCR State Record Layout v12"
  S DIR("A")=" Select record layout: "
  S DIR("?")="Select the record layout to use"
  D ^DIR
  I $D(DIRUT) S OUT=1 K DIRUT Q
  I +Y<1 S OUT=1 Q
- I Y=1 S EXT="VACCR",EXTRACT=$O(^ONCO(160.16,"B","VACCR EXTRACT V12.1",0))
- I Y=2 S EXT="STATE",EXTRACT=$O(^ONCO(160.16,"B","STATE EXTRACT V12.1",0))
+ I Y=1 S EXT="VACCR",EXTRACT=$O(^ONCO(160.16,"B","VACCR EXTRACT V12",0))
+ I Y=2 S EXT="STATE",EXTRACT=$O(^ONCO(160.16,"B","STATE EXTRACT V12",0))
  Q
  ;
 GETHOSP() ;Facility Identification Number (FIN)
@@ -182,7 +182,7 @@ EXIT ;Exit
  K ACDSTATE,DIC,EXT,OUT,X,Y
  I '$D(^TMP($J)) W !?3,"No records extracted." G EX
  W !
- S DIC="^ONCO(165.5,",L=0,FLDS="[ONC EXTRACT REPORT]",BY(0)="^TMP($J,",L(0)=1
+ S DIC="^ONCO(165.5,",L=0,FLDS="[ONC EXTRACT]",BY(0)="^TMP($J,",L(0)=1
  S:DEVICE IOP=ION
  I STEXT=0 S DHD=$P(^ONCO(160.16,EXTRACT,0),U,1) W !
  I (STEXT=1)!(STEXT=2) S DHD=$P(^ONCO(160.16,EXTRACT,0),U,1)_" "_$$FMTE^XLFDT(BDT,"2D")_" - "_$$FMTE^XLFDT(EDT,"2D")
@@ -232,7 +232,7 @@ VERIFY(STAT,DATE,SDT,EDT,STEXT,YESNO,OUT) ;Verify settings
  I EXT="STATE" D
  .W !," State to be extracted...............: ",ACDSTATE
  I STEXT=0 D
- .W !," Diagnosis Year......................: ",DIAGYR
+ .W !," Accession Year......................: ",DATE
  .W !," Selection criterion.................: ",$S(NCDB=1:"All cases",NCDB=2:"Date Case Last Changed date range",1:"")
  I (STEXT=1)!(STEXT=2)!(STEXT=3)!($G(NCDB)=2) D
  .W !," Start date..........................: ",$$FMTE^XLFDT(SDT,"2D")
@@ -254,19 +254,16 @@ VERIFY(STAT,DATE,SDT,EDT,STEXT,YESNO,OUT) ;Verify settings
  I STEXT=2,EXT="STATE" S $P(^ONCO(160.1,ONCSPIEN,0),U,11)=EDT
  Q
  ;
-GETDATE(DATE,OUT) ;Select Diagnosis Year
+GETDATE(DATE,OUT) ;Select ACCESSION YEAR
  Q:STEXT>0
  N CYR,DIR,SCREEN,Y
  S DATE=0
  S CYR=1700+($E(DT,1,3)),SCREEN="K:X>CYR X"
  S DIR(0)="NAO^1900:"_CYR_":0^"_SCREEN
- S DIR("A")=" Diagnosis Year: "
+ S DIR("A")=" Accession Year: "
  D ^DIR
  I $D(DIRUT) S OUT=1 K DIRUT Q
- S (DATE,DIAGYR)=Y
- S DATE=DATE-1700
- S DATE=DATE_"0000"
- S DATE=DATE-1
+ S DATE=Y
  K DIR
  W !
  W !,?6,"Select one of the following:"
@@ -279,11 +276,11 @@ GETDATE(DATE,OUT) ;Select Diagnosis Year
  S DIR("B")="All cases"
  S DIR("?")=" "
  S DIR("?",1)=" Select 'All cases' if you want to extract all"
- S DIR("?",2)=" of the eligible cases for this Diagnosis Year."
+ S DIR("?",2)=" of the eligible cases for this Accession Year."
  S DIR("?",3)=""
  S DIR("?",4)=" Select 'Cases within a date range' if you want"
  S DIR("?",5)=" to specify a 'Date Case Last Changed' date range"
- S DIR("?",6)=" for this Diagnois Year."
+ S DIR("?",6)=" for this Accession Year."
  D ^DIR
  I $D(DIRUT) S OUT=1 K DIRUT Q
  I Y<1 S OUT=1 Q

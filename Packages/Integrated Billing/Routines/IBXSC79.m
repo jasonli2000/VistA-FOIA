@@ -1,4 +1,4 @@
-IBXSC79 ; ;08/13/09
+IBXSC79 ; ;09/01/09
  D DE G BEGIN
 DE S DIE="^DGCR(399,D0,""RC"",",DIC=DIE,DP=399.042,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^DGCR(399,D0,"RC",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=% S %=$P(%Z,U,2) S:%]"" DE(2)=% S %=$P(%Z,U,3) S:%]"" DE(3)=% S %=$P(%Z,U,4) S:%]"" DE(4)=% S %=$P(%Z,U,5) S:%]"" DE(5)=% S %=$P(%Z,U,6) S:%]"" DE(7)=% S %=$P(%Z,U,7) S:%]"" DE(9)=%
@@ -64,7 +64,7 @@ C1S S X="" G:DG(DQ)=X C1F1 K DB
  S ^DGCR(399,DA(1),"RC","B",$E(X,1,30),DA)=""
  S X=DG(DQ),DIC=DIE
  I $P(^DGCR(399,DA(1),"RC",DA,0),U,5) S ^DGCR(399,DA(1),"RC","ABS",$P(^DGCR(399,DA(1),"RC",DA,0),U,5),$E(X,1,30),DA)=""
-C1F1 N X,X1,X2 S DIXR=53 D C1X1(U) K X2 M X2=X D C1X1("O") K X1 M X1=X
+C1F1 N X,X1,X2 S DIXR=86 D C1X1(U) K X2 M X2=X D C1X1("O") K X1 M X1=X
  I $G(X(1))]"" D
  . I X(2)'=""&'$D(^TMP("IBCRRX",$J)) D DELPR^IBCU1(DA(1),X(2))
  G C1F2
@@ -77,7 +77,7 @@ C1F2 Q
 X1 S DIC("S")="I +$P(^(0),U,3)" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
  Q
  ;
-2 D:$D(DG)>9 F^DIE17,DE S DQ=2,DW="0;2",DV="RNJ8,2",DU="",DLB="CHARGES",DIFLD=.02
+2 D:$D(DG)>9 F^DIE17,DE S DQ=2,DW="0;2",DV="RNJ9,2",DU="",DLB="CHARGES",DIFLD=.02
  S DE(DW)="C2^IBXSC79"
  G RE
 C2 G C2S:$D(DE(2))[0 K DB
@@ -87,7 +87,7 @@ C2S S X="" G:DG(DQ)=X C2F1 K DB
  S X=DG(DQ),DIC=DIE
  D 21^IBCU2
 C2F1 Q
-X2 S:X["$" X=$P(X,"$",2) K:X'?.N.1".".2N!(X>99999)!(X<0) X
+X2 S:X["$" X=$P(X,"$",2) K:X'?.N.1".".2N!(X>999999)!(X<0) X
  Q
  ;
 3 D:$D(DG)>9 F^DIE17,DE S DQ=3,DW="0;3",DV="RNJ6,0X",DU="",DLB="UNITS OF SERVICE",DIFLD=.03

@@ -1,5 +1,5 @@
-ORWORR ; SLC/KCM/JLI - Retrieve Orders for Broker ;8/24/09
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,92,116,110,132,141,163,189,195,215,243,280**;Dec 17, 1997;Build 85
+ORWORR ; SLC/KCM/JLI - Retrieve Orders for Broker ;7/24/05
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,92,116,110,132,141,163,189,195,215,243**;Dec 17, 1997;Build 242
  ;
 GET(LST,DFN,FILTER,GROUPS) ; procedure
  Q  ; don't call until using same treating specialty logic as AGET
@@ -140,7 +140,7 @@ GETBYIFN(LST,IFN) ; procedure
  S IFN=+IFN,X8=$G(^OR(100,IFN,8,ACT,0))
 GETFLDS ; used by entry points to place order fields into list
  ; expects IDX=sequence #, IFN=order, X0=node 0, X3=node 3, LST=results
- ; LST(IDX)=~IFN^Grp^OrdTm^StrtTm^StopTm^Sts^Sig^Nrs^Clk^PrvID^PrvNam^Act^Flagged[^DCType]^ChartRev^DEA#^^DigSig^LOC^[DCORIGNAL]^IsPendingDCorder^IsDelayOrder
+ ; LST(IDX)=~IFN^Grp^OrdTm^StrtTm^StopTm^Sts^Sig^Nrs^Clk^PrvID^PrvNam^Act^Flagged[^DCType]^ChartRev^DEA#^^DigSig^LOC
  S PRV=$P(X8,U,5) S:'PRV PRV=$P(X8,U,3) S PRV=PRV_U
  I PRV S PRV=PRV_$P(^VA(200,+PRV,0),U)
  S DEA=$$DEA^XUSER(,+PRV) ; get user DEA info - PKI
@@ -174,9 +174,6 @@ GETFLDS ; used by entry points to place order fields into list
  .S LOC=$P(X0,U,10) ;IMO
  .S:+LOC LOC=$P($G(^SC(+LOC,0)),U)_":"_+LOC ;IMO
  S $P(LST(IDX),U,19)=LOC ;IMO
- ;need a way to determine if order is in an unsigned DC state.
- S $P(LST(IDX),U,21)=$S(ACTID="DC":1,1:0)
- S $P(LST(IDX),U,22)=$$CHKORD^OREVNTX1(IFN)
  ;
  S ORIGVIEW=$S($G(TXTVW)=0:0,$G(TXTVW)=1:1,ORYD=-1:1,'ORYD:1,$P(X8,U)'<ORYD:0,1:1)
  K TXT D TEXT^ORQ12(.TXT,ID,255)                  ; optimize later

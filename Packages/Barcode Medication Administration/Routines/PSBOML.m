@@ -1,5 +1,5 @@
 PSBOML ;BIRMINGHAM/EFC-MEDICATION LOG ;Mar 2004
- ;;3.0;BAR CODE MED ADMIN;**3,11,50**;Mar 2004;Build 78
+ ;;3.0;BAR CODE MED ADMIN;**3,11**;Mar 2004
  ;
  ; Reference/IA
  ; ^DPT/10035
@@ -89,8 +89,7 @@ LINE(PSBIEN) ; Displays the med log entry in PSBIEN
  .W !?16,"PRN Reason: ",?30,$$GET1^DIQ(53.79,PSBIEN_",",.21)
  .W !?16,"PRN Effectiveness: "
  .I $P($G(^PSB(53.79,PSBIEN,.2)),U,2)="" W "<No PRN Effectiveness Entered>" Q
- .N PSBEIECMT S PSBEIECMT="" I $P($G(^PSB(53.79,PSBIEN,.2)),U,2)'="",$P(PSBRPT(.2),U,8)=0 S PSBEIECMT=$$PRNEFF^PSBO(PSBEIECMT,PSBIEN)
- .W $$WRAP^PSBO(20,100,$$GET1^DIQ(53.79,PSBIEN_",",.22)_PSBEIECMT)
+ .W $$WRAP^PSBO(20,100,$$GET1^DIQ(53.79,PSBIEN_",",.22))
  .W !?20,"Entered By: ",$$GET1^DIQ(53.79,PSBIEN_",",.23)
  .W " Date/Time: ",$$GET1^DIQ(53.79,PSBIEN_",",.24)
  .W " Minutes: ",$$GET1^DIQ(53.79,PSBIEN_",",.25)

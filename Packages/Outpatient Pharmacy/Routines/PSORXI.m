@@ -1,8 +1,7 @@
 PSORXI ;IHS/DSD/JCM - logs pharmacy interventions ;03/19/93 11:56
- ;;7.0;OUTPATIENT PHARMACY;**268,324,251,387**;DEC 1997;Build 13
- ;External reference to ^APSPQA(32.4 supported by DBIA 2179
+ ;;7.0;OUTPATIENT PHARMACY;**268,324**;DEC 1997;Build 6
  ; This routine is used to create entries in the APSP INTERVENTION file.
-START ;  
+START ;   
  D INIT,DIC G:PSORXI("QFLG") END
  D EDIT
  S:'$D(PSONEW("PROVIDER")) PSONEW("PROVIDER")=$P(^APSPQA(32.4,PSORXI("DA"),0),"^",3)
@@ -16,9 +15,9 @@ INIT ;
 DIC ;
  K DIC,DR,DA,X,Y,DD,DO S DIC="^APSPQA(32.4,",DLAYGO=9009032.4,DIC(0)="L",X=DT
  S DIC("DR")=".02////"_+PSODFN_";.04////"_DUZ_";.05////"_PSODRUG("IEN")_";.06///PHARMACY"
- S DIC("DR")=DIC("DR")_";.07"_$S($G(PSOIVDSN):"////"_$G(PSOIVDSN),$G(PSORX("INTERVENE"))=1:"////18",$G(PSORX("INTERVENE"))=2:"////19",1:"////6")_";.14////0"_";.16////"_$S($G(PSOSITE)]"":PSOSITE,1:"")
+ S DIC("DR")=DIC("DR")_";.07"_$S($G(PSORX("INTERVENE"))=1:"////18",$G(PSORX("INTERVENE"))=2:"////19",1:"////6")_";.14////0"_";.16////"_$S($G(PSOSITE)]"":PSOSITE,1:"")
  D FILE^DICN K DIC,DR,DA
- I Y>0 S PSORXI("DA")=+Y
+ I Y>0 S PSORXI("DA")=+Y,^TMP($J,"PSOINTERVENE",PSODFN)=+Y
  E  S PSORXI("QFLG")=1 G DICX
  D DIE
 DICX K X,Y
@@ -64,28 +63,4 @@ EN1(PSOX) ; Entry Point if have internal rx #
  S PSORXI("IRXN")=PSOX K PSOY S PSOY=^PSRX(PSORXI("IRXN"),0)
  S PSODFN=$P(PSOY,"^",2),PSONEW("PROVIDER")=$P(PSOY,"^",4),PSODRUG("IEN")=$P(PSOY,"^",6)
  D START
-EN1X ;
- Q
- ;
-EN2(PSOIVDST,PSOX) ; Entry Point for dose interventions with a prescription
- ;PSOIVDST = Dosing intervention text
- ;PSOX = Internal prescription Number
- N PSOIVDSN S PSOIVDSN=0
- D LOOK I 'PSOIVDSN Q 1
- N PSODFN,PSONEW,PSODRUG,PSOY
- I $G(^PSRX(+$G(PSOX),0))']"" W !,$C(7),"No prescription data" G EN2X
- S PSORXI("IRXN")=PSOX K PSOY S PSOY=^PSRX(PSORXI("IRXN"),0)
- S PSODFN=$P(PSOY,"^",2),PSONEW("PROVIDER")=$P(PSOY,"^",4),PSODRUG("IEN")=$P(PSOY,"^",6)
- D START K PSOIVDSN
-EN2X Q 0
- ;
-EN3(PSOIVDST) ; Entry Point for dose interventions without a prescription
- ;PSOIVDST = Dosing intervention text
- N PSOIVDSN S PSOIVDSN=0
- D LOOK I 'PSOIVDSN Q 1
- D START K PSOIVDSN
-EN3X Q 0
- ;
-LOOK ;Find Internal Number of 32.3 file
- S PSOIVDSN=$$FIND1^DIC(9009032.3,"","X",PSOIVDST,"B")
- Q
+EN1X Q

@@ -1,4 +1,4 @@
-MCAROAT ; GENERATED FROM 'MCAREP2' PRINT TEMPLATE (#1041) ; 10/04/96 ; (FILE 691.9, MARGIN=80)
+MCAROAT ; GENERATED FROM 'MCAREP2' PRINT TEMPLATE (#2109) ; 07/22/97 ; (FILE 691.9, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(1041,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(2109,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D T Q:'DN  D N W ?0 W "----------------------------------ATRIAL STUDY----------------------------------"
  D T Q:'DN  D N W ?0 X DXS(1,9.2) S X=X_Y K DIP K:DN Y W X
  D T Q:'DN  D N D N:$X>7 Q:'DN  W ?7 W "PREMEDICATION:"

@@ -1,4 +1,4 @@
-DGPTX114 ; ;01/12/06
+DGPTX114 ; ;03/22/06
  D DE G BEGIN
 DE S DIE="^DPT(",DIC=DIE,DP=2,DL=2,DIEL=0,DU="" K DG,DE,DB Q:$O(^DPT(DA,""))=""
  I $D(^(.11)) S %Z=^(.11) S %=$P(%Z,U,7) S:%]"" DE(1)=%

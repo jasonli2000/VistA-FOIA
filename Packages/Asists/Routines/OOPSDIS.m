@@ -1,5 +1,5 @@
-OOPSDIS ;HIRMFO/GWB-Display 2162 ;3/5/98
- ;;2.0;ASISTS;;Jun 03, 2002
+OOPSDIS ;HIRMFO/GWB - Display 2162 ;3/5/98
+ ;;1.0;ASISTS;**3,5**;Jun 01, 1998
  W @IOF
  S CAT=$$GET1^DIQ(2260,IEN,2,"I")
  ;Include logic for Non_PAID employee, CAT=6
@@ -28,7 +28,5 @@ OOPSDIS ;HIRMFO/GWB-Display 2162 ;3/5/98
  W !," SECONDARY SUPERVISOR...: ",OOPS(2260,IEN,53.1)
  W !," DATE/TIME OF OCCURRENCE: ",OOPS(2260,IEN,4)
  W !,"----------------------------------------------------------------------------"
- ; Patch 8 - leave this code, other routines rely on it, clean up
- ;           in other routines.
  S SUP=OOPS(2260,IEN,53)
  K OOPS,DIQ,DIC,DR,DA,CAT Q

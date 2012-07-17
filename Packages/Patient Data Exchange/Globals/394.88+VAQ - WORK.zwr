@@ -2,7 +2,7 @@ VAQ - WORK
 ZWR
 ^VAT(394.88,0)="VAQ - WORK^394.88^9^9"
 ^VAT(394.88,1,0)="RQST^Generation of a PDX Request"
-^VAT(394.88,1,"DESC",0)="^^3^3^2930225^"
+^VAT(394.88,1,"DESC",0)="^^3^3^2961105^^"
 ^VAT(394.88,1,"DESC",1,0)="Patient information is electronically requested from another VA"
 ^VAT(394.88,1,"DESC",2,0)="facility.  Information may be retrieved from any VA facility that"
 ^VAT(394.88,1,"DESC",3,0)="has information on that patient in their database."
@@ -30,7 +30,7 @@ ZWR
 ^VAT(394.88,6,"DESC",1,0)="The information requested by another facility was not released.  This"
 ^VAT(394.88,6,"DESC",2,0)="is usually done by a user who is manually processing the request."
 ^VAT(394.88,7,0)="NEW^Created a new patient based on PDX information"
-^VAT(394.88,7,"DESC",0)="^^4^4^2930225^"
+^VAT(394.88,7,"DESC",0)="^^4^4^2950316^^"
 ^VAT(394.88,7,"DESC",1,0)="PDX provides the ability to create a new patient in the PATIENT file based"
 ^VAT(394.88,7,"DESC",2,0)="on information obtained from another facility.  When adding a new patient,"
 ^VAT(394.88,7,"DESC",3,0)="PDX will place the minimum information required to pass the MAS"

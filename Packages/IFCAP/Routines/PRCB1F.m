@@ -1,5 +1,5 @@
 PRCB1F ;WISC/PLT-IFCAP MONTHLY ACCRUAL ;9/13/96  16:21
-V ;;5.1;IFCAP;**64,72,142**;Oct 20, 2000;Build 5
+V ;;5.1;IFCAP;**64,72,127**;Oct 20, 2000;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  QUIT  ;invalid entry
  ;
@@ -71,7 +71,7 @@ Q47 ;generate sv-document
 Q5 D YN^PRC0A(.X,.Y,"Ready to "_$P("Compile/Print,Edit,Generate/Rebuild Document",",",PRCOPT),"O","NO")
  I X["^"!(X="")!'Y G Q4
  I PRCOPT=1 D ACCR G Q5X
- L +^PRCH(440.7,PRCRI(440.7)):3 E  W !,"Another user has this Accrual file open, please try later" G Q4
+ L +PRCH(440.7,PRCRI(440.7)):3 E  W !,"Another user has this Accrual file open, please try later" G Q4
  I PRCOPT=2 D EDIT
  I PRCOPT=3 D
  . D EN^DDIOL("Generating the monthly accrual FMS SV-Document")

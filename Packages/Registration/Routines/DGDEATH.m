@@ -1,5 +1,5 @@
 DGDEATH ;ALB/MRL/PJR-PROCESS DECEASED PATIENTS ; 10/27/04 9:45pm
- ;;5.3;Registration;**45,84,101,149,392,545,595,568,563,725,772**;Aug 13, 1993;Build 4
+ ;;5.3;Registration;**45,84,101,149,392,545,595,568,563,725**;Aug 13, 1993;Build 12
  ;
 GET N DGMTI,DATA
  S DGDTHEN="" W !! S DIC="^DPT(",DIC(0)="AEQMZ" D ^DIC G Q:Y'>0 S (DA,DFN)=+Y
@@ -13,7 +13,7 @@ GET N DGMTI,DATA
  S DGDNEW=^DPT(DFN,.35)
  I $P(DGDNEW,"^",1)="",$P(DGDNEW,"^",2)'="" S DR=".352////@" D ^DIE
  I $P(DGDNEW,"^",1)="" K ^TMP("DEATH",$J) G GET
-SN I $P(DGDNEW,"^",1)'="" S DR=".353" D ^DIE I $P($G(^DPT(DFN,.35)),"^",3)']"" D SNDISP G SN
+ I $P(DGDNEW,"^",1)'="" S DR=".353" D ^DIE
  I DGDOLD'=DGDNEW D DISCHRGE
  I $P(DGDOLD,"^",1)'=$P(DGDNEW,"^",1) D XFR
  K ^TMP("DEATH",$J) G GET
@@ -141,17 +141,4 @@ APTT3 ;Check to exclude "While an Inpatient" from DOD Bulletin
  S XIEN=$O(^DGPM("APTT3",DFN,DATE,"")) I 'XIEN Q
  S TYPE=$P($G(^DGPM(XIEN,0)),"^",4)
  I YES,'((TYPE=27)!(TYPE=32)) S DGDONOT=1
- Q
-SNDISP ; Source of Notification display choices
- N DIR,DTOUT,DUOUT,DIRUT,DIROUT,DGLIST,DGLNAME,I,X,Y
- S DGLIST=$P($G(^DD(2,.353,0)),"^",3)
- S Y=6
- S DIR("?",1)=" "
- S DIR("?",2)=" This is a required response. Please select from the following:"
- S DIR("?",3)=" Entering '^' will take you back to the Source of Notification prompt"
- S DIR("?",4)=" "
- S DIR("?",5)=" "
- F X=1:1 S DGLNAME=$P(DGLIST,";",X) Q:DGLNAME']""  S DIR("?",Y)="      "_$P(DGLNAME,":",1)_"      "_$P(DGLNAME,":",2) S Y=Y+1
- S DIR("?",Y)=" "
- F I=1:1 Q:'$D(DIR("?",I))  W !,DIR("?",I)
  Q

@@ -1,9 +1,8 @@
-PRCHT312 ; ;10/06/97
+PRCHT312 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442,D0,2,",DIC=DIE,DP=442.01,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^PRC(442,D0,2,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,6) S:%]"" DE(1)=% S %=$P(%Z,U,15) S:%]"" DE(8)=%
- I $D(^(2)) S %Z=^(2) S %=$P(%Z,U,2) S:%]"" DE(14)=% S %=$P(%Z,U,3) S:%]"" DE(4)=%
- I $D(^(4)) S %Z=^(4) S %=$P(%Z,U,11) S:%]"" DE(9)=% S %=$P(%Z,U,12) S:%]"" DE(11)=% S %=$P(%Z,U,13) S:%]"" DE(12)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,6) S:%]"" DE(10)=% S %=$P(%Z,U,12) S:%]"" DE(1)=% S %=$P(%Z,U,13) S:%]"" DE(7)=% S %=$P(%Z,U,16) S:%]"" DE(2)=% S %=$P(%Z,U,17) S:%]"" DE(5)=%
+ I $D(^(2)) S %Z=^(2) S %=$P(%Z,U,3) S:%]"" DE(13)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -45,73 +44,64 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="PRCHT312",DQ=1
-1 S DW="0;6",DV="FX",DU="",DLB="VENDOR STOCK NUMBER",DIFLD=9
+1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW="0;12",DV="NJ6,0X",DU="",DLB="PACKAGING MULTIPLE",DIFLD=3.1
  G RE
-X1 K:$L(X)>30!($L(X)<1) X I $D(X) D EN12^PRCHNPO5
+X1 K:+X'=X!(X>999999)!(X<0)!(X?.E1"."1N.N) X D:$D(X) EN7^PRCHNPO6
+ Q
+ ;
+2 S DW="0;16",DV="P420.5'X",DU="",DLB="SKU",DIFLD=9.4
+ S DU="PRCD(420.5,"
+ G RE
+X2 D EN6^PRCHNPO7
+ Q
+ ;
+3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X3 S:X']"" Y=9.5
+ Q
+4 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=4 D X4 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X4 S DIE("NO^")="A"
+ Q
+5 S DW="0;17",DV="RNJ6,0X",DU="",DLB="UNIT CONVERSION FACTOR",DIFLD=9.7
+ G RE
+X5 K:+X'=X!(X>999999)!(X<1)!(X?.E1"."1N.N) X D:$D(X) EN7^PRCHNPO7
+ Q
+ ;
+6 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=6 D X6 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X6 K DIE("NO^")
+ Q
+7 S DW="0;13",DV="FX",DU="",DLB="NSN",DIFLD=9.5
+ G RE
+X7 K:$L(X)>17!($L(X)<16)!'(X?4N1"-"2UN1"-"3UN1"-"4N.UN) X I $D(X) D EN1^PRCHNPO7
  I $D(X),X'?.ANP K X
  Q
  ;
-2 S DQ=3 ;@7
-3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X3 I PRCHN("SC")'=9 S Y="@3"
+8 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=8 D X8 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X8 S PRCHN("COM")=$S($D(^PRC(441.2,+X,0)):$P(^(0),U,4),1:"") I PRCHN("COM")="",PRCHN("SC")'=9 W *7,!,"NSN is required!!!" S Y=9.5
  Q
-4 S DW="2;3",DV="RP441.2'X",DU="",DLB="FEDERAL SUPPLY CLASSIFICATION",DIFLD=8
+9 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=9 D X9 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X9 I PRCHN("SC")'=9 S Y="@3"
+ Q
+10 S DW="0;6",DV="FX",DU="",DLB="VENDOR STOCK NUMBER",DIFLD=9
+ G RE
+X10 K:$L(X)>30!($L(X)<1) X I $D(X) D EN12^PRCHNPO5
+ I $D(X),X'?.ANP K X
+ Q
+ ;
+11 S DQ=12 ;@7
+12 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=12 D X12 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X12 I PRCHN("SC")'=9 S Y="@3"
+ Q
+13 S DW="2;3",DV="RP441.2'X",DU="",DLB="FEDERAL SUPPLY CLASSIFICATION",DIFLD=8
  S DU="PRC(441.2,"
  G RE
-X4 D EN10^PRCHNPO7
+X13 D EN10^PRCHNPO7
  Q
  ;
-5 S DQ=6 ;@3
-6 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=6 D X6 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X6 S PRCHN("COM")="" I $D(^PRC(442,DA(1),2,DA,2)),$D(^PRC(441.2,+$P(^(2),U,3),0)) S PRCHN("COM")=$P(^(0),U,4),PRCHSTN=$P(PRCHPONO,"-"),PRCHFCP=+$P(^PRC(442,DA(1),0),U,3)
+14 S DQ=15 ;@3
+15 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=15 D X15 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X15 S PRCHN("COM")="" I $D(^PRC(442,DA(1),2,DA,2)),$D(^PRC(441.2,+$P(^(2),U,3),0)) S PRCHN("COM")=$P(^(0),U,4),PRCHSTN=$P(PRCHPONO,"-"),PRCHFCP=+$P(^PRC(442,DA(1),0),U,3)
  Q
-7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X7 S:$E($P($G(^PRC(420,PRCHSTN,1,PRCHFCP,0)),U,18),1,2)=11 Y=41 S:($E($P($G(^(0)),U,18),1,2)'=11)&(PRCHN("SC")=9) Y="@4" S:(((PRCHN("COM")'=1)&($E($P($G(^(0)),U,18),1,2)'=11))&(PRCHN("SC")'=9)) Y=4
- Q
-8 S DW="0;15",DV="FX",DU="",DLB="NATIONAL DRUG CODE",DIFLD=9.3
- G RE
-X8 K:$L(X)>14!($L(X)<11)!'(X?1.6N1"-"1.4N1"-"1.2N) X I $D(X) D EN12^PRCHNPO7
- I $D(X),X'?.ANP K X
- Q
- ;
-9 S DW="4;11",DV="RS",DU="",DLB="DRUG TYPE CODE",DIFLD=40
- S DU="A:NARCOTIC;L:CONTROLLED SUBSTANCE;D:OTHER DRUGS;"
- S X="D"
- S Y=X
- G Y
-X9 Q
-10 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=10 D X10 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X10 S Y=$S(PRCHN("SC")'=9:4,1:"@4")
- Q
-11 S DW="4;12",DV="RS",DU="",DLB="FOOD GROUP",DIFLD=41
- S DU="1:Meat, Fish, Poultry, Eggs & Convenience Entrees;2:Milk, Milk Products;3:Fruits, Vegetables;4:Bread, Flour, Cereal, etc.;5:Commercial Nutritional Products, Tube feedings & supplements;6:Miscellaneous, Foods;"
- S Z=$S($D(^PRC(441,+$P(^PRC(442,DA(1),2,DA,0),U,5),3)):^(3),1:""),X=$P(Z,U,7) K Z
- S Y=X
- G Y
-X11 Q
-12 S DW="4;13",DV="F",DU="",DLB="DIETETIC CONVERSION FACTOR",DIFLD=42
- G RE
-X12 K:$L(X)>5!($L(X)<1) X
- I $D(X),X'?.ANP K X
- Q
- ;
-13 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=13 D X13 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X13 S Y=$S(PRCHN("SC")'=9:4,1:"@4")
- Q
-14 S DW="2;2",DV="FX",DU="",DLB="CONTRACT/BOA #",DIFLD=4
- S DE(DW)="C14^PRCHT312"
- G RE
-C14 G C14S:$D(DE(14))[0 K DB S X=DE(14),DIC=DIE
- K ^PRC(442,DA(1),2,"AC",$E(X,1,30),DA)
-C14S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
- S ^PRC(442,DA(1),2,"AC",$E(X,1,30),DA)=""
- Q
-X14 D EN8^PRCHNPO5
- I $D(X),X'?.ANP K X
- Q
- ;
-15 S DQ=16 ;@4
 16 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=16 D X16 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X16 S Y=$S((PRCHN("SC")=0)!(PRCHN("SC")=3):30,PRCHN("SC")=1:35,1:"@5")
+X16 S:$E($P($G(^PRC(420,PRCHSTN,1,PRCHFCP,0)),U,18),1,2)=11 Y=41 S:($E($P($G(^(0)),U,18),1,2)'=11)&(PRCHN("SC")=9) Y="@4" S:(((PRCHN("COM")'=1)&($E($P($G(^(0)),U,18),1,2)'=11))&(PRCHN("SC")'=9)) Y=4
  Q
 17 D:$D(DG)>9 F^DIE17 G ^PRCHT313

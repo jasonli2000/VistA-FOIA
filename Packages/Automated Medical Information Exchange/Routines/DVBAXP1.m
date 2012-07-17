@@ -1,4 +1,4 @@
-DVBAXP1 ; GENERATED FROM 'DVBA STATUS' PRINT TEMPLATE (#517) ; 08/19/96 ; (continued)
+DVBAXP1 ; GENERATED FROM 'DVBA STATUS' PRINT TEMPLATE (#1042) ; 04/27/95 ; (continued)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,14 +11,6 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- S X=$G(^DVB(396,D0,1)) D N:$X>34 Q:'DN  W ?34 S Y=$P(X,U,5) D DT
- S X=$G(^DVB(396,D0,2)) D N:$X>49 Q:'DN  W ?49,$E($P(X,U,1),1,11)
- S X=$G(^DVB(396,D0,6)) D N:$X>61 Q:'DN  W ?61 S Y=$P(X,U,21) S Y=$S(Y="":Y,$D(^DG(40.8,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,16)
- F Y=0:0 Q:$Y>11  W !
- D N:$X>1 Q:'DN  W ?1 W "Asset Information:"
- S X=$G(^DVB(396,D0,0)) D N:$X>22 Q:'DN  W ?22 S Y=$P(X,U,23) W:Y]"" $S($D(DXS(13,Y)):DXS(13,Y),1:Y)
- S X=$G(^DVB(396,D0,1)) D N:$X>34 Q:'DN  W ?34 S Y=$P(X,U,6) D DT
- S X=$G(^DVB(396,D0,2)) D N:$X>49 Q:'DN  W ?49,$E($P(X,U,2),1,11)
  S X=$G(^DVB(396,D0,6)) D N:$X>61 Q:'DN  W ?61 S Y=$P(X,U,23) S Y=$S(Y="":Y,$D(^DG(40.8,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,16)
  F Y=0:0 Q:$Y>12  W !
  D N:$X>2 Q:'DN  W ?2 W "Admission Report:"

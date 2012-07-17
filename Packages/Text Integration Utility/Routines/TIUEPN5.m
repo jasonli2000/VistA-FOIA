@@ -1,4 +1,4 @@
-TIUEPN5 ; ;10/06/97
+TIUEPN5 ; ;08/15/97
  D DE G BEGIN
 DE S DIE="^TIU(8925,",DIC=DIE,DP=8925,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^TIU(8925,DA,""))=""
  I $D(^(12)) S %Z=^(12) S %=$P(%Z,U,2) S:%]"" DE(1)=% S %=$P(%Z,U,4) S:%]"" DE(4)=%

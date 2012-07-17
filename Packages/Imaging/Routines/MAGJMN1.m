@@ -1,5 +1,5 @@
-MAGJMN1 ;WIRMFO/JHC VRad Maint functions ; 2-Jul-2010 6:21 PM
- ;;3.0;IMAGING;**16,9,22,18,65,76,101,90,115**;Mar 19, 2002;Build 1912;Dec 17, 2010
+MAGJMN1 ;WIRMFO/JHC VRad Maint functions ; 25-Mar-2010 1:40 PM
+ ;;3.0;IMAGING;**16,9,22,18,65,76,101,90**;Mar 19, 2002;Build 1764;Jun 09, 2010
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -210,29 +210,6 @@ VRSIT ;
  K DA,DR,DIE
  Q
  ;
- ;+++++ OPTION: MAGJ E/E DEFAULT USER PROFILES
- ;
- ; FileMan ^DIE call to enter/edit IMAGING SITE PARAMETERS File (#2006.1),
- ;   fields #202: DEFAULT VISTARAD USERPREF RAD and
- ;          #203: DEFAULT VISTARAD USERPREF NON.
- ; 
- ; These fields point to entries in the MAGJ USER DATA File (#2006.68), and
- ;   allow the VistARad client to initialize new VistARad users to the settings
- ;   held by the appropriate default user type ("Radiologist", "Non-rad'ist").
- ;
-EEPRO ;
- ;
- ;--- Get IEN of IMAGING SITE PARAMETERS File.
- N FIELD,SITEPIEN S SITEPIEN=+$$IMGSIT^MAGJUTL1(DUZ(2),1)
- F FIELD=202,203 D
- . ;
- . ;--- Report field being edited.
- . N PROMPT S PROMPT=$S(FIELD=202:"RADIOLOGIST",FIELD=203:"NON-RADIOLOGIST")
- . W !!,"Editing default "_PROMPT_" profile ...",!
- . N DA,DIE,DR
- . S DIE=2006.1,DR=FIELD,DA=SITEPIEN D ^DIE
- . Q
- Q
 EEPREF ;
  W @IOF,!!?10,"Enter/Edit VistARad Prefetch Logic",!!
  N MAGIEN

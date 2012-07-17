@@ -1,5 +1,5 @@
-PXRMDEDT ; SLC/PJH - Edit PXRM reminder dialog. ;03/01/2010
- ;;2.0;CLINICAL REMINDERS;**4,6,12,17,16**;Feb 04, 2005;Build 119
+PXRMDEDT ; SLC/PJH - Edit PXRM reminder dialog. ;09/14/2009
+ ;;2.0;CLINICAL REMINDERS;**4,6,12,17**;Feb 04, 2005;Build 102
  ;
  ;Used by protocol PXRM SELECTION ADD/PXRM GENERAL ADD
  ;
@@ -136,7 +136,7 @@ ESEL(PXRMDIEN,SEL) ;
  D SETSTART^PXRMCOPY(DIC)
  S DIC(0)="AEMQL"
  S DIC("A")="Select new DIALOG ELEMENT: "
- S DIC("S")="I ""EGPF""[$P(^PXRMD(801.41,Y,0),U,4)"
+ S DIC("S")="I ""EG""[$P(^PXRMD(801.41,Y,0),U,4)"
  S DIC("DR")="4///E"
  W !
  D ^DIC

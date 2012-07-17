@@ -1,5 +1,5 @@
 PSIVORFB ;BIR/MLM-FILE/RETRIEVE ORDERS IN ^PS(55 ;25 Sep 98 / 2:24 PM
- ;;5.0; INPATIENT MEDICATIONS ;**3,18,28,68,58,85,110,111,120,134,213,161,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**3,18,28,68,58,85,110,111,120,134,213,161**;16 DEC 97;Build 28
  ;
  ; Reference to ^PS(50.7 is supported by DBIA #2180.
  ; Reference to ^PS(51.2 is supported by DBIA #2178.
@@ -87,7 +87,7 @@ PUTD55 ; Move drug data from local array into 55
  .S ^PS(55,DFN,"IV",+ON55,DRGT,0)=Y,Y=$P(DRG(DRGT,X),U)_U_$P(DRG(DRGT,X),U,3) S:DRGT="AD" $P(Y,U,3)=$P(DRG(DRGT,X),U,4) S ^PS(55,DFN,"IV",+ON55,DRGT,+DRG,0)=Y
  Q
 GT55 ; Retrieve data from 55 into local array
- K DRG,DRGN,P S:'$D(ON55) ON55=ON S P("REN")="",Y=$G(^PS(55,DFN,"IV",+ON55,0)) F X=1:1:25 S P(X)=$P(Y,U,X)
+ K DRG,DRGN,P S:'$D(ON55) ON55=ON S P("REN")="",Y=$G(^PS(55,DFN,"IV",+ON55,0)) F X=1:1:23 S P(X)=$P(Y,U,X)
  S P("21FLG")=P(21)
  S P("PON")=ON55,PSJORIFN=P(21),P(6)=P(6)_U_$P($G(^VA(200,+P(6),0)),U),(DRG,DRGN)="",P("REM")=$G(^PS(55,DFN,"IV",+ON55,1))
  S Y=$G(^PS(55,DFN,"IV",+ON55,2)),P("LOG")=$P(Y,U),P("IVRM")=$P(Y,U,2)_U_$P($G(^PS(59.5,+$P(Y,U,2),0)),U)

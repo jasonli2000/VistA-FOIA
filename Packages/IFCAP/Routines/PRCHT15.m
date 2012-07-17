@@ -1,8 +1,9 @@
-PRCHT15 ; ;10/06/97
+PRCHT15 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442,",DIC=DIE,DP=442,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRC(442,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,10) S:%]"" DE(16)=%
- I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,3) S:%]"" DE(5)=% S %=$P(%Z,U,4) S:%]"" DE(10)=% S %=$P(%Z,U,5) S:%]"" DE(12)=% S %=$P(%Z,U,6) S:%]"" DE(13)=% S %=$P(%Z,U,11) S:%]"" DE(1)=% S %=$P(%Z,U,12) S:%]"" DE(8)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,5) S:%]"" DE(3)=%
+ I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,2) S:%]"" DE(5)=% S %=$P(%Z,U,3) S:%]"" DE(16)=% S %=$P(%Z,U,11) S:%]"" DE(12)=% S %=$P(%Z,U,18) S:%]"" DE(8)=%
+ I $D(^(23)) S %Z=^(23) S %=$P(%Z,U,2) S:%]"" DE(1)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -44,65 +45,74 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="PRCHT15",DQ=1
-1 S DW="1;11",DV="F",DU="",DLB="DELIVERY LOCATION",DIFLD=5.6
- G RE
-X1 K:$L(X)>20!($L(X)<3) X
- I $D(X),X'?.ANP K X
+1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW="23;2",DV="D",DU="",DLB="BBFY",DIFLD=26
+ S X=PRC("BBFY")
+ S Y=X
+ S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD
+X1 S %DT="" D ^%DT S X=Y K:Y<1 X
  Q
  ;
 2 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=2 D X2 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X2 I X="PATIENT",$P(^PRC(442,DA,0),U,19) I $P(^(0),U,19)!(PRCHN("MP")=2) W *7,!,"  PATIENT DELIVERY not valid for this type of order!" S Y=5.6
+X2 D EN2^PRCHNPO3
  Q
-3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X3 I X="PATIENT" W "   Direct Delivery to Patient" S Y=5.3
+3 S DW="0;5",DV="RFX",DU="",DLB="COST CENTER",DIFLD=2
+ S X=PRCHN("CC")
+ S Y=X
+ G Y
+X3 S Z0=+$P(^PRC(442,DA,0),"^",3) K:'$D(PRC("SITE"))!'Z0 X,Z0 I $D(X) K:'$D(^PRC(420,PRC("SITE"),1,Z0,2,0)) X I $D(X) D EN2^PRCHNPO5
+ I $D(X),X'?.ANP K X
  Q
-4 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=4 G A
-5 S DW="1;3",DV="NJ5,0XO",DU="",DLB="SHIP TO",DIFLD=5.4
- S DQ(5,2)="S Y(0)=Y Q:Y']""""  S Z0=$S($P($G(^PRC(442,D0,23)),U,7)]"""":$P($G(^PRC(442,D0,23)),U,7),1:$E($G(^PRC(442,D0,0)),1,3)) Q:'Z0  S Y=$P($S($D(^PRC(411,Z0,1,Y,0)):^(0),1:""""),U,1) K Z0"
+ ;
+4 S DQ=5 ;@88
+5 S DW="1;2",DV="RP49'",DU="",DLB="REQUESTING SERVICE",DIFLD=5.2
+ S DU="DIC(49,"
+ S X=PRCHN("SVC")
+ S Y=X
+ G Y
+X5 Q
+6 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=6 G A
+7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X7 S:PRCHN("MP")=2 Y="@3" I $D(^PRC(442,DA,1)),$P(^(1),U,18)]"" S Y="@3"
+ Q
+8 S DW="1;18",DV="RS",DU="",DLB="EXPENDABLE/NONEXPENDABLE",DIFLD=.3
+ S DU="E:EXPENDABLE;N:NON-EXPENDABLE;"
+ S X="E"
+ S Y=X
+ G Y
+X8 Q
+9 S DQ=10 ;@3
+10 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=10 D X10 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X10 S:PRCHN("MP")=4 Y=5.3
+ Q
+11 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=11 D X11 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X11 I '$P(^PRC(442,DA,0),U,19)&(PRCHN("MP")'=2) W !,"Enter the word 'PATIENT' in the 'DELIVERY LOCATION' field for a direct delivery",!,"to a patient."
+ Q
+12 S DW="1;11",DV="F",DU="",DLB="DELIVERY LOCATION",DIFLD=5.6
+ G RE
+X12 K:$L(X)>20!($L(X)<3) X
+ I $D(X),X'?.ANP K X
+ Q
+ ;
+13 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=13 D X13 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X13 I X="PATIENT",$P(^PRC(442,DA,0),U,19) I $P(^(0),U,19)!(PRCHN("MP")=2) W *7,!,"  PATIENT DELIVERY not valid for this type of order!" S Y=5.6
+ Q
+14 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=14 D X14 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X14 I X="PATIENT" W "   Direct Delivery to Patient" S Y=5.3
+ Q
+15 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=15 G A
+16 S DW="1;3",DV="NJ5,0XO",DU="",DLB="SHIP TO",DIFLD=5.4
+ S DQ(16,2)="S Y(0)=Y Q:Y']""""  S Z0=$S($P($G(^PRC(442,D0,23)),U,7)]"""":$P($G(^PRC(442,D0,23)),U,7),1:$E($G(^PRC(442,D0,0)),1,3)) Q:'Z0  S Y=$P($S($D(^PRC(411,Z0,1,Y,0)):^(0),1:""""),U,1) K Z0"
  S X=$G(PRCY)
  S Y=X
  G Y
-X5 S Z0=$S($P($G(^PRC(442,D0,23)),U,7)]"":$P($G(^PRC(442,D0,23)),U,7),1:$E($G(^PRC(442,D0,0)),1,3)) K:'Z0 X Q:'Z0  S DIC="^PRC(411,Z0,1,",DIC(0)="QEM" D ^DIC S X=+Y K:Y'>0 X K Z0,DIC
+X16 S Z0=$S($P($G(^PRC(442,D0,23)),U,7)]"":$P($G(^PRC(442,D0,23)),U,7),1:$E($G(^PRC(442,D0,0)),1,3)) K:'Z0 X Q:'Z0  S DIC="^PRC(411,Z0,1,",DIC(0)="QEM" D ^DIC S X=+Y K:Y'>0 X K Z0,DIC
  Q
  ;
-6 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=6 D X6 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X6 I $P(^PRC(442,DA,1),U,12)'="" W *7,!,"Delete the Direct Delivery patient name if you wish the 'Ship to' address",!,"to print on the P.O.",!
+17 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=17 D X17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X17 I $P(^PRC(442,DA,1),U,12)'="" W *7,!,"Delete the Direct Delivery patient name if you wish the 'Ship to' address",!,"to print on the P.O.",!
  Q
-7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X7 S:(PRCHN("MP")'=4)&($P(^(1),U,12)="") Y=6
+18 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=18 D X18 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X18 S:(PRCHN("MP")'=4)&($P(^(1),U,12)="") Y=6
  Q
-8 S DW="1;12",DV="P440.2",DU="",DLB="DIRECT DELIVERY PATIENT",DIFLD=5.3
- S DU="PRC(440.2,"
- G RE
-X8 Q
-9 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=9 D X9 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X9 K DIC("DR")
- Q
-10 S DW="1;4",DV="RS",DU="",DLB="VERBAL PURCHASE ORDER (Y/N)",DIFLD=6
- S DU="Y:YES;N:NO;"
- S Y="NO"
- G Y
-X10 Q
-11 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=11 D X11 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X11 S:X'="Y" Y=6.4
- Q
-12 S DW="1;5",DV="RS",DU="",DLB="CONFIRMATION COPY (Y/N)",DIFLD=6.2
- S DU="Y:YES;N:NO;"
- G RE
-X12 Q
-13 S DW="1;6",DV="S",DU="",DLB="F.O.B. POINT",DIFLD=6.4
- S DU="D:DESTINATION;O:ORIGIN;"
- S Y="DESTINATION"
- G Y
-X13 Q
-14 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=14 D X14 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X14 S PRCHN("FOB")=X
- Q
-15 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=15 G A
-16 S DW="0;10",DV="RDX",DU="",DLB="DELIVERY DATE",DIFLD=7
- S Y="TODAY+10"
- G Y
-X16 S %DT="EX" D ^%DT S X=Y K:Y<1 X I $D(X) S Z1=$S($D(^PRC(442,DA,1)):$P(^(1),U,15),1:""),Z2=$S('Z1:"Missing P.O. DATE",X<Z1:"DELIVERY DATE before P.O. DATE",1:"") W:Z2'="" *7,"   * ",Z2 K:Z2'="" X K Z1,Z2
- Q
- ;
-17 D:$D(DG)>9 F^DIE17 G ^PRCHT16
+19 D:$D(DG)>9 F^DIE17 G ^PRCHT16

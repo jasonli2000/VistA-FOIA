@@ -1,5 +1,5 @@
-LEXASO ;ISL/KER - Look-up Display String (Sources) ;01/03/2011
- ;;2.0;LEXICON UTILITY;**25,32,73**;Sep 23, 1996;Build 10
+LEXASO ; ISL/KER Look-up Display String (Sources) ; 05/14/2003
+ ;;2.0;LEXICON UTILITY;**25,32**;Sep 23, 1996
  ;
  ; Entry S X=$$SO^LEXASO(IEN,SAB,ALL,DATE)
  ;
@@ -70,16 +70,15 @@ MAJ ; Source string for a major concept
  S LEXX=$$ASSEM
  Q
 CODES(LEXEX,LEXSA,LEXVDT) ; Get Source Codes
- Q:$L($G(LEXSA))'=3  N LEXCD,LEXCN,LEXCS,LEXHE,LEXHI,LEXHN,LEXHS,LEXSAI,LEXSO,LEXSR,LEXST,LEXSTA
- S LEXST="",LEXSAI=+($O(^LEX(757.03,"ASAB",LEXSA,0))) Q:+LEXSAI'>0  S LEXSO=0 F  S LEXSO=$O(^LEX(757.02,"B",LEXEX,LEXSO)) Q:+LEXSO=0  D
- . S LEXCN=$G(^LEX(757.02,LEXSO,0)),LEXCD=$P(LEXCN,"^",2) Q:'$L(LEXCD)  S LEXCS=$P(LEXCN,"^",3) Q:+LEXCS'=+LEXSAI
- . S LEXHE=$S(+LEXVDT>0:(LEXVDT_".99999"),1:" "),LEXHE=$O(^LEX(757.02,+LEXSO,4,"B",LEXHE),-1) Q:+LEXHE'>0
- . S LEXHI=$O(^LEX(757.02,+LEXSO,4,"B",+LEXHE," "),-1)
- . S LEXHN=$G(^LEX(757.02,+LEXSO,4,+LEXHI,0)),LEXHS=$P(LEXHN,"^",2) Q:+($G(LEXHS))'>0
- . S LEXSR=$P($G(^LEX(757.03,$P($G(^LEX(757.02,LEXSO,0)),"^",3),0)),"^",2)
- . S LEXCC(LEXSR,(($P($G(^LEX(757.02,LEXSO,0)),"^",2))_" "))=""
- . ; Primary Code Saved - p32
- . S:$P($G(^LEX(757.02,LEXSO,0)),"^",7)=1 LEXCC(LEXSR,"P",(($P($G(^LEX(757.02,LEXSO,0)),"^",2))_" "))=""
+ Q:$L($G(LEXSA))'=3  N LEXSO,LEXSR,LEXST,LEXSTA,LEXCD S LEXST=""
+ S LEXSO=0 F  S LEXSO=$O(^LEX(757.02,"B",LEXEX,LEXSO)) Q:+LEXSO=0  D
+ . S LEXCD=$P($G(^LEX(757.02,LEXSO,0)),"^",2) Q:'$L(LEXCD)
+ . S LEXSTA=$$STATCHK^LEXSRC2(LEXCD,$G(LEXVDT)) Q:+LEXSTA'>0
+ . I $E($G(^LEX(757.03,$P($G(^LEX(757.02,LEXSO,0)),"^",3),0)),1,3)=LEXSA D
+ . . S LEXSR=$P($G(^LEX(757.03,$P($G(^LEX(757.02,LEXSO,0)),"^",3),0)),"^",2)
+ . . S LEXCC(LEXSR,(($P($G(^LEX(757.02,LEXSO,0)),"^",2))_" "))=""
+ . . ; Primary Code Saved - p32
+ . . S:$P($G(^LEX(757.02,LEXSO,0)),"^",7)=1 LEXCC(LEXSR,"P",(($P($G(^LEX(757.02,LEXSO,0)),"^",2))_" "))=""
  Q
 ASSEM(LEXX) ; Assemble display string  (SOURCE CODE/CODE/CODE)
  Q:'$D(LEXCC) ""

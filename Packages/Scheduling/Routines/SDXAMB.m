@@ -1,4 +1,4 @@
-SDXAMB ; GENERATED FROM 'SD-AMB-PROC-DISPLAY' PRINT TEMPLATE (#229) ; 06/13/96 ; (FILE 409.71, MARGIN=80)
+SDXAMB ; GENERATED FROM 'SD-AMB-PROC-DISPLAY' PRINT TEMPLATE (#800) ; 12/20/96 ; (FILE 409.71, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(229,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(800,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D T Q:'DN  D N W ?0 W ""
  D N:$X>0 Q:'DN  W ?0 W "CPT/HCPCS Code"
  D N:$X>59 Q:'DN  W ?59 W "Synonyms"
@@ -25,6 +25,8 @@ A1 ;
  S X=$G(^SD(409.71,D0,"S",D1,0)) D N:$X>59 Q:'DN  W ?59,$E($P(X,U,1),1,30)
  Q
 A1R ;
+ W ?59 I $$LOC^SDAMBAE3(D0,DT) W !!?4,"** LOCALLY INACTIVE **" K DIP K:DN Y
+ D T Q:'DN  W ?2 I $P($G(^ICPT(D0,0)),U,4) W !!?4,"** NATIONALLY INACTIVATED **" K DIP K:DN Y
  S DICMX="D L^DIWP" D T Q:'DN  D N D N:$X>4 Q:'DN  S DIWL=5,DIWR=78 X DXS(1,9) K DIP K:DN Y
  D A^DIWW
  D T Q:'DN  D N D N:$X>2 Q:'DN  W ?2 W "Effective Date"
@@ -56,8 +58,14 @@ B1 ;
 B1R ;
  K J(100),I(100) S:$D(I(0,0)) D0=I(0,0)
  D T Q:'DN  D N W ?0 W ""
- D N:$X>0 Q:'DN  W ?0 S X="-",DIP(1)=X,DIP(2)=X,X=$S($D(IOM):IOM,1:80) S X=X,X1=DIP(1) S %=X1 X:%]"" "F X=X:0 S %=%_X1 Q:$L(%)>X" S X=$E(%,1,X) K DIP K:DN Y W X
+ D N:$X>0 Q:'DN  W ?0 S X="-",DIP(1)=X,DIP(2)=X,X=$S($D(IOM):IOM,1:80) S X=X,X1=DIP(1) S %=X,X="" Q:X1=""  S $P(X,X1,%\$L(X1)+1)=X1,X=$E(X,1,%) K DIP K:DN Y W X
  K Y K DIWF
  Q
 HEAD ;
+ W !,?59,"I"
+ W !,?59,"$$LOC^SDAMBAE3(D0,DT)"
+ W !,?59,"W !!?4,"
+ W !,?2,"I"
+ W !,?2,"$P($G(^ICPT(D0,0)),U,4)"
+ W !,?2,"W !!?4,"
  W !,"--------------------------------------------------------------------------------",!!

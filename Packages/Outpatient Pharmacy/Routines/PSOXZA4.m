@@ -1,4 +1,4 @@
-PSOXZA4 ; COMPILED XREF FOR FILE #52.1 ; 11/02/11
+PSOXZA4 ; COMPILED XREF FOR FILE #52.1 ; 11/03/10
  ; 
  S DA=0
 A1 ;
@@ -29,7 +29,7 @@ A S DA=$O(^PSRX(DA(1),1,DA)) I DA'>0 S DA=0 G END
  I X'="" D KPR^PSOUTL
  S X=$P($G(DIKZ(0)),U,1)
  I X'="" I +$G(^PSRX(DA(1),"IB")) K:$P($G(^PSRX(DA(1),0)),"^",2)&($P($G(^PSRX(DA(1),1,DA,0)),"^",2)="W")&('$P($G(^(0)),"^",16))&('$P($G(^(0)),"^",18))&('$G(^("IB"))) ^PSRX("ACP",$P(^PSRX(DA(1),0),"^",2),X,DA,DA(1))
-CR1 S DIXR=462
+CR1 S DIXR=450
  K X
  S DIKZ(0)=$G(^PSRX(DA(1),1,DA,0))
  S X(1)=$P(DIKZ(0),U,10)

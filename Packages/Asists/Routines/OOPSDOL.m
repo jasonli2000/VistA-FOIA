@@ -1,5 +1,5 @@
 OOPSDOL ;WIOFO/CAH-ASISTS TRANSMISSION OF CA1/CA2 TO DOL ;3/15/00
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**8,11,12**;Jun 01, 1998
  ;
  N ARR,FIELD,FL,MSG,VAL,XMZ
  S MAN=1
@@ -80,8 +80,6 @@ GETREC ; Loop thru ^OOP(2260 "AW" or "AWC" XRef to get records to transmit
  S OPI=0 F  S OPI=$O(@INDEX) Q:'OPI  D
  .S OOPDA=0 F  S OOPDA=$O(@INDEX2) Q:'OOPDA  D
  .. I $D(MAN),OPI'=RDATE Q
- .. I '$G(MAN),($$GET1^DIQ(2260,OOPDA,66)'="") D  Q
- ... K ^OOPS(2260,"AW",OPI,OOPDA)
  .. I '$$VERIFY^OOPSUTL6(OOPDA) Q            ; verify data not chged 
  .. S VALID=$$VAL^OOPSUTL5(OOPDA)
  .. ; Get Station #, use w/Mail Grp by Station for messages, if there

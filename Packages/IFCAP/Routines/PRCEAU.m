@@ -1,5 +1,5 @@
 PRCEAU ;WISC/CLH/LDB/BGJ-CREATE/EDIT AUTHORIZATIONS-CONTROL POINTS ; 15 Apr 93  1:20 PM
-V ;;5.1;IFCAP;**23**;Oct 20, 2000
+V ;;5.1;IFCAP;;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;Enter new or edit old authorizations
  N AMT,PRC,PRCF,DIC,DIR,DLAYGO,DIE,DA,DR,Y,X,PODA,TRDA,ER,TIME,IN,ABAL,ACT,AUDA,BAL,BAL1,BAL2,Z,X,Y
@@ -41,8 +41,7 @@ EN ;when and poda and site variables are defined
 AMT ;looping area for authorization amount
  G:$D(DIRUT) EN0 K DIR S DIR(0)="N^.01:999999999.99:2",DIR("A")="AUTHORIZATION AMOUNT",DIR("?")="enter the amount of this authorization or '^' to QUIT" D ^DIR
  I $D(DIRUT)!(Y<.01) D AMTMSG,AMTDEL G EN0
- ;   no MAIL for create authorization
- ;D BUL^PRCEAU0
+ D BUL^PRCEAU0
  I Y>(+BAL-$P(BAL,U,3)) D  G EN0
   . W $C(7),!,"This amount will EXCEED obligation balances by $",$FN((+BAL-$P(BAL,U,3))-Y,",",2),"."
   . W !!?20,"SERVICE BALANCE: $",$FN(+BAL-$P(BAL,U,3),",",2),!! H 3

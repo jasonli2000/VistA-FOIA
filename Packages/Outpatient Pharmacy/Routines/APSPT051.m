@@ -1,7 +1,7 @@
-APSPT051 ; ;07/16/96
+APSPT051 ; ;09/17/98
  D DE G BEGIN
 DE S DIE="^APSPQA(32.4,",DIC=DIE,DP=9009032.4,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^APSPQA(32.4,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,11) S:%]"" DE(1)=% S %=$P(%Z,U,12) S:%]"" DE(3)=% S %=$P(%Z,U,13) S:%]"" DE(5)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,11) S:%]"" DE(1)=% S %=$P(%Z,U,12) S:%]"" DE(3)=% S %=$P(%Z,U,13) S:%]"" DE(5)=% S %=$P(%Z,U,17) S:%]"" DE(7)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -18,7 +18,7 @@ N I X="" G A:DV'["R",X:'DV,X:D'>0,A
 RD G QS:X?."?" I X["^" D D G ^DIE17
  I X="@" D D G Z^DIE2
  I X=" ",DV["d",DV'["P",$D(^DISV(DUZ,"DIE",DLB)) S X=^(DLB) I DV'["D",DV'["S" W "  "_X
-T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
+T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) I X?.ANP D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
  K DDER G X
 P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
@@ -38,8 +38,7 @@ RP D O I X="" S X=DE(DQ) G A:'DV,A:DC<2,N^DIE17
 I I DV'["I",DV'["#" G RD
  D E^DIE0 G RD:$D(X),PR
  Q
-SET I X'?.ANP S DDER=1 Q 
- N DIR S DIR(0)="SMV^"_DU,DIR("V")=1
+SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  I $D(DB(DQ)),'$D(DIQUIET) N DIQUIET S DIQUIET=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
@@ -63,16 +62,21 @@ X4 I X=1 S Y="@4"
  G RE
 X5 Q
 6 S DQ=7 ;@4
-7 S D=0 K DE(1) ;1300
+7 S DW="0;17",DV="NJ12,2",DU="",DLB="FINANCIAL COST",DIFLD=.17
+ G RE
+X7 S:X["$" X=$P(X,"$",2) K:X'?.N.1".".2N!(X>999999999)!(X<0) X
+ Q
+ ;
+8 S D=0 K DE(1) ;1300
  S Y="REASON FOR INTERVENTION^WL^^0;1^Q",DG="13",DC="^9009032.413" D DIEN^DIWE K DE(1) G A
  ;
-8 S D=0 K DE(1) ;1400
+9 S D=0 K DE(1) ;1400
  S Y="ACTION TAKEN^WL^^0;1^Q",DG="14",DC="^9009032.414" D DIEN^DIWE K DE(1) G A
  ;
-9 S D=0 K DE(1) ;1500
+10 S D=0 K DE(1) ;1500
  S Y="CLINICAL IMPACT^WL^^0;1^Q",DG="15",DC="^9009032.415" D DIEN^DIWE K DE(1) G A
  ;
-10 S D=0 K DE(1) ;1600
+11 S D=0 K DE(1) ;1600
  S Y="FINANCIAL IMPACT^WL^^0;1^Q",DG="16",DC="^9009032.416" D DIEN^DIWE K DE(1) G A
  ;
-11 G 0^DIE17
+12 G 0^DIE17

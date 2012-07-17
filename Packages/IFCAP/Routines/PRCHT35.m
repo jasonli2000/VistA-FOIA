@@ -1,4 +1,4 @@
-PRCHT35 ; ;10/06/97
+PRCHT35 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442,",DIC=DIE,DP=442,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRC(442,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,3) S:%]"" DE(6)=% S %=$P(%Z,U,5) S:%]"" DE(13)=%
@@ -54,7 +54,7 @@ X1 S DIC("S")="I "_$S($D(PRCHPUSH):"""13""[$E(^(0))",$D(PRCHNRQ):"""1390""[$E(^(
  Q
  ;
 2 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=2 D X2 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X2 S PRCHN("SC")=$S($D(^PRCD(420.8,+X,0)):$P(^(0),U,1),1:"") K DIC("DR")
+X2 S PRCHN("SC")=$S($D(^PRCD(420.8,+X,0)):$P(^(0),U,1),1:"")
  Q
 3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
 X3 D ^PRCHNPO3

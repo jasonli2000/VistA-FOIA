@@ -1,21 +1,8 @@
 DVBAB54 ;ALB/VM - CAPRI ADMISSION REPORT ;09/06/00
- ;;2.7;AMIE;**35,149**;Apr 10, 1995;Build 16
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.7;AMIE;**35**;Apr 10, 1995
  ;
- ;Input: ZMSG      - Output Array for SC Veteran Admssn report (By Ref)
- ;       BDATE     - Beginning date for eport (FM Format)
- ;       EDATE     - Ending date for report (FM Format)
- ;       DVBADLMTR - Indicates if report should be delimitted (Optional)
- ;                    CAPRI currently executes RPC by each day in 
- ;                    date range, so DVBADLMTR should equal the
- ;                    final EDATE in range so that XTMP global
- ;                    can be killed.
- ;Output: ZMSG contains delimited/non-delimited SC Veteran Admssn report 
-STRT(ZMSG,BDATE,EDATE,DVBADLMTR)  ;ENTER HERE
- N DVBAFNLDTE
+STRT(ZMSG,BDATE,EDATE)  ;ENTER HERE
  S DVBABCNT=0,RO="N",RONUM=0
- S DVBAFNLDTE=$S(+$G(DVBADLMTR):+$P(DVBADLMTR,"."),1:0)
- S DVBADLMTR=$S('+$G(DVBADLMTR):"",1:"^")
  K ^TMP($J) G TERM
 SET Q:'$D(^DPT(DA,0))  S DFN=DA,DVBASC="" D SC^DVBAVDPT Q:DVBASC'="Y"  Q:CFLOC'=RONUM&(RO="Y")&(CFLOC'=0)&(CFLOC'=376)  S ^TMP($J,XCN,CFLOC,MB,DA)=MA
  Q
@@ -24,13 +11,6 @@ PRINTB S ADMDT=$P(DATA,U),DFN=DA D ADM^DVBAVDPT
  ;W:(IOST?1"C-".E)!($D(DVBAON2)) @IOF
  ;W !!!,?(80-$L(HEAD)\2),HEAD,!,?(80-$L(HEAD1)\2),HEAD1,!!
  S:ADMDT]"" ADMDT=$E(ADMDT,4,5)_"/"_$E(ADMDT,6,7)_"/"_$E(ADMDT,2,3) S:DCHGDT]"" DCHGDT=$E(DCHGDT,4,5)_"/"_$E(DCHGDT,6,7)_"/"_$E(DCHGDT,2,3)
- ;create delimited/non-delimited report
- D:($G(DVBADLMTR)'="") PRINTD
- D:($G(DVBADLMTR)="") PRINTND
- S DVBAON2=""
- Q
- ;
-PRINTND ;create non-delimited admission report
  S ZMSG(DVBABCNT)="",DVBABCNT=DVBABCNT+1
  S ZMSG(DVBABCNT)="",DVBABCNT=DVBABCNT+1
  S ZMSG(DVBABCNT)="          Patient Name:   "_PNAM,DVBABCNT=DVBABCNT+1
@@ -47,24 +27,11 @@ PRINTND ;create non-delimited admission report
 ELIG S ELIG=DVBAELIG,INCMP=""
  I ELIG]"" S ELIG=ELIG_" ("_$S(DVBAELST="P":"Pend Ver",DVBAELST="R":"Pend Re-verif",DVBAELST="V":"Verified",1:"Not Verified")_")"
  I $D(^DPT(DA,.29)) S INCMP=$S($P(^(.29),U,12)=1:"Incompetent",1:"")
- S ZMSG(DVBABCNT)="      Eligibility data:   "_ELIG_$S(((ELIG]"")&(INCMP]"")):", ",1:""),DVBABCNT=DVBABCNT+1
+ S ZMSG(DVBABCNT)="      Eligibility data:   "_ELIG_$S(ELIG]"":", ",1:""),DVBABCNT=DVBABCNT+1
  I $X>60 S ZMSG(DVBABCNT)=INCMP,DVBABCNT=DVBABCNT+1
  ;Q
  ;***VM-OUT*I IOST?1"C-".E W *7,!,"Press RETURN to continue or ""^"" to stop    " R ANS:DTIME S:ANS=U!('$T) QUIT=1 I '$T S DVBAQUIT=1
- Q
- ;
-PRINTD ;create delimited admission report
- N ELIG,INCMP
- D:('$D(^XTMP("DVBA_SCADMSSN_RPT"_$J,0))) COLHDR
- S ZMSG(DVBABCNT)=PNAM_DVBADLMTR_CNUM_DVBADLMTR_CFLOC_DVBADLMTR_SSN_DVBADLMTR_ADMDT_DVBADLMTR
- S ZMSG(DVBABCNT)=ZMSG(DVBABCNT)_DIAG_DVBADLMTR_DCHGDT_DVBADLMTR_BEDSEC_DVBADLMTR
- S ZMSG(DVBABCNT)=ZMSG(DVBABCNT)_$S(RCVAA=0:"NO",RCVAA=1:"YES",1:"Not specified")_DVBADLMTR
- S ZMSG(DVBABCNT)=ZMSG(DVBABCNT)_$S(RCVPEN=0:"NO",RCVPEN=1:"YES",1:"Not specified")_DVBADLMTR
- S ELIG=DVBAELIG,INCMP=""
- I ELIG]"" S ELIG=ELIG_" ("_$S(DVBAELST="P":"Pend Ver",DVBAELST="R":"Pend Re-verif",DVBAELST="V":"Verified",1:"Not Verified")_")"
- I $D(^DPT(DA,.29)) S INCMP=$S($P(^(.29),U,12)=1:"Incompetent",1:"")
- S ZMSG(DVBABCNT)=ZMSG(DVBABCNT)_ELIG_$S(((ELIG]"")&(INCMP]"")):", ",1:"")_INCMP
- S DVBABCNT=DVBABCNT+1
+ S DVBAON2=""
  Q
  ;
 PRINT K MA S QUIT=""
@@ -89,21 +56,8 @@ TERM ;D HOME^%ZIS K NOASK
  ;
 GO S MA=BDATE F J=0:0 S MA=$O(^DGPM("AMV1",MA)) Q:$P(MA,".")>EDATE!(MA="")  F DA=0:0 S DA=$O(^DGPM("AMV1",MA,DA)) Q:DA=""  F MB=0:0 S MB=$O(^DGPM("AMV1",MA,DA,MB)) Q:MB=""  D SET W:'$D(NOASK) "."
  I '$D(^TMP($J)) S ZMSG(DVBABCNT)="No data found for parameters entered." H 2 G KILL
- D PRINT K:(DVBAFNLDTE=$P(EDATE,".")) ^XTMP("DVBA_SCADMSSN_RPT"_$J,0)
- I $D(DVBAQUIT) K DVBAON2 D:$D(ZTQUEUED) KILL^%ZTLOAD G KILL^DVBAUTIL
+ D PRINT I $D(DVBAQUIT) K DVBAON2 D:$D(ZTQUEUED) KILL^%ZTLOAD G KILL^DVBAUTIL
  ;
-KILL K:(DVBAFNLDTE=$P(EDATE,".")) ^XTMP("DVBA_SCADMSSN_RPT"_$J,0)
- D:$D(ZTQUEUED) KILL^%ZTLOAD D ^%ZISC S X=8 K DVBAON2 G FINAL^DVBAUTIL
+KILL D:$D(ZTQUEUED) KILL^%ZTLOAD D ^%ZISC S X=8 K DVBAON2 G FINAL^DVBAUTIL
  ;
 DEQUE K ^TMP($J) G GO
- ;
-COLHDR ;Column header for delimited report
- S ZMSG(DVBABCNT)="Patient Name"_DVBADLMTR_"Claim No"_DVBADLMTR_"Claim Folder Loc"_DVBADLMTR
- S ZMSG(DVBABCNT)=(ZMSG(DVBABCNT))_"Social Sec No"_DVBADLMTR_"Admission Date"_DVBADLMTR
- S ZMSG(DVBABCNT)=(ZMSG(DVBABCNT))_"Admitting Diagnosis"_DVBADLMTR_"Discharge Date"_DVBADLMTR
- S ZMSG(DVBABCNT)=(ZMSG(DVBABCNT))_"Bed Service"_DVBADLMTR_"Recv A&A?"_DVBADLMTR
- S ZMSG(DVBABCNT)=(ZMSG(DVBABCNT))_"Pension?"_DVBADLMTR_"Eligibility Data"
- S DVBABCNT=DVBABCNT+1
- ;set global entry so header is only created once for job ($J)
- S ^XTMP("DVBA_SCADMSSN_RPT"_$J,0)=DT_U_DT
- Q

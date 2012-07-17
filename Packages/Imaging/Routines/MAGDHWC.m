@@ -1,5 +1,5 @@
-MAGDHWC ;WOIFO/PMK/NST - Capture Consult/Procedure Request data ; 27 Aug 2010 8:40 AM
- ;;3.0;IMAGING;**10,51,46,54,106**;Mar 19, 2002;Build 2002;Feb 28, 2011
+MAGDHWC ;WOIFO/PMK - Capture Consult/Procedure Request data ; 05/18/2007 11:23
+ ;;3.0;IMAGING;**10,51,46,54**;03-July-2009;;Build 1424
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -86,6 +86,7 @@ ENTRY ;
  S I=0 I '$$FINDSEG^MAGDHW0(.HL7,"ZSV",.I,.X) Q  ; no ZSV segment
  S SERVICE=$P($P(X,DEL),DEL2,4)
  D SERVICE ; send this transaction to the DICOM gateway?
+ I IGNORE Q  ; just ignore HL7 message, don't send it to DICOM gateway
  ;
  S Z=$P(HL7ORC,DEL,1) ; Order Control
  S Y=$P(HL7ORC,DEL,5) ; Order Status
@@ -101,13 +102,6 @@ ENTRY ;
  . . Q
  . Q
  E  S MSGTYPE="UNKNOWN"
- ;
- ;-- patch 106: In case the service is not in file #2006.5831
- I IGNORE D  Q  ; just ignore HL7 message, don't send it to DICOM gateway
- . N I
- . I MSGTYPE["RESULT" S I=$$NEWTIU^MAGDHWA(GMRCIEN)
- . Q
- ;
  D MSH^MAGDHWA,PID^MAGDHWA,ORC^MAGDHWA,OBR^MAGDHWA,ZSV^MAGDHWA
  I '$$OBX() D  ; get OBX segment from database
  . S I=$O(HL7(""),-1)+1 S I=$$OBX^MAGDHWS(I)

@@ -1,12 +1,12 @@
-PRCPHLQU ;WISC/CC/DWA-Build/receive HL7 messages for QOH queries ;4/00
-V ;;5.1;IFCAP;**1,24,52**;Oct 20, 2000
+PRCPHLQU ;WISC/CC-Build/receive HL7 messages for QOH queries ;4/00
+V ;;5.1;IFCAP;**1,24**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  Q
  ;
 BLDSEG(INVPT) ;
  ;
- N %,%H,%I,CNT,DATETIME,HLA,HLCS,HLEVN,HLFS,MC,MYRESULT,MYOPTNS,SEG
+ N %,%H,%I,CNT,DATETIME,HLA,HLCS,HLEVN,HLFS,MC,SEG
  S CNT=0
  I $P($G(^PRCP(445,INVPT,5)),"^",1)']"" Q  ; no supply station
  ;
@@ -16,7 +16,7 @@ BLDSEG(INVPT) ;
  I $G(HL) D  Q  ; error occurred
  . ; put error handler here for init failure
  . W !,"HL7 can't build your QOH update request now.  Please try later."
- . W !,"HL7 Error: "_$P(HL,"^",2)
+ . W !,"HL7 Error: "_$P(HL,2)
  S HLFS=$G(HL("FS")) I HLFS="" S HLFS="|"
  S HLCS=$E(HL("ECH"),1)
  ;

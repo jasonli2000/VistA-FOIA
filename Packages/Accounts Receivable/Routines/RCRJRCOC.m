@@ -1,5 +1,5 @@
-RCRJRCOC ;WISC/RFJ/BGJ-count current receivables ; 11/2/10 10:53am
- ;;4.5;Accounts Receivable;**156,170,182,203,220,138,239,272,273**;Mar 20, 1995;Build 3
+RCRJRCOC ;WISC/RFJ/BGJ-count current receivables ;1 Aug 00
+ ;;4.5;Accounts Receivable;**156,170,182,203,220,138,239,272**;Mar 20, 1995;Build 2
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ; IA 4385 for call to $$MRATYPE^IBCEMU2
  Q
@@ -33,7 +33,7 @@ CURRENT(RCBILLDA,RCVALUE) ;  count current bills balance
  .   ;  ----- this code is used to set up the SV code sheet -----
  .   S TYPE=21
  .   ;  special type for tort feasor
- .   I $E(RCRSC,1,2)=86!($E(RCRSC,1,2)="8S") S TYPE="2A"
+ .   I $E(RCRSC,1,2)=86 S TYPE="2A"
  .   ;
  .   ;  Get ARACTDT=AR Date Active for bill
  .   S ARACTDT=+$P($P($G(^PRCA(430,RCBILLDA,6)),"^",21),".")
@@ -42,7 +42,7 @@ CURRENT(RCBILLDA,RCVALUE) ;  count current bills balance
  .   S MRATYPE=$$MRATYPE^IBCEMU2(RCBILLDA,ARACTDT)
  .   ;  set TYPE to 2F for post-MRA Medicare bills or to 2L for
  .   ;  post-MRA non-Medicare bills (for RHI receivables only)
- .   I $E(RCRSC,1,2)=85!($E(RCRSC,1,2)="8R"),MRATYPE>1 S TYPE=$S(MRATYPE=2:"2F",1:"2L")
+ .   I $E(RCRSC,1,2)=85,MRATYPE>1 S TYPE=$S(MRATYPE=2:"2F",1:"2L")
  .   ;
  .   ;  store dollars to mccf and hsif
  .   I RCTOMCCF S ^TMP($J,"RCRJRCOLSV",TYPE,RCFUND,RCRSC)=$G(^TMP($J,"RCRJRCOLSV",TYPE,RCFUND,RCRSC))+RCTOMCCF
@@ -111,7 +111,7 @@ WRITEOFF(RCBILLDA,RCVALUE,RCRITER2) ;  count write offs
  .   ;
  .   S TYPE=37
  .   ;  special type for tort feasor
- .   I $E(RCRSC,1,2)=86!($E(RCRSC,1,2)="8S") S TYPE=39
+ .   I $E(RCRSC,1,2)=86 S TYPE=39
  .   S ARACTDT=+$P($P($G(^PRCA(430,RCBILLDA,6)),"^",21),".")
  .   ;  DBIA #4385 activated on 31-Mar-2004
  .   S MRATYPE=$$MRATYPE^IBCEMU2(RCBILLDA,ARACTDT)

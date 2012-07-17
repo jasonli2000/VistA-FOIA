@@ -1,5 +1,5 @@
 ORORDDSC ; SLC/AGP - API for returning Order Dialogs Structure; 03/18/09
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**301,295,280**;Dec 17, 1997;Build 85
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**301,295**;Dec 17, 1997;Build 63
  ;
 BEG(OUTPUT,IEN,TYPE,CNT) ;
  N DTYPE,NODE
@@ -33,7 +33,6 @@ DIRECT(OUTPUT,IEN,CNT) ;
  I TYPE="Q" D  Q
  .;done to prevent a problem with TIU Active Medication Objects
  .;killing the variable IEN
- .S ORTYPE="Z"
  .S SAFEIEN=IEN
  .D GETQDLG^ORCD(IEN)
  .D QO(.ORDIALOG,SAFEIEN,.OUTPUT,.CNT)

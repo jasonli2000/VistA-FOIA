@@ -1,5 +1,5 @@
-OOPSSUP3 ;HINES/WAA-S/E Supervisor Edit routine 2162 ;04/15/1998
- ;;2.0;ASISTS;;Jun 03, 2002
+OOPSSUP3 ;HINES/WAA - S/E Supervisor Edit routine 2162 [ 04/15/1998  1:25 PM ]
+ ;;1.0;ASISTS;**3,5,11**;Jun 01, 1998
  ;;
 ASIST ;  2162 FORM
  N INCID,SUP,CAT,OBJ,IEN200

@@ -1,5 +1,5 @@
-PSDOPT ;BIR/JPW,LTL,BJW - Outpatient Rx Entry ;2/5/04 12:15pm
- ;;3.0;CONTROLLED SUBSTANCES;**10,11,15,21,30,39,48,62,69,71**;13 Feb 97;Build 29
+PSDOPT ;BIR/JPW,LTL,BJW-Outpatient Rx Entry ; 2/5/04 12:15pm
+ ;;3.0; CONTROLLED SUBSTANCES ;**10,11,15,21,30,39,48,62,69**;13 Feb 97;Build 13
  ;Reference to ^PSDRUG( supported by DBIA #221
  ;References to ^PSD(58.8 are covered by DBIA #2711
  ;References to file 58.81 are covered by DBIA #2808
@@ -110,10 +110,11 @@ PROCESS ;process selection
  ;
  D:PSDA="O" PSDORIG^PSDOPT1 D:PSDA="R" PSDRFL^PSDOPT1 D:PSDA="P" PSDPRTL^PSDOPT1
  I $G(PSDOUT)=1 G ASKP
- I $G(PSDPOST)=1,$G(PSDREL)="" W !,"This fill has already been posted." D CHKEY D:'$G(PSDOUT) PSDREL^PSDOPT1 G ASKP
+ I $G(PSDPOST)=1,$G(PSDREL)="" W !,"This fill has already been posted." D CHKEY D:'$D(PSDOUT) PSDREL^PSDOPT1 G ASKP
  I $G(PSDREL)'="",$G(PSDPOST)'>0 W !,"This fill has already been released."
  I $G(PSDREL)'="",$G(PSDPOST)>0 W !,"This fill has already been posted & released, no further action required." G ASKP
  D DISPLAY G:PSDOUT END
+ D CHKEY I PSDOUT G ASKP
  K DA,DIR,DIRUT S DIR(0)="YA",DIR("B")="YES",DIR("A")="Is this OK? "
  S DIR("?",1)="Answer 'YES' to log this RX transaction in your CS vault,",DIR("?")="answer 'NO' to reselect a prescription, or '^' to quit."
  D ^DIR K DIR I Y<1 D MSG G:$D(DIRUT) END G:Y<1 ASKP
@@ -140,6 +141,7 @@ DISPLAY ;disp data
  I QTY'?.N W !,"The Quantity is not strictly numeric. This will cause the new balance to be",!,"calculated incorrectly.",!
  W !,"Patient: ",?10,PATN_"  ("_VA("BID")_")",?55,PSDRN(1)," Date: ",?65,$E(DAT,4,5)_"/"_$E(DAT,6,7)_"/"_$E(DAT,2,3),!
  S BAL=+$P($G(^PSD(58.8,+PSDS,1,PSDR,0)),"^",4) I QTY>BAL W !!,?5,"Your balance is ",BAL,".",!,?5,"You may not dispense lower than your balance.",!! D MSG S PSDOUT=1 Q
+ I '$D(^XUSEC("PSJ RPHARM",DUZ)) W !!?15,"Current Balance: ",BAL Q
  W !!,?15,"Old Balance: ",BAL,?40,"New Balance: ",BAL-QTY,!!
  Q
 MSG W $C(7),!!,"No action taken.  This transaction has not been recorded.",!!

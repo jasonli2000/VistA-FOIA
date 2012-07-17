@@ -1,5 +1,8 @@
 RORX005A ;HOIFO/BH,SG - INPATIENT UTILIZATION (QUERY) ;4/21/09 2:20pm
- ;;1.5;CLINICAL CASE REGISTRIES;**1,8,10,13**;Feb 17, 2006;Build 27
+ ;;1.5;CLINICAL CASE REGISTRIES;**1,8,10**;Feb 17, 2006;Build 32
+ ;
+ ; This routine was modified March 2009 to handle ICD9 Filter to 
+ ;     Include or Exclude patients
  ;
  ; This routine uses the following IAs:
  ;
@@ -10,18 +13,6 @@ RORX005A ;HOIFO/BH,SG - INPATIENT UTILIZATION (QUERY) ;4/21/09 2:20pm
  ; #10061        IN5^VADPT (supported) 
  ; #10103        FMADD^XLFDT, FMDIFF^XLFDT (supported)
  ;
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*8    MAR  2010   V CARR       Modified to handle ICD9 filter for
- ;                                      'include' or 'exclude'.
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can select specific patients.
- ;                                      
- ;******************************************************************************
- ;******************************************************************************
  Q
  ;
  ;***** ADDS THE INPATIENT STAY
@@ -155,12 +146,12 @@ QUERY(FLAGS) ;
  . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . S IENS=IEN_",",CNT=CNT+1
- . ;--- Get the patient DFN
- . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
- . ;check for patient list and quit if not on list
- . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",PATIEN)) Q
  . ;--- Check if the patient should be skipped
  . Q:$$SKIP^RORXU005(IEN,FLAGS,RORSDT,ROREDT)
+ . ;
+ . ;--- Get the patient IEN (DFN)
+ . S PATIEN=$$PTIEN^RORUTL01(IEN)  Q:PATIEN'>0
+ . ;
  . ;--- Filter patient on ICD9 codes
  . S RCC=0
  . I FLAG'="ALL" D

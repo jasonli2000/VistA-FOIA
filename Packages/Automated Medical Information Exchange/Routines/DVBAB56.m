@@ -1,21 +1,7 @@
 DVBAB56 ;ALB/SPH - CAPRI READMISSION REPORT ;09/05/00
- ;;2.7;AMIE;**35,149**;Apr 10, 1995;Build 16
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.7;AMIE;**35**;Apr 10, 1995
  ;
- ;Input: ZMSG      - Output Array for Re-Admission report (By Ref)
- ;       BDATE     - Beginning date for eport (FM Format)
- ;       EDATE     - Ending date for report (FM Format)
- ;       DVBAH     - Specifies Hospital (H) or DOM (D)
- ;       DVBADLMTR - Indicates if report should be delimitted (Optional)
- ;                    CAPRI currently executes RPC by each day in
- ;                    date range, so DVBADLMTR should equal the
- ;                    final EDATE in range so that XTMP global
- ;                    can be killed.
- ;Output: ZMSG contains delimited/non-delimited re-admission report 
-STRT(ZMSG,BDATE,EDATE,DVBAH,DVBADLMTR)    ;
- N DVBAFNLDTE
- S DVBAFNLDTE=$S(+$G(DVBADLMTR):+$P(DVBADLMTR,"."),1:0)
- S DVBADLMTR=$S('+$G(DVBADLMTR):"",1:"^")
+STRT(ZMSG,BDATE,EDATE,DVBAH)    ;
  S DVBABCNT=0
  G TERM
 SORT D RCV^DVBAVDPT I $D(RONUM),$D(RO) Q:CFLOC'=RONUM&(RO="Y")
@@ -81,9 +67,7 @@ GO I '$D(NOASK) W !!,"Looking for Pension and A&A cases ...",!!
  I '$D(NOASK) W !!,"Examining cases found for re-admissions within 185 days ...",!!
  F DVBAT="PEN","A&A" S HOSPDAYS=$S(DVBAT="PEN"&(DVBAH="H"):89,DVBAT="PEN"&(DVBAH="D"):59,1:29) F DFN=0:0 S DFN=$O(^TMP("DVBA",$J,DVBAT,DFN)) Q:DFN=""  D CAL W:'$D(NOASK) "+"
  K ^TMP("DVBA",$J,"PEN"),^TMP("DVBA",$J,"A&A")
- I '$D(^TMP("DVBA","PEN",$J))&('$D(^TMP("DVBA","A&A",$J))) D  H 2 D:$D(ZTQUEUED) KILL^%ZTLOAD G KILL^DVBAUTIL
- .N DVBAERTXT S DVBAERTXT="No data found for parameters entered."
- .W DVBAERTXT S:($G(DVBADLMTR)'="") ZMSG(DVBABCNT)=DVBAERTXT
+ I '$D(^TMP("DVBA","PEN",$J))&('$D(^TMP("DVBA","A&A",$J))) W "No data found for parameters entered." H 2 D:$D(ZTQUEUED) KILL^%ZTLOAD G KILL^DVBAUTIL
  G ^DVBAB98
  ;
 DQ K ^TMP("DVBA",$J),^TMP("DVBA","PEN",$J),^TMP("DVBA","A&A",$J)

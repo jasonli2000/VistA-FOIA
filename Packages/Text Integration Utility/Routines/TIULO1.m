@@ -10,7 +10,7 @@ LABS(DFN,TIUTEST,TIUEDT,TIULDT) ; Get Lab Results
  N TIUY,TIUTST,TIUX S TIUTST=+$O(^LAB(60,"B",TIUTEST,0))
  I '+$G(TIUTST) G LABX
  D TEST^LR7OR2(.TIUY,DFN,"",$G(TIUEDT),$G(TIULDT),"",TIUTST)
- S TIUX=$S($D(TIUY)#2:$G(@TIUY@(1)),1:"____")
+ S TIUX=$S($D(TIUY)#2:$G(@TIUY@(1)),1:"No Data Available")
  I $L(TIUX,U)>1 D
  . S TIUTST=$P(TIUX,U,4)_" "_$P(TIUX,U,6)_" "_$P(TIUX,U,5)_"    ("
  . S TIUTST=TIUTST_$$DATE^TIULS($P(TIUX,U),"MM/DD/CCYY HR:MIN")_")"
@@ -32,6 +32,12 @@ SADX Q J
 CISTZI(DFN) ;City, State, Zip
  N VAPA,J
  D ADD^VADPT
- S:$D(VAPA(4)) J=VAPA(4) S:$D(VAPA(5)) J=J_", "_$P(VAPA(5),U,2) S:$D(VAPA(6)) J=J_", "_VAPA(6)
+ S:$D(VAPA(4)) J=VAPA(4) S:$D(VAPA(5)) J=J_", "_$P(VAPA(5),U,2) S:$D(VAPA(6)) J=J_"   "_VAPA(6)
 CSTX Q J
+ ;
+CIST(DFN) ;City, State  PHI/KPM  8/23/99
+ N VAPA,J
+ D ADD^VADPT
+ S:$D(VAPA(4)) J=VAPA(4) S:$D(VAPA(5)) J=J_", "_$P(VAPA(5),U,2)
+CISX Q J
  ;

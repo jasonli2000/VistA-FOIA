@@ -1,5 +1,5 @@
 ORWD ; SLC/KCM - Utilities for Windows Dialogs ;7/2/01  13:31
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243,280**;Dec 17, 1997;Build 85
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243**;Dec 17, 1997;Build 242
  ;
 DT(Y,X) ; Returns internal Fileman Date/Time
  N %DT S %DT="TS" D ^%DT
@@ -80,6 +80,16 @@ EXTDT(X) ; Return an external date time that can be interpreted by %DT
  I $E(X)="T" Q "TODAY"_$E(X,2,255)
  I $E(X)="V" Q "NEXT VISIT"_$E(X,2,255)
  Q ""
+WRLST(Y,TYP) ; Return list of dialogs for writing orders
+ ; .Y(n): DlgName^ListBox Text
+ ;   TYP: 'I' = inpatient, 'O' = outpatient
+ N PAR,ERR,SEQ,IEN,I,X
+ S PAR=$S(TYP="I":"ORW ADDORD INPT",1:"ORW ADDORD OUTPT")
+ D GETLST^XPAR(.X,"ALL",PAR,"Q",.ERR) Q:ERR
+ S I=0 F  S I=$O(X(I)) Q:'I  D
+ . S SEQ=$P(X(I),U,1),IEN=$P(X(I),U,2)
+ . S Y(SEQ)=$P(^ORD(101.41,IEN,0),U,1)_U_$P($G(^(5)),U,4)
+ Q
 SAVE(Y,DFN,ORNP,LOC,DLG,ORWDACT,RSP) ; procedure
  ; Save order
  N ORDIALOG,ORL,ORVP,ORIFN,ORDUZ,ORSTS,ORDG,OREVENT,ORCAT,ORDA

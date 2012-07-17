@@ -1,5 +1,5 @@
 OOPSEMP2 ;WIOFO/LLH-E/E Employee CA2 data ;4/24/00
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**8,10**;Jun 01, 1998
  ;;
  ; Employee/Person Address is now only stored in the 2162A node
  ; of file 2260.  Prior to patch 3 it was stored in the CA1A and

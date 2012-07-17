@@ -1,5 +1,5 @@
 XUSNPIX5 ;OAK_BP/CMW - NPI EXTRACT REPORT ;7/7/08  17:45
- ;;8.0;KERNEL;**453,481,548**; Jul 10, 1995;Build 24
+ ;;8.0;KERNEL;**453,481**; Jul 10, 1995;Build 18
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ; NPI Extract Report Mailer routine
@@ -39,7 +39,7 @@ EMAIL(XUSRTN) ; EMAIL THE MESSAGE
  ;
  N XMY
  ; Send email to designated recipient for live release
- D MAILTO^XUSNPIX1(.XMY) ;p548
+ S XMY("XXX@Q-NPS.VA.GOV")=""
  D ESEND
  Q
  ;

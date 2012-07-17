@@ -1,5 +1,5 @@
 RORX018 ;BPOIFO/ACS - BMI BY RANGE REPORT ;11/1/09
- ;;1.5;CLINICAL CASE REGISTRIES;**10,13**;Feb 17, 2006;Build 27
+ ;;1.5;CLINICAL CASE REGISTRIES;**10**;Feb 17, 2006;Build 32
  ;
  ;
  ; This routine uses the following IAs:
@@ -8,19 +8,6 @@ RORX018 ;BPOIFO/ACS - BMI BY RANGE REPORT ;11/1/09
  ; #3647   $$EN^GMVPXRM (controlled)
  ; #5047   $$GETIEN^GMVGETVT (supported)
  ;
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*10   MAR  2010   A SAUNDERS   Routine created
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can select specific patients,
- ;                                      clinics, or divisions for the report.
- ;                                      Modified XML tags for sort.
- ;                                      
- ;******************************************************************************
- ;******************************************************************************
  Q
  ;*****************************************************************************
  ;COMPILE THE "BMI BY RANGE" REPORT
@@ -65,9 +52,6 @@ BMIRANGE(RORTSK) ;
  N ROREDT        ; report end date
  N RORPTIEN      ; IEN of patient in the ROR registry
  N DFN           ; DFN of patient in the PATIENT file (#2)
- N RORCDLIST     ; Flag to indicate whether a clinic or division list exists
- N RORCDSTDT     ; Start date for clinic/division utilization search
- N RORCDENDT     ; End date for clinic/division utilization search
  ;
  N REPORT,PARAMS,SFLAGS,RC,CNT,ECNT,UTSDT,UTEDT,SKIPSDT,SKIPEDT,RORBODY,RORPTN
  N RCC,FLAG,TMP,DFN,SKIP
@@ -130,32 +114,23 @@ BMIRANGE(RORTSK) ;
  ;task progress percentage - shown on the GUI screen
  S RORPTN=$$REGSIZE^RORUTL02(+RORREG) S:RORPTN<0 RORPTN=0
  ;
- ;=== Set up Clinic/Division list parameters
- S RORCDLIST=$$CDPARMS^RORXU001(.RORTSK,.RORCDSTDT,.RORCDENDT,1)
- ;
  ;--- Get registry records
  S (CNT,RORPTIEN,RC)=0
  S FLAG=$G(RORTSK("PARAMS","ICD9FILT","A","FILTER"))
  F  S RORPTIEN=$O(^RORDATA(798,"AC",RORREG,RORPTIEN))  Q:RORPTIEN'>0  D  Q:RC<0
- . ;--- Calculate 'progress' for the GUI display
  . S TMP=$S(RORPTN>0:CNT/RORPTN,1:"")
  . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . S CNT=CNT+1
- . ;--- Get patient DFN
- . S DFN=$$PTIEN^RORUTL01(RORPTIEN) Q:DFN'>0
- . ;check for patient list and quit if not on list
- . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",DFN)) Q
  . ;--- Check if the patient should be skipped
  . Q:$$SKIP^RORXU005(RORPTIEN,SFLAGS,SKIPSDT,SKIPEDT)
+ . ;--- Get the patient DFN
+ . S DFN=$$PTIEN^RORUTL01(RORPTIEN)  Q:DFN'>0
  . ;--- Check if patient has passed the ICD9 filter
  . S RCC=0
  . I FLAG'="ALL" D
  . . S RCC=$$ICD^RORXU010(DFN,RORREG)
  . I (FLAG="INCLUDE")&(RCC=0) Q
  . I (FLAG="EXCLUDE")&(RCC=1) Q
- . ;
- . ;--- Check for Clinic or Division list and quit if not in list
- . I RORCDLIST,'$$CDUTIL^RORXU001(.RORTSK,DFN,RORCDSTDT,RORCDENDT) Q
  . ;
  . ;--- Check for any utilization in the corresponding date range
  . S SKIP=0 I $G(UTSDT)>0 D
@@ -221,8 +196,8 @@ PATIENT(DFN,PTAG,RORDATA) ;
  D ADDVAL^RORTSK11(RORTSK,"DATE",$G(RORDATA("WDATE")),WTAG)
  ;---  Weight value
  D ADDVAL^RORTSK11(RORTSK,"RESULT",$G(RORDATA("WGT")),WTAG)
- ;---  Calculated BMI value goes on PATIENT tag
- D ADDVAL^RORTSK11(RORTSK,"BMI",$G(RORDATA("SCORE",1)),PTAG,3)
+ ;---  Calculated BMI value goes on BMIDATA tag
+ D ADDVAL^RORTSK11(RORTSK,"BMI",$G(RORDATA("SCORE",1)),BTAG,3)
  Q 1
  ;
  ;*****************************************************************************

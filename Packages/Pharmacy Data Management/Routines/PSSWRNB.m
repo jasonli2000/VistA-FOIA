@@ -1,5 +1,5 @@
 PSSWRNB ;BIR/EJW-NEW WARNING SOURCE CUSTOM WARNING LIST BUILDER ; 9/8/05 3:46pm
- ;;1.0;PHARMACY DATA MANAGEMENT;**87,98,144**;9/30/97;Build 13
+ ;;1.0;PHARMACY DATA MANAGEMENT;**87,98**;9/30/97
  ;
  ;IA: 3735 ^PSNDF(50.68
  ;IA: 4445 ^PS(50.625
@@ -19,7 +19,7 @@ SEL ;
  W !,?2,"examine or edit their drug warnings:"
  K DIR
  S DIR("B")=""
- S DIR("A")="Enter selection or '^' to exit: "
+ S DIR("A")="Enter selection: "
  S DIR("A",1)="1. Drug has WARNING LABEL filled in but there are no FDB warnings for the drug"
  S DIR("A",2)="2. Drug has WARNING LABEL numbers higher than 20"
  S DIR("A",3)="3. Select by range of drug names"
@@ -35,10 +35,10 @@ SEL ;
  N DR,ACTIVE,SKIP,QUIT,PSO9
  S SKIP=1,QUIT=0
  K ^TMP("PSSWRNB",$J)
-ASK K DIR W ! S DIR(0)="Y",DIR("B")="Y",DIR("A")="Exclude drugs with NEW WARNING LABEL LIST filled in" D ^DIR K DIR I Y["^"!($D(DTOUT)) G SEL
+ASK K DIR W ! S DIR(0)="Y",DIR("B")="Y",DIR("A")="Exclude drugs with NEW WARNING LABEL LIST filled in" D ^DIR K DIR
  I 'Y S SKIP=0
  W !!,$C(7),"NOTE: Only the first 5 warnings will print on the yellow auxillary labels."
- K DIR S DIR(0)="Y",DIR("B")="Y",DIR("A")="Do you want to see the warning text for all warnings" D ^DIR K DIR I Y["^"!($D(DTOUT)) G SEL
+  K DIR S DIR(0)="Y",DIR("B")="Y",DIR("A")="Do you want to see the warning text for all warnings" D ^DIR K DIR
  S ENDWARN=5
  I Y S ENDWARN=99 D
  .W !,"  Warnings (>5) that won't print and won't be sent to CMOP"

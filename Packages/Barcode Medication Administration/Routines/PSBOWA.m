@@ -1,5 +1,5 @@
 PSBOWA ;BIRMINGHAM/EFC-WARD ADMINISTRATION TIMES ;Mar 2004
- ;;3.0;BAR CODE MED ADMIN;**9,32,56**;Mar 2004;Build 10
+ ;;3.0;BAR CODE MED ADMIN;**9,32**;Mar 2004;Build 32
  ;Per VHA Directive 2004-038 (or future revisions regarding same), this routine should not be modified.
  ;
  ; Reference/IA
@@ -11,7 +11,7 @@ EN ;
  S PSBHDR(2)="ADMINISTRATION DATE: "_Y
  S (Y,PSBEVDT2)=$S($P(PSBRPT(.1),U,8)']"":PSBEVDT,1:$P(PSBRPT(.1),U,8)) D D^DIQ
  S PSBHDR(2)=PSBHDR(2)_" to "_Y
- F PSBIX=0:1 S PSBRPDT=$$FMADD^XLFDT(PSBEVDT,PSBIX) Q:PSBRPDT>PSBEVDT2!(PSBRPDT="-1")  D
+ F PSBIX=0:1 S PSBRPDT=$$FMADD^XLFDT(PSBEVDT,PSBIX) Q:PSBRPDT>PSBEVDT2  D
  .D:$P(PSBRPT(.1),U)="W"
  ..F X=0,.01:.01:.24 S PSBGTOT(X)=""
  ..W $$WRDHDR()
@@ -30,7 +30,7 @@ EN ;
  .....D CLEAN^PSBVT
  .....D PSJ^PSBVT(PSBX)
  .....Q:PSBSCHT'="C"  ; Not a Continuous
- .....Q:PSBOSTS'="A"&(PSBOSTS'="R")&(PSBOSTS'="O")  ; Active? - PSB*3*56 adds on call as an active status
+ .....Q:PSBOSTS'="A"&(PSBOSTS'="R")  ; Active?
  .....Q:PSBSM=1  ;Self med?
  .....S (PSBCADM,PSBYES,PSBODD)=0
  .....S PSBFREQ=$$GETFREQ^PSBVDLU1(DFN,PSBONX)
@@ -89,7 +89,7 @@ EN ;
  ...D CLEAN^PSBVT
  ...D PSJ^PSBVT(PSBX)
  ...Q:PSBSCHT'="C"  ; Not a Continuous
- ...Q:PSBOSTS'="A"&(PSBOSTS'="R")&(PSBOSTS'="O")  ; Active? - PSB*3*56 adds on call as an active status
+ ...Q:PSBOSTS'="A"&(PSBOSTS'="R")  ; Active?
  ...S (PSBCADM,PSBYES,PSBODD)=0
  ...S PSBFREQ=$$GETFREQ^PSBVDLU1(DFN,PSBONX)
  ...S:$$PSBDCHK1^PSBVT1(PSBSCH) PSBYES=1

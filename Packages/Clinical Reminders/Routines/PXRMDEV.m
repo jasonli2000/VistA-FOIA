@@ -1,5 +1,5 @@
-PXRMDEV ; SLC/PKR - This is a driver for testing Clinical Reminders.;10/20/2009
- ;;2.0;CLINICAL REMINDERS;**4,6,11,16**;Feb 04, 2005;Build 119
+PXRMDEV ; SLC/PKR - This is a driver for testing Clinical Reminders.;03/17/2008
+ ;;2.0;CLINICAL REMINDERS;**4,6,11**;Feb 04, 2005;Build 39
  ;
  ;==================================================
 CMOUT ;Do formatted Clinical Maintenance output.
@@ -37,7 +37,7 @@ DEB ;Prompt for patient and reminder by name input component.
  S PXRMITEM=+$P(Y,U,1)
  I PXRMITEM=-1 W !,"No reminder selected!" Q
  S DIR(0)="LA"_U_"0"
- S DIR("A")="Enter component number 0, 1, 5, 10, 11, 12, 55: "
+ S DIR("A")="Enter component number 0, 1, 5, 10, 11, 12: "
  D ^DIR
  I $D(DIROUT)!$D(DIRUT) Q
  I $D(DTOUT)!$D(DUOUT) Q

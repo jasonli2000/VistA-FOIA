@@ -1,5 +1,5 @@
-ONCACDU2 ;Hines OIFO/GWB - Utility routine ;03/09/11
- ;;2.11;Oncology;**12,18,20,21,22,24,26,27,29,30,31,32,34,36,37,38,39,41,46,47,49,50,51,52,53**;Mar 07, 1995;Build 31
+ONCACDU2 ;Hines OIFO/GWB - Utility routine ;06/23/10
+ ;;2.11;Oncology;**12,18,20,21,22,24,26,27,29,30,31,32,34,36,37,38,39,41,46,47,49,50,51**;Mar 07, 1995;Build 65
  ;
 VAFLD(ACDANS) ;Convert data to NAACCR format
  I ACDANS="N" S ACDANS=0
@@ -7,17 +7,11 @@ VAFLD(ACDANS) ;Convert data to NAACCR format
  I ACDANS="U" S ACDANS=9
  Q ACDANS
  ;
-VASIT() ;VISN (160.1,7) [2340-2341]
+VASIT() ;VISN 1452-1453
+ ;Output: X = VISN
  N X
  S OSPIEN=$O(^ONCO(160.1,0))
  S X=$P($G(^ONCO(160.1,OSPIEN,1)),U,7)
- K OSPIEN
- Q X
- ;
-COCACC() ;COC ACCREDITATION (160.1,68) [2547-2548]
- N X
- S OSPIEN=$O(^ONCO(160.1,0))
- S X=$P($G(^ONCO(160.1,OSPIEN,7)),U,2)
  K OSPIEN
  Q X
  ;
@@ -62,20 +56,16 @@ WORD(IEN,NODE,LEN) ;Get word processing data
 STAGE(IEN,TYPE) ;TNM Descriptors
  ;TNM Path Descriptor [910] 956-956
  ;TNM Clin Descriptor [980] 974-974
- N CD,LOC,PD,X
+ N LOC,X
  S X=""
- S CD=$$GET1^DIQ(165.5,IEN,241,"I")
- S PD=$$GET1^DIQ(165.5,IEN,242,"I")
- I TYPE="C",CD'="" S X=CD G STAGEEX
- I TYPE="P",PD'="" S X=PD G STAGEEX
  S LOC=$S(TYPE="P":89.1,TYPE="C":37,1:"")
  I TYPE'="" D
  .N STRING
  .S STRING=$$GET1^DIQ(165.5,IEN,LOC,"E")
  .I ($P(STRING," ")["m")&($P(STRING," ")["y") S X=6 Q
  .I $P(STRING," ")["m" S X=3 Q
- .I TYPE="P",$P(STRING," ")["y" S X=4 Q
-STAGEEX Q X
+ .I $P(STRING," ")["y" S X=4 Q
+ Q X
  ;
 CCOUNTY(ACD160) ;County--Current [1840] 2192-2194
  I $$DPTLRT^ONCOES(ACD160)="LRT" S X="" G CCEX
@@ -250,7 +240,7 @@ DS(IEN) ;RX Date--Surgery [1200] 755-762
  K SURGDT
  Q X
 STRIP ;Replace punctuation marks with spaces
- S ACDANS=$TR(ACDANS,"!""""@#$%&'()*+,-./:;<=>?[>]^_\{|}~`","                                    ")
+ S ACDANS=$TR(ACDANS,"!""""#$%&'()*+,-./:;<=>?[>]^_\{|}~`","                                   ")
  S ACDANS=$$TRIM^XLFSTR(ACDANS)
  Q
  ;

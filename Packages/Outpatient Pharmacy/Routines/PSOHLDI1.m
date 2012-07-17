@@ -1,5 +1,5 @@
-PSOHLDI1 ;BIR/PWC,SAB - Automated Dispense Completion HL7 v.2.4 cont. ; 5/29/09 3:28pm
- ;;7.0;OUTPATIENT PHARMACY;**259,268,330**;DEC 1997;Build 5
+PSOHLDI1 ;BIR/PWC,SAB - Automated Dispense Completion HL7 v.2.4 cont. ;10/25/06 10:04am
+ ;;7.0;OUTPATIENT PHARMACY;**259,268**;DEC 1997;Build 9
  ;Reference to ^PSD(58.8 supported by DBIA 1036
  ;Reference to ^XTMP("PSA" supported by DBIA 1036
  ;This routine is called by PSOHLDIS
@@ -29,10 +29,9 @@ BINGREL ;displays to bingo board
  S DA=ODA D STATS1^PSOBRPRT,WTIME^PSOBING1
  Q
  ;
-DRGACCT(RXP,PSOSITE) ;update Drug Accountability Package PSO*209,*330
+DRGACCT(RXP) ;update Drug Accountability Package                      ;PSO*209
  S RXP=+$G(RXP) Q:'RXP
- S PSOSITE=+$G(PSOSITE) Q:'PSOSITE    ; PSO*7*330
- N PSA,DIC,DA,DR,X,Y,DIQ,PSODA,QDRUG,QTY,JOB192
+ N PSA,DIC,DA,DR,X,Y,DIQ,PSODA,PSOSITE,QDRUG,QTY,JOB192
  S (JOB192,PSODA)=0
  ;check for Drug Acct background job
  S X="PSA IV ALL LOCATIONS",DIC(0)="MZ",DIC=19.2 D ^DIC S JOB192=Y
@@ -46,6 +45,7 @@ DRGACCT(RXP,PSOSITE) ;update Drug Accountability Package PSO*209,*330
  . . S PSODA=1
  . . S:'$P($G(^XTMP("PSA",0)),U,2) $P(^(0),U,2)=DT
  ;drug stocked in Drug Acct Location?
+ S PSOSITE=+$O(^PS(59,0))
  S PSODA(1)=$S($D(^PSD(58.8,+$O(^PSD(58.8,"AOP",PSOSITE,0)),1,+$P(^PSRX(RXP,0),U,6))):1,1:0)
  ;if appropriate update ^XTMP("PSA", for Drug Acct
  S QTY=$P($G(^PSRX(RXP,0)),"^",7)
@@ -60,8 +60,6 @@ MAIL ;Send mail message
  S XMY("G.PSO EXTERNAL DISPENSE ALERTS")=""
  ;if no members in group, then send to PSXCMOPMGR key holders
  S PSOIEN=$O(^XMB(3.8,"B","PSO EXTERNAL DISPENSE ALERTS",0))
- I $G(FLL)'="" D
- . I FLL="P" S FLLN="Partial "_FLLN
  I '$O(^XMB(3.8,PSOIEN,1,0)) D
  . S PSOKEYN=0
  . F  S PSOKEYN=$O(^XUSEC("PSXCMOPMGR",PSOKEYN)) Q:'PSOKEYN  D

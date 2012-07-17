@@ -1,24 +1,11 @@
 RORRP034 ;HIOFO/SG,VC - RPC: HIV PATIENT SAVE/CANCEL ;1/29/09 9:46am
- ;;1.5;CLINICAL CASE REGISTRIES;**2,8,14**;Feb 17, 2006;Build 24
+ ;;1.5;CLINICAL CASE REGISTRIES;**2,8**;Feb 17, 2006;Build 8
  ;Per VHA Directive 10-92-142, this routine should not be modified.
  ;
  ; This routine uses the following IAs:
  ;
  ; #2053         FILE^DIC (supported)
  Q
- ;******************************************************************************
- ;******************************************************************************
- ;                       --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*14   APR  2011   A SAUNDERS   SAVE1: Added AIDS DX - FIRST DIAGNOSED
- ;                                      (#12.08) to the data that gets saved in
- ;                                      file 799.4.  Modified logic for the
- ;                                      CLINICAL AIDS DATE (#.03) to correctly
- ;                                      handle additional values (null/0/1/9).
- ;******************************************************************************
- ;******************************************************************************
  ;
  ;***** UPDATES THE PATIENT'S REGISTRY DATA
  ; RPC: [RORICR PATIENT SAVE]
@@ -103,10 +90,8 @@ SAVE1(IENS798) ;
  . ;--- Registry data
  . I SEG="ICR"  D  Q
  . . S TMP=$P(DATA(RDI),U,3)
- . . S RORFDA(799.4,IENS798,.02)=$G(TMP) ;clinical AIDS
- . . ;S RORFDA(799.4,IENS798,.03)=$S(TMP:$P(DATA(RDI),U,4),1:"")
- . . S RORFDA(799.4,IENS798,.03)=$S($G(TMP)=1:$P(DATA(RDI),U,4),1:"") ;clinical AIDS date
- . . S RORFDA(799.4,IENS798,12.08)=$P(DATA(RDI),U,6) ;first VA site to diagnose HIV
+ . . S RORFDA(799.4,IENS798,.02)=TMP
+ . . S RORFDA(799.4,IENS798,.03)=$S(TMP:$P(DATA(RDI),U,4),1:"")
  . ;--- Local field values
  . I SEG="LFV"  D  Q
  . . S LFIEN=+$P(DATA(RDI),U,3)

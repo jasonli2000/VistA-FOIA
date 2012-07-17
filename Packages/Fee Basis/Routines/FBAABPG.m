@@ -1,20 +1,13 @@
-FBAABPG ;AISC/DMK - PURGE BATCH FILE ;11/15/2010
- ;;3.5;FEE BASIS;**117**;JAN 30, 1995;Build 9
- ;;Per VHA Directive 2004-038, this routine should not be modified.
+FBAABPG ;AISC/DMK-PURGE BATCH FILE ;01SEP89
+ ;;3.5;FEE BASIS;;JAN 30, 1995
+ ;;Per VHA Directive 10-93-142, this routine should not be modified.
  I $S('($D(DUZ)#2):1,'($D(DUZ(0))#2):1,'DUZ:1,1:0) W *7,!!,"DUZ and DUZ(0) must be defined as a valid user to run the batch purge.",!! Q
  I DUZ(0)'="@" W *7,!!,"You must have programmer access (DUZ(0)='@') before running the batch purge.",!! Q
  D DT^DICRW S Y=DT D PDF^FBAAUTL S FBPGDT=Y
  I '$D(^FBAA(161.7,"AF")) W !,*7,?7,"There are no batches finalized !!" Q
-RD W !,"This option is used to purge Fee Basis batch numbers that were"
- W !,"finalized before a specified date (at least 18 months ago)."
-SETDT W ! S %DT="AEP",%DT(0)=("-"_$$FMADD^XLFDT(DT,-549)) ; IA #10103
- S %DT("A")="Purge batch #'s PRIOR to date : "
- D ^%DT G:Y<0 END K %DT S PDAT=Y
- ;
- S DIR(0)="Y",DIR("A")="Do you want to continue",DIR("B")="NO"
- S DIR("?")="Answer ""Yes"" if you wish to proceed with Fee Basis batch number purging!"
+RD S DIR(0)="Y",DIR("A")="This option is used to purge Fee Basis batch numbers for a time frame in the    past.  Do you want to continue",DIR("B")="NO",DIR("?")="Answer ""Yes"" if you wish to proceed with Fee Basis batch number purging!"
  D ^DIR K DIR I 'Y!$D(DIRUT) G END
- ;
+SETDT W !! S %DT="AEP",%DT(0)=-DT,%DT("A")="Purge batch #'s PRIOR to date : " D ^%DT G:Y<0 END K %DT S PDAT=Y
  S VAR="PDAT^FBPGDT",VAL=PDAT_"^"_FBPGDT,PGM="START^FBAABPG" D ZIS^FBAAUTL G:FBPOP END
 START U IO W:$E(IOST,1,2)="C-" @IOF W ?15,"*** BEGIN FEE BASIS BATCH NUMBER PURGE ***",!!! S CNT=0
  F PD=0:0 S PD=$O(^FBAA(161.7,"AF",PD)) Q:PD'>0!(PD'<PDAT)  F I=0:0 S I=$O(^FBAA(161.7,"AF",PD,I)) Q:I'>0  I $D(^FBAA(161.7,I,0)) D MORE

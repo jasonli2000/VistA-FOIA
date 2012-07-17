@@ -1,5 +1,5 @@
-ORCDPS1 ;SLC/MKB-Pharmacy dialog utilities ; 12/9/2010
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**94,117,141,149,195,215,243,280,337**;Dec 17, 1997;Build 84
+ORCDPS1 ;SLC/MKB-Pharmacy dialog utilities ; 08 May 2002  2:12 PM
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**94,117,141,149,195,215,243**;Dec 17, 1997;Build 242
  ;
  ; DBIA 2418   START^PSSJORDF   ^TMP("PSJMR",$J)
  ; DBIA 3166   EN^PSSDIN        ^TMP("PSSDIN",$J)
@@ -154,16 +154,6 @@ ENCONJ ; -- Get allowable values, if req'd for INST
  S REQD=$S($O(ORDIALOG(P,INST)):1,1:0)
  S ORDIALOG(PROMPT,"A")="And/then"_$S(ORCAT="O":"/except: ",1:": ")
  S $P(ORDIALOG(PROMPT,0),U,2)="A:AND;T:THEN;"_$S(ORCAT="O":"X:EXCEPT;",1:"")
- Q
- ;
-INPCONJ ;
- N LETTER,DUR
- I $G(X)="" Q
- S LETTER=$$UP^XLFSTR($E(X,1))
- I LETTER'="T" Q
- S DUR=$$PTR("DURATION") I '$L($G(ORDIALOG(DUR,INST))) D
- .W !,"A duration is required when using a 'Then' conjunction."
- .K X
  Q
  ;
 DSUP ; -- Get max/default days supply

@@ -1,6 +1,6 @@
 PRCFSITE ;WISC/CTB/CLH/DL-RETURNS PRC* VARIABLES ; 1/29/98  1315
-V ;;5.1;IFCAP;**139**;Oct 20, 2000;Build 16
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 DIVFY ;CHECK FOR STATION AND FY
  D DUZ G:'% Q
  I $D(PRC("FY")),PRC("FY")'?2N K PRC("FY")
@@ -25,7 +25,7 @@ QTR G:PRCF("X")'["Q" SE1 W !,"Select FISCAL QUARTER: "_$S($D(PRC("QTR")):PRC("QT
  I X]"" S PRC("QTR")=X
 SE1 S X="" S:$D(PRC("SITE")) PRC("PARAM")=^PRC(411,PRC("SITE"),0)
 ISMS I $D(PRCFASYS),$D(PRC("SITE")) S:$$ISMSFLAG^PRCPUX2(PRC("SITE"))=2 PRCFASYS=PRCFASYS_"ISM"
- I PRCF("X")["B" S PRCF("SIFY")=PRC("SITE")_"-"_PRC("FY"),PRCB("LAST")=100000-($O(^PRCF(421,"AD",PRCF("SIFY"),0)))
+ I PRCF("X")["B" S PRCF("SIFY")=PRC("SITE")_"-"_PRC("FY"),PRCB("LAST")=10000-($O(^PRCF(421,"AD",PRCF("SIFY"),0)))
 OUT S %=1 K %DT,DIC,PRC("SP"),PRC("MDIV"),PRC("L"),PRC("I"),PRCF("X"),%F,A,B,X,Y Q
 FYQ ;RETURNS FY AND QTR GIVEN IN FILEMANAGER DATE IN 'X'
  G:'$D(X) Q G:X=""!($E(X,1,7)'?7N)!(+$E(X,1,7)'=$E(X,1,7)) Q S Y=$E(X,2,3),Y(1)=$E(X,4,5),PRC("FY")=$E(100+$S(+Y(1)>9:Y+1,1:Y),2,3),PRC("QTR")=$S(Y(1)<4:2,Y(1)<7:3,Y(1)<10:4,1:1) K Y S %=1 Q

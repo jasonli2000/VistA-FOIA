@@ -1,5 +1,5 @@
 OOPSWCE2 ;WIOFO/LLH-Worker's Comp CA2 Edit routine ;03/23/00
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**8,11**;Jun 01, 1998
  ;;
 CA2 ; CA2 FORM
  N ITEM

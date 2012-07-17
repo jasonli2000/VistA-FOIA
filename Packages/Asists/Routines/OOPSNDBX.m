@@ -1,5 +1,5 @@
-OOPSNDBX ;WCIOFO/LLH-Extract data to MailMan message ;10/12/99
- ;;2.0;ASISTS;;Jun 03, 2002
+OOPSNDBX ;;WCIOFO/LLH - Extract data to MailMan message
+ ;;1.0;ASISTS;**5,11,12**;Jun 01, 1998
  ;
  ; Retrieves data from ^OOPS(2260, for 2162
  ; Variables used
@@ -94,16 +94,16 @@ OP9 ; Seg OP9 - Word processing field for field 85
  S NCHAR=$L(OPSAR("2162S"))
  S NSEG=$S((NCHAR>210):4,(NCHAR>140&(NCHAR<211)):3,(NCHAR>70&(NCHAR<141)):2,1:0)
  I NCHAR D
- . S OPX="OP9^1^"_NSEG_"^"_$E(OPSAR("2162S"),1,70)_U_"|"
+ . S OPX="OP9^1^"_NSEG_"^"_$E(OPSAR("2162S"),1,70)
  . S ARR=ARR+1,MESS(ARR)=OPX,RSIZE=RSIZE+$L(OPX)+2
  I NCHAR>70 D
- . S OPX="OP9^2^"_NSEG_"^"_$E(OPSAR("2162S"),71,140)_U_"|"
+ . S OPX="OP9^2^"_NSEG_"^"_$E(OPSAR("2162S"),71,140)
  . S ARR=ARR+1,MESS(ARR)=OPX,RSIZE=RSIZE+$L(OPX)+2
  I NCHAR>140 D
- . S OPX="OP9^3^"_NSEG_"^"_$E(OPSAR("2162S"),141,210)_U_"|"
+ . S OPX="OP9^3^"_NSEG_"^"_$E(OPSAR("2162S"),141,210)
  . S ARR=ARR+1,MESS(ARR)=OPX,RSIZE=RSIZE+$L(OPX)+2
  I NCHAR>210 D
- . S OPX="OP9^4^"_NSEG_"^"_$E(OPSAR("2162S"),211,250)_U_"|"
+ . S OPX="OP9^4^"_NSEG_"^"_$E(OPSAR("2162S"),211,250)
  . S ARR=ARR+1,MESS(ARR)=OPX,RSIZE=RSIZE+$L(OPX)+2
  ;
 EXIT ; Loads the message and Quits the routine

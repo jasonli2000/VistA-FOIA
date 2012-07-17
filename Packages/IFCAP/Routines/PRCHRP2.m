@@ -1,45 +1,22 @@
 PRCHRP2 ;WISC/KMB/CR UNPAID PC TRANSACTION BY FCP ;6/05/98  11:15
- ;;5.1;IFCAP;**62**;Oct 20, 2000
+ ;;5.1;IFCAP;;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
 START ;
- N BDATE,EDATE,PODATE,PC1,ARR,XXZ,EX,CP,VEND,USER,STATUS,TDATE,EDATE,FDATE,DIR,ZP,P,X,Y,F1,F2,LINE3,TOT,PCNUM,ZTR,ZTR1
+ N PC1,ARR,XXZ,EX,CP,VEND,USER,STATUS,TDATE,EDATE,FDATE,DIR,ZP,P,X,Y,F1,F2,LINE3,TOT,PCNUM,ZTR,ZTR1
  N AMT,AMT1,LINE1,LINE2,LSTATUS,PRCST,PRCSJ,ZIP,BOC,CC,CCREC,PP,QSTATUS
  K ^TMP($J)
- ;
- W @IOF,!!,"Detailed Report of Unpaid PC Transactions by FCP"
- ;
-DATE S DIR(0)="D",DIR("A")="P.O. DATE (BEGIN RANGE) ",DIR("B")="T-30"
- D ^DIR Q:$D(DIRUT)  S BDATE=Y
- ;
- S DIR("A")="P.O. DATE (END RANGE) ",DIR("B")="T"
- D ^DIR Q:$D(DIRUT)  S EDATE=Y
- ;
- I BDATE'<EDATE,BDATE'=EDATE D  G DATE
- . W !,"Please enter a valid date range",!
- ;
- W !,"Please select a device for printing this report.",!
- ;
+ W @IOF W !,"Please select a device for printing this report.",!
  S %ZIS("B")="",%ZIS="MQ" D ^%ZIS Q:POP
- ;
- ;Queue the report
- I $D(IO("Q")) D  Q
- . S ZTRTN="DETAIL^PRCHRP2"
- . S ZTSAVE("BDATE")=""
- . S ZTSAVE("EDATE")=""
- . D ^%ZTLOAD,^%ZISC Q
- ;
+ I $D(IO("Q")) S ZTRTN="DETAIL^PRCHRP2" D ^%ZTLOAD,^%ZISC Q
  D DETAIL,^%ZISC Q
  ;
 DETAIL ;
- F ZTR=1,24,29,32,34,37,38,40,41,45,50,51 S ARR(ZTR)=""
+ F ZTR=24,29,32,34,37,38,40,41,50,51 S ARR(ZTR)=""
  U IO S U="^",(P,EX)=1,ZP="" F  S ZP=$O(^PRC(442,"F",25,ZP)) Q:ZP=""  D
- .S ZTR1=+$P($G(^PRC(442,ZP,7)),"^",2) Q:ZTR1=""
- .Q:$D(ARR(ZTR1))
  .S F1=$G(^PRC(442,ZP,0)),F2=$G(^PRC(442,ZP,1)),LINE3=$G(^PRC(442,ZP,2,1,1,1,0))
- .S (PODATE,Y)=$P(F2,"^",15)
- .I PODATE<BDATE!(PODATE>EDATE) Q
+ .S QSTATUS=+$P($G(^PRC(442,ZP,7)),"^",2) Q:QSTATUS=45
  .S STATUS=+$P($G(^PRC(442,ZP,7)),"^",1),LSTATUS=$P($G(^PRCD(442.3,STATUS,0)),"^",1)
- .S PCNUM=$P(F1,"^"),CP=$P(F1,"^",3),CP=$P(CP," ")
+ .S PCNUM=$P(F1,"^"),Y=$P(F2,"^",15),CP=$P(F1,"^",3),CP=$P(CP," ")
  .S ZTR1=+$P($G(^PRC(442,ZP,7)),"^",2) Q:$D(ARR(ZTR1))
  .Q:CP=""
  .S PC1=$P($G(^PRC(442,ZP,23)),"^",8) Q:PC1=""

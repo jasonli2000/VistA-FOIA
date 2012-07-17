@@ -1,3 +1,3 @@
-DGPTX43 ; ;12/12/07
+DGPTX43 ; ;09/27/07
  S X=DG(DQ),DIC=DIE
  S ^DGPT(DA(1),"S","AO",$E(X,1,30),DA)=""

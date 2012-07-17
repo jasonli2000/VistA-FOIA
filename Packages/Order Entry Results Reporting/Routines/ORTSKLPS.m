@@ -1,9 +1,9 @@
-ORTSKLPS ;SLC/JMH-nightly task to lapse old unsigned orders ;03/11/10  07:52
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243,280**;Dec 17, 1997;Build 85
+ORTSKLPS ;SLC/JMH-nightly task to lapse old unsigned orders ; 4/9/08 10:00am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243**;Dec 17, 1997;Build 242
  ;
 TASK ;
  ;only run between Midnight and 1:59:59 AM
- ;I $E($P($$NOW^XLFDT,".",2),1,2)>1 Q
+ I $E($P($$NOW^XLFDT,".",2),1,2)>1 Q
  ;don't run if run recently (within 4 hours)
  ;I $$FMDIFF^XLFDT($$NOW^XLFDT,$G(^XTMP("OR LAPSE ORDERS","LAST TIME")),2)<14400 Q
  ;set timestamp of last run
@@ -26,13 +26,13 @@ TASK ;
  ...S ORDISP=$P($G(^ORD(101.41,+ORDIAL,0)),U,5)
  ...I +ORDISP S ORDISP=$P($G(^ORD(100.98,+ORDISP,0)),U)
  ...;get lapse parameter for display group
- ...I $L(ORDISP) S ORPARAM=$$GET^XPAR($$ENT(ORN),"OR LAPSE ORDERS",ORDISP)
+ ...I $L(ORDISP) S ORPARAM=$$GET^XPAR("ALL","OR LAPSE ORDERS",ORDISP)
  ...;get default lapse parameter if one for display group not set
- ...I '$G(ORPARAM) S ORPARAM=$$GET^XPAR($$ENT(ORN),"OR LAPSE ORDERS DFLT")
+ ...I '$G(ORPARAM) S ORPARAM=$$GET^XPAR("ALL","OR LAPSE ORDERS DFLT")
  ...;quit if ORPARAM isn't even set
  ...Q:'$L(ORPARAM)
  ...;quit if order is not older than T-(days for lapse)
- ...I $$FMDIFF^XLFDT($$NOW^XLFDT,ORDT,2)<(ORPARAM*24*60*60) Q
+ ...I $$FMDIFF^XLFDT($$NOW^XLFDT,ORDT,1)<ORPARAM Q
  ...;if old then lapse
  ...D LAPSE^ORCSAVE2(ORN_";"_ORACT)
  ;loop through pending events
@@ -41,10 +41,3 @@ TASK ;
  .S OREVT="" F  S OREVT=$O(^ORE(100.2,"AE",ORPT,OREVT)) Q:'OREVT  D
  ..S ORPTR="" F  S ORPTR=$O(^ORE(100.2,"AE",ORPT,OREVT,ORPTR)) Q:'ORPTR  S Y=$$LAPSED^OREVNTX(ORPTR)
  Q
-ENT(ORN) ;get the proper entity for an order
- N ORRET,ORHS,ORDIV
- S ORRET="ALL"
- S ORHS=$P(^OR(100,ORN,0),U,10)
- I $G(ORHS)>0 S ORDIV=$P(^SC(+ORHS,0),U,4)
- I $G(ORDIV)>0 S ORRET=ORDIV_";DIC(4,^SYS^PKG"
- Q ORRET

@@ -1,5 +1,5 @@
 NHINVART ;SLC/MKB -- Allergy/Reaction extract
- ;;1.0;NHIN;**1**;Oct 25, 2010;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -29,23 +29,23 @@ EN(DFN,BEG,END,MAX,IFN) ; -- find patient's allergies/reactions
  ;
 EN1(ID,REAC) ; -- return a reaction in REAC("attribute")=value
  ;          from EN: expects GMRAL(ID)
- N NHY,GMRA,I,J,X,Y,SEV,TXT,NM,SEV K REAC
+ N NHY,GMRA,I,J,X,Y,SEV,TXT,SYMP,NM,SEV K REAC
  S GMRA=$G(GMRAL(ID)) D EN1^GMRAOR2(ID,"NHY")
  S X=$P(NHY,U,10) I $L(X) S X=$$DATE(X) Q:X<BEG  Q:X>END  S REAC("entered")=X
  S REAC("facility")=$$FAC^NHINV ;local stn#^name
- S REAC("id")=ID,REAC("name")=$P(NHY,U) I $P(GMRA,U,9) D
+ S REAC("id")=ID,REAC("name")=$P(GMRA,U,2) D
  . S X=$P(GMRA,U,9),Y=+$P(X,"(",2) I 'Y,X["PSDRUG" S Y=50
  . S REAC("localCode")=X,REAC("vuid")=$$VUID^NHINV(+X,Y)
- S X=$P(NHY,U,6) S:$L(X) REAC("mechanism")=X
+ ;S X=$P(GMRA,U,8) S:$L(X) REAC("mechanism")=$P(X,";")
  S X=$P(NHY,U,5),REAC("source")=$E(X)
- S REAC("adverseEventType")=$S($L(GMRA):$P(GMRA,U,7),1:$$DFO($P(NHY,U,7)))
- I $P(NHY,U,4)="VERIFIED",$P(NHY,U,9) S REAC("verified")=$P(NHY,U,9)
+ S REAC("adverseEventType")=$P(GMRA,U,7)
+ I $P(GMRA,U,4),$P(NHY,U,9) S REAC("verified")=$P(NHY,U,9)
  S I=0,SEV="" F  S I=$O(NHY("O",I)) Q:I<1  S X=$P(NHY("O",I),U,2) S:X]SEV SEV=X ;find highest severity
  S:$L(SEV) REAC("severity")=SEV
- ; reactions
+ ; reactions [index first]
+ S I=0 F  S I=$O(GMRAL(ID,"S",I)) Q:I<1  S X=$G(GMRAL(ID,"S",I)),Y=+$P(X,";",2),SYMP($P(X,";"))=Y
  S I=0 F  S I=$O(NHY("S",I)) Q:I<1  D
- . S X=NHY("S",I),NM=$P(X," (") S:NM="" NM="OTHER REACTION"
- . S Y=+$$FIND1^DIC(120.83,,"QX",NM)
+ . S X=NHY("S",I),NM=$P(X," ("),Y=+$G(SYMP(NM))
  . S REAC("reaction",I)=NM_U_$$VUID^NHINV(Y,120.83)
  ; comments
  S I=0 F  S I=$O(NHY("C",I)) Q:I<1  D
@@ -66,7 +66,6 @@ EN1(ID,REAC) ; -- return a reaction in REAC("attribute")=value
  .. D C^PSN50P65("",$P(X,U,2),"PSN")
  .. N IEN S IEN=+$O(^TMP($J,"PSN","C",$P(X,U),0))
  .. S REAC("drugClass",I)=$P(X,U,2)_U_$$VUID^NHINV(IEN,50.605)
- I GMRA="" S REAC("removed")=1 ;entered in error
  Q
  ;
 VA200(NAME) ; -- Return ien^name from #200
@@ -79,18 +78,12 @@ DATE(X) ; -- Return internal form of date X
  S %DT="TX" D ^%DT
  Q Y
  ;
-DFO(X) ; -- Return 'DFO' string for mechanism name(s)
- N I,P,Y S Y=""
- F I=1:1:$L(X,",") S P=$P(X,",",I),Y=Y_$S($E(P)=" ":$E(P,2),1:$E(P))
- S:Y="" Y=$G(X)
- Q Y
- ;
  ; ------------ Return data to middle tier ------------
  ;
 XML(REAC) ; -- Return patient reaction as XML
  ;  as <element code='123' displayName='ABC' />
  N ATT,X,Y,I,P,NM,TAG
- D ADD("<allergy>") S NHINTOTL=$G(NHINTOTL)+1
+ D ADD("<allergy>")
  S ATT="" F  S ATT=$O(REAC(ATT)) Q:ATT=""  D  D:$L(Y) ADD(Y)
  . I ATT="comment" D  S Y="" Q
  .. S I=0,Y="<comments>" D ADD(Y)

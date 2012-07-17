@@ -1,4 +1,4 @@
-GRPX71 ; ;11/21/01
+GRPX71 ; ;12/03/01
  D DE G BEGIN
 DE S DIE="^DPT(",DIC=DIE,DP=2,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DPT(DA,""))=""
  I $D(^(.3)) S %Z=^(.3) S %=$P(%Z,U,11) S:%]"" DE(8)=%

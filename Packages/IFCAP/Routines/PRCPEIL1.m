@@ -1,5 +1,5 @@
 PRCPEIL1 ;WISC/RFJ-edit inventory item (list manager) calls         ;01 Dec 93
-V ;;5.1;IFCAP;**1,142**;Oct 20, 2000;Build 5
+V ;;5.1;IFCAP;**1,127**;Oct 20, 2000;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  Q
  ;
@@ -65,7 +65,7 @@ Q1 D FULL^VALM1
  D QUANTITY^PRCPEIL0
  D COSTS^PRCPEIL0
  S VALMBCK="R"
- K ERR,%,%A,%B
+ K ERR
  Q
  ;
  ;

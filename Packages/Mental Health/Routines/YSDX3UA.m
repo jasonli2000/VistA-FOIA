@@ -1,9 +1,5 @@
-YSDX3UA ;SLC/DJP/LJA-Utilities for Diagnosis Entry in the MH Medical Record (cont.) ; 11/12/09 4:14pm
- ;;5.01;MENTAL HEALTH;**96**;Dec 30, 1994;Build 46
- ;Reference to ^VA(200, supported by DBIA #10060
- ;Reference to ^ICD9( supported by DBIA #5388
- ;Reference to ^ICDCODE APIs supported by DBIA #3990
- ;Reference to ^VDEFQM APIs supported by DBIA #4253
+YSDX3UA ;SLC/DJP/LJA-Utilities for Diagnosis Entry in the MH Medical Record (cont.) ;12/14/93 13:02
+ ;;5.01;MENTAL HEALTH;;Dec 30, 1994
  ;D RECORD^YSDX0001("^YSDX3UA") ;Used for testing.  Inactivated in YSDX0001...
  ;
 DSMLK ; Called by routine YSDX3
@@ -44,7 +40,7 @@ ICD1 ;
  ;
 ICDP ; Called by routine YSDX3A
  ;D RECORD^YSDX0001("ICDP^YSDX3UA") ;Used for testing.  Inactivated in YSDX0001...
- S S1=$P(^YSD(627.8,P2(X2),1),U),S2=$$ICDDX^ICDCODE($P(S1,";")),S2=$P(S2,U,2),YSY=1 ;ASF 04/10/09
+ S S1=$P(^YSD(627.8,P2(X2),1),U),S2=^ICD9($P(S1,";"),0),YSY=1
  QUIT
  ;
 DXLS D DXLS^YSDX3UA0
@@ -57,10 +53,9 @@ DUPL ; Called by routine YSDX3, YSDX3A
  ; Print out information concerning duplicate entry
  ;D RECORD^YSDX0001("DUPL^YSDX3UA") ;Used for testing.  Inactivated in YSDX0001...
  S W3=$P(^VA(200,$P(^YSD(627.8,W2,0),U,4),0),U)
- N YSDZX
  S Y=$P(^YSD(627.8,W2,0),U,3) D DD^%DT S W4=Y
  I YSAX=1 S YSDXND=$P(^YSD(627.7,S2,0),U),YSDXD=$P(^(0),U)
- I YSAX=3 S YSDXD=$P(^ICD9(S2,0),U) N YSDXZ S YSDZX=$$ICDD^ICDCODE(YSDXD,"YSDZX"),YSDXND=YSDZX(1) ;asf 04/10/09
+ I YSAX=3 S YSDXND=$P(^ICD9(S2,0),U,3),YSDXD=$P(^(0),U)
  S W5=$P(^YSD(627.8,W2,1),U,2)
  I W5="i" K YSDXND,YSDXD,W3,W4,W5 QUIT  ;->
  S W6=$S(W5="v":"VERIFIED",W5="p":"PROVISIONAL",W5="i":"INACTIVE",W5="r":"REFORMULATED",W5="n":"NOT FOUND",W5="ru":"RULE OUT",1:"")
@@ -78,37 +73,33 @@ FILE ; Called from routines YSDX3, YSDX3A
  S YSDUZ=$P(^VA(200,DUZ,0),U)
  W !
  S DIE=DIC,DA=YSDA,DR=".02////"_YSDFN_";.03//NOW;.04//"_YSDUZ_";.05///^S X=""`""_DUZ;1////^S X=YSDXDA;5"
- L +@(DIE_"DA)"):0
+ L +@(DIE_"DA)")
  D ^DIE
  L -@(DIE_"DA)")
- D HDRQUE(YSDA)
  S YSTOUT=$D(DTOUT) I YSTOUT D DELETE QUIT  ;->
  D CHECK QUIT:YSUOUT  ;->
  S C1=$P(^YSD(627.8,YSDA,1),U,2)
  I C1="" W !!?18,"Incomplete information." D DELETE QUIT  ;->
  S C2=$S(C1="v":"A",C1="p":"A",C1="i":"I",C1="r":"I",C1="n":"I",C1="ru":"A",1:"I")
  S DIE="^YSD(627.8,",DA=YSDA,DR="7///^S X=C2;8///NOW"
- L +^YSD(627.8,DA):0
+ L +^YSD(627.8,DA)
  D ^DIE
  L -^YSD(627.8,DA)
- D HDRQUE(YSDA)
  K DIE
  S YSTOUT=$D(DTOUT) I YSTOUT QUIT  ;->
  D CHECK QUIT:YSUOUT  ;->
  I $D(W3) D
  .  S DIE="^YSD(627.8,",DA=YSDUPDA
  .  S DR="7///^S X=""I"";8///NOW;9///^S X=""Y"""
- .  L +^YSD(627.8,DA):0
+ .  L +^YSD(627.8,DA)
  .  D ^DIE
  .  L -^YSD(627.8,DA)
- .  D HDRQUE(YSDA)
  D DXLS,DXLSQ
  S DIE="^YSD(627.8,",DA=YSDA
  S DR="10///^S X=YSDXLX;80"
- L +^YSD(627.8,DA):0
+ L +^YSD(627.8,DA)
  D ^DIE
  L -^YSD(627.8,DA)
- D HDRQUE(YSDA)
  S YSTOUT=$D(DTOUT) QUIT:YSTOUT  ;->
  D CHECK QUIT:YSUOUT  ;->
 FILEQ ;
@@ -131,11 +122,5 @@ DELETE ; Called by routine YSDX3UB
  D ^DIK
  W !!?15,"< This diagnosis deleted. >"
  QUIT
- ;
-HDRQUE(YSDA) ; patch YS*5.01*80 hdr trigger event
- N X,YSERR
- Q:'$L($T(QUEUE^VDEFQM))
- S X=$$QUEUE^VDEFQM("PPR^PC1","SUBTYPE=MTLH^IEN="_YSDA,.YSERR)
- Q
  ;
 EOR ;YSDX3UA - Utilities for Diagnosis Entry in the MH Medical Record (cont.) ;4/16/92 11:17

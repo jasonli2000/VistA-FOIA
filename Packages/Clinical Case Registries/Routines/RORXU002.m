@@ -1,5 +1,5 @@
 RORXU002 ;HCIOFO/SG - REPORT BUILDER UTILITIES ;5/18/06 11:13am
- ;;1.5;CLINICAL CASE REGISTRIES;**1,10,13**;Feb 17, 2006;Build 27
+ ;;1.5;CLINICAL CASE REGISTRIES;**1,10**;Feb 17, 2006;Build 32
  ;
  ; This routine uses the following IAs:
  ;
@@ -9,22 +9,6 @@ RORXU002 ;HCIOFO/SG - REPORT BUILDER UTILITIES ;5/18/06 11:13am
  ; #2056   $$GET1^DIQ (supported)
  ; #10103  $$NOW^XLFDT  (supported)
  ; #10104  $$TRIM^XLFSTR (supported)
- ; #417    Read access to .01 field of file #40.8 (controlled)
- ; #10040  Read access to file #44 (supported)
- ;
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*10   APR  2010   A SAUNDERS   Modified Lab Tests Ranges section in
- ;                                      PARAMS tag to include the 3 new reports.
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   Added Division and Clinic sections in
- ;                                      PARAMS tag (pulled from RORXU006).
- ;
- ;******************************************************************************
- ;******************************************************************************
  Q
  ;
  ;***** SCANS THE TABLE DEFINITION (RORSRC) FOR COLUMN NAMES
@@ -131,7 +115,7 @@ OPTXT(OPTIONS,DLGNUM) ;
  ;       >0  IEN of the PARAMETERS element
  ;
 PARAMS(RORTSK,PARTAG,STDT,ENDT,FLAGS) ;
- N BUF,ELEMENT,I,LTAG,MODE,NAME,PARAMS,RC,REGIEN,RORMSG,TMP,IEN
+ N BUF,ELEMENT,I,LTAG,MODE,NAME,PARAMS,RC,REGIEN,RORMSG,TMP
  S PARAMS=$$ADDVAL^RORTSK11(RORTSK,"PARAMETERS",,PARTAG)
  S RC=0,(ENDT,STDT)="",FLAGS=""
  ;
@@ -165,31 +149,6 @@ PARAMS(RORTSK,PARTAG,STDT,ENDT,FLAGS) ;
  ;=== Task comment
  S TMP=$$PARAM^RORTSK01("TASK_COMMENT")
  D:TMP'="" ADDVAL^RORTSK11(RORTSK,"TASK_COMMENT",TMP,PARAMS)
- ;
- ;=== Clinic Selection - patch 13
- D:$D(RORTSK("PARAMS","CLINICS","C"))
- . S LTAG=$$ADDVAL^RORTSK11(RORTSK,"CLINICS",,PARAMS)  Q:LTAG'>0
- . S IEN=0
- . F  S IEN=$O(RORTSK("PARAMS","CLINICS","C",IEN))  Q:IEN'>0  D
- . . S TMP=$$GET1^DIQ(44,IEN_",",.01,,,"RORMSG")
- . . D:$G(DIERR) DBS^RORERR("RORMSG",-9,,,44,IEN_",")
- . . Q:TMP=""
- . . D ADDVAL^RORTSK11(RORTSK,"CLINIC",TMP,LTAG,,IEN)
- D:$$PARAM^RORTSK01("CLINICS","ALL")
- . S LTAG=$$ADDVAL^RORTSK11(RORTSK,"CLINICS","ALL",PARAMS)
- ;
- ;=== Division Selection - patch 13
- D:$D(RORTSK("PARAMS","DIVISIONS","C"))
- . S LTAG=$$ADDVAL^RORTSK11(RORTSK,"DIVISIONS",,PARAMS)  Q:LTAG'>0
- . S IEN=0
- . F  S IEN=$O(RORTSK("PARAMS","DIVISIONS","C",IEN))  Q:IEN'>0  D
- . . S TMP=$$GET1^DIQ(40.8,IEN_",",.01,,,"RORMSG")
- . . D:$G(DIERR) DBS^RORERR("RORMSG",-9,,,40.8,IEN_",")
- . . Q:TMP=""
- . . D ADDVAL^RORTSK11(RORTSK,"DIVISION",TMP,LTAG,,IEN)
- D:$$PARAM^RORTSK01("DIVISIONS","ALL")
- . S LTAG=$$ADDVAL^RORTSK11(RORTSK,"DIVISIONS","ALL",PARAMS)
- ;
  ;
  ;=== Patient selection and Options
  F NAME="PATIENTS","OPTIONS"  D  Q:RC<0

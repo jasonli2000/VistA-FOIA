@@ -1,5 +1,5 @@
 NHINVPT ;SLC/MKB -- Patient demographics extract
- ;;1.0;NHIN;**1**;Dec 01, 2009;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -30,10 +30,10 @@ EN(DFN,BEG,END,MAX,ID) ; -- find current patient demographics
  ;
 DEM ;-demographic data
  N VADM,VA,VAERR,X
- S X=+$$GETICN^MPIF001(DFN) S:X>1 PAT("icn")=X
+ S PAT("id")=DFN,PAT("icn")=+$$GETICN^MPIF001(DFN)
  D DEM^VADPT S X=VADM(1),PAT("fullName")=X
  S PAT("familyName")=$P(X,","),PAT("givenNames")=$P(X,",",2,99)
- S PAT("ssn")=$P(VADM(2),U),PAT("id")=DFN
+ S PAT("ssn")=$P(VADM(2),U)
  S:$D(VA("BID")) PAT("bid")=$E(X)_VA("BID")
  S PAT("dob")=+$P($P(VADM(3),U),".")
  S PAT("gender")=$P(VADM(5),U)
@@ -108,8 +108,7 @@ FAC ;-treating facilities [see FACLIST^ORWCIRN]
  N IFN S DFN=+$G(DFN) Q:DFN<1
  N NHINY,HOME,I,X,IEN
  I $L($T(TFL^VAFCTFU1)) D TFL^VAFCTFU1(.NHINY,DFN)
- I $P($G(NHINY(1)),U)<0 D  Q  ;not setup
- . S X=$$SITE^VASITE,PAT("facility",+X)=$P(X,U,3)_U_$P(X,U,2)
+ Q:$P($G(NHINY(1)),U)<0  ;not setup
  S HOME=+$P($G(^DPT(DFN,"MPI")),U,3) ;home facility
  S I=0 F  S I=$O(NHINY(I)) Q:I<1  D
  . S X=NHINY(I) Q:$P(X,U)=""  ;unknown
@@ -141,7 +140,7 @@ INPT ;-current inpt status data
 XML(ITEM) ; -- Return patient data as XML in @NHIN@(n)
  ; as <element code='123' displayName='ABC' />
  N ATT,X,Y,I,ID
- D ADD("<patient>") S NHINTOTL=$G(NHINTOTL)+1
+ D ADD("<patient>")
  S ATT="" F  S ATT=$O(ITEM(ATT)) Q:ATT=""  D  D:$L(Y) ADD(Y)
  . I ATT="exposures" D:X["1"  S Y="" Q
  .. S I=0,Y="<exposures>" D ADD(Y)

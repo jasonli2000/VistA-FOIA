@@ -1,15 +1,11 @@
-PRCEFIS5 ;WISC/CTB/CLH-DISPLAY 1358 TRANSACTIONS ;05/19/94
-V ;;5.1;IFCAP;**148**;Oct 20, 2000;Build 5
- ;Per VHA Directive 2004-038, this routine should not be modified.
- N PO,PODA,PRCFA,PRC410
+PRCEFIS5 ;WISC/CTB/CLH-DISPLAY 1358 TRANSACTIONS ; 05/19/94  9:22 AM
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
+ N PO,PODA,PRCFA
  I '$D(PRC("SITE")) N PRC,% S PRCF("X")="AS" D ^PRCFSITE Q:'%
 EN1 N Y,DIR,PRCFAUTH,ZTSAVE,ZTRTN,ZTDESC
  D HILO^PRCFQ
  I '$D(PO(0)) N PODA D OBLK^PRCH58OB(.PODA) Q:'PODA  D PO^PRCH58OB(PODA,.PO) Q:$G(PO(0))=""  S PRCFA("PODA")=PODA
- S PRC410(1)=$G(^PRCS(410,+$P($G(PO(0)),"^",12),1)),PRC410(11)=$G(^(11))
- W !!,"SERVICE START DATE: ",$$FMTE^XLFDT($P(PRC410(1),"^",6),"2DZ"),"     SERVICE END DATE: ",$$FMTE^XLFDT($P(PRC410(1),"^",7),"2DZ")
- W !,"AUTHORITY: ",$P($G(^PRCS(410.9,+$P(PRC410(11),"^",4),0)),"^")," ",$P($G(^(0)),"^",2)
- W:$P(PRC410(11),"^",5) !,"SUB: ",$P($G(^PRCS(410.9,+$P(PRC410(11),"^",5),0)),"^")," ",$P($G(^(0)),"^",2) W !
  S DIR("A")="Do you wish to view the Authorization information",DIR("B")="No",DIR(0)="YO",DIR("?")="Enter YES to view authorization information" D ^DIR Q:Y["^"  K DIR S:Y=1 PRCFAUTH=""
  S ZTSAVE("PO*")="",ZTSAVE("PR*")="",ZTSAVE("PRCFAUTH")="",ZTDESC="DISPLAY 1358 "_$P(PO(0),"^"),ZTRTN="Q^PRCEFIS5" D ^PRCFQ
  Q

@@ -1,5 +1,5 @@
-ORWDX ; SLC/KCM/REV/JLI - Order dialog utilities ;09/08/2008 [2/11/09 8:00am]
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,125,131,132,141,164,178,187,190,195,215,246,243,283,296,280**;Dec 17, 1997;Build 85
+ORWDX ; SLC/KCM/REV/JLI - Order dialog utilities ;11/28/2006
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,125,131,132,141,164,178,187,190,195,215,246,243,283,296**;Dec 17, 1997;Build 19
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;Reference to DIC(9.4 supported by IA #2058
  ;
@@ -13,8 +13,9 @@ ORDITM(Y,FROM,DIR,XREF) ; Subset of orderable items
  . . S X=^ORD(101.43,XREF,FROM,IEN)
  . . I +$P(X,U,3),$P(X,U,3)<CURTM Q
  . . Q:$P(X,U,5)  S I=I+1
- . . I 'X S Y(I)=IEN_U_$P(X,U,2)_U_$P(X,U,2)
- . . E  S Y(I)=IEN_U_$P(X,U,2)_$C(9)_"<"_$P(X,U,4)_">"_U_$P(X,U,4)
+ . . I XREF="S.IVA RX"!(XREF="S.IVB RX") S DEFROUTE=$P($G(^ORD(101.43,IEN,"PS")),U,8)
+ . . I 'X S Y(I)=IEN_U_$P(X,U,2)_U_$P(X,U,2)_U_DEFROUTE
+ . . E  S Y(I)=IEN_U_$P(X,U,2)_$C(9)_"<"_$P(X,U,4)_">"_U_$P(X,U,4)_U_DEFROUTE
  Q
 ODITMBC(Y,XREF,ODLST) ;
  N CNT,NM,XRF
@@ -160,24 +161,21 @@ SEND1 N ORVP,ORWI,ORWERR,ORWREL,ORWSIG,ORWNATR,ORDERID,ORBEF,ORLR,ORLAB,X,I
  . I ORWSIG'=2 S X=X_"S"
  . S $P(ORWLST(ORWI),U,2)=X
  I $G(ORLAB) D BTS^ORMBLD(ORVP)
- I $D(ORWLST)>9 D
- . N I,A
- . S I=0 F  S I=$O(ORWLST(I)) Q:I=""  S A=$G(ORWLST(I)) I A["Invalid Procedure, Inactive, no Imaging Type" D SM^ORWDX2(A)
-  Q
+ Q
 DLGID(VAL,ORIFN) ; return dlg IEN for order
  S VAL=$P(^OR(100,+ORIFN,0),U,5)
  S VAL=$S($P(VAL,";",2)="ORD(101.41,":+VAL,1:0)
  Q
-FORMID(VAL,ORIFN) ; Base dlg FormID for an order
+FORMID(VAL,ORIFN)  ; Base dlg FormID for an order
  N DLG
  S VAL=0,DLG=$P(^OR(100,+ORIFN,0),U,5)
  Q:$P(DLG,";",2)'="ORD(101.41,"
  D FORMID^ORWDXM(.VAL,+DLG)
  Q
-AGAIN(VAL,DLG) ; return true to keep dlg for another order
+AGAIN(VAL,DLG)  ; return true to keep dlg for another order
  S VAL=''$P($G(^ORD(101.41,DLG,0)),U,9)
  Q
-DGRP(VAL,DLG) ; Display grp pointer for a dlg
+DGRP(VAL,DLG)   ; Display grp pointer for a dlg
  S DLG=$S($E(DLG)="`":+$P(DLG,"`",2),1:$O(^ORD(101.41,"AB",DLG,0))) ;kcm
  S VAL=$P($G(^ORD(101.41,DLG,0)),U,5)
  Q

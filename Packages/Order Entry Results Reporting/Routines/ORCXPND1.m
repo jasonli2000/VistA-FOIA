@@ -1,5 +1,5 @@
-ORCXPND1 ; SLC/MKB - Expanded Display cont ;08/31/09  09:18
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**26,67,75,89,92,94,148,159,188,172,215,243,280**;Dec 17, 1997;Build 85
+ORCXPND1 ; SLC/MKB - Expanded Display cont ; 04/25/2007
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**26,67,75,89,92,94,148,159,188,172,215,243**;Dec 17, 1997;Build 242
  ;
  ; External References
  ;   DBIA  2387  ^LAB(60
@@ -23,7 +23,7 @@ ORCXPND1 ; SLC/MKB - Expanded Display cont ;08/31/09  09:18
  ;   DBIA 10061  OAD^VADPT
  ;   DBIA 10103  $$FMTE^XLFDT
  ;   DBIA  4408  DISP^DGIBDSP
- ;
+ ;                       
 COVER ; -- Cover Sheet
  N PKG S PKG=$P($G(^TMP("OR",$J,ORTAB,"IDX",NUM)),U,4)
  D ALLERGY^ORCXPND2:PKG="GMRA",NOTES:PKG="TIU"
@@ -48,7 +48,7 @@ MEDS ; -- Pharmacy
 LABS ; -- Laboratory [RESULTS ONLY for ID=OE order #]
  N ORIFN,X,SUB,TEST,NAME,SS,IDE,IVDT,TST,CCNT,ORCY,IG,TCNT
  K ^TMP("LRRR",$J)  ;DBIA 2503
- I (ID?2.5E1" "2N1" "1.N1"-"7N1"."1.4N)!(ID?2.5E1" "2N1" "1.N1"-"7N) D AP^ORCXPND3 Q  ;ID=Accession #-Date/time specimen taken
+ I (ID?2.5U1" "2N1" "1.N1"-"7N1"."1.4N)!(ID?2.5U1" "2N1" "1.N1"-"7N) D AP^ORCXPND3 Q  ;ID=Accession #-Date/time specimen taken
  S ORIFN=+ID,IDE=$G(^OR(100,+ID,4)) Q:'$L(IDE)  ; OE# -> Lab#
  I +IDE  D RR^LR7OR1(+ORVP,IDE) I '$D(^TMP("LRRR",$J,+ORVP)) S $P(IDE,";",1,3)=";;" ;Order possibly purged, reset to lookup on file 63
  I '+IDE,$P(IDE,";",5)  D RR^LR7OR1(+ORVP,,9999999-$P(IDE,";",5),9999999-$P(IDE,";",5),$P(IDE,";",4))

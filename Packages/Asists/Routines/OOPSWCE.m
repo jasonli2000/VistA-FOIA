@@ -1,8 +1,8 @@
 OOPSWCE ;WIOFO/LLH-Workers Comp Edit routine ;3/23/00
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**8,11**;Jun 01, 1998
  ;;
 EN1(CALLER) ;  Main Entry Point
- N CA,CASIGN,DIC,DONE,FORM,IEN,OOPS,OUT,SIGN,SSN,SUP,X,WOK,WCPDO
+ N CA,CASIGN,DIC,DONE,FORM,IEN,OOPS,OUT,SIGN,SSN,SUP,X,WOK
  S (DONE,OUT,IEN)=0
  S WOK=1                            ; to set cross reference
  Q:DUZ<1
@@ -118,24 +118,12 @@ SUPSIGN ; Sign/validate Document
  . I $G(ES)'="" S $P(^OOPS(2260,IEN,ES),U,4,6)=SUPSIGN
  Q
 SIGNS(FORM) ;
- N PAYPLAN,DA,DIE,DR,VALID
+ N DA,DIE,DR,VALID
  S VALID=0,SIGN=""
- S PAYPLAN=$$GET1^DIQ(2260,IEN,63)
  I '$P($$EDSTA^OOPSUTL1(IEN,"S"),U,CA) D  Q        ; Super hasn't signed
  . W !!,"Supervisor has not signed "_FORM
  D VALIDATE^OOPSUTL4(IEN,FORM,"W",.VALID)
  I 'VALID Q
- ; V2.0 1/9/02 - fixes for Fee Basis, Non-Paid Employees
- I $$GET1^DIQ(2260,IEN,2,"I")=6 D  Q
- .W !,"This person is not in the PAID Employee File and does not appear "
- .W !,"eligible to submit a claim to DOL.  Please check with your"
- .W !,"Human Resources Department for assistance.  Sending a paper"
- .W !,"hardcopy may be necessary, if allowable."
- I (PAYPLAN="OT"),'$$VALEMP^OOPSUTL6 D  Q
- .W !,"This person does not appear to be eligible for submitting a claim"
- .W !,"to DOL, please review the RETIREMENT, GRADE, STEP, PAY"
- .W !,"PLAN, PAY RATE and PAY RATE PER Fields.  You may need to"
- .W !,"contact your Human Resources Department or IRM for assistance."
  N DIR,Y
  W !
  S DIR("A")="OK to transmit to DOL"
@@ -153,10 +141,8 @@ SIGNS(FORM) ;
 CLRFLDS ; Clear Supervisor Signature fields
  N DR,DA,DIE
  ; Clear Supervisor Signature
- ; Added next line for ASISTS V2.0 11/09/01
- I '$$BROKER^XWBLIB D
- . W !!,"Worker's Comp edit of special fields occurred, Supervisor"
- . W !,"signature fields cleared, you will need to sign as Supervisor."
+ W !!,"Worker's Comp edit of special fields occurred, Supervisor"
+ W !,"signature fields cleared, you will need to sign as Supervisor."
  D CLRES^OOPSUTL1(IEN,"S",FORM)
  ; If get in this subroutine, need to set flag that Super needs to
  ; be notified of edits even if user ^'s out

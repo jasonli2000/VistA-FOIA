@@ -1,5 +1,5 @@
-ORCSAVE ;SLC/MKB/JDL-Save ;07/08/10  11:46
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**7,56,70,73,92,94,116,141,163,187,190,195,243,303,293,280**;Dec 17, 1997;Build 85
+ORCSAVE ;SLC/MKB/JDL-Save ; 7/24/07 9:54am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**7,56,70,73,92,94,116,141,163,187,190,195,243,303**;Dec 17, 1997;Build 3
  ;Per VHA Directive 2004-038, this routine should not be modified.
 NEW(ORDIALOG,ORDG,ORPKG,ORCAT,OREVENT,ORDUZ,ORLOG) ; -- New order
  ; Returns ORIFN = [new] order number, if created/saved
@@ -9,7 +9,7 @@ NEW(ORDIALOG,ORDG,ORPKG,ORCAT,OREVENT,ORDUZ,ORLOG) ; -- New order
 XX ; -- save new/unreleased edited order into Orders file
  ;    Requires: ORDIALOG() = array of dialog values
  ;              ORIFN      = IFN of original order that was edited
- ;
+ ;  
  N OLDIFN S ORIFN=+ORIFN,OLDIFN=0
  I $S($P(^OR(100,ORIFN,3),U,3)=11:0,$P(^(3),U,3)'=10:1,$P(^(8,1,0),U,4)=2:0,1:1) S OLDIFN=ORIFN K ORIFN ; create new order if released or delayed&signed
  D EN Q:'ORIFN  S:'$G(ORDA) ORDA=1
@@ -21,7 +21,7 @@ XX ; -- save new/unreleased edited order into Orders file
  . N OLDEVT,OLDSTS,LSTACT,PATID,NOW,WHEN
  . S (OLDEVT,OLDSTS,LSTACT)=0
  . S NOW=$$NOW^XLFDT
- . S OLDEVT=$P(^OR(100,+OLDIFN,0),U,17),OLDSTS=$P(^OR(100,+OLDIFN,3),U,3)
+ . S OLDEVT=$P(^(0),U,17),OLDSTS=$P(^(3),U,3)
  . ; Active status = 6 from #100.01
  . I (OLDEVT>0),OLDSTS=6 D
  . . S $P(^OR(100,+ORIFN,0),U,17)=OLDEVT
@@ -37,7 +37,7 @@ XX ; -- save new/unreleased edited order into Orders file
 RN ; -- save new/unreleased renewal order into Orders file
  ;    Requires: ORDIALOG() = array of new dialog values
  ;              ORIFN      = IFN of original order that was renewed
- ;
+ ; 
  N OLDIFN S OLDIFN=+ORIFN K ORIFN
  D EN Q:'ORIFN  S:'$G(ORDA) ORDA=1
  S $P(^OR(100,ORIFN,3),U,5)=OLDIFN,$P(^(3),U,11)=2
@@ -49,7 +49,7 @@ EN ; -- save new/unreleased order in ORDIALOG() into Orders file
  ;    If defined: ORCAT,ORPKG,ORDG,ORLOG,ORDUZ,OREVENT,ORDCNTRL,ORSRC
  ;     (else use values from ORDIALOG and current state)
  ;
- N PKG,NOW,NODE,CNT,CDL,I,X,STS,SIGNREQD,LOC,TRSPEC,NATR,CATG,DG,LOG,USR,TYPE,ORK
+ N PKG,NOW,NODE,CNT,CDL,I,X,STS,SIGNREQD,LOC,TRSPEC,NATR,CATG,DG,LOG,USR,TYPE
  Q:'$G(ORVP)  Q:'$G(ORDIALOG)  Q:'$D(^ORD(101.41,+ORDIALOG,0))
  S NOW=$$NOW^XLFDT,SIGNREQD=+$P(^ORD(101.41,+ORDIALOG,0),U,6)
  S CATG=$S($L($G(ORCAT)):ORCAT,1:$S($$INPT^ORCD:"I",1:"O"))
@@ -93,41 +93,18 @@ EN2 S ORIFN=+ORIFN D RESPONSE ; save responses
  . S I=$O(^OR(100,ORIFN,4.5,"ID","CLASS",0))
  . I I S X=$G(^OR(100,ORIFN,4.5,+I,1)) S:"^I^O^"[(U_X_U) $P(NODE,U,12)=X
  S $P(^OR(100,ORIFN,3),U)=NOW
- D DELOCC^OROCAPI1(ORIFN,"ACCEPTANCE_CPRS")
- I $G(ORCHECK) D  ; save order checks
+ K ^OR(100,ORIFN,9) I $G(ORCHECK) D  ; save order checks
  . S (CNT,CDL)=0 F  S CDL=$O(ORCHECK("NEW",CDL)) Q:CDL'>0  S I=0 D
- . . F  S I=$O(ORCHECK("NEW",CDL,I)) Q:I'>0  D
- . . . I $D(ORCHECK("NEW",CDL,I,0)) D
- . . . . N J S J=0,ORCHECK("NEW",CDL,I)=ORCHECK("NEW",CDL,I,J) F  S J=$O(ORCHECK("NEW",CDL,I,J)) Q:'J  S ORCHECK("NEW",CDL,I)=ORCHECK("NEW",CDL,I)_ORCHECK("NEW",CDL,I,J)
- . . . S X=ORCHECK("NEW",CDL,I)
- . . . S ORK(I,1)=+ORIFN_U_"ACCEPTANCE_CPRS"_U_DUZ_U_$$NOW^XLFDT_U_$P(X,U)_U_CDL
- . . .; S ORK(I,2)=$E($P(X,U,3),1,500)
- . . . S ORK(I,2)=$P(X,U,3)
- . . . I $E(ORK(I,2),0,2)="||" D
- . . . . N ORGLOB,ORRULE,ORI
- . . . . S ORGLOB=$P($P(ORK(I,2),"||",2),"&"),ORRULE=$P($P(ORK(I,2),"||",2),"&",2)
- . . . . S ORK(I,2)=ORRULE
- . . . . S ORI=0 F  S ORI=$O(^TMP($J,"ORK XTRA TXT",ORGLOB,ORRULE,ORI)) Q:'ORI  S ORK(I,2,ORI)=^TMP($J,"ORK XTRA TXT",ORGLOB,ORRULE,ORI)
- . I $D(ORK) D
- . . N OCRET,ORKI
- . . D SAVEOC^OROCAPI1(.ORK,.OCRET)
- . . S ORKI=0 F  S ORKI=$O(ORK(ORKI)) Q:'ORKI  D
- . . . N OCINST,OCTXT S OCTXT=$G(ORK(ORKI,2))
- . . . S OCINST=$O(OCRET(ORKI,0))
- . . . N ORMONOI,ORMONOQ S ORMONOI=0,ORMONOQ=0 F  Q:ORMONOQ=1  S ORMONOI=$O(^TMP($J,"ORMONOGRAPH",ORMONOI)) Q:'ORMONOI  D
- . . . . I OCTXT[$G(^TMP($J,"ORMONOGRAPH",ORMONOI,"OC")) D
- . . . . . S ORMONOQ=1
- . . . . . S ^ORD(100.05,OCINST,17)=^TMP($J,"ORMONOGRAPH",ORMONOI,"INT")
- . . . . . M ^ORD(100.05,OCINST,16)=^TMP($J,"ORMONOGRAPH",ORMONOI,"DATA")
- . . . . . S ^ORD(100.05,OCINST,16,0)="^^"_$O(^ORD(100.05,OCINST,16,""),-1)_U_$O(^ORD(100.05,OCINST,16,""),-1)_U_+$$NOW^XLFDT_U
- . . K ^TMP($J,"ORMONOGRAPH")
- . . K ^TMP($J,"ORK XTRA TXT")
+ . . F  S I=$O(ORCHECK("NEW",CDL,I)) Q:I'>0  S X=ORCHECK("NEW",CDL,I) D
+ . . . S CNT=CNT+1,^OR(100,ORIFN,9,"B",+X,CNT)=""
+ . . . S ^OR(100,ORIFN,9,CNT,0)=$P(X,U,1,2),^(1)=$E($P(X,U,3),1,245)
+ . S:CNT ^OR(100,ORIFN,9,0)="^100.09PA^"_CNT_U_CNT
  K ORDEA
 ENQ Q
  ;
 NEXTIFN() ; -- Returns next available ORIFN
  N I,HDR,LAST,TOTAL,DA
- L +^OR(100,0):$S($G(DILOCKTM)>0:DILOCKTM,1:5)
+ F I=1:1:10 L +^OR(100,0):1 Q:$T  H 2
  I '$T Q "^"
  S HDR=$G(^OR(100,0)),TOTAL=+$P(HDR,U,4),LAST=$O(^OR(100,"?"),-1)
  S I=LAST\1 F I=(I+1):1 Q:'$D(^OR(100,I,0))
@@ -163,9 +140,9 @@ R1 ; [Reset] Orderables
 RESUME(IFN) ; -- add Response nodes for RESUME tray service
  ; S ^OR(100,+IFN,4.5,<next>,0)=DT_"^^^RESUME",^(1)=1
  ;
- N X,Y,DA,DIC,DLAYGO
+ N X,Y,DA,DIC
  S DIC="^OR(100,"_+IFN_",4.5,",DIC(0)="LX",DA(1)=+IFN,X=DT
- S DIC("DR")=".04///RESUME",DIC("P")=$P(^DD(100,4.5,0),U,2),DLAYGO=100
+ S DIC("DR")=".04///RESUME",DIC("P")=$P(^DD(100,4.5,0),U,2)
  D ^DIC S:Y ^OR(100,+IFN,4.5,+Y,1)=1
  Q
  ;

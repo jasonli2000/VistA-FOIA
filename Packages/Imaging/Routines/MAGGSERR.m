@@ -1,5 +1,5 @@
 MAGGSERR ;WOIFO/GEK - IMAGING ERROR TRAP, AND ERROR LOG ; [ 12/27/2000 10:49 ]
- ;;3.0;IMAGING;**7**;Jul 12, 2002
+ ;;3.0;IMAGING;**7**;Apr 17, 2002
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -42,18 +42,15 @@ ERR ; ERROR TRAP FOR String Return variables
  D LOGERR(ERR)
  D @^%ZOSF("ERRTN")
  Q
-LOGERR(ERROR,MAGSESS) ;
- N SESSIEN
- S SESSIEN=$S($G(MAGSESS):MAGSESS,$D(MAGJOB("SESSION")):MAGJOB("SESSION"),1:0)
- I 'SESSIEN Q
+LOGERR(ERROR) ;
+ Q:'$G(MAGJOB("SESSION"))
  N MAGGFDA,MAGXERR,MAGXIEN,MAGNODE
- S MAGNODE="+1,"_+SESSIEN_","
+ S MAGNODE="+1,"_+MAGJOB("SESSION")_","
  ;S MAGNODE="+1,10,"
  S MAGGFDA(2006.823,MAGNODE,.01)=ERROR
  D UPDATE^DIE("","MAGGFDA","MAGXIEN","MAGXERR")
  ; error flag for this session in workstation file
- I $G(MAGJOB("WRKSIEN")) D
- . S MAGNODE=+MAGJOB("WRKSIEN")_","
- . S MAGGFDA(2006.81,MAGNODE,11)=+MAGXIEN(1) ;
- . D UPDATE^DIE("","MAGGFDA","MAGXIEN","MAGXERR")
+ S MAGNODE=+MAGJOB("WRKSIEN")_","
+ S MAGGFDA(2006.81,MAGNODE,11)=+MAGXIEN(1) ;
+ D UPDATE^DIE("","MAGGFDA","MAGXIEN","MAGXERR")
  Q

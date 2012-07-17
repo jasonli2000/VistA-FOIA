@@ -1,4 +1,4 @@
-IBXSC52 ; ;02/03/08
+IBXSC52 ; ;01/04/08
  D DE G BEGIN
 DE S DIE="^DGCR(399,D0,""OC"",",DIC=DIE,DP=399.041,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^DGCR(399,D0,"OC",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=% S %=$P(%Z,U,2) S:%]"" DE(2)=% S %=$P(%Z,U,3) S:%]"" DE(4)=% S %=$P(%Z,U,4) S:%]"" DE(8)=%
@@ -69,7 +69,7 @@ X2 S %DT="EX" D ^%DT S X=Y K:DT<X!(2000101>X) X
  Q
  ;
 3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X3 I $P($G(^DGCR(399.1,+^DGCR(399,DA(1),"OC",DA,0),0)),U,9)'=2 S Y="@554"
+X3 I $P(^DGCR(399,DA(1),0),U,19)'=2 S Y="@554"
  Q
 4 S DW="0;3",DV="P5'",DU="",DLB="STATE",DIFLD=.03
  S DU="DIC(5,"

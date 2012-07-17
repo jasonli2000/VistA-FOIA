@@ -1,5 +1,5 @@
 ORWRP ; ALB/MJK,dcm Report Calls ; 12/05/02 11:03
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**1,10,85,109,132,160,194,227,215,262,243,280**;Dec 17, 1997;Build 85
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**1,10,85,109,132,160,194,227,215,262,243**;Dec 17, 1997;Build 242
  ;
 LABLIST(LST) ; -- report list for labs tab
  ;  RPC: ORWRP LAB REPORT LIST
@@ -47,7 +47,7 @@ GETRPTS(ROOT,EOF) ; -- get report list
  D SETITEM(.ROOT,"$$END")
  Q
 GETHS(ROOT,EOF) ; --get health summary types
- N C,I,IFN,ORHSPARM,ORHSROOT,ORERR,X,T
+ N C,I,IFN,ORHSPARM,ORERR,X,T
  K ^TMP("ORHSPARM",$J)
  S ORHSROOT="^TMP(""ORHSPARM"",$J)"
  I $$GET^XPAR("ALL","ORWRP HEALTH SUMMARY LIST ALL",1) S I="",C=0 D
@@ -72,11 +72,12 @@ DTLIST ; -- list of date ranges
  ;<number of days>^ <display text>
  ;;S^Date Range...
  ;;0^Today
- ;;7^One Week
- ;;30^One Month
- ;;180^Six Months
- ;;365^One Year
- ;;732^Two Year
+ ;;7^One Week Back
+ ;;14^Two Weeks Back
+ ;;30^One Month Back
+ ;;180^Six Months Back
+ ;;365^One Year Back
+ ;;732^Two Years Back
  ;;50000^All Results
  ;;$$END
  ;

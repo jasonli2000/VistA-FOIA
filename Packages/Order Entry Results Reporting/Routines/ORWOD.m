@@ -1,5 +1,5 @@
-ORWOD ; SLC/GSS - Utility for Order Dialogs ; 7/24/09 9:55am
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243,296,280**;DEC 17, 1997;Build 85
+ORWOD ; SLC/GSS - Utility for Order Dialogs ; 7/24/07 9:55am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243,296**;DEC 17, 1997;Build 19
  ;
  ; DBIA 5133: reading ^PXRMD file #801.41
  ; 
@@ -125,11 +125,6 @@ NTRY ;Compiling report
  .. Q:ODALIMIT?1"for "1.2N1" hours"
  .. D XSET S ^TMP("OR",$J,"QO",ANCSTR,$P(REC,U),5,1,0)=RC,HIT=1
  . ;
- . ;AGP If IV TYPE="C" and the numbers Additive Frequency do not match the number
- . ;of additives
- . I ODATYPE="C",$$IVADFCHK^ORWDXM3(.ORDIALOG)=0 D
- ..D XSET S ^TMP("OR",$J,"QO",ANCSTR,$P(REC,U),8,1,0)=RC,HIT=1
- . ;
  . ; Go get next Order Dialog entry if no problems
  . I 'HIT Q
  . ;
@@ -179,7 +174,6 @@ MAILSU ;Set-up MAILMAN variables and format ^TMP("OR",$J,"MAIL")
  ;Group 5/E="IV LIMIT OR DURATION (LIMITATION) WAS NOT NULL OR INTEGER"
  ;Group 6/F="ORDER DIALOGS WITH 'MM' IN THE DISPLAY TEXT"
  ;Group 7/G="AUTO-ACCEPT QUICK ORDER WAS 'Y'es, NOW SET TO 'N'o"
- ;Group 8/H="Number of IV Bags and additives do not matches"
  ;
  D NTRY^ORWOD1
  S ODQONAME="@",SPC="                            ",QOTOT=0

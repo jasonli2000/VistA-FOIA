@@ -1,4 +1,4 @@
-MCARORP ; GENERATED FROM 'MCRHPHYS1' PRINT TEMPLATE (#1008) ; 10/04/96 ; (FILE 701, MARGIN=80)
+MCARORP ; GENERATED FROM 'MCRHPHYS1' PRINT TEMPLATE (#2076) ; 07/22/97 ; (FILE 701, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(1008,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(2076,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D T Q:'DN  D N D N D N:$X>0 Q:'DN  W ?0 W "Physical Examination"
  D T Q:'DN  D N D N D N:$X>0 Q:'DN  W ?0 W "General:"
  D N:$X>39 Q:'DN  W ?39 W "LYMPH NODE ENLARGEMENT:"

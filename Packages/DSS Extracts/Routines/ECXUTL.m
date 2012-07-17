@@ -1,5 +1,5 @@
-ECXUTL ;ALB/JAP - Utilities for DSS Extracts ; 11/23/10 1:58pm
- ;;3.0;DSS EXTRACTS;**1,5,8,84,90,127**;Dec 22, 1997;Build 36
+ECXUTL ;ALB/JAP - Utilities for DSS Extracts ; 9/13/05 8:43am
+ ;;3.0;DSS EXTRACTS;**1,5,8,84**;Dec 22, 1997
  ;
 ECXYM(ECXFMDT) ;extrinsic function
  ;converts any FM internal format date or date/time to a 6-character string
@@ -228,7 +228,6 @@ PRVCLASS(PERS,DATE) ;determine the person class and return va code
  ;            (exactly 7 characters in length)
  N ECX,VACODE
  S VACODE=""
- S ECHEAD=$G(ECHEAD)
  S ECX=$$GET^XUA4A72(PERS,DATE)
  ;if no person class use alternate date to resolve person class
  I +ECX'>0 D
@@ -238,50 +237,3 @@ PRVCLASS(PERS,DATE) ;determine the person class and return va code
  .Q
  S VACODE=$P(ECX,U,7) I $L(VACODE)'=7 S VACODE=""
  Q VACODE
- ;
-PATCAT(DFN) ; Extrinsic function to return OTHER ELIGIBILITY CODE 
- ;            in patcat field in the extract file if the PATIENT TYPE 
- ;            = active duty, retire, tricare
- ;  INPUT DFN - ien in file #2 (required)
- ; OUTPUT PATCAT - Patient Category mapping to be filed in extracts
- ;
- N ELIG,I,PATCAT,PCAT,TYPE
- S PATCAT=""
- I '$G(DFN) Q PATCAT
- S TYPE=$$TYPE^ECXUTL5(DFN)
- I (TYPE="MI")!(TYPE="AC")!(TYPE="TR") D
- .;get first other eligibilty code that matches in list, if it exists
- .S ELIG=0 F  S ELIG=$O(^DPT(DFN,"E",ELIG)) Q:(ELIG'>0)!((ELIG>0)&(PATCAT'=""))  D
- ..; if get last code, use line below
- ..;S ELIG=0 F  S ELIG=$O(^DPT(DFN,"E",ELIG)) Q:(ELIG'>0)  D
- ..S PCAT=$$GET1^DIQ(8,ELIG,.01)
- ..F I=1:1 Q:$T(ELIGCDS+I)=" Q"  I PCAT=$P($T(ELIGCDS+I),";;",2) S PATCAT=$P($T(ELIGCDS+I),";;",3)
- Q PATCAT
- ;
-ORDPROV(DFN,ON,PSJTMP) ; get provider using order reference number
- ;  input:  
- ;    dfn
- ;    on     - order reference number
- ;    psjtmp - 1 if temp global node = PSJ1, else global node = PSJ
- ;
- ;  output:
- ;    Provider IEN from PARMACY PATIENT File (#55) (1st piece ^TMP( )
- ;
- ;  NOTE:  Don't kill ^TMP here, used in ECXBCM, killed there
- ;
- I $G(DFN)']"" Q 0
- I $G(ON)']"" Q 0
- D EN^PSJBCMA1(DFN,ON,PSJTMP) ;IA#2829
- Q +($G(^TMP("PSJ",$J,1)))
- ;
-ELIGCDS ;
- ;;AD-ACTIVE DUTY;;AD
- ;;REC-RECRUIT;;REC
- ;;ADD-ACTIVE DUTY DEPENDENT;;ADD
- ;;FNRS-NON REMARRIED SPOUSE;;FNRS
- ;;RET-RETIREE;;RET
- ;;RETD-RETIREE DEPENDENT;;RETD
- ;;RES-RESERVIST;;RES
- ;;TFL-TRICARE FOR LIFE;;TFL
- ;;TDRL-TEMPORARY DISABILITY;;TDRL
- Q

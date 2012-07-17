@@ -1,4 +1,4 @@
-OCXOZ0I ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
+OCXOZ0I ;SLC/RJS,CLA - Order Check Scan ;NOV 3,2010 at 19:22
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;**32,221,243**;Dec 17,1997;Build 242
  ;;  ;;ORDER CHECK EXPERT version 1.01 released OCT 29,1998
  ;
@@ -10,8 +10,243 @@ OCXOZ0I ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
  ;
  Q
  ;
+EL114 ; Examine every rule that involves Element #114 [CLOZAPINE ANC < 1.5]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R57R2A^OCXOZ0W   ; Check Relation #2 in Rule #57 'CLOZAPINE'
+ Q
+ ;
+EL119 ; Examine every rule that involves Element #119 [CLOZAPINE WBC < 3.0]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R57R2A^OCXOZ0W   ; Check Relation #2 in Rule #57 'CLOZAPINE'
+ Q
+ ;
+EL115 ; Examine every rule that involves Element #115 [CLOZAPINE ANC >= 1.5]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R57R3A^OCXOZ0W   ; Check Relation #3 in Rule #57 'CLOZAPINE'
+ Q
+ ;
+EL120 ; Examine every rule that involves Element #120 [CLOZAPINE WBC >= 3.0 & < 3.5]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R57R3A^OCXOZ0W   ; Check Relation #3 in Rule #57 'CLOZAPINE'
+ Q
+ ;
+EL140 ; Examine every rule that involves Element #140 [CLOZAPINE ANC >= 1.5 & < 2.0]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R57R4A^OCXOZ0W   ; Check Relation #4 in Rule #57 'CLOZAPINE'
+ Q
+ ;
+EL71 ; Examine every rule that involves Element #71 [AMINOGLYCOSIDE ORDER SESSION]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R59R1A^OCXOZ0X   ; Check Relation #1 in Rule #59 'AMINOGLYCOSIDE ORDER'
+ Q
+ ;
+EL72 ; Examine every rule that involves Element #72 [PATIENT OVER CT OR MRI DEVICE LIMITATIONS]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R60R1A^OCXOZ0X   ; Check Relation #1 in Rule #60 'CT OR MRI PHYSICAL LIMIT CHECK'
+ Q
+ ;
+EL73 ; Examine every rule that involves Element #73 [CREATININE CLEARANCE ESTIMATE]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R61R1A^OCXOZ0Y   ; Check Relation #1 in Rule #61 'CREATININE CLEARANCE ESTIMATION'
+ Q
+ ;
+EL96 ; Examine every rule that involves Element #96 [CREATININE CLEARANCE DATE/TIME]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R61R1A^OCXOZ0Y   ; Check Relation #1 in Rule #61 'CREATININE CLEARANCE ESTIMATION'
+ Q
+ ;
+EL97 ; Examine every rule that involves Element #97 [RENAL RESULTS]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R61R1A^OCXOZ0Y   ; Check Relation #1 in Rule #61 'CREATININE CLEARANCE ESTIMATION'
+ Q
+ ;
+EL84 ; Examine every rule that involves Element #84 [INPATIENT FOOD-DRUG REACTION]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R62R1A^OCXOZ0Z   ; Check Relation #1 in Rule #62 'FOOD/DRUG INTERACTION'
+ Q
+ ;
+EL91 ; Examine every rule that involves Element #91 [PATIENT WITH GLUCOPHAGE MED]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R63R1A^OCXOZ0Z   ; Check Relation #1 in Rule #63 'GLUCOPHAGE - CONTRAST MEDIA'
+ Q
+ ;
+EL106 ; Examine every rule that involves Element #106 [RADIOLOGY PROCEDURE CONTAINS NON-BARIUM CONTRAST MEDIA]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R63R1A^OCXOZ0Z   ; Check Relation #1 in Rule #63 'GLUCOPHAGE - CONTRAST MEDIA'
+ Q
+ ;
+EL95 ; Examine every rule that involves Element #95 [POLYPHARMACY]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R65R1A^OCXOZ0Z   ; Check Relation #1 in Rule #65 'POLYPHARMACY'
+ Q
+ ;
+EL86 ; Examine every rule that involves Element #86 [GLUCOPHAGE ORDER]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R67R1A^OCXOZ10   ; Check Relation #1 in Rule #67 'GLUCOPHAGE - LAB RESULTS'
+ D R67R2A^OCXOZ10   ; Check Relation #2 in Rule #67 'GLUCOPHAGE - LAB RESULTS'
+ Q
+ ;
+EL111 ; Examine every rule that involves Element #111 [GLUCOPHAGE CREATININE > 1.5]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R67R1A^OCXOZ10   ; Check Relation #1 in Rule #67 'GLUCOPHAGE - LAB RESULTS'
+ Q
+ ;
+EL112 ; Examine every rule that involves Element #112 [NO GLUCOPHAGE CREATININE]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R67R2A^OCXOZ10   ; Check Relation #2 in Rule #67 'GLUCOPHAGE - LAB RESULTS'
+ Q
+ ;
+EL122 ; Examine every rule that involves Element #122 [AMITRIPTYLINE ORDER]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R68R1A^OCXOZ11   ; Check Relation #1 in Rule #68 'DANGEROUS MEDS OVER AGE 64'
+ Q
+ ;
+EL125 ; Examine every rule that involves Element #125 [MED ORDER FOR PT > 64]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R68R1A^OCXOZ11   ; Check Relation #1 in Rule #68 'DANGEROUS MEDS OVER AGE 64'
+ D R68R2A^OCXOZ11   ; Check Relation #2 in Rule #68 'DANGEROUS MEDS OVER AGE 64'
+ D R68R3A^OCXOZ11   ; Check Relation #3 in Rule #68 'DANGEROUS MEDS OVER AGE 64'
+ Q
+ ;
+EL123 ; Examine every rule that involves Element #123 [CHLORPROPAMIDE ORDER]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R68R2A^OCXOZ11   ; Check Relation #2 in Rule #68 'DANGEROUS MEDS OVER AGE 64'
+ Q
+ ;
+EL124 ; Examine every rule that involves Element #124 [DIPYRIDAMOLE ORDER]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R68R3A^OCXOZ11   ; Check Relation #3 in Rule #68 'DANGEROUS MEDS OVER AGE 64'
+ Q
+ ;
+EL131 ; Examine every rule that involves Element #131 [GREATER THAN LAB THRESHOLD]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R69R1A^OCXOZ11   ; Check Relation #1 in Rule #69 'LAB THRESHOLD'
+ Q
+ ;
+EL132 ; Examine every rule that involves Element #132 [LESS THAN LAB THRESHOLD]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R69R1A^OCXOZ11   ; Check Relation #1 in Rule #69 'LAB THRESHOLD'
+ Q
+ ;
+EL28 ; Examine every rule that involves Element #28 [RADIOLOGY ORDER]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R70R1A^OCXOZ12   ; Check Relation #1 in Rule #70 'NO ALLERGY ASSESSMENT'
+ Q
+ ;
+EL135 ; Examine every rule that involves Element #135 [DIET ORDER]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R70R1A^OCXOZ12   ; Check Relation #1 in Rule #70 'NO ALLERGY ASSESSMENT'
+ Q
+ ;
+EL136 ; Examine every rule that involves Element #136 [NO ALLERGY ASSESSMENT]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R70R1A^OCXOZ12   ; Check Relation #1 in Rule #70 'NO ALLERGY ASSESSMENT'
+ Q
+ ;
+EL137 ; Examine every rule that involves Element #137 [PHARMACY ORDER]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R70R1A^OCXOZ12   ; Check Relation #1 in Rule #70 'NO ALLERGY ASSESSMENT'
+ Q
+ ;
+EL138 ; Examine every rule that involves Element #138 [DUP OPIOID MEDS]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R71R1A^OCXOZ13   ; Check Relation #1 in Rule #71 'OPIOID MEDICATIONS'
+ Q
+ ;
+EL139 ; Examine every rule that involves Element #139 [OPIOID MED ORDER]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R71R1A^OCXOZ13   ; Check Relation #1 in Rule #71 'OPIOID MEDICATIONS'
+ Q
+ ;
 R3R1A ; Verify all Event/Elements of  Rule #3 'CRITICAL LAB RESULTS'  Relation #1 'CRITICAL LAB TEST'
- ;  Called from EL24+5^OCXOZ0F.
+ ;  Called from EL24+5^OCXOZ0G.
  ;
  Q:$G(OCXOERR)
  ;
@@ -20,144 +255,8 @@ R3R1A ; Verify all Event/Elements of  Rule #3 'CRITICAL LAB RESULTS'  Relation #
  ;
  Q:$G(^OCXS(860.2,3,"INACT"))
  ;
- I $$MCE24 D R3R1B
+ I $$MCE24 D R3R1B^OCXOZ0J
  Q
- ;
-R3R1B ; Send Order Check, Notication messages and/or Execute code for  Rule #3 'CRITICAL LAB RESULTS'  Relation #1 'CRITICAL LAB TEST'
- ;  Called from R3R1A+10.
- ;
- Q:$G(OCXOERR)
- ;
- ;      Local Extrinsic Functions
- ; GETDATA( ---------> GET DATA FROM THE ACTIVE DATA FILE
- ; INT2DT( ----------> CONVERT DATE FROM OCX FORMAT TO READABLE FORMAT
- ; NEWRULE( ---------> NEW RULE MESSAGE
- ;
- Q:$D(OCXRULE("R3R1B"))
- ;
- N OCXNMSG,OCXCMSG,OCXPORD,OCXFORD,OCXDATA,OCXNUM,OCXDUZ,OCXQUIT,OCXLOGS,OCXLOGD
- S OCXCMSG=""
- S OCXNMSG="Critical lab: "_$$GETDATA(DFN,"24^",114)_" "_$$GETDATA(DFN,"24^",12)_" "_$$INT2DT($$GETDATA(DFN,"24^",13),0)
- ;
- Q:$G(OCXOERR)
- ;
- ; Send Notification
- ;
- S (OCXDUZ,OCXDATA)="",OCXNUM=0
- I ($G(OCXOSRC)="GENERIC HL7 MESSAGE ARRAY") D
- .S OCXDATA=$G(^TMP("OCXSWAP",$J,"OCXODATA","ORC",2))_"|"_$G(^TMP("OCXSWAP",$J,"OCXODATA","ORC",3))
- .S OCXDATA=$TR(OCXDATA,"^","@"),OCXNUM=+OCXDATA
- I ($G(OCXOSRC)="CPRS ORDER PROTOCOL") D
- .I $P($G(OCXORD),U,3) S OCXDUZ(+$P(OCXORD,U,3))=""
- .S OCXNUM=+$P(OCXORD,U,2)
- S:($G(OCXOSRC)="CPRS ORDER PRESCAN") OCXNUM=+$P(OCXPSD,"|",5)
- S OCXRULE("R3R1B")=""
- I $$NEWRULE(DFN,OCXNUM,3,1,24,OCXNMSG) D  I 1
- .D:($G(OCXTRACE)<5) EN^ORB3(24,DFN,OCXNUM,.OCXDUZ,OCXNMSG,.OCXDATA)
- Q
- ;
-R3R2A ; Verify all Event/Elements of  Rule #3 'CRITICAL LAB RESULTS'  Relation #2 'CRITICAL LAB ORDER'
- ;  Called from EL105+5^OCXOZ0F.
- ;
- Q:$G(OCXOERR)
- ;
- ;      Local Extrinsic Functions
- ; MCE105( ---------->  Verify Event/Element: 'HL7 LAB ORDER RESULTS CRITICAL'
- ;
- Q:$G(^OCXS(860.2,3,"INACT"))
- ;
- I $$MCE105 D R3R2B
- Q
- ;
-R3R2B ; Send Order Check, Notication messages and/or Execute code for  Rule #3 'CRITICAL LAB RESULTS'  Relation #2 'CRITICAL LAB ORDER'
- ;  Called from R3R2A+10.
- ;
- Q:$G(OCXOERR)
- ;
- ;      Local Extrinsic Functions
- ; GETDATA( ---------> GET DATA FROM THE ACTIVE DATA FILE
- ; NEWRULE( ---------> NEW RULE MESSAGE
- ;
- Q:$D(OCXRULE("R3R2B"))
- ;
- N OCXNMSG,OCXCMSG,OCXPORD,OCXFORD,OCXDATA,OCXNUM,OCXDUZ,OCXQUIT,OCXLOGS,OCXLOGD
- S OCXCMSG=""
- S OCXNMSG="Critical labs - ["_$$GETDATA(DFN,"105^",96)_"]"
- ;
- Q:$G(OCXOERR)
- ;
- ; Send Notification
- ;
- S (OCXDUZ,OCXDATA)="",OCXNUM=0
- I ($G(OCXOSRC)="GENERIC HL7 MESSAGE ARRAY") D
- .S OCXDATA=$G(^TMP("OCXSWAP",$J,"OCXODATA","ORC",2))_"|"_$G(^TMP("OCXSWAP",$J,"OCXODATA","ORC",3))
- .S OCXDATA=$TR(OCXDATA,"^","@"),OCXNUM=+OCXDATA
- I ($G(OCXOSRC)="CPRS ORDER PROTOCOL") D
- .I $P($G(OCXORD),U,3) S OCXDUZ(+$P(OCXORD,U,3))=""
- .S OCXNUM=+$P(OCXORD,U,2)
- S:($G(OCXOSRC)="CPRS ORDER PRESCAN") OCXNUM=+$P(OCXPSD,"|",5)
- S OCXRULE("R3R2B")=""
- I $$NEWRULE(DFN,OCXNUM,3,2,57,OCXNMSG) D  I 1
- .D:($G(OCXTRACE)<5) EN^ORB3(57,DFN,OCXNUM,.OCXDUZ,OCXNMSG,.OCXDATA)
- Q
- ;
-R5R1A ; Verify all Event/Elements of  Rule #5 'ORDER FLAGGED FOR CLARIFICATION'  Relation #1 'ORDER FLAGGED'
- ;  Called from EL44+5^OCXOZ0F.
- ;
- Q:$G(OCXOERR)
- ;
- ;      Local Extrinsic Functions
- ; MCE44( ----------->  Verify Event/Element: 'ORDER FLAGGED'
- ;
- Q:$G(^OCXS(860.2,5,"INACT"))
- ;
- I $$MCE44 D R5R1B^OCXOZ0J
- Q
- ;
-CKSUM(STR) ;  Compiler Function: GENERATE STRING CHECKSUM
- ;
- N CKSUM,PTR,ASC S CKSUM=0
- S STR=$TR(STR,"abcdefghijklmnopqrstuvwxyz","ABCDEFGHIJKLMNOPQRSTUVWXYZ")
- F PTR=$L(STR):-1:1 S ASC=$A(STR,PTR)-42 I (ASC>0),(ASC<51) S CKSUM=CKSUM*2+ASC
- Q +CKSUM
- ;
-GETDATA(DFN,OCXL,OCXDFI) ;     This Local Extrinsic Function returns runtime data
- ;
- N OCXE,VAL,PC S VAL=""
- F PC=1:1:$L(OCXL,U) S OCXE=$P(OCXL,U,PC) I OCXE S VAL=$G(^TMP("OCXCHK",$J,DFN,OCXE,OCXDFI)) Q:$L(VAL)
- Q VAL
- ;
-INT2DT(OCXDT,OCXF) ;      This Local Extrinsic Function converts an OCX internal format
- ; date into an Externl Format (Human Readable) date.   'OCXF=SHORT FORMAT OCXF=LONG FORMAT
- ;
- Q:'$L($G(OCXDT)) "" S OCXF=+$G(OCXF)
- N OCXYR,OCXLPYR,OCXMON,OCXDAY,OCXHR,OCXMIN,OCXSEC,OCXCYR
- S (OCXYR,OCXLPYR,OCXMON,OCXDAY,OCXHR,OCXMIN,OCXSEC,OCXAP)=""
- S OCXSEC=$E(OCXDT#60+100,2,3),OCXDT=OCXDT\60
- S OCXMIN=$E(OCXDT#60+100,2,3),OCXDT=OCXDT\60
- S OCXHR=$E(OCXDT#24+100,2,3),OCXDT=OCXDT\24
- S OCXCYR=($H\1461)*4+1841+(($H#1461)\365)
- S OCXYR=(OCXDT\1461)*4+1841,OCXDT=OCXDT#1461
- S OCXLPYR=(OCXDT\365),OCXDT=OCXDT-(OCXLPYR*365),OCXYR=OCXYR+OCXLPYR
- S OCXCNT="031^059^090^120^151^181^212^243^273^304^334^365"
- S:(OCXLPYR=3) OCXCNT="031^060^091^121^152^182^213^244^274^305^335^366"
- F OCXMON=1:1:12 Q:(OCXDT<$P(OCXCNT,U,OCXMON))
- S OCXDAY=OCXDT-$P(OCXCNT,U,OCXMON-1)+1
- I OCXF S OCXMON=$P("January^February^March^April^May^June^July^August^September^October^November^December",U,OCXMON)
- E  S OCXMON=$E(OCXMON+100,2,3)
- S OCXAP=$S('OCXHR:"Midnight",(OCXHR=12):"Noon",(OCXHR<12):"AM",1:"PM")
- I OCXF S OCXHR=OCXHR#12 S:'OCXHR OCXHR=12
- Q:'OCXF $E(OCXMON+100,2,3)_"/"_$E(OCXDAY+100,2,3)_$S((OCXCYR=OCXYR):" "_OCXHR_":"_OCXMIN,1:"/"_$E(OCXYR,3,4))
- Q:(OCXHR+OCXMIN+OCXSEC) OCXMON_" "_OCXDAY_","_OCXYR_" at "_OCXHR_":"_OCXMIN_"."_OCXSEC_" "_OCXAP
- Q OCXMON_" "_OCXDAY_","_OCXYR
- ;
-MCE105() ; Verify Event/Element: HL7 LAB ORDER RESULTS CRITICAL
- ;
- ;
- N OCXRES
- I $L(OCXDF(37)) S OCXRES(105,37)=OCXDF(37)
- Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),105)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),105))
- Q 0
  ;
 MCE24() ; Verify Event/Element: HL7 LAB TEST RESULTS CRITICAL
  ;
@@ -166,82 +265,4 @@ MCE24() ; Verify Event/Element: HL7 LAB TEST RESULTS CRITICAL
  I $L(OCXDF(37)) S OCXRES(24,37)=OCXDF(37)
  Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),24)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),24))
  Q 0
- ;
-MCE44() ; Verify Event/Element: ORDER FLAGGED
- ;
- ;  OCXDF(37) -> PATIENT IEN data field
- ;
- N OCXRES
- S OCXDF(37)=$P($G(OCXORD),"^",1) I $L(OCXDF(37)) S OCXRES(44,37)=OCXDF(37)
- Q:'(OCXDF(37)) 0 I $D(^TMP("OCXCHK",$J,OCXDF(37),44)) Q $G(^TMP("OCXCHK",$J,OCXDF(37),44))
- Q 0
- ;
-NEWRULE(OCXDFN,OCXORD,OCXRUL,OCXREL,OCXNOTF,OCXMESS) ; Has this rule already been triggered for this order number
- ;
- ;
- Q:'$G(OCXDFN) 0 Q:'$G(OCXRUL) 0
- Q:'$G(OCXREL) 0  Q:'$G(OCXNOTF) 0  Q:'$L($G(OCXMESS)) 0
- S OCXORD=+$G(OCXORD),OCXDFN=+OCXDFN
- ;
- N OCXNDX,OCXDATA,OCXDFI,OCXELE,OCXGR,OCXTIME,OCXCKSUM,OCXTSP,OCXTSPL
- ;
- S OCXTIME=(+$H)
- S OCXCKSUM=$$CKSUM(OCXMESS)
- ;
- S OCXTSP=($H*86400)+$P($H,",",2)
- S OCXTSPL=($G(^OCXD(860.7,"AT",OCXTIME,OCXDFN,OCXRUL,+OCXORD,OCXCKSUM))+$G(OCXTSPI,300))
- ;
- Q:(OCXTSPL>OCXTSP) 0
- ;
- K OCXDATA
- S OCXDATA(OCXDFN,0)=OCXDFN
- S OCXDATA("B",OCXDFN,OCXDFN)=""
- S OCXDATA("AT",OCXTIME,OCXDFN,OCXRUL,+OCXORD,OCXCKSUM)=OCXTSP
- ;
- S OCXGR="^OCXD(860.7"
- D SETAP(OCXGR_")",0,.OCXDATA,OCXDFN)
- ;
- K OCXDATA
- S OCXDATA(OCXRUL,0)=OCXRUL_U_(OCXTIME)_U_(+OCXORD)
- S OCXDATA(OCXRUL,"M")=OCXMESS
- S OCXDATA("B",OCXRUL,OCXRUL)=""
- S OCXGR=OCXGR_","_OCXDFN_",1"
- D SETAP(OCXGR_")","860.71P",.OCXDATA,OCXRUL)
- ;
- K OCXDATA
- S OCXDATA(OCXREL,0)=OCXREL
- S OCXDATA("B",OCXREL,OCXREL)=""
- S OCXGR=OCXGR_","_OCXRUL_",1"
- D SETAP(OCXGR_")","860.712",.OCXDATA,OCXREL)
- ;
- S OCXELE=0 F  S OCXELE=$O(^OCXS(860.2,OCXRUL,"C","C",OCXELE)) Q:'OCXELE  D
- .;
- .N OCXGR1
- .S OCXGR1=OCXGR_","_OCXREL_",1"
- .K OCXDATA
- .S OCXDATA(OCXELE,0)=OCXELE
- .S OCXDATA(OCXELE,"TIME")=OCXTIME
- .S OCXDATA(OCXELE,"LOG")=$G(OCXOLOG)
- .S OCXDATA("B",OCXELE,OCXELE)=""
- .K ^OCXD(860.7,OCXDFN,1,OCXRUL,1,OCXREL,1,OCXELE)
- .D SETAP(OCXGR1_")","860.7122P",.OCXDATA,OCXELE)
- .;
- .S OCXDFI=0 F  S OCXDFI=$O(^TMP("OCXCHK",$J,OCXDFN,OCXELE,OCXDFI)) Q:'OCXDFI  D
- ..N OCXGR2
- ..S OCXGR2=OCXGR1_","_OCXELE_",1"
- ..K OCXDATA
- ..S OCXDATA(OCXDFI,0)=OCXDFI
- ..S OCXDATA(OCXDFI,"VAL")=^TMP("OCXCHK",$J,OCXDFN,OCXELE,OCXDFI)
- ..S OCXDATA("B",OCXDFI,OCXDFI)=""
- ..D SETAP(OCXGR2_")","860.71223P",.OCXDATA,OCXDFI)
- ;
- Q 1
- ;
-SETAP(ROOT,DD,DATA,DA) ;  Set Rule Event data
- M @ROOT=DATA
- I +$G(DD) S @ROOT@(0)="^"_($G(DD))_"^"_($P($G(@ROOT@(0)),U,3)+1)_"^"_$G(DA)
- I '$G(DD) S $P(@ROOT@(0),U,3,4)=($P($G(@ROOT@(0)),U,3)+1)_"^"_$G(DA)
- ;
- Q
- ;
  ;

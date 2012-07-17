@@ -1,5 +1,5 @@
-MAGGSTI ;WOIFO/GEK - Imaging interface to TIU RPC Calls etc. ; 01 Nov 2001 12:32 PM 
- ;;3.0;IMAGING;**7**;Jul 12, 2002
+MAGGSTI ;WOIFO/GEK - Imaging interface to TIU RPC Calls etc. ;
+ ;;3.0;IMAGING;**7**;Apr 17, 2002
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |

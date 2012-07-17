@@ -1,5 +1,5 @@
 DENTPEX ;ISC2/HCD-Inpatients needing Dental Exam Report ;10/23/90  14:35 ;
- ;;VERSION 1.2;;**7,11**;
+ ;;VERSION 1.2;;**11**;
  S Z4="" G:'$D(^DENT(225,0)) W I $P(^(0),U,4)=1 S X=$P(^(0),U,3) I $D(^DENT(225,X,0)) S DENTSTA=$P(^(0),U) G D
  S DIC="^DENT(225,",DIC(0)="AEMQ" D ^DIC G EXIT1:Y<0 S DENTSTA=$P(Y,U,2)
 D S %ZIS="MQ" K IO("Q") D ^%ZIS G EXIT1:IO=""

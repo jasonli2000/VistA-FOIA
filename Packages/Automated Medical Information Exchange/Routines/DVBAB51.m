@@ -1,21 +1,8 @@
 DVBAB51 ;ALB/VM - CAPRI INCOMPETENT PATIENT REPORT ;09/01/00
- ;;2.7;AMIE;**35,149**;Apr 10, 1995;Build 16
- ;Per VHA Directive 2004-038, this routine should not be modified.
+ ;;2.7;AMIE;**35**;Apr 10, 1995
  ;
- ;Input: ZMSG      - Output Array for incompetent report (By Ref)
- ;       BDATE     - Beginning date for report (FM Format)
- ;       EDATE     - Ending date for report (FM Format)
- ;       DVBADLMTR - Indicates if report should be delimitted (Optional)
- ;                    CAPRI currently executes RPC by each day in 
- ;                    date range, so DVBADLMTR should equal the
- ;                    final EDATE in range so that XTMP global
- ;                    can be killed. 
- ;Output: ZMSG contains delimited/non-delimited incompetent report 
-STRT(ZMSG,BDATE,EDATE,DVBADLMTR) ;ENTER HERE
- N DVBAFNLDTE
+STRT(ZMSG,BDATE,EDATE) ;ENTER HERE
  S DVBABCNT=0,RO="N",RONUM=0
- S DVBAFNLDTE=$S(+$G(DVBADLMTR):+$P(DVBADLMTR,"."),1:0)
- S DVBADLMTR=$S('+$G(DVBADLMTR):"",1:"^")
  K ^TMP($J) G TERM
 SET Q:'$D(^DPT(DA,.29))  S ICDAT=^(.29) Q:$P(ICDAT,U,12)'=1&(ICDAT']"")  S INCMP="" S:$P(ICDAT,U)]""!($P(ICDAT,U,12)=1) INCMP=1 Q:INCMP'=1  S ICDAT2=$P(ICDAT,U,2),ICDAT=$P(ICDAT,U)
  S:ICDAT]"" ICDAT=$$FMTE^XLFDT(ICDAT,"5DZ")
@@ -31,13 +18,6 @@ PRINTB S MA=$P(DATA,U),RCVAA=$P(DATA,U,2),RCVPEN=$P(DATA,U,3),CNUM=$P(DATA,U,4),
  S:'$D(^DG(405.2,+TDIS,0)) TDIS="Unknown discharge type" I $D(^(0)) S TDIS=$S($P(^DG(405.2,+TDIS,0),U,1)]"":$P(^(0),U,1),1:"Unknown discharge type")
  S:(IOST?1"C-".E)!($D(DVBAON2)) ZMSG(DVBABCNT)=" ",DVBABCNT=DVBABCNT+1
  ;***vm-out*W !!!,?(80-$L(HEAD)\2),HEAD,!,?(80-$L(HEAD1)\2),HEAD1,!!
- ;create delimited/non-delimited report
- D:($G(DVBADLMTR)'="") PRINTD
- D:($G(DVBADLMTR)="") PRINTND
- S DVBAON2=""
- Q
- ;
-PRINTND ;create non-delimited incompetent report
  S ZMSG(DVBABCNT)="  Patient Name:    "_PNAM,DVBABCNT=DVBABCNT+1,ZMSG(DVBABCNT)=" ",DVBABCNT=DVBABCNT+1
  S ZMSG(DVBABCNT)="           Claim No:   "_CNUM,DVBABCNT=DVBABCNT+1
  S ZMSG(DVBABCNT)="   Claim Folder Loc:   "_CFLOC,DVBABCNT=DVBABCNT+1
@@ -45,7 +25,7 @@ PRINTND ;create non-delimited incompetent report
  S ZMSG(DVBABCNT)="     Admission Date:   "_ADMDT,DVBABCNT=DVBABCNT+1
  S ZMSG(DVBABCNT)="Admitting Diagnosis:   "_DIAG,DVBABCNT=DVBABCNT+1
  S ZMSG(DVBABCNT)="     Discharge Date:   "_DCHGDT,DVBABCNT=DVBABCNT+1
- I DCHGDT]"" S ZMSG(DVBABCNT)="  Type of Discharge:   "_TDIS_$S(TO]"":" TO "_$S($D(^DIC(4,+TO,0)):$P(^(0),U,1),1:""),1:""),DVBABCNT=DVBABCNT+1
+ I DCHGDT]"" S ZMSG(DVBABCNT)="     Type of Discharge:   "_TDIS_$S(TO]"":" TO "_$S($D(^DIC(4,+TO,0)):$P(^(0),U,1),1:""),1:""),DVBABCNT=DVBABCNT+1
  S ZMSG(DVBABCNT)="        Bed Service:   "_BEDSEC,DVBABCNT=DVBABCNT+1
  S ZMSG(DVBABCNT)="          Recv A&A?:   "_$S(RCVAA=0:"NO",RCVAA=1:"YES",1:"Not specified"),DVBABCNT=DVBABCNT+1
  S ZMSG(DVBABCNT)="           Pension?:   "_$S(RCVPEN=0:"NO",RCVPEN=1:"YES",1:"Not specified"),DVBABCNT=DVBABCNT+1
@@ -54,24 +34,10 @@ ELIG S ELIG=DVBAELIG,INCMP=""
  S ZMSG(DVBABCNT)="   Eligibility data:   "
  I ELIG]"" S ELIG=ELIG_" ("_$S(DVBAELST="P":"Pend Ver",DVBAELST="R":"Pend Re-verif",DVBAELST="V":"Verified",1:"Not Verified")_")"
  I $D(^DPT(DA,.29)) S INCMP=$S($P(^(.29),U,12)=1:"Incompetent",1:"")
- S ZMSG(DVBABCNT)=ZMSG(DVBABCNT)_ELIG_$S(((ELIG]"")&(INCMP]"")):", ",1:"")_INCMP,DVBABCNT=DVBABCNT+1
- S ZMSG(DVBABCNT)="  DATE RULED INCOMP:   "_$S($D(ICDAT)]"":ICDAT_" (VA)",1:"")_$S(ICDAT2]"":" - "_ICDAT2_" (CIVIL)",1:" "),DVBABCNT=DVBABCNT+1
+ S ZMSG(DVBABCNT)=ELIG_$S(ELIG]"":", ",1:"")_INCMP,DVBABCNT=DVBABCNT+1
+ S ZMSG(DVBABCNT)="  DATE RULED INCOMP: "_$S($D(ICDAT)]"":ICDAT_" (VA)",1:"")_$S(ICDAT2]"":" - "_ICDAT2_" (CIVIL)",1:" "),DVBABCNT=DVBABCNT+1
  ;***vm-out*I IOST?1"C-".E W *7,!,"Press RETURN to continue or ""^"" to stop    " R ANS:DTIME S:ANS=U!('$T) QUIT=1 I '$T S DVBAQUIT=1
- Q
- ;
-PRINTD ;create delimited incompetent report
- D:('$D(^XTMP("DVBA_INCOMPETENT_RPT"_$J,0))) COLHDR
- S ZMSG(DVBABCNT)=PNAM_DVBADLMTR_CNUM_DVBADLMTR_CFLOC_DVBADLMTR_SSN_DVBADLMTR_ADMDT_DVBADLMTR_DIAG_DVBADLMTR_DCHGDT_DVBADLMTR
- S ZMSG(DVBABCNT)=ZMSG(DVBABCNT)_$S((DCHGDT]""):TDIS_$S(TO]"":" TO "_$S($D(^DIC(4,+TO,0)):$P(^(0),U,1),1:""),1:""),1:"")_DVBADLMTR
- S ZMSG(DVBABCNT)=ZMSG(DVBABCNT)_BEDSEC_DVBADLMTR_""_$S(RCVAA=0:"NO",RCVAA=1:"YES",1:"Not specified")_DVBADLMTR
- S ZMSG(DVBABCNT)=ZMSG(DVBABCNT)_$S(RCVPEN=0:"NO",RCVPEN=1:"YES",1:"Not specified")_DVBADLMTR
- ;
- S ELIG=DVBAELIG,INCMP=""
- I ELIG]"" S ELIG=ELIG_" ("_$S(DVBAELST="P":"Pend Ver",DVBAELST="R":"Pend Re-verif",DVBAELST="V":"Verified",1:"Not Verified")_")"
- I $D(^DPT(DA,.29)) S INCMP=$S($P(^(.29),U,12)=1:"Incompetent",1:"")
- ;
- S ZMSG(DVBABCNT)=ZMSG(DVBABCNT)_ELIG_$S(ELIG]"":", ",1:"")_INCMP_DVBADLMTR_$S($D(ICDAT)]"":ICDAT_" (VA)",1:"")_$S(ICDAT2]"":" - "_ICDAT2_" (CIVIL)",1:"")
- S DVBABCNT=DVBABCNT+1
+ S DVBAON2=""
  Q
  ;
 PRINT U IO S QUIT=""
@@ -98,20 +64,8 @@ QUEUE ;***vm-out*I $D(IO("Q")) S ZTRTN="DEQUE^DVBACMRP",ZTIO=ION,NOASK=1,ZTDESC=
  ;
 GO S MA=BDATE F J=0:0 S MA=$O(^DGPM("AMV1",MA)) Q:$P(MA,".")>EDATE!(MA="")  F DA=0:0 S DA=$O(^DGPM("AMV1",MA,DA)) Q:DA=""  F MB=0:0 S MB=$O(^DGPM("AMV1",MA,DA,MB)) Q:MB=""  D SET I '$D(NOASK) W "."
  I '$D(^TMP($J)) S ZMSG(DVBABCNT)="No data found for parameters entered." H 2 G KILL
- I $D(^TMP($J)) D PRINT K:(DVBAFNLDTE=$P(EDATE,".")) ^XTMP("DVBA_INCOMPETENT_RPT"_$J,0) I $D(DVBAQUIT) K DVBAON2 G KILL^DVBAUTIL
+ I $D(^TMP($J)) D PRINT I $D(DVBAQUIT) K DVBAON2 G KILL^DVBAUTIL
  ;
-KILL K:(DVBAFNLDTE=$P(EDATE,".")) ^XTMP("DVBA_INCOMPETENT_RPT"_$J,0)
- D ^%ZISC S X=5 K DVBAON2 D:$D(ZTQUEUED) KILL^%ZTLOAD G FINAL^DVBAUTIL
+KILL D ^%ZISC S X=5 K DVBAON2 D:$D(ZTQUEUED) KILL^%ZTLOAD G FINAL^DVBAUTIL
  ;
 DEQUE K ^TMP($J) G GO
- ;
-COLHDR ;Column header for delimited report
- S ZMSG(DVBABCNT)="Patient Name"_DVBADLMTR_"Claim No"_DVBADLMTR_"Claim Folder Loc"_DVBADLMTR
- S ZMSG(DVBABCNT)=(ZMSG(DVBABCNT))_"Social Sec No"_DVBADLMTR_"Admission Date"_DVBADLMTR
- S ZMSG(DVBABCNT)=(ZMSG(DVBABCNT))_"Admitting Diagnosis"_DVBADLMTR_"Discharge Date"_DVBADLMTR
- S ZMSG(DVBABCNT)=(ZMSG(DVBABCNT))_"Type of Discharge"_DVBADLMTR_"Bed Service"_DVBADLMTR
- S ZMSG(DVBABCNT)=(ZMSG(DVBABCNT))_"Recv A&A?"_DVBADLMTR_"Pension?"_DVBADLMTR
- S ZMSG(DVBABCNT)=(ZMSG(DVBABCNT))_"Eligibility Data"_DVBADLMTR_"Date Ruled Incomp"
- S DVBABCNT=DVBABCNT+1
- S ^XTMP("DVBA_INCOMPETENT_RPT"_$J,0)=DT_U_DT
- Q

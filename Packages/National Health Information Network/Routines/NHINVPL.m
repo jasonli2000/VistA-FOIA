@@ -1,5 +1,5 @@
 NHINVPL ;SLC/MKB -- Problem extract
- ;;1.0;NHIN;**1**;Dec 01, 2009;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -89,7 +89,7 @@ EXP(X) ; -- Return code for exposure name X
  ;
 XML(PROB) ; -- Return patient problem as XML in @NHIN@(I)
  N ATT,I,X,Y,P,TAG
- D ADD("<problem>") S NHINTOTL=$G(NHINTOTL)+1
+ D ADD("<problem>")
  S ATT="" F  S ATT=$O(PROB(ATT)) Q:ATT=""  D  D:$L(Y) ADD(Y)
  . I ATT="exposure" D  S Y="" Q
  .. S Y="<exposures>" D ADD(Y)

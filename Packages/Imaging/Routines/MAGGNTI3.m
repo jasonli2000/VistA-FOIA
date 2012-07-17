@@ -1,5 +1,5 @@
 MAGGNTI3 ;WOIFO/GEK - Imaging interface to TIU. RPC Calls etc. ; 04 Apr 2002  2:37 PM
- ;;3.0;IMAGING;**46,59**;Nov 27, 2007;Build 20
+ ;;3.0;IMAGING;**46,59**;Mar 27, 2007;Build 15
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |

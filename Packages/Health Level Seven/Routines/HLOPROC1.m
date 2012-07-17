@@ -1,5 +1,5 @@
-HLOPROC1 ;ALB/CJM/OAK/PIJ- Process Manager - 10/4/94 1pm ;12/30/2010
- ;;1.6;HEALTH LEVEL SEVEN;**126,138,139,147,153**;Oct 13, 1995;Build 11
+HLOPROC1 ;ALB/CJM/OAK/PIJ- Process Manager - 10/4/94 1pm ;06/09/2010
+ ;;1.6;HEALTH LEVEL SEVEN;**126,138,139,147**;Oct 13, 1995;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ;
@@ -198,9 +198,30 @@ ERROR ;
  D UNWIND^%ZTER
  Q
  ;*****End HL*1.6*138
-QCOUNT(WORK) ;count messages pending on all the queues
- N LOCK,FROM,LINK,QUEUE
- D RCNT^HLOSITE("S") ; Set RECOUNT FLAG on
+QCOUNT ;count messages pending on all the queues
+ ;
+ N STOPPED,HLON
+ S HLON=$P(^HLD(779.1,1,0),"^",9)
+ D STOPHL7^HLOPROC1
+ L +^HLTMP("PROCESS MANAGER"):600
+ S STOPPED=$T
+ D RECOUNT() ;checks list of processes, both running and queued
+ I STOPPED D
+ .N ALLDEAD
+ .;wait a little while to see if all the processes stop 
+ .F I=1:1:4 S ALLDEAD=$S(($O(^HLTMP("HL7 RUNNING PROCESSES",""))=""):1,1:0) Q:ALLDEAD  H 10
+ .Q:'ALLDEAD  ;giveup on recounting queues - processes aren't stopping
+ .;
+ .D QCNT
+ ;restart HLO
+ L -^HLTMP("PROCESS MANAGER")
+ D:$G(HLON) STARTHL7
+ Q
+QCNT ; count messages pending on queues
+ ;HLO processes should be stopped
+ N LOCK,FROM
+ N $ETRAP,$ESTACK S $ETRAP="G ERROR^HLOPROC1"
+ D RCNT^HLOSITE("S") ;; SET RECOUNT FLAG on
  ;
  ; recount each OUT queue
  ;first delete counters for non-existent queues
@@ -209,7 +230,7 @@ QCOUNT(WORK) ;count messages pending on all the queues
  . S QUEUE=""
  . F  S QUEUE=$O(^HLC("QUEUECOUNT","OUT",LINK,QUEUE)) Q:QUEUE=""  I '$O(^HLB("QUEUE","OUT",LINK,QUEUE,0)) D
  . . S LOCK=$NA(RECOUNT("OUT",LINK,QUEUE))
- . . L +@LOCK:1 Q:'$T  ;If lock not obtained skip recount for this queue
+ . . L +@LOCK:1 Q:'$T  ;should not fail, but if it does skip recount for this queue
  . .I '$O(^HLB("QUEUE","OUT",LINK,QUEUE,0)) S ^HLC("QUEUECOUNT","OUT",LINK,QUEUE)=0
  . . L -@LOCK
  ;
@@ -219,7 +240,7 @@ QCOUNT(WORK) ;count messages pending on all the queues
  . S QUEUE=""
  . F  S QUEUE=$O(^HLB("QUEUE","OUT",LINK,QUEUE)) Q:QUEUE=""  D
  . . S LOCK=$NA(RECOUNT("OUT",LINK,QUEUE))
- . . L +@LOCK:1 Q:'$T  ;If lock not obtained skip recount for this queue
+ . . L +@LOCK:1 Q:'$T  ;should not fail, but if it does skip recount for this queue
  . . S (MSGIEN,CTR)=0
  . . F  S MSGIEN=$O(^HLB("QUEUE","OUT",LINK,QUEUE,MSGIEN)) Q:MSGIEN=""  S CTR=CTR+1
  . . S ^HLC("QUEUECOUNT","OUT",LINK,QUEUE)=CTR
@@ -249,6 +270,8 @@ QCOUNT(WORK) ;count messages pending on all the queues
  . S ^HLC("QUEUECOUNT","SEQUENCE",QUEUE)=CTR
  . L -@LOCK
  ;
+ ;recount flag not needed anymore
+ D RCNT^HLOSITE("U")
  ;
  ; now caculate the all-inclusive counter
  S QUEUE=""
@@ -258,30 +281,22 @@ QCOUNT(WORK) ;count messages pending on all the queues
  ;
  ;
  ; recount IN queues
+ ;the infilers and server should currently be stopped, so there is no contention for these data structures
  ;
  ;first delete counts for non-existent queues
  S FROM=""
  F  S FROM=$O(^HLC("QUEUECOUNT","IN",FROM)) Q:FROM=""  D
  . S QUEUE=""
- . F  S QUEUE=$O(^HLC("QUEUECOUNT","IN",FROM,QUEUE)) Q:QUEUE=""  I '$O(^HLB("QUEUE","IN",FROM,QUEUE,0)) D
- . . S LOCK=$NA(RECOUNT("IN","FROM",QUEUE))
- . . L +@LOCK:1 Q:'$T  ;If lock not obtained skip recount for this queue
- . .I '$O(^HLB("QUEUE","IN",FROM,QUEUE,0)) S ^HLC("QUEUECOUNT","IN",FROM,QUEUE)=0
- . . L -@LOCK
+ . F  S QUEUE=$O(^HLC("QUEUECOUNT","IN",FROM,QUEUE)) Q:QUEUE=""  I '$O(^HLB("QUEUE","IN",FROM,QUEUE,0)) S ^HLC("QUEUECOUNT","IN",FROM,QUEUE)=0
  ;
  ;now count the queues
  S FROM=""
  F  S FROM=$O(^HLB("QUEUE","IN",FROM)) Q:FROM=""  D
  . S QUEUE=""
  . F  S QUEUE=$O(^HLB("QUEUE","IN",FROM,QUEUE)) Q:QUEUE=""  D
- . . S LOCK=$NA(RECOUNT("IN","FROM",QUEUE))
- . . L +@LOCK:1 Q:'$T  ;If lock not obtained skip recount for this queue
  . . S (MSGIEN,CTR)=0
  . . F  S MSGIEN=$O(^HLB("QUEUE","IN",FROM,QUEUE,MSGIEN)) Q:MSGIEN=""  D
  . . . S CTR=CTR+1
  . . S ^HLC("QUEUECOUNT","IN",FROM,QUEUE)=CTR
- . . L -@LOCK
  ;
- ;recount flag not needed anymore
- D RCNT^HLOSITE("U")
  Q

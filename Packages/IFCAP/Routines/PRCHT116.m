@@ -1,4 +1,4 @@
-PRCHT116 ; ;10/06/97
+PRCHT116 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442.8,",DIC=DIE,DP=442.8,DL=3,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRC(442.8,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=%
@@ -45,10 +45,9 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
 BEGIN S DNM="PRCHT116",DQ=1
 1 S DW="0;1",DV="RFX",DU="",DLB="ORDER NUMBER (PAT)",DIFLD=.01
  S DE(DW)="C1^PRCHT116"
- S X="@"
- S Y=X
+ S Y="@"
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD
+ G RD:X="@",Z
 C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
  K ^PRC(442.8,"B",$E(X,1,30),DA)
  S X=DE(1),DIC=DIE
@@ -62,8 +61,6 @@ C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  S X=DG(DQ),DIC=DIE
  I $P(^PRC(442.8,DA,0),U,3) S ^PRC(442.8,"AF",$E(X,1,30),$P(^(0),U,3),DA)=""
  Q
-X1 K:X[""""!($A(X)=45) X I $D(X),'$O(^PRC(442,"B",X,0)) K X
- I $D(X),X'?.ANP K X
- Q
- ;
-2 G 1^DIE17
+X1 Q
+2 S DQ=3 ;@445
+3 G 1^DIE17

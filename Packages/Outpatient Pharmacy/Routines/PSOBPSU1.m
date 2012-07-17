@@ -1,10 +1,9 @@
 PSOBPSU1 ;BIRM/MFR - BPS (ECME) Utilities 1 ;10/15/04
- ;;7.0;OUTPATIENT PHARMACY;**148,260,281,287,303,289,290,358,359**;DEC 1997;Build 27
+ ;;7.0;OUTPATIENT PHARMACY;**148,260,281,287,303,289,290**;DEC 1997;Build 69
  ;Reference to $$EN^BPSNCPDP supported by IA 4415 & 4304
  ;References to $$NDCFMT^PSSNDCUT,$$GETNDC^PSSNDCUT supported by IA 4707
  ;References to $$ECMEON^BPSUTIL,$$CMOPON^BPSUTIL supported by IA 4410
  ;References to $$STORESP^IBNCPDP supported by IA 4299
- ;Reference to $$CLAIM^BPSBUTL supported by IA 4719
  ;
 ECMESND(RX,RFL,DATE,FROM,NDC,CMOP,RVTX,OVRC,CNDC,RESP,IGSW,ALTX,CLA,PA,RXCOB) ; - Sends Rx Release 
  ;information to ECME/IB and updates NDC in the files 50 & 52; DBIA4304
@@ -22,7 +21,7 @@ ECMESND(RX,RFL,DATE,FROM,NDC,CMOP,RVTX,OVRC,CNDC,RESP,IGSW,ALTX,CLA,PA,RXCOB) ; 
  ;       (o) CNDC - Changed NDC? 1 - Yes / 0 - No (Default: NO)
  ;       (o) IGSW - Ignore Switches (Master and CMOP)? 1 - Yes / 0 - No (Default: NO)
  ;       (o) ALTX - Alternative Text to be placed in the Rx ECME Activity Log
- ;       (o) CLA  - NCPDP Clarification Code(s) for overriding DUR/RTS REJECTS
+ ;       (o) CLA  - NCPDP Clarification Code for overriding DUR/RTS REJECTS
  ;       (o) PA   - NCPDP Prior Authorization Type and Number (separated by "^")
  ;       (o) RXCOB- Payer Sequence
  ;Output:    RESP - Response from $$EN^BPSNCPDP api
@@ -48,12 +47,13 @@ ECMESND(RX,RFL,DATE,FROM,NDC,CMOP,RVTX,OVRC,CNDC,RESP,IGSW,ALTX,CLA,PA,RXCOB) ; 
  N CLSCOM,COD1,COD2,COD3
  S COD2=$P($G(OVRC),"^"),COD1=$P($G(OVRC),"^",2),COD3=$P($G(OVRC),"^",3)
  I $G(COD3)'="" S CLSCOM="DUR Override Codes "_COD1_"/"_COD2_"/"_COD3_" submitted."
- I $G(CLA)'="" S CLSCOM="Clarification Code(s) "_CLA_" submitted."
+ I $G(CLA)'="" S CLSCOM="Clarification Code "_$P(CLA,"^",2)_" submitted."
  I $G(PA)'="" S CLSCOM="Prior Authorization Code ("_$P(PA,"^")_"/"_$P(PA,"^",2)_") submitted."
- D CLSALL^PSOREJUT(RX,RFL,DUZ,1,$G(CLSCOM),$G(COD1),$G(COD2),$G(COD3),$G(CLA),$G(PA))
+ D CLSALL^PSOREJUT(RX,RFL,DUZ,1,$G(CLSCOM),$G(COD1),$G(COD2),$G(COD3),$S($G(CLA):$P(CLA,"^",2),1:""),$G(PA))
  ; - Call to ECME (NEWing STAT because ECME was overwriting it - Important variable for CMOP release PSXVND)
  N STAT
  I $G(RVTX)="",FROM="ED" S RVTX="RX EDITED"
+ I $G(CLA) S CLA=$P(CLA,"^")
  S RESP=$$EN^BPSNCPDP(RX,RFL,$$DOS(RX,RFL,.DATE),FROM,NDC,$G(RVTX),$G(OVRC),,$G(CLA),$G(PA),$G(RXCOB))
  I $$STATUS^PSOBPSUT(RX,RFL)="E PAYABLE" D SAVNDC^PSONDCUT(RX,RFL,NDC,+$G(CMOP),1,FROM)
  ;
@@ -61,12 +61,6 @@ ECMESND(RX,RFL,DATE,FROM,NDC,CMOP,RVTX,OVRC,CNDC,RESP,IGSW,ALTX,CLA,PA,RXCOB) ; 
  D RETRXF^PSOREJU2(RX,RFL,0)
  ; Storing eligibility flag
  S PSOELIG=$P(RESP,"^",3) D:PSOELIG'="" ELIG^PSOBPSU2(RX,RFL,PSOELIG)
- ;
- ;7/8/2010; bld ; added for tricare bypass/override audit file
- I $P(RESP,"^",2)="TRICARE INPATIENT/DISCHARGE" D
- .D EN^PSOBORP2(RX,RFL,RESP)
- ;
- ;
  ; - Logging ECME Act Log to file 52
  I $G(ALTX)="" D
  . N X,ROUTE S (ROUTE,X)=""
@@ -93,7 +87,7 @@ ECMESND(RX,RFL,DATE,FROM,NDC,CMOP,RVTX,OVRC,CNDC,RESP,IGSW,ALTX,CLA,PA,RXCOB) ; 
  S ACT=$E(ACT_ACT1,1,75)
  D RXACT^PSOBPSU2(RX,RFL,ACT,"M",DUZ)
  D ELOG^PSOBPSU2(RESP)  ;-Logs an ECME Act Log if Rx Qty is different than Billing Qty
- I PSOELIG="T",$P(RESP,"^",2)'="TRICARE INPATIENT/DISCHARGE" D TRICCHK^PSOREJU3(RX,RFL,RESP,FROM,$G(RVTX))
+ I PSOELIG="T" D TRICCHK^PSOREJU3(RX,RFL,RESP,FROM,$G(RVTX))
  Q
  ;
 REVERSE(RX,RFL,FROM,RSN,RTXT,IGRL,NDC) ; - Reverse a claim and close all OPEN/UNRESOLVED Rejects
@@ -105,8 +99,7 @@ REVERSE(RX,RFL,FROM,RSN,RTXT,IGRL,NDC) ; - Reverse a claim and close all OPEN/UN
  ;       (o) IGRL - Ignore RELEASE DATE, reverse anyway  
  ;       (o) NDC  - NDC number related to the reversal (Note: might be an invalid NDC)
  I '$D(RFL) S RFL=$$LSTRFL(RX)
- N PSOET S PSOET=$$PSOET^PSOREJP3(RX,RFL)   ;cnf, PSO*7.0*358
- I 'PSOET,$$STATUS^PSOBPSUT(RX,RFL)="" Q    ;cnf, PSO*7.0*358, add PSOET check, allow reversal for TRICARE non-billable reject
+ I $$STATUS^PSOBPSUT(RX,RFL)="" Q
  N RESP,STS,ACT,STAT,DA,STATUS,NOACT,REVECME S RSN=+$G(RSN),RTXT=$G(RTXT),REVECME=1
  I RTXT="",RSN D
  . S:RSN=2 RTXT="RX PLACED ON HOLD" S:RSN=3 RTXT="RX SUSPENDED" S:RSN=4 RTXT="RX RETURNED TO STOCK"
@@ -151,8 +144,7 @@ RELEASE(RX,RFL,USR) ; - Notifies IB that the Rx was RELEASED
  D GETS^DIQ(52,RX_",",".01;2;6;7;8;22","I","RXAR")
  S DFN=+$G(RXAR(52,RX_",",2,"I"))
  S IBAR("PRESCRIPTION")=RX,IBAR("RX NO")=$G(RXAR(52,RX_",",.01,"I"))
- S IBAR("CLAIMID")=$P($$CLAIM^BPSBUTL(RX,RFL),U,6)
- S IBAR("USER")=USR
+ S IBAR("CLAIMID")=$E((RX#10000000)+10000000,2,8),IBAR("USER")=USR
  S IBAR("DRUG")=RXAR(52,RX_",",6,"I"),IBAR("NDC")=$$GETNDC^PSONDCUT(RX,RFL)
  S FLDT=$$RXFLDT^PSOBPSUT(RX,RFL) I FLDT>DT S FLDT=DT
  S IBAR("FILL NUMBER")=RFL,IBAR("FILL DATE")=FLDT

@@ -1,5 +1,5 @@
-PRCPOPD ;WISC/RFJ/DWA-delete distribution order ;27 Sep 93
-V ;;5.1;IFCAP;**24,52**;Oct 20, 2000
+PRCPOPD ;WISC/RFJ-delete distribution order ;27 Sep 93
+V ;;5.1;IFCAP;**24**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
@@ -48,7 +48,7 @@ ORDRDELM ;  delete distribution order (ask first)
 DELORDER(ORDERDA)         ;  delete distribution order from file 445.3
  ;  cancel due-ins and due-outs first
  I '$D(^PRCP(445.3,+ORDERDA,0)) Q
- I $P(^PRCP(445.3,+ORDERDA,0),"^",10)]"",$P(^PRCP(445.3,+ORDERDA,0),"^",6)="R" D MESSAGE(+ORDERDA,1)
+ I $P(^PRCP(445.3,+ORDERDA,0),"^",10)]"" D MESSAGE(+ORDERDA,1)
  N %,DA,DIC,DIK,X,Y
  W !!,"DELETING distribution order..."
  S DA=+ORDERDA,DIK="^PRCP(445.3," D ^DIK

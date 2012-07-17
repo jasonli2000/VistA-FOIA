@@ -1,4 +1,4 @@
-OREOR0 ; slc/dcm - Check things ;7/23/97  12:49
+OREOR0 ; slc/dcm - Check things ; 21 Jan 99  3:20 PM
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;;Dec 17, 1997
 EN ;Check for mutliple keys
  W !,"This utility identifies users that have more than one OR key assigned."

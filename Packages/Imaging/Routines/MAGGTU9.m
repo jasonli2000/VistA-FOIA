@@ -1,5 +1,5 @@
 MAGGTU9 ;WOIFO/LB/GEK - Imaging utilities assign key
- ;;3.0;IMAGING;**8,59**;Nov 27, 2007;Build 20
+ ;;3.0;IMAGING;**8,59**;Mar 27, 2007;Build 15
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -25,7 +25,7 @@ GIVEKEY ;Give MAGDISP CLIN key to all MAG WINDOWS option holders
  ;   Find the menu option's IEN
  N MKEYC,MKEYA,ERR,OPT,MAGUSER,I,KEYCLIN,KEYADMIN,KEYCT,KEYECT,XCT
  N KEYHASC,KEYHASA,KEYHASB,KEYNONE,SP,LSP
- N UCT,UTOT,OPTACC,MDOT,UDISCT
+ N UCT,UTOT,OPTACC,MDOT
  ; This could be made Generic if ever a need, to search for users 
  ; withour either key, and assigned those users the first (KEYCLIN)
  S KEYCLIN="MAGDISP CLIN"
@@ -37,7 +37,6 @@ GIVEKEY ;Give MAGDISP CLIN key to all MAG WINDOWS option holders
  S KEYHASB=0 ; count of number of users that Have Both keys
  S KEYNONE=0 ; count of Users that have Neither Key.
  S OPTACC=0 ; count of users with access to MAG WINDOWS.
- S UDISCT=0 ; count of Disabled Users Skipped.
  S MDOT=10000 ; print '.' to screen to show progress.
  S UCT=0 ; user count. for progress
  S UTOT=$P(^VA(200,0),"^",4)
@@ -45,7 +44,6 @@ GIVEKEY ;Give MAGDISP CLIN key to all MAG WINDOWS option holders
  I $G(NOGIVE) D 
  . D MES^XPDUTL("Checking for users that have access to Option : "_"MAG WINDOWS")
  . D MES^XPDUTL("  but do not have either '"_KEYCLIN_"' or '"_KEYADMIN_"' Keys")
- . D MES^XPDUTL("  Disabled users (DISUSER=1) are skipped, they are not checked.")
  . Q
  E  D MES^XPDUTL("Assigning "_KEYCLIN_" to all users with access to Option : "_"MAG WINDOWS")
  D MES^XPDUTL("  ")
@@ -60,7 +58,6 @@ GIVEKEY ;Give MAGDISP CLIN key to all MAG WINDOWS option holders
  D MES^XPDUTL("Checking users...")
  D MES^XPDUTL(" ")
  S I=0 F  S I=$O(^VA(200,I)) Q:'I  D
- . I $$GET1^DIQ(200,I,7,"E")]"" S UDISCT=UDISCT+1 Q
  . S UCT=UCT+1 I UCT>MDOT S MDOT=MDOT+10000 D MES^XPDUTL(UCT_" of "_UTOT_" users checked...")
  . I (($$ACCESS^XQCHK(I,OPT))>0) S OPTACC=OPTACC+1 D C(I)
  . Q

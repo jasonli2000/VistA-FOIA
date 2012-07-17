@@ -1,12 +1,7 @@
 AGENCY
 ZWR
 ^DIC(4.11,0)="AGENCY^4.11^8^8"
-^DIC(4.11,0,"AUDIT")="@"
-^DIC(4.11,0,"DD")="@"
-^DIC(4.11,0,"DEL")="@"
 ^DIC(4.11,0,"GL")="^DIC(4.11,"
-^DIC(4.11,0,"LAYGO")="@"
-^DIC(4.11,0,"WR")="y"
 ^DIC(4.11,1,0)="VA^V"
 ^DIC(4.11,2,0)="AIR FORCE^AF"
 ^DIC(4.11,3,0)="IHS^I"

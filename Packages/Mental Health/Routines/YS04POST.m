@@ -1,0 +1,16 @@
+YS04POST ;DALIRMFO/MJD-PATCH YS*5.01*19 POST RTN.; 1/29/96
+ ;;5.01;MENTAL HEALTH;**19**;Dec 30, 1994
+ ;
+ ; This HARD sets the zero node for the multiple - ^YTT(601,201,"Q",0)
+ ; THIS CORRECTS THE MULTIPLE FILE NUMBER OF 549022.02 for the IEN
+ ; OF 201 (MCMI2)
+ S:$P(^YTT(601,201,"Q",0),U,2)="549022.02" ^YTT(601,201,"Q",0)="^601.02^175^175"
+ ;
+SF36 ; This sets field #9 TEST COPYRIGHT HOLDER -
+ ;                 #10 TEST COPYRIGHT DATE -
+ ; The 6th and 7th piece of the zero node of ^YTT(601,201,0
+ N DA,DIE,DR,X,Y
+ S DIE="^YTT(601,",DA=222,DR="9////17" D ^DIE
+ N DA,DIE,DR,X,Y
+ S DIE="^YTT(601,",DA=222,DR="10////2920000" D ^DIE
+ QUIT

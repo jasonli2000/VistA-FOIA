@@ -1,4 +1,4 @@
-ECMXP2 ; ;10/06/97
+ECMXP2 ; ;10/08/97
  D DE G BEGIN
 DE S DIE="^ECH(",DIC=DIE,DP=721,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^ECH(DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,19) S:%]"" DE(4)=% S %=$P(%Z,U,20) S:%]"" DE(5)=% S %=$P(%Z,U,22) S:%]"" DE(6)=% S %=$P(%Z,U,23) S:%]"" DE(7)=%

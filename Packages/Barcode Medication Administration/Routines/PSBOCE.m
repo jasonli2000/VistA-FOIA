@@ -1,5 +1,5 @@
 PSBOCE ;BIRMINGHAM/TEJ-Expired/DC'd/EXPIRING ORDERS REPORT ;Mar 2004
- ;;3.0;BAR CODE MED ADMIN;**32,50**;Mar 2004;Build 78
+ ;;3.0;BAR CODE MED ADMIN;**32**;Mar 2004;Build 32
  ;Per VHA Directive 2004-038 (or future revisions regarding same), this routine should not be modified.
  ;
 EN ;
@@ -88,7 +88,7 @@ EN ;
  ....I 'PSBCFLG S PSBDATA=PSBDATA(PSBX2X+1) Q
  ....I $P(PSBDATA,U,2)'="" D
  .....S PSBLGD(PSBORDN,"C","INITIALS",$P(PSBDATA,U,4))=""
- .....S PSBCMT(PSBORDN,$P(PSBXID,U,2),(-1*$P(PSBDATA,U,6)),PSBX2X)=PSBDATA
+ .....S PSBCMT(PSBORDN,$P(PSBXID,U,2),(-1*$P(PSBDATA,U,6)))=PSBDATA
  I '$D(PSBLIST2) K PSBLIST,^XTMP("PSBO",$J,"PSBLIST")
  D CREATHDR
  D SUBHDR

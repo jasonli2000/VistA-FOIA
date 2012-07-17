@@ -1,4 +1,4 @@
-OCXOZ0B ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
+OCXOZ0B ;SLC/RJS,CLA - Order Check Scan ;NOV 3,2010 at 19:22
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;**32,221,243**;Dec 17,1997;Build 242
  ;;  ;;ORDER CHECK EXPERT version 1.01 released OCT 29,1998
  ;
@@ -8,6 +8,40 @@ OCXOZ0B ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
  ; ** will be lost the next time the rule compiler executes.    **
  ; ***************************************************************
  ;
+ Q
+ ;
+CHK241 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK236+16^OCXOZ0A.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK241 Variables
+ ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
+ ; OCXDF(73) ---> Data Field: ORDERABLE ITEM IEN (NUMERIC)
+ ; OCXDF(79) ---> Data Field: PATIENT TOO BIG FOR SCANNER TEXT (FREE TEXT)
+ ; OCXDF(80) ---> Data Field: PATIENT TOO BIG FOR SCANNER DEVICE (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; CTMRI( -----------> CT MRI PHYSICAL LIMITS
+ ; FILE(DFN,72, -----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: PATIENT OVER CT OR MRI DEVICE LIMITATIONS)
+ ;
+ S OCXDF(79)=$P($$CTMRI(OCXDF(37),OCXDF(73)),"^",2),OCXDF(80)=$P($$CTMRI(OCXDF(37),OCXDF(73)),"^",3),OCXOERR=$$FILE(DFN,72,"79,80") Q:OCXOERR 
+ Q
+ ;
+CHK247 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK182+19^OCXOZ08.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK247 Variables
+ ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
+ ; OCXDF(64) ---> Data Field: FORMATTED RENAL LAB RESULTS (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; FILE(DFN,73, -----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: CREATININE CLEARANCE ESTIMATE)
+ ; FLAB( ------------> FORMATTED LAB RESULTS
+ ;
+ S OCXDF(64)=$$FLAB(OCXDF(37),"SERUM CREATININE^SERUM UREA NITROGEN","SERUM SPECIMEN"),OCXOERR=$$FILE(DFN,73,"64,76") Q:OCXOERR 
  Q
  ;
 CHK253 ; Look through the current environment for valid Event/Elements for this patient.
@@ -99,78 +133,19 @@ CHK293 ; Look through the current environment for valid Event/Elements for this 
  S OCXOERR=$$FILE(DFN,100,"105") Q:OCXOERR 
  Q
  ;
-CHK302 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK6+19^OCXOZ02.
+CTMRI(DFN,OCXOI) ;  Compiler Function: CT MRI PHYSICAL LIMITS
  ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK302 Variables
- ; OCXDF(34) ---> Data Field: ORDER NUMBER (NUMERIC)
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(55) ---> Data Field: SITE FLAGGED RESULT (BOOLEAN)
- ; OCXDF(96) ---> Data Field: ORDERABLE ITEM NAME (FREE TEXT)
- ; OCXDF(147) --> Data Field: PATIENT LOCATION (FREE TEXT)
- ;
- ;      Local Extrinsic Functions
- ; FILE(DFN,102, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: SITE FLAGGED FINAL IMAGING RESULT)
- ; ORDITEM( ---------> GET ORDERABLE ITEM FROM ORDER NUMBER
- ; PATLOC( ----------> PATIENT LOCATION
- ;
- I $L(OCXDF(55)),(OCXDF(55)) S OCXDF(96)=$$ORDITEM(OCXDF(34)),OCXDF(147)=$P($$PATLOC(OCXDF(37)),"^",2),OCXOERR=$$FILE(DFN,102,"9,96,147") Q:OCXOERR 
- Q
- ;
-CHK314 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK35+18^OCXOZ04.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK314 Variables
- ; OCXDF(113) --> Data Field: LAB TEST ID (NUMERIC)
- ; OCXDF(114) --> Data Field: LAB TEST PRINT NAME (FREE TEXT)
- ;
- ;      Local Extrinsic Functions
- ; FILE(DFN,103, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: HL7 LAB TEST RESULTS ABNORMAL)
- ;
- I $L(OCXDF(113)) S OCXDF(114)=$$PRINTNAM^ORQQLR1(OCXDF(113)),OCXOERR=$$FILE(DFN,103,"12,13,96,114") Q:OCXOERR 
- Q
- ;
-CHK324 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK34+16^OCXOZ04.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK324 Variables
- ; OCXDF(34) ---> Data Field: ORDER NUMBER (NUMERIC)
- ; OCXDF(96) ---> Data Field: ORDERABLE ITEM NAME (FREE TEXT)
- ; OCXDF(113) --> Data Field: LAB TEST ID (NUMERIC)
- ; OCXDF(114) --> Data Field: LAB TEST PRINT NAME (FREE TEXT)
- ;
- ;      Local Extrinsic Functions
- ; FILE(DFN,105, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: HL7 LAB ORDER RESULTS CRITICAL)
- ; ORDITEM( ---------> GET ORDERABLE ITEM FROM ORDER NUMBER
- ;
- S OCXDF(96)=$$ORDITEM(OCXDF(34)) I $L(OCXDF(113)) S OCXDF(114)=$$PRINTNAM^ORQQLR1(OCXDF(113)),OCXOERR=$$FILE(DFN,105,"12,13,96,114") Q:OCXOERR 
- Q
- ;
-CHK336 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK6+20^OCXOZ02.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK336 Variables
- ; OCXDF(34) ---> Data Field: ORDER NUMBER (NUMERIC)
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(55) ---> Data Field: SITE FLAGGED RESULT (BOOLEAN)
- ; OCXDF(96) ---> Data Field: ORDERABLE ITEM NAME (FREE TEXT)
- ; OCXDF(147) --> Data Field: PATIENT LOCATION (FREE TEXT)
- ;
- ;      Local Extrinsic Functions
- ; FILE(DFN,109, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: SITE FLAGGED FINAL CONSULT RESULT)
- ; ORDITEM( ---------> GET ORDERABLE ITEM FROM ORDER NUMBER
- ; PATLOC( ----------> PATIENT LOCATION
- ;
- I $L(OCXDF(55)),(OCXDF(55)) S OCXDF(96)=$$ORDITEM(OCXDF(34)),OCXDF(147)=$P($$PATLOC(OCXDF(37)),"^",2),OCXOERR=$$FILE(DFN,109,"9,96,147") Q:OCXOERR 
- Q
+ N OCXDEV,OCXWTP,OCXHTP,OCXWTL,OCXHTL
+ S OCXDEV=$$TYPE^ORKRA(OCXOI)
+ Q:'((OCXDEV="MRI")!(OCXDEV="CT")) 0_U
+ S OCXWTP=$P($$WT^ORQPTQ4(DFN),U,2),OCXHTP=$P($$HT^ORQPTQ4(DFN),U,2)
+ I (OCXDEV="CT") S OCXWTL=$$GET^XPAR("ALL","ORK CT LIMIT WT",1,"Q"),OCXHTL=$$GET^XPAR("ALL","ORK CT LIMIT HT",1,"Q")
+ I (OCXDEV="CT"),(OCXWTL),(OCXWTP>OCXWTL) Q 1_U_"too heavy"_U_"CT scanner"
+ I (OCXDEV="CT"),(OCXHTL),(OCXHTP>OCXHTL) Q 1_U_"too tall"_U_"CT scanner"
+ I (OCXDEV="MRI") S OCXWTL=$$GET^XPAR("ALL","ORK MRI LIMIT WT",1,"Q"),OCXHTL=$$GET^XPAR("ALL","ORK MRI LIMIT HT",1,"Q")
+ I (OCXDEV="MRI"),(OCXWTL),(OCXWTP>OCXWTL) Q 1_U_"too heavy"_U_"MRI scanner"
+ I (OCXDEV="MRI"),(OCXHTL),(OCXHTP>OCXHTL) Q 1_U_"too tall"_U_"MRI scanner"
+ Q 0_U
  ;
 FILE(DFN,OCXELE,OCXDFL) ;     This Local Extrinsic Function logs a validated event/element.
  ;
@@ -186,6 +161,30 @@ FILE(DFN,OCXELE,OCXDFL) ;     This Local Extrinsic Function logs a validated eve
  M ^TMP("OCXCHK",$J,DFN)=OCXDATA(DFN)
  ;
  Q 0
+ ;
+FLAB(DFN,OCXLIST,OCXSPEC) ;  Compiler Function: FORMATTED LAB RESULTS
+ ;
+ Q:'$G(DFN) "<Patient Not Specified>"
+ Q:'$L($G(OCXLIST)) "<Lab Tests Not Specified>"
+ N OCXLAB,OCXOUT,OCXPC,OCXSL,SPEC S OCXOUT="",SPEC=""
+ I $L($G(OCXSPEC)) S OCXSL=$$TERMLKUP(OCXSPEC,.OCXSL)
+ F OCXPC=1:1:$L(OCXLIST,U) S OCXLAB=$P(OCXLIST,U,OCXPC) I $L(OCXLAB) D
+ .N OCXX,OCXY,X,Y,DIC,TEST,SPEC,OCXTL,OCXA,OCXR
+ .S OCXTL="" Q:'$$TERMLKUP(OCXLAB,.OCXTL)
+ .S OCXX="",TEST=0 F  S TEST=$O(OCXTL(TEST)) Q:'TEST  D
+ ..I $L($G(OCXSL)) D
+ ...S SPEC=0 F  S SPEC=$O(OCXSL(SPEC)) Q:'SPEC  D
+ ....S OCXX=$$LOCL^ORQQLR1(DFN,TEST,SPEC) I $L(OCXX) D
+ .....S OCXA($P(OCXX,U,7))=OCXX
+ ..I '$L($G(OCXSL)) S OCXX=$$LOCL^ORQQLR1(DFN,TEST,"")
+ ..Q:'$L(OCXX)
+ .I $D(OCXA) S OCXR="",OCXR=$O(OCXA(OCXR),-1),OCXX=OCXA(OCXR)
+ .I $L(OCXX) D
+ ..S OCXY=$P(OCXX,U,2)_": "_$P(OCXX,U,3)_" "_$P(OCXX,U,4)
+ ..S OCXY=OCXY_" "_$S($L($P(OCXX,U,5)):"["_$P(OCXX,U,5)_"]",1:"")
+ ..I $L($P(OCXX,U,7)) S OCXY=OCXY_" "_$$FMTE^XLFDT($P(OCXX,U,7),"2P")
+ .S:$L(OCXOUT) OCXOUT=OCXOUT_"   " S OCXOUT=OCXOUT_$G(OCXY)
+ Q:'$L(OCXOUT) "<Results Not Found>" Q OCXOUT
  ;
 ORDITEM(OIEN) ;  Compiler Function: GET ORDERABLE ITEM FROM ORDER NUMBER
  Q:'$G(OIEN) ""
@@ -209,6 +208,9 @@ PATLOC(DFN) ;  Compiler Function: PATIENT LOCATION
  S OCXP2=$G(^DPT(+$G(DFN),.1))
  I $L(OCXP2) Q "I^"_OCXP2
  Q "O^OUTPT"
+ ;
+TERMLKUP(OCXTERM,OCXLIST) ;
+ Q $$TERM^OCXOZ01(OCXTERM,.OCXLIST)
  ;
 WARDRMBD(DFN) ;  Compiler Function: WARD ROOM-BED
  ;

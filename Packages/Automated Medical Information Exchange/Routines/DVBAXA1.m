@@ -1,4 +1,4 @@
-DVBAXA1 ; ;07/14/09
+DVBAXA1 ; ;08/28/09
  S X=DE(6),DIC=DIE
  K:$E(X,6,9)'="" ^DPT("BS",$E(X,6,9),DA)
  S X=DE(6),DIC=DIE

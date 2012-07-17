@@ -1,5 +1,5 @@
-PXRMEXU5 ; SLC/PKR - Reminder exchange KIDS utilities, #5. ;03/07/2010
- ;;2.0;CLINICAL REMINDERS;**12,16**;Feb 04, 2005;Build 119
+PXRMEXU5 ; SLC/PKR - Reminder exchange KIDS utilities, #5. ;06/08/2009
+ ;;2.0;CLINICAL REMINDERS;**12**;Feb 04, 2005;Build 73
  ;==================================================
 BMTABLE(MTABLE,IENROOT,DIQOUT,FDA) ;Build the table for merging
  ;GETS^DIQOUT indexes into the FDA. The merge table has the form:
@@ -160,44 +160,6 @@ REPCHAR(PXRMRIEN,CHAR1,CHAR2) ;Replace CHAR1 with CHAR2 for all lines in node
  . S ^PXD(811.8,PXRMRIEN,100,IND,0)=LINE
  Q
  ;
-ROC(FDA) ;
- N ACTION,IEN,IENS,OI,OOI,TEXT
- S ACTION="",IENS=""
- F  S IENS=$O(FDA(801.02,IENS)) Q:IENS=""  D  I ACTION="Q" K FDA S PXRMDONE=1
- .S TEXT=""
- .S (OI,OOI)=FDA(801.02,IENS,.01)
- .S IEN=$$EXISTS^PXRMEXIU(101.43,OI)
- .I IEN>0,$G(^ORD(101.43,IEN,.1))'="" D
- ..S IEN=0
- ..S TEXT="ORDERABLE ITEM  entry "_OI_" is inactive."
- .I IEN=0 D
- ..;Get replacement
- ..I TEXT="" S TEXT="ORDERABLE ITEM  entry "_OI_" does not exist."
- ..N DIC,DIR,DUOUT,MSG,X,Y
- ..S MSG(1)=" "
- ..S MSG(2)=TEXT
- ..D MES^XPDUTL(.MSG)
- ..S ACTION=$$GETACT^PXRMEXIU("DPQ",.DIR) I ACTION="S" S ACTION="Q"
- ..I ACTION="Q" Q
- ..I ACTION="D" K FDA(801.02,IENS,.01) Q
- ..S DIC=101.43
- ..S DIC(0)="AEMNQ"
- ..;S DIC("S")="I $$FILESCR^PXRMDLG6(Y,FILENUM)=1"
- ..S Y=-1
- ..F  Q:+Y'=-1  D
- ...;If this is being called during a KIDS install we need echoing on.
- ...I $D(XPDNM) X ^%ZOSF("EON")
- ...D ^DIC
- ...I $D(XPDNM) X ^%ZOSF("EOFF")
- ...;If this is being called during a KIDS install we need echoing on.
- ...I $D(DUOUT) S Y="" Q
- ...I Y=-1 D BMES^XPDUTL("You must input a replacement!")
- ..I Y="" S ACTION="Q" Q
- ..S OI=$P(Y,U,2)
- ..S FDA(801.02,IENS,.01)=OI
- .;I OI'=OOI D
- .;.S ^TMP("PXRMEXIA",$J,"DIAF",$P(IENS,",",1),ABBR_"."_OOI)=ABBR_"."_OI
- Q
  ;==================================================
 TIU(IEN,ARRAY,SUB) ;
  I $D(^TMP($J,SUB,IEN))>0 Q

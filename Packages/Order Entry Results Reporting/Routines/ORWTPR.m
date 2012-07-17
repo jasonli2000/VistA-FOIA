@@ -1,5 +1,5 @@
-ORWTPR ; SLC/STAFF Personal Preference - Reminders ;07/28/09  10:16
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**85,173,215,243,280**;Oct 24, 2000;Build 85
+ORWTPR ; SLC/STAFF Personal Preference - Reminders ; 4/20/07 10:00am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**85,173,215,243**;Oct 24, 2000;Build 242
  ;
 GETREM(VALUES,USER) ; from ORWTPP
  ; get user's reminders
@@ -67,7 +67,7 @@ SAVENOT(OK,VALUES,USER) ; from ORWTPP
  ;
 CLEARNOT(OK,USER) ; from ORWTPP
  ; clear user's notifications
- D RECIPURG^XQALBUTL(USER) ;ICR(DBIA) #3010
+ D RECIPURG^XQALBUTL(USER)
  S OK=1
  Q
  ;
@@ -80,7 +80,7 @@ GETNOTO(INFO,USER) ; from ORWTPP
 GETSURR(INFO,USER) ; from ORWTPP
  ; get user's surrogate info
  N SURR
- D SUROLIST^XQALSURO(USER,.SURR) ;ICR(DBIA) #2790
+ D SUROLIST^XQALSURO(USER,.SURR)
  S INFO=$G(SURR(1))
  Q
  ;

@@ -1,5 +1,5 @@
 OOPSSOF2 ;HINES/WAA-SOF/E Safety officer CLOSE Routine ;3/30/98
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**1,5,6,8**;Jun 01, 1998
  ;;
 EN1 ;  Main Entry Point
  N DIC,SSN,IEN,CLOSED,FORM,SIGN

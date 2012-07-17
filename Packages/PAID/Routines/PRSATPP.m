@@ -1,5 +1,5 @@
 PRSATPP ;WCIOFO/PLT - Timekeeper Prior PP Post Time ;7/29/08  15:44
- ;;4.0;PAID;**117,124**;Sep 21, 1995;Build 9
+ ;;4.0;PAID;**117**;Sep 21, 1995;Build 32
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  S PRSTLV=2 D ^PRSAUTL G:TLI<1 EX
@@ -31,7 +31,7 @@ T1 ; Get new tour
  S TYP=1,WTL=TLI
  S DIC="^PRST(455.5,",DIC(0)="AEQM",DIC("A")="T&L on which Tour will be worked: ",DIC("B")=TLE W ! D ^DIC Q:Y<1  K DIC S WTL=+Y
  S DIC="^PRST(457.1,",DIC(0)="AEQMN"
- S DIC("S")="I "_$S($E(ENT,1)="D":"Y<3",$P(C0,"^",10)=3:"Y>2!(Y=1)",1:"Y>5!(Y=1)")_",$P(^PRST(457.1,+Y,0),U,4)!($D(^PRST(457.1,+Y,""T"",""B"",WTL)))"
+ S DIC("S")="I "_$S($E(ENT,1)="D":"Y<3",1:"Y>5!(Y=1)")_",$P(^PRST(457.1,+Y,0),U,4)!($D(^PRST(457.1,+Y,""T"",""B"",WTL)))"
  S DIC("A")="Select TOUR OF DUTY: " W ! D ^DIC K DIC G:Y'>0 T2
  S TD=+Y
  ;tour overlap check

@@ -1,5 +1,5 @@
 ECXARAD ;ALB/JAP - RAD Extract Audit Report ;Oct 16, 1997
- ;;3.0;DSS EXTRACTS;**8,33,39**;Dec 22, 1997
+ ;;3.0;DSS EXTRACTS;**8**;Dec 22, 1997
  ;
 EN ;entry point for RAD extract audit report
  ;select extract
@@ -65,15 +65,14 @@ PROCESS ;process data in file #727.814
  .S $E(DATE,1,2)=$E(DATE,1,2)-17
  .Q:$L(DATE)<7  Q:(DATE<ECXSTART)  Q:(DATE>ECXEND)
  .Q:'$D(ECXDIV(DIV))
- .S PAT=$P(DATA,U,8),TYPE=$P(DATA,U,21),PROC=$P(DATA,U,11)
- .S CPT=$E($P(DATA,U,10),1,5),CPT="A"_$$RJ^XLFSTR(CPT,5,0)
+ .S PAT=$P(DATA,U,8),TYPE=$P(DATA,U,21),PROC=$P(DATA,U,11),CPT=$P(DATA,U,10),CPT="A"_$$RJ^XLFSTR(CPT,5,0)
  .S IMNM=$P(TYPE(TYPE),U,1),IMAB=$P(TYPE(TYPE),U,2)
  .K ECX S DIC="^RAMIS(71,",DR=".01",DIQ="ECX",DIQ(0)="I",DA=+PROC D EN^DIQ1
  .S PROCN=$G(ECX(71,+PROC,.01,"I")) I PROCN="" S PROCN="Unknown"
  .;tally procedures; 1st piece is outpatient total, 2nd piece is inpatient total
  .I '$D(^TMP($J,"ECXAUD",DIV,IMNM,CPT)) S ^TMP($J,"ECXAUD",DIV,IMNM,CPT)=0_U_0_U_PROCN
- .I PAT=1!(PAT="O") S $P(^(CPT),U,1)=$P(^TMP($J,"ECXAUD",DIV,IMNM,CPT),U,1)+1,CNT=CNT+1
- .I PAT=3!(PAT="I") S $P(^(CPT),U,2)=$P(^TMP($J,"ECXAUD",DIV,IMNM,CPT),U,2)+1,CNT=CNT+1
+ .I PAT=1 S $P(^(CPT),U,1)=$P(^TMP($J,"ECXAUD",DIV,IMNM,CPT),U,1)+1,CNT=CNT+1
+ .I PAT=3 S $P(^(CPT),U,2)=$P(^TMP($J,"ECXAUD",DIV,IMNM,CPT),U,2)+1,CNT=CNT+1
  .I $D(ZTQUEUED),(CNT>499),'(CNT#500),$$S^%ZTLOAD S QQFLG=1,ZTSTOP=1 K ZTREQ
  ;print the report
  D PRINT
@@ -99,7 +98,7 @@ PRINT ;print the RAD audit report by radiology site
  ...S STOT(1)=STOT(1)+TOT(1),STOT(3)=STOT(3)+TOT(3)
  ...S GTOT(1)=GTOT(1)+TOT(1),GTOT(3)=GTOT(3)+TOT(3)
  ...;write procedure and total
- ...D:($Y+3>IOSL) HEADER Q:QFLG  W ?3,$E(CPT,2,6),?14,$E(PROCN,1,38),?60,$$RJ^XLFSTR(TOT(3),5," "),?70,$$RJ^XLFSTR(TOT(1),5," "),!
+ ...D:($Y+3>IOSL) HEADER Q:QFLG  W ?3,$E(CPT,2,99),?14,$E(PROCN,1,38),?60,$$RJ^XLFSTR(TOT(3),5," "),?70,$$RJ^XLFSTR(TOT(1),5," "),!
  ..;write the unit subtotal
  ..D:($Y+3>IOSL) HEADER Q:QFLG  W !,?5,$E(LN,1,74)
  ..D:($Y+3>IOSL) HEADER Q:QFLG  W !,"Sub-totals for "_IMNM_" ("_DIV_"-"_IMTYPE_"):",?60,$$RJ^XLFSTR(STOT(3),5," "),?70,$$RJ^XLFSTR(STOT(1),5," "),!

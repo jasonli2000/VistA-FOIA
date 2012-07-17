@@ -1,5 +1,5 @@
-ORWDXM3 ; SLC/KCM/JLI - Quick Orders ;09/10/09
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,131,132,141,185,187,190,195,215,243,303,296,280**;Dec 17, 1997;Build 85
+ORWDXM3 ; SLC/KCM/JLI - Quick Orders ;10/27/2008
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,131,132,141,185,187,190,195,215,243,303,296**;Dec 17, 1997;Build 19
  ;
 VALCOUNT(NAME,ORDIALOG) ;
  N COUNT,IEN,NUM
@@ -19,27 +19,6 @@ ISMISSFL(ORDIALOG,IVTYPE) ;
  .I ADDCNT=0,SOLCNT>0 Q
  .I ADDCNT=0 S RESULT=1 Q
  .I ADDCNT'=STRCNT S RESULT=1 Q
- Q RESULT
- ;
-IVADFCHK(ORDIALOG) ;
- ; This line tag checks to see if there are the same number of values
- ;for ADDITIVE and Additive Frequency. This also checks to see if
- ;the value assigned to ADDFREQ is one of the three possible values
- ;All Bags, 1 bag/day, See Comments. If See Comments it also checks
- ;for text in the comment section.
- N ADDCNT,ADDFCNT,ADDFREQ,COMMENT,FREQ,INST,RESULT
- S ADDCNT=$$VALCOUNT("ADDITIVE",.ORDIALOG)
- S ADDFCNT=$$VALCOUNT("ADDITIVE FREQUENCY",.ORDIALOG)
- I ADDCNT'=ADDFCNT Q 0
- S ADDFREQ=$O(^ORD(101.41,"AB","OR GTX ADDITIVE FREQUENCY",""))
- S COMMENT=$O(^ORD(101.41,"AB","OR GTX WORD PROCESSING 1",""))
- I +$G(ADDFREQ)'>0 Q O
- S INST=0,RESULT=1
- F  S INST=$O(ORDIALOG(ADDFREQ,INST)) Q:INST'>0!(RESULT=0)  D
- .S FREQ=$$ADDFRQCV^ORMBLDP1($G(ORDIALOG(ADDFREQ,INST)),"O")
- .I FREQ="A"!(FREQ=1) Q
- .I FREQ="" S RESULT=0 Q
- .I FREQ="S",'$L($G(ORDIALOG(COMMENT,1))) S RESULT=0 Q
  Q RESULT
  ;
 KEYVAR(DLG)  ; Parse entry action for key variables & return in string
@@ -105,7 +84,7 @@ DLGINFO(IEN,MODE)    ; return information about a dialog
  I DLGIEN=$O(^ORD(101.41,"B","PSJ OR PAT OE",0)) S PSMDGP=1
  I DLGIEN=$O(^ORD(101.41,"B","PSO OERR",0)) S PSMDGP=2
  ;JD NEW END 11/13/02
- ; for copy or change, if the base dialog has changed, use it's info
+ ; for copy or change, if the base dialog has changed, use it's info 
  I MODE,$G(ORDIALOG),(+DLGIEN'=+ORDIALOG),(PSMDGP=0) D
  . S DLGIEN=+ORDIALOG,DGRP=$P(^ORD(101.41,+ORDIALOG,0),U,5)
  D FORMID^ORWDXM(.FID,DLGIEN)
@@ -176,36 +155,16 @@ VALDOI ; Validate the Orderable Items
  S ORPS=$G(^ORD(101.43,+OI,"PS"))
  I $P(ORPS,U,1,4)="0^0^0^0",($P(ORPS,U,7)=0) S LST(0)="8^0"
  Q
-VERDUR(ORDIALOG) ;
- ;check for duration value if a THEN conjunation is used
- N CONJ,CONVALUE,DUR,I,SUCC
- S SUCC=1
- S CONJ=$$PTR^ORCDPS1("AND/THEN")
- S DUR=$$PTR^ORCDPS1("DURATION")
- S I=0 F  S I=$O(ORDIALOG(CONJ,I)) Q:I'>0!(SUCC=0)  D
- . I $$UP^XLFSTR($E($G(ORDIALOG(CONJ,I)),1))="T" D
- . . I '$L($G(ORDIALOG(DUR,I))) S SUCC=0
- Q SUCC
- ;
-VERORD(OIEN) ;
- N IFN,INFUSE,INFUID,ODG,ODP,ASSIV,SUCC,TYPE
- S SUCC=0,IFN=ORDIALOG
- S ODP=+$P($G(^ORD(101.41,+IFN,0)),U,7),ODG=+$P($G(^(0)),U,5)
- S ODP=$$GET1^DIQ(9.4,+ODP_",",1),ODG=$P($G(^ORD(100.98,ODG,0)),U,3)
- I ODP'["PS" Q 1
- I ODP="PSH" Q 1
- ;check infusion rate for IV QO
- I ODG="IV RX"!(ODG="TPN") D  Q SUCC
- .S TYPE=$$GETIVTYP
- .I TYPE="" Q SUCC
- .S PASSIV=$$IVRTECHK
- .I PASSIV=0 Q SUCC
- .S INFUID=$O(^ORD(101.41,"B","OR GTX INFUSION RATE",0))
- .S INFUSE=$G(ORDIALOG(INFUID,1))
- .S SUCC=$$VALINF(TYPE,INFUSE)
- .I SUCC=0 Q
- .I TYPE="C" S SUCC=$$IVADFCHK(.ORDIALOG)
- I (ODP="PSJ")!(ODP="PSO"),ODG'="IV RX",ODG'="TPN" S SUCC=$$VERDUR(.ORDIALOG)
+VERORD() ;
+ N INFUSE,INFUID,PASSIV,SUCC,TYPE
+ S SUCC=0
+ S TYPE=$$GETIVTYP
+ I TYPE="" Q SUCC
+ S PASSIV=$$IVRTECHK
+ I PASSIV=0 Q SUCC
+ S INFUID=$O(^ORD(101.41,"B","OR GTX INFUSION RATE",0))
+ S INFUSE=$G(ORDIALOG(INFUID,1))
+ S SUCC=$$VALINF(TYPE,INFUSE)
  Q SUCC
  ;
 VALINF(TYPE,INFUSE) ;
@@ -222,52 +181,40 @@ VALQO(IFN) ;Check to see if it's a good QO med
  ;If it's an UD QO: check if dosage entered
  ;regular order treated as good QO
  ;
- I IFN[";",($$UPCTCHK^ORWDXA(+IFN)) Q 0
  I $P($G(^ORD(101.41,IFN,0)),U,4)'="Q" Q 1
  N ODP,ODG,INFUID,INFUSE,DSAGEID,SUCC,PASSIV,TYPE
  S SUCC=0
  S ODP=+$P($G(^ORD(101.41,IFN,0)),U,7),ODG=+$P($G(^(0)),U,5)
  S ODP=$$GET1^DIQ(9.4,+ODP_",",1),ODG=$P($G(^ORD(100.98,ODG,0)),U,3)
  I ODP'["PS" Q 1
- I ODP="PSH" Q 1
  ;check infusion rate for IV QO
  I ODG="IV RX"!(ODG="TPN") D
  . S INFUID=$O(^ORD(101.41,"B","OR GTX INFUSION RATE",0))
  . S TYPE=$$GETIVTYP
  . I TYPE="" Q
- . I $D(ORDIALOG(INFUID,1)) D
- . . I TYPE="I" D  Q
+ . I TYPE="I" D  I SUCC=0 Q
+ . . N SCHIEN
+ . . S SCHIEN=$O(^ORD(101.41,"B","OR GTX SCHEDULE",0))
+ . . I $G(ORDIALOG(SCHIEN,1))="" Q
+ . . I $D(ORDIALOG(INFUID,1)) D  Q
  . . . S INFUSE=$G(ORDIALOG(INFUID,1))
  . . . I INFUSE="" Q
  . . . I INFUSE["INFUSE OVER" S SUCC=1 Q
  . . . I $L(INFUSE)>4 Q
  . . . I +INFUSE>0 S INFUSE="INFUSE OVER "_INFUSE_" Minutes"
  . . . S ORDIALOG(INFUID,1)=INFUSE,SUCC=1
- . . S SUCC=1
- . ; additive frequency check/infusion rate checks for continuous orders
+ . . . S SUCC=1
+ . . I '$D(ORDIALOG(INFUID,1)) S SUCC=1 Q
  . I TYPE="C" D  I SUCC=0 Q
- . . I $D(ORDIALOG(INFUID,1)) S SUCC=1 I SUCC=0 Q
- . . S SUCC=$$IVADFCHK(.ORDIALOG)
+ . . I $D(ORDIALOG(INFUID,1)) S SUCC=1
  . I SUCC=0 Q
- . I '$D(ORDIALOG(INFUID,1)),TYPE="I" S SUCC=1
  . S PASSIV=$$IVRTECHK
- . I SUCC=0 Q
  . I PASSIV=0 S SUCC=0
  . I SUCC=1,$$ISMISSFL(.ORDIALOG,TYPE)=1 S SUCC=0
  ;check dosage for UD QO
  I (ODP="PSJ")!(ODP="PSO"),ODG'="IV RX",ODG'="TPN" D
  . S DSAGEID=$O(^ORD(101.41,"B","OR GTX INSTRUCTIONS",0))
  . I $D(ORDIALOG(DSAGEID,1)) S SUCC=1
- . I SUCC=0 Q
- . ;
- . S SUCC=$$VERDUR(.ORDIALOG)
- ;
- I SUCC=1,$P($G(^ORD(101.41,IFN,5)),U,8) D
- .N COMMID,WPCNT
- .S COMMID=$O(^ORD(101.41,"B","OR GTX WORD PROCESSING 1",0))
- .S COMMID=$O(^ORD(101.41,IFN,6,"D",COMMID,0))
- .I COMMID S WPCNT=0 F  S WPCNT=$O(^ORD(101.41,IFN,6,COMMID,2,WPCNT)) Q:'WPCNT!('SUCC)  D
- ..I ^ORD(101.41,IFN,6,COMMID,2,WPCNT,0)["^" S SUCC=0
  Q SUCC
  ;
 IVRTECHK() ;

@@ -1,5 +1,5 @@
 SROMOD0 ;BIR/ADM - CPT MODIFIER INPUT ;08/01/05
- ;;3.0; Surgery ;**142,165**;24 Jun 93;Build 6
+ ;;3.0; Surgery ;**142**;24 Jun 93
  Q
 DISPLAY ; display name with modifier
  N SRY,SRDA,SRDATE S SRDATE=DT
@@ -15,9 +15,7 @@ PCHK ; return value of modifier if acceptable for principal procedure
  N SRSDATE S SRSDATE=DT
  S SROK=0,SRCODE="",SRDA=$S($G(SRTN):SRTN,$D(DA(1)):DA(1),$D(DA):DA,1:""),SRM=$S($D(SRM):SRM,1:+Y)
  I SRDA S SRSDATE=$P(^SRF(SRDA,0),"^",9),SRCODE=$P($G(^SRO(136,SRDA,0)),"^",2)
- ;; Begin *165 - RJS
- I 'SRCODE!(X=51) Q
- ;;End *165 - RJS
+ I 'SRCODE Q
  S SRZ=$P($$MODP^ICPTMOD(SRCODE,SRM,"I",SRSDATE),"^") I SRZ>0 S SROK=SRZ
  Q
 OTH() ; screen for acceptable CPT code/modifier pair for other procedure

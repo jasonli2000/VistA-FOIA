@@ -1,5 +1,5 @@
-OOPSPRT1 ;HINES/WAA-Utilities Routines ;3/24/98
- ;;2.0;ASISTS;;Jun 03, 2002
+OOPSPRT1 ;HINES/WAA - Utilities Routines - 3/24/98
+ ;;1.0;ASISTS;**2,3,5,9,11**;Jun 01, 1998
  ;;
  ; This routine is to display all the report that a person has
  ; access to.
@@ -10,7 +10,7 @@ EN1(CALLER) ;
  ;           S = Supervisor
  ;           E = Employee
  ; 
- N YEAR,OUT,PAGE,STA,OUTPUT,SSN,HEAD
+ N YEAR,OUT,PAGE,STA,OUTPUT,SSN
  ; Patch 5 - added logic to print all stations or 1
  S OUT=0,PAGE=1,OUTPUT=0
  S YEAR=""

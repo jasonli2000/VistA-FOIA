@@ -1,5 +1,5 @@
 PSORXRP2 ;BIR/SAB-main menu entry reprint of a Rx label ;10/5/07 7:45am
- ;;7.0;OUTPATIENT PHARMACY;**11,27,120,138,135,156,185,280,251**;DEC 1997;Build 202
+ ;;7.0;OUTPATIENT PHARMACY;**11,27,120,138,135,156,185,280**;DEC 1997;Build 5
  ;External references PSOL and PSOUL^PSSLOCK supported by DBIA 2789
  ;External reference ^PS(55 supported by DBIA 2228
  ;External reference to ^PSDRUG supported by DBIA 221

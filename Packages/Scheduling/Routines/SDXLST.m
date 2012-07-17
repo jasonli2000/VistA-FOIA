@@ -1,4 +1,4 @@
-SDXLST ; GENERATED FROM 'SD-AMB-PROC-LIST' PRINT TEMPLATE (#231) ; 06/13/96 ; (FILE 409.72, MARGIN=80)
+SDXLST ; GENERATED FROM 'SD-AMB-PROC-LIST' PRINT TEMPLATE (#802) ; 12/20/96 ; (FILE 409.72, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(231,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(802,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  S X=$G(^SD(409.72,D0,0)) D N:$X>0 Q:'DN  W ?0 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^SD(409.71,Y,0))#2:$P(^(0),U,1),1:Y) S Y=$S(Y="":Y,$D(^ICPT(Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,5)
  X $P(^DD(409.72,.025,0),U,5,99) S DIP(1)=X S X=" - "_DIP(1) K DIP K:DN Y W X
  D N:$X>41 Q:'DN  W ?41 S DIP(2)=$S($D(^SD(409.72,D0,0)):^(0),1:"") S X="    ",DIP(1)=X S X=$P(DIP(2),U,4),X=X S Y=X,X=DIP(1),X=X S X=X_Y K DIP K:DN Y W X

@@ -1,5 +1,5 @@
-ORWDXM2 ; SLC/KCM - Quick Orders ;05/18/2009
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,109,116,132,158,187,195,215,243,280**;Dec 17, 1997;Build 85
+ORWDXM2 ; SLC/KCM - Quick Orders ;04/25/2007
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,109,116,132,158,187,195,215,243**;Dec 17, 1997;Build 242
  ;
 ADMTIME(ORDLOC,PATLOC,ENCLOC,DELAY,ISIMO) ;
  N ADMLOC,INST,SCHLOC,SCHTYPE
@@ -191,11 +191,9 @@ AUTHMED ; sets ORQUIT if not authorized to write meds
  I +NOAUTH D
  . S ORQUIT=1
  . S LST(0)="8^0"
- . ; FIX FOR REMEDY 71069, CQ 15917
- . S LST(.5)=$P(NOAUTH,U,2)
- . ;S NAME=$P($G(^VA(200,+ORNP,20)),U,2)
- . ;I '$L(NAME) S NAME=$P($G(^VA(200,+ORNP,0)),U,1)
- . ;S LST(.5)=NAME_" is not authorized to write med orders."
+ . S NAME=$P($G(^VA(200,+ORNP,20)),U,2)
+ . I '$L(NAME) S NAME=$P($G(^VA(200,+ORNP,0)),U,1)
+ . S LST(.5)=NAME_" is not authorized to write med orders."
  Q
 MEDACTV(USAGE) ; sets ORQUIT if the orderable item is not active for a med
  Q:'$G(OI)  S USAGE=+$G(USAGE)

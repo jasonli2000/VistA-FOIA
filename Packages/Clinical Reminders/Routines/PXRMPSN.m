@@ -1,5 +1,5 @@
-PXRMPSN ; SLC/PKR - Process PSN protocol events. ;03/25/2010
- ;;2.0;CLINICAL REMINDERS;**12,17,16**;Feb 04, 2005;Build 119
+PXRMPSN ; SLC/PKR - Process PSN protocol events. ;01/28/2010
+ ;;2.0;CLINICAL REMINDERS;**12,17**;Feb 04, 2005;Build 102
  ;==============================
 DEF(FILENUM,GBL,FIEN,NL) ;Write out the list of definintions using this
  ;finding.
@@ -59,7 +59,6 @@ EVDRVR ;Event driver for PSN events.
  . D DEF(50.605,"PS(50.605,",OLDDCIEN,.NL)
  . D TERMLIST^PXRMFRPT(50.605,"PS(50.605,",OLDDCIEN,"FDATA")
  . D TERM(50.605,"PS(50.605,",OLDDCIEN,.NL)
- . D ROC(50.605,"PS(60.605,",OLDDCIEN,.NL)
  . S NL=NL+1,^TMP("PXRMXMZ",$J,NL,0)=""
  . S NL=NL+1,^TMP("PXRMXMZ",$J,NL,0)="VA GENERIC "_VAGNAM_" is used directly"
  . D DEFLIST^PXRMFRPT(50.6,"PSNDF(50.6,",VAGIEN,"FDATA")
@@ -92,22 +91,6 @@ PSNEVENT ;Handle PSN events. This routine is attached to the PSN NEW CLASS
  S ZTDTH=$H
  S ZTIO=""
  D ^%ZTLOAD
- Q
- ;
- ;==============================
-ROC(FILENUM,GBL,FIEN,NL) ;Search all reminder order checks for any that are
- ;using this finding, defined by the global (GBL) and the IEN (FIEN)
- ;should only be called for Drug Class
- N IEN,NAME,START
- S NL=NL+1,^TMP("PXRMXMZ",$J,NL,0)=""
- S NL=NL+1,^TMP("PXRMXMZ",$J,NL,0)="and the following reminder order check groups:"
- I '$D(^PXD(801,"D",FIEN)) S NL=NL+1,^TMP("PXRMXMZ",$J,NL,0)="  None" Q
- S (IEN,START)=0
- F  S IEN=$O(^PXD(801,"D",FIEN,IEN)) Q:IEN'>0  D
- . S NAME=$P($G(^PXD(801,IEN,0)),U) I NAME="" Q
- . I START>0 S NL=NL+1,^TMP("PXRMXMZ",$J,NL,0)=""
- . S NL=NL+1,^TMP("PXRMXMZ",$J,NL,0)="  "_NAME_" (IEN="_IEN_")"
- . S START=1
  Q
  ;
  ;==============================

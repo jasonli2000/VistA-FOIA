@@ -1,5 +1,5 @@
 VBECA7A1 ;HOIFO/SAE - Workload API ; 9/30/04 5:49pm
- ;;1.0;VBECS;**10**;Apr 14, 2005;Build 15
+ ;;1.0;VBECS;;Apr 14, 2005;Build 35
  ;
  ; Note: This routine supports data exchange with an FDA registered
  ; medical device. As such, it may not be changed in any way without
@@ -18,7 +18,6 @@ CHKERROR(VBECPRMS,VBRSLT,VBMT) ; check for error in results
  ; Output
  ;   VBMT     - message text global to build onto
  ;
- Q  ;RLM 07 08 10 Don't record errors.
  Q:$D(@VBMT@(" ERROR"))   ; an error has already been identified
  ;
  N VBX     ; temporary variable for holding text
@@ -39,8 +38,6 @@ CHKERROR(VBECPRMS,VBRSLT,VBMT) ; check for error in results
  Q
  ;
 BLDERMSG(VBECPRMS,VBRSLT,VBMT) ;  build error message(s) into VBMT global
- ;
- Q  ;RLM 07 08 10 Don't record errors.
  ;
  N VBX       ; temporary variable for holding text
  N VBNM      ; indirect name of request/results array/global
@@ -160,16 +157,16 @@ STELE(ELE,ATR) ; Find attribute value
  . . . . S @VBMT@("!SUCCESSFUL FIND")="SUCCESSFUL FIND:  "_VBX
  . . . I VBIEN=0!(VBIEN'?1.N.E)!$D(VBIENERR) D  Q
  . . . . S VBX="No VistA entry for Txn id "_ATR("id")_" was found"
- . . . . ;S @VBMT@(" ERROR")="ERROR:  "_VBX
+ . . . . S @VBMT@(" ERROR")="ERROR:  "_VBX
  . . . I VBIEN=$P($G(@VBMT@("!INITIAL IEN")),U,2) D  Q
  . . . . S VBX="Successful match: initial lookup IEN and derived IEN"
  . . . . S @VBMT@("!IEN MATCH")="IENs match:  "_VBX
  . . . I VBIEN'=$P($G(@VBMT@("!INITIAL IEN")),U,2) D  Q
  . . . . S VBX="Mismatch between initial lookup IEN and derived IEN"
- . . . . ;S @VBMT@(" ERROR")="ERROR:  "_VBX
+ . . . . S @VBMT@(" ERROR")="ERROR:  "_VBX
  . . I '$D(ATR("id")) D
  . . . S VBX="No Txn ID accompanied the successfullyUpdated attribute"
- . . . ;S @VBMT@(" ERROR")="ERROR:  "_VBX
+ . . . S @VBMT@(" ERROR")="ERROR:  "_VBX
  Q
  ;
 ENELE(ELE) ; Ignore end of each element until end of WorkloadTransactions
@@ -215,11 +212,11 @@ ENELE(ELE) ; Ignore end of each element until end of WorkloadTransactions
  . . . S @VBMT@("!VISTA UPDATE - ENTRY UPDATED")=VBX
  . . I $D(VBERRMSG) D
  . . . S VBX=$G(VBERRMSG("DIERR",1,"TEXT",1))
- . . . ;S @VBMT@(" ERROR")="ERROR: "_VBX
+ . . . S @VBMT@(" ERROR")="ERROR: "_VBX
  . . . S @VBMT@("!VISTA UPDATE - UPDATE FAILED")=VBX
  . I '$D(@VBMT@("!DERIVED IEN")) D
  . . S VBX="No VistA update for ERROR TEXT attempted (no IEN)"
- . . ;S @VBMT@(" ERROR")="ERROR: "_VBX
+ . . S @VBMT@(" ERROR")="ERROR: "_VBX
  . . S @VBMT@("!VISTA UPDATE NOT ATTEMPTED")=VBX
  Q
  ;

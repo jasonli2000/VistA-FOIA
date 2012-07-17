@@ -1,4 +1,4 @@
-SDXRAM ; GENERATED FROM 'SD-AMB-RAM-DISPLAY' PRINT TEMPLATE (#230) ; 06/13/96 ; (FILE 409.81, MARGIN=80)
+SDXRAM ; GENERATED FROM 'SD-AMB-RAM-DISPLAY' PRINT TEMPLATE (#801) ; 12/20/96 ; (FILE 409.81, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(230,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(801,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D T Q:'DN  D N W ?0 W ""
  D N:$X>0 Q:'DN  W ?0 W "RAM Group"
  D N:$X>19 Q:'DN  W ?19 W "Weight [1 - low ; 4 - high]"

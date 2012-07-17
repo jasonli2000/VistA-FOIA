@@ -1,5 +1,5 @@
-ORWDPS33 ; SLC/KCM - Pharmacy Calls for GUI Dialog ;10/07/10
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243,280**;Dec 17, 1997;Build 85
+ORWDPS33 ; SLC/KCM - Pharmacy Calls for GUI Dialog ; 01/26/2008
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**243**;Dec 17, 1997;Build 242
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;This routine move several RPCs from ORWDPS32 because of the routine size
  ;
@@ -35,14 +35,6 @@ FORMALT(ORLST,IEN,PSTYPE) ; return a list of formulary alternatives
  . S $P(ORLST(I),U,4)=OI I OI S $P(ORLST(I),U,5)=$P(^ORD(101.43,OI,0),U)
  Q
  ;
-GETADDFR(ORY,OIIEN) ;
- N PSOI,TEMP
- S ORY=""
- S PSOI=+$P($G(^ORD(101.43,OIIEN,0)),U,2)
- S TEMP=$$IV^PSSDSAPA(PSOI)
- S ORY=$$ADDFRQCV^ORMBLDP1(TEMP,"I")
- Q
- ;
 ISVALIV(RESULT,ORID,ACTION) ;
  N ARRAY,CNT,ID,IVD,NUM,ORDERID,OUTPUT,ROUTE,ROUTEID,TYPE
  S TYPE=$S(ACTION="XFR":"transfered",ACTION="RN":"renewed",1:"copied")
@@ -53,56 +45,45 @@ ISVALIV(RESULT,ORID,ACTION) ;
  .I +$G(^OR(100,+ORID,4.5,ORDERID,1))'>0 Q
  .S CNT=CNT+1,ARRAY(CNT)=^OR(100,+ORID,4.5,ORDERID,1)
  S ROUTEID=+$O(^OR(100,+ORID,4.5,"ID","ROUTE","")) I ROUTEID'>0 D  Q
- .S RESULT="This order contains an invalid route. It cannot be "_TYPE_"."
+ .S RESULT="This order contains an invalid route it cannot be "_TYPE_"."
  S ROUTE=+$G(^OR(100,+ORID,4.5,ROUTEID,1)) I ROUTE'>0 D  Q
- .S RESULT="This order contains an invalid route. It cannot be "_TYPE_"."
+ .S RESULT="This order contains an invalid route it cannot be "_TYPE_"."
  S OUTPUT=$$IVQOVAL(.ARRAY,ROUTE) I OUTPUT="" D
  .;S TYPE=$S(ACTION="XFR":"transfered",ACTION="RN":"renewed",1:"copied")
- .S RESULT="This order contains an invalid route. It cannot be "_TYPE_"."
+ .S RESULT="This order contains an invalid route it cannot be "_TYPE_"."
  I RESULT'="" Q
  N IVTYPE,IVTYPEID,INFUSEID,INFUSE
  S IVTYPEID=+$O(^OR(100,+ORID,4.5,"ID","TYPE","")) I IVTYPEID'>0 D  Q
- .S RESULT="This order contains an  invalid IV Type. It cannot be "_TYPE_"."
+ .S RESULT="This order contains an  invalid IV Type it cannot be "_TYPE_"."
  S IVTYPE=$G(^OR(100,+ORID,4.5,IVTYPEID,1)) I IVTYPE="" D  Q
- .S RESULT="This order contains an invalid IV Type. It cannot be "_TYPE_"."
+ .S RESULT="This order contains an invalid IV Type it cannot be "_TYPE_"."
  S INFUSEID=+$O(^OR(100,+ORID,4.5,"ID","RATE","")) Q:INFUSEID'>0
  S INFUSE=$G(^OR(100,+ORID,4.5,INFUSEID,1)) Q:INFUSE=""
  I $$VALINF^ORWDXM3(IVTYPE,INFUSE)=0 D
  .;S TYPE=$S(ACTION="XFR":"transfered",ACTION="RN":"renewed",1:"copied")
- .S RESULT="This order contains an invalid infusion rate. It cannot be "_TYPE_"."
- ;//AGP IV ADDITIVE FREQUENCY
- I IVTYPE="C",ACTION="RN" D
- .N ADDCNT,ADDIEN,ADDFCNT,SUB
- .S ADDIEN=$$PTR^ORCD("OR GTX ADDITIVE")
- .S ADDCNT=0,ADDFCNT=0,SUB=0
- .F  S SUB=$O(^OR(100,+ORID,4.5,"ID","ORDERABLE",SUB)) Q:SUB'>0  D
- ..I $P($G(^OR(100,+ORID,4.5,SUB,0)),U,2)'=ADDIEN Q
- ..S ADDCNT=ADDCNT+1
- .S SUB=0
- .F  S SUB=$O(^OR(100,+ORID,4.5,"ID","ADDFREQ",SUB)) Q:SUB'>0  S ADDFCNT=ADDFCNT+1
- .I ADDCNT'=ADDFCNT S RESULT="This order does not contain the same number of values for the Additives and the IV Additive Frequency prompts. It cannot be renewed."
+ .S RESULT="This order contains an invalid infusion rate it cannot be "_TYPE_"."
  Q
  ;
 IVQOVAL(ARRAY,ROUTE) ;
  N CNT,RARR,RESULT
  S RESULT=""
- D IVDOSFRM(.RARR,.ARRAY,1)
+ D IVDOSFRM(.RARR,.ARRAY,0,1)
  S CNT="" F  S CNT=$O(RARR(CNT)) Q:CNT'>0!(RESULT'="")  D
- .I $P(RARR(CNT),U)=ROUTE S RESULT=RARR(CNT) Q
+ .I $P(RARR(CNT),U)=ROUTE S RESULT=RARR(CNT) Q 
  Q RESULT
  ;
-IVDOSFRM(LST,ORDERIDS,ALLIV) ;
- N ORARRAY,CNT,CNT1,OI,POI
+IVDOSFRM(LST,ORDERIDS,DEFAULT,ALLIV) ;
+ N ARRAY,CNT,CNT1,OI,POI
  S OI="",CNT=0,CNT1=0
  F  S OI=$O(ORDERIDS(OI)) Q:OI'>0  D
  .S POI=+$P($G(^ORD(101.43,$G(ORDERIDS(OI)),0)),U,2) Q:POI'>0
  .S CNT=CNT+1
- .S ORARRAY(CNT)=POI
+ .S ARRAY(CNT)=POI
  I CNT=0 Q
- S ORARRAY(0)=CNT
- D START1^PSSJORDF(.ORARRAY,ALLIV)
- S CNT="" F  S CNT=$O(ORARRAY(CNT)) Q:CNT'>0  D
- .S CNT1=CNT1+1,LST(CNT1)=$G(ORARRAY(CNT))
+ S ARRAY(0)=CNT
+ D START1^PSSJORDF(.ARRAY,ALLIV)
+ S CNT="" F  S CNT=$O(ARRAY(CNT)) Q:CNT'>0  D
+ .S CNT1=CNT1+1,LST(CNT1)=$G(ARRAY(CNT))
  ;this temp should be killed by Pharmacy. This will be removed once
  ;Pharmacy send an update
  K ^TMP("PSJMR",$J)

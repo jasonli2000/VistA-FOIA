@@ -1,19 +1,17 @@
-XUSPURGE ;SFISC/STAFF - PURGE ROUTINE FOR XUSEC ;03/18/10  07:10
- ;;8.0;KERNEL;**180,312,543**;Jul 10, 1995;Build 15
- ;Per VHA Directive 2004-038, this routine should not be modified.
+XUSPURGE ;SFISC/STAFF - PURGE ROUTINE FOR XUSEC ;08/27/2003  15:26
+ ;;8.0;KERNEL;**180,312**;Jul 10, 1995
 SCPURG ;Purge sign-on log to 30 days
- N XU1,XU2,XUDT,DIK,DA,DIE,DR,XUNOW
- S XUDT=$$FMADD^XLFDT(DT,-30),XUNOW=$$NOW^XLFDT() ;Set the limit
- I $O(^XUSEC(0,0))'>0 Q
+ N XU1,XU2,XUDT,DIK,DA
+ S XUDT=$$FMADD^XLFDT(DT,-30) ;Set the limit
+ I $O(^XUSEC(0,0))'>0 G SCEXIT
+ S DIK="^XUSEC(0,"
  F DA=0:0 S DA=$O(^XUSEC(0,DA)) Q:(DA'>0)!(DA>XUDT)  D
- . S XU1=$G(^XUSEC(0,DA,0)),XU2=+XU1
- . ;Enter a SIGN OFF time to clear the X-ref's p543
- . I $P(XU1,U,4)="" S DR="3////"_XUNOW,DIE="^XUSEC(0," D ^DIE
- . ;Now kill the record.
- . S DIK="^XUSEC(0," D ^DIK
+ . S XU1=+$G(^XUSEC(0,DA,0))
+ . D ^DIK
  . ;Make sure the CUR X-ref is cleared.
- . I XU1 K ^XUSEC(0,"CUR",XU2,DA)
+ . I XU1 K ^XUSEC(0,"CUR",XU1,DA)
  . Q
+SCEXIT K DIK,DA,XUDT,X1,X2
  Q
  ;
 AOLD ;
@@ -24,7 +22,7 @@ AOLD ;
  W !!,"This option will purge the log of inactive access and verify codes ",!,"older than the date specified to allow for their re-use."
  S DIR("A")="Do you wish to continue",DIR(0)="Y",DIR("B")="NO" D ^DIR G:$D(DIRUT)!(Y'=1) ENDA
 DAYS K DIR S DIR("A")="How far back do you wish to retain codes",DIR("A",1)="VHA has set the minimum time to keep old codes at 270 days.",DIR("B")=270
- S DIR("?")="Enter the number of days indicating at what date codes should be purged.",DIR(0)="N^270:400"
+ S DIR("?")="Enter the number of days indicating at what date codes should be purged.",DIR(0)="N^1:4000"
  D ^DIR Q:$D(DIRUT)
  D A02(X),V02(X)
  Q

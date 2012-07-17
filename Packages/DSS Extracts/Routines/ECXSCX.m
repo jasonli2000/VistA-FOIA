@@ -1,14 +1,12 @@
 ECXSCX ;ALB/JAP,BIR/DMA,CML,PTD-Clinic Extract ; 02/06/97 10:24 [ 03/26/97  2:10 PM ]
- ;;3.0;DSS EXTRACTS;**1,3,11,8,13,14,28**;Dec 22, 1997
+ ;;3.0;DSS EXTRACTS;**1,3,11,8**;Dec 22, 1997
 BEG ;entry point from option
  D SETUP I ECFILE="" Q
  D ^ECXTRAC,^ECXKILL
  Q
  ;
 START ;entry point
- N QFLG,TIU
- ;get ien for tiu in file #839.7
- S DIC="^PX(839.7,",DIC(0)="X",X="TEXT INTEGRATION UTILITIES" D ^DIC S TIU=0 S:+Y>0 TIU=+Y K DIC,Y
+ N QFLG
  K ^TMP("ECXS",$J) S ECXMISS=10,ECED=ECED+.3 S SC=0,QFLG=0
  ;scheduled appts. and appended ekgs: loop through the file (#44)
  F  S SC=$O(^SC(SC)) Q:('SC)!(QFLG)  I $D(^(SC,0)) S EC=^(0) I $P(EC,U,3)="C" S ECSU=$P(EC,U,15) S:'ECSU ECSU=1 D FEEDER^ECXSCX1(SC,ECSD1,.P1,.P2,.P3,.ECST) I ECST'=6 S ECD=ECSD1 D  Q:QFLG
@@ -26,7 +24,7 @@ START ;entry point
  ...I ECST=3 S ECFD=P2_"000"_ECL_P3_ECN,ECO1=ECO1_U_ECFD_U_ECOB_U_SC D API,FILE
  ...;check for appended visits for EKG (107); if regular appt. is a no-show, append is a no-show
  ...Q:'ECEKG  D
- ....S $P(ECODE,U,10,12)="1070000280000"_ECN_U_U
+ ....S $P(ECODE,U,7,9)="1070000280000"_ECN_U_U
  ....S EC7=$O(^ECX(ECFILE,999999999),-1),EC7=EC7+1
  ....S $P(ECODE,U,1)=EC7
  ....D FILE2
@@ -67,27 +65,18 @@ BLD ;build record from outpatient encounter
  ;for dispositions
  I FD=2 S ECO1=ECO1_U_P1_"47906000000"_U_U D API,FILE Q
  ;for stand-alone visits
- I FD=0,LOC,$D(^SC(LOC,0)) D
- .S SC=LOC,APTLEN=29
- .D FEEDER^ECXSCX1(SC,ECD,.P1,.P2,.P3,.ECST)
- .I ECST'=6 D
- ..D API
- ..I $D(^TMP("PXKENC",$J,ECVIS,"VST",ECVIS,812)) D
- ...S ECXSRCE=$P(^TMP("PXKENC",$J,ECVIS,"VST",ECVIS,812),U,3)
- ...I ECXSRCE=TIU S APTLEN=+$P($G(^SC(SC,"SL")),U,1) S:APTLEN=0 APTLEN=29
- ..S APTLEN=$TR($J(APTLEN,3)," ","0")
- ..S ECO1=ECO1_U_P1_P2_APTLEN_P3_"0"_U_U_SC
- ..D FILE
+ I LOC,$D(^SC(LOC,0)) S SC=LOC,EC=^(0) D FEEDER^ECXSCX1(SC,ECD,.P1,.P2,.P3,.ECST)
+ I ECST'=6 S ECO1=ECO1_U_P1_P2_"029"_P3_"0"_U_U_SC D API,FILE
  Q
  ;
 FILE ;finish record setup
  ;node0
  ;facility^dfn^ssn^name^in/out status^day^feeder key^overbook^sc^mov #^treat spec^time^primary care team^
  ;primary care provider^provider^CPT code^ICD-9 code^dob^eligibility^vet^race^
- ;ao status^ao visit^ir status^ir visit^pow status^pow location^provider person class
+ ;ao status^ao visit^ir statusir visit^pow status^pow location^provider person class
  ;node1
- ;mpi^dss dept^sex^zip+4^pc provider npi^provider npi^encounter elig^mst status^mst indicator
- ;cpt2^cpt3^cpt4^cpt5^cpt6^cpt7^cpt8^cpt9^cpt10^cpt11^sharing payor^sharing insurance^enr location^state^county^pc prov person class
+ ;mpi^dss dept^sex^zip+4^pc provider npi^provider npi^encounter elig^mst status^mst indicator^
+ ;cpt2^cpt3^cpt4^cpt5^cpt6^cpt7^cpt8^cpt9^cpt10^cpt11^sharing payor^sharing insurance^enr location^state^county
  S EC7=$O(^ECX(ECFILE,999999999),-1),EC7=EC7+1
  S ECODE=EC7_U_EC23
  S ECODE=ECODE_U_ECO1
@@ -95,8 +84,7 @@ FILE ;finish record setup
  S ECODE=ECODE_U_$$ECXDOB^ECXUTL(DOB)_U_ELIG_U_VET_U_RACE
  S ECODE=ECODE_U_ECXAIP("AO")_U_ECVAO_U_ECXAIP("IR")_U_ECVIR_U_ECXAIP("POW")_U_ECXAIP("POWL")_U_ECXPRPC
  S CPT="" F C=2:1:11 S CPT=CPT_CPT(C) I C<11 S CPT=CPT_U
- S ECODE1=U_U_SEX_U_ZIP_U_U_U_ENELG_U_MST_U_MSTEI_U_CPT_U_PAYOR_U_SAI_U_ENR_U_STATE_U_CNTY_U_ECCLAS
- D CUT^ECXSCX1(.ECODE,.ECODE1)
+ S ECODE1=U_U_SEX_U_ZIP_U_U_U_ENELG_U_MST_U_MSTEI_U_CPT_U_PAYOR_U_SAI_U_ENR_U_STATE_U_CNTY
  D FILE2
  Q
  ;
@@ -134,7 +122,7 @@ API ;call external utilities
  N X,PROV
  F C=2:1:11 S CPT(C)=""
  S X=$$INP^ECXUTL2(DFN,ECD),ECA=$P(X,U,1),ECMN=$P(X,U,2),ECTS=$P(X,U,3)
- S X=$$PRIMARY^ECXUTL2(DFN,ECD),ECPTTM=$P(X,U,1),ECPTPR=$P(X,U,2),ECCLAS=$P(X,U,3)
+ S X=$$PRIMARY^ECXUTL2(DFN,ECD),ECPTTM=$P(X,U,1),ECPTPR=$P(X,U,2)
  ;call pce api for cpt code, diagnosis/provider designated as primary
  S ENELG="",ECPROV="",ECXPRPC="",ECCPT=99199,ECICD=799.9,ECVAO="",ECVIR=""
  I 'ECIEN Q

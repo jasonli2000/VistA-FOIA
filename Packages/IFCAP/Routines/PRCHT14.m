@@ -1,9 +1,9 @@
-PRCHT14 ; ;10/06/97
+PRCHT14 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442,",DIC=DIE,DP=442,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRC(442,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,3) S:%]"" DE(1)=% S %=$P(%Z,U,5) S:%]"" DE(8)=%
- I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,2) S:%]"" DE(10)=% S %=$P(%Z,U,18) S:%]"" DE(13)=%
- I $D(^(23)) S %Z=^(23) S %=$P(%Z,U,2) S:%]"" DE(6)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,3) S:%]"" DE(9)=%
+ I $D(^(1)) S %Z=^(1) S %=$P(%Z,U,7) S:%]"" DE(3)=% S %=$P(%Z,U,19) S:%]"" DE(5)=%
+ I $D(^(12)) S %Z=^(12) S %=$P(%Z,U,14) S:%]"" DE(1)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -45,71 +45,61 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="PRCHT14",DQ=1
-1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW="0;3",DV="RFX",DU="",DLB="FCP",DIFLD=1
- S DE(DW)="C1^PRCHT14"
+1 S DW="12;14",DV="P443.4'",DU="",DLB="TYPE OF SPECIAL HANDLING",DIFLD=18.7
+ S DU="PRC(443.4,"
  G RE
-C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
+X1 Q
+2 S DQ=3 ;@10
+3 S DW="1;7",DV="R*P420.8'",DU="",DLB="SOURCE CODE",DIFLD=8
+ S DU="PRCD(420.8,"
+ S X=PRCHN("SC")
+ S Y=X
+ G Y
+X3 S DIC("S")="I "_$S($D(PRCHPUSH):"""13""[$E(^(0))",$D(PRCHNRQ):"""1390""[$E(^(0))",1:"""2456789B""[$E(^(0))") D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
+ Q
+ ;
+4 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=4 D X4 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X4 I "29"'[X K:0 DIC("DR") D ^PRCHNPO3 S Y="@1"
+ Q
+5 S DW="1;19",DV="RP443.8'",DU="",DLB="LOCAL PROCUREMENT REASON CODE",DIFLD=.25
+ S DE(DW)="C5^PRCHT14"
+ S DU="PRC(443.8,"
+ G RE
+C5 G C5S:$D(DE(5))[0 K DB S X=DE(5),DIC=DIE
+ ;
+C5S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+ K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(1)=$S($D(^PRC(442,D0,1)):^(1),1:"") S X=$P(Y(1),U,17),X=X S DIU=X K Y X ^DD(442,.25,1,1,1.1) X ^DD(442,.25,1,1,1.4)
+ Q
+X5 Q
+6 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=6 D X6 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X6 D ^PRCHNPO3
+ Q
+7 S DQ=8 ;@1
+8 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=8 D X8 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X8 I $D(^PRCS(410,+$P(^PRC(442,DA,0),"^",12),0)) S X=$P($P(^(0),U,1),"-",4) I +X=+$P(^PRC(442,DA,0),U,3) W !,"FCP: ",$P(^(0),U,3) S Y="@2"
+ Q
+9 D:$D(DG)>9 F^DIE17,DE S DQ=9,DW="0;3",DV="RFX",DU="",DLB="FCP",DIFLD=1
+ S DE(DW)="C9^PRCHT14"
+ G RE
+C9 G C9S:$D(DE(9))[0 K DB S X=DE(9),DIC=DIE
  K ^PRC(442,"E",$P(X," ",1),DA)
- S X=DE(1),DIC=DIE
+ S X=DE(9),DIC=DIE
  S $P(^PRC(442,DA,0),U,19)="",$P(^(17),U,1)=""
-C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+C9S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  S ^PRC(442,"E",$P(X," ",1),DA)=""
  S X=DG(DQ),DIC=DIE
  I $D(^PRC(420,+^PRC(442,DA,0),1,+X,0)) S Z=^(0) S:$P(Z,U,12) $P(^PRC(442,DA,0),U,19)=$P(Z,U,12) S:$P(Z,U,18) $P(^PRC(442,DA,17),U,1)=$E($P(Z,U,18),1,3) K Z
  Q
-X1 K:X[""""!($A(X)=45) X I $D(X) K:'$D(PRC("SITE"))!('$D(^PRC(442,DA,1))) X Q:'$D(X)  S:$P(^(1),U,15)]"" PRC("FY")=$P(^(1),U,15) D EN1^PRCHNPO5 Q:'$D(X)  S $P(^PRC(442,DA,0),U,4)=PRC("APP")
+X9 K:X[""""!($A(X)=45) X I $D(X) K:'$D(PRC("SITE"))!('$D(^PRC(442,DA,1))) X Q:'$D(X)  S:$P(^(1),U,15)]"" PRC("FY")=$P(^(1),U,15) D EN1^PRCHNPO5 Q:'$D(X)  S $P(^PRC(442,DA,0),U,4)=PRC("APP")
  I $D(X),X'?.ANP K X
  Q
  ;
-2 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=2 G A
-3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X3 S PRCHN("SFC")=$P(^PRC(442,DA,0),U,19)
+10 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=10 G A
+11 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=11 D X11 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X11 S PRCHN("SFC")=$P(^PRC(442,DA,0),U,19)
  Q
-4 S DQ=5 ;@2
-5 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=5 D X5 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X5 I $G(PRC("BBFY"))="" S PRC("BBFY")=$$BBFY^PRCSUT(PRC("SITE"),PRC("FY"),$P(^PRC(442,DA,0),U,3))
+12 S DQ=13 ;@2
+13 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=13 D X13 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X13 I $G(PRC("BBFY"))="" S PRC("BBFY")=$$BBFY^PRCSUT(PRC("SITE"),PRC("FY"),$P(^PRC(442,DA,0),U,3))
  Q
-6 D:$D(DG)>9 F^DIE17,DE S DQ=6,DW="23;2",DV="D",DU="",DLB="BBFY",DIFLD=26
- S X=PRC("BBFY")
- S Y=X
- S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G RD
-X6 S %DT="" D ^%DT S X=Y K:Y<1 X
- Q
- ;
-7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X7 D EN2^PRCHNPO3
- Q
-8 S DW="0;5",DV="RFX",DU="",DLB="COST CENTER",DIFLD=2
- S X=PRCHN("CC")
- S Y=X
- G Y
-X8 S Z0=+$P(^PRC(442,DA,0),"^",3) K:'$D(PRC("SITE"))!'Z0 X,Z0 I $D(X) K:'$D(^PRC(420,PRC("SITE"),1,Z0,2,0)) X I $D(X) D EN2^PRCHNPO5
- I $D(X),X'?.ANP K X
- Q
- ;
-9 S DQ=10 ;@88
-10 S DW="1;2",DV="RP49'",DU="",DLB="REQUESTING SERVICE",DIFLD=5.2
- S DU="DIC(49,"
- S X=PRCHN("SVC")
- S Y=X
- G Y
-X10 Q
-11 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=11 G A
-12 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=12 D X12 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X12 S:PRCHN("MP")=2 Y="@3" I $D(^PRC(442,DA,1)),$P(^(1),U,18)]"" S Y="@3"
- Q
-13 S DW="1;18",DV="RS",DU="",DLB="EXPENDABLE/NONEXPENDABLE",DIFLD=.3
- S DU="E:EXPENDABLE;N:NON-EXPENDABLE;"
- S X="E"
- S Y=X
- G Y
-X13 Q
-14 S DQ=15 ;@3
-15 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=15 D X15 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X15 S:PRCHN("MP")=4 Y=5.3
- Q
-16 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=16 D X16 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X16 I '$P(^PRC(442,DA,0),U,19)&(PRCHN("MP")'=2) W !,"Enter the word 'PATIENT' in the 'DELIVERY LOCATION' field for a direct delivery",!,"to a patient."
- Q
-17 D:$D(DG)>9 F^DIE17 G ^PRCHT15
+14 D:$D(DG)>9 F^DIE17 G ^PRCHT15

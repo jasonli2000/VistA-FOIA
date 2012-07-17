@@ -1,4 +1,4 @@
-OCXOZ0G ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
+OCXOZ0G ;SLC/RJS,CLA - Order Check Scan ;NOV 3,2010 at 19:22
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;**32,221,243**;Dec 17,1997;Build 242
  ;;  ;;ORDER CHECK EXPERT version 1.01 released OCT 29,1998
  ;
@@ -10,15 +10,131 @@ OCXOZ0G ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
  ;
  Q
  ;
+CHK482 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK446+17^OCXOZ0F.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK482 Variables
+ ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
+ ; OCXDF(58) ---> Data Field: ABNORMAL RENAL BIOCHEM RESULTS (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; ABREN( -----------> DETERMINE IF RENAL LAB RESULTS ARE ABNORMAL HIGH OR LOW
+ ; FILE(DFN,133, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: NO CREAT RESULTS W/IN X DAYS)
+ ;
+ S OCXDF(58)=$P($$ABREN(OCXDF(37)),"^",2),OCXOERR=$$FILE(DFN,133,"58,154") Q:OCXOERR 
+ Q
+ ;
+CHK497 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK360+15^OCXOZ0D.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK497 Variables
+ ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
+ ; OCXDF(74) ---> Data Field: VA DRUG CLASS (FREE TEXT)
+ ; OCXDF(158) --> Data Field: DUPLICATE OPIOID MEDICATIONS TEXT (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; LIST( ------------> IN LIST OPERATOR
+ ; OPIOID( ----------> OPIOID MEDICATIONS
+ ;
+ I $$LIST(OCXDF(74),"OPIOID ANALGESICS,OPIOID ANTAGONIST ANALGESICS") S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) S OCXDF(158)=$P($$OPIOID(OCXDF(37)),"^",2) D CHK501
+ Q
+ ;
+CHK501 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK497+14.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;      Local Extrinsic Functions
+ ; FILE(DFN,139, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: OPIOID MED ORDER)
+ ;
+ S OCXOERR=$$FILE(DFN,139,"158") Q:OCXOERR 
+ Q
+ ;
+CHK505 ; Look through the current environment for valid Event/Elements for this patient.
+ ;  Called from CHK355+14^OCXOZ0C.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ ;    Local CHK505 Variables
+ ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
+ ; OCXDF(130) --> Data Field: CLOZAPINE LAB RESULTS (FREE TEXT)
+ ; OCXDF(131) --> Data Field: PHARMACY LOCAL ID (FREE TEXT)
+ ;
+ ;      Local Extrinsic Functions
+ ; FILE(DFN,140, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: CLOZAPINE ANC >= 1.5 & < 2.0)
+ ;
+ S OCXDF(130)=$P($$CLOZLABS^ORKLR(OCXDF(37),"",OCXDF(131)),"^",4),OCXOERR=$$FILE(DFN,140,"130") Q:OCXOERR 
+ Q
+ ;
+EL24 ; Examine every rule that involves Element #24 [HL7 LAB TEST RESULTS CRITICAL]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R3R1A^OCXOZ0I   ; Check Relation #1 in Rule #3 'CRITICAL LAB RESULTS'
+ Q
+ ;
+EL105 ; Examine every rule that involves Element #105 [HL7 LAB ORDER RESULTS CRITICAL]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R3R2A^OCXOZ0J   ; Check Relation #2 in Rule #3 'CRITICAL LAB RESULTS'
+ Q
+ ;
+EL44 ; Examine every rule that involves Element #44 [ORDER FLAGGED]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R5R1A^OCXOZ0J   ; Check Relation #1 in Rule #5 'ORDER FLAGGED FOR CLARIFICATION'
+ Q
+ ;
+EL134 ; Examine every rule that involves Element #134 [ORDER UNFLAGGED]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R5R2A^OCXOZ0K   ; Check Relation #2 in Rule #5 'ORDER FLAGGED FOR CLARIFICATION'
+ Q
+ ;
+EL45 ; Examine every rule that involves Element #45 [ORDER REQUIRES CHART SIGNATURE]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R6R1A^OCXOZ0K   ; Check Relation #1 in Rule #6 'ORDER REQUIRES CHART SIGNATURE'
+ Q
+ ;
+EL21 ; Examine every rule that involves Element #21 [PATIENT ADMISSION]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R7R1A^OCXOZ0K   ; Check Relation #1 in Rule #7 'PATIENT ADMISSION'
+ Q
+ ;
+EL31 ; Examine every rule that involves Element #31 [RADIOLOGY ORDER CANCELLED]
+ ;  Called from SCAN+9^OCXOZ01.
+ ;
+ Q:$G(OCXOERR)
+ ;
+ D R11R1A^OCXOZ0L   ; Check Relation #1 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
+ Q
+ ;
 EL100 ; Examine every rule that involves Element #100 [CANCELED BY NON-ORIG ORDERING PROVIDER]
  ;  Called from SCAN+9^OCXOZ01.
  ;
  Q:$G(OCXOERR)
  ;
- D R11R1A^OCXOZ0K   ; Check Relation #1 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
- D R11R2A^OCXOZ0K   ; Check Relation #2 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
- D R11R3A^OCXOZ0L   ; Check Relation #3 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
- D R35R1A^OCXOZ0P   ; Check Relation #1 in Rule #35 'LAB ORDER CANCELLED'
+ D R11R1A^OCXOZ0L   ; Check Relation #1 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
+ D R11R2A^OCXOZ0L   ; Check Relation #2 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
+ D R11R3A^OCXOZ0M   ; Check Relation #3 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
+ D R35R1A^OCXOZ0Q   ; Check Relation #1 in Rule #35 'LAB ORDER CANCELLED'
  Q
  ;
 EL30 ; Examine every rule that involves Element #30 [RADIOLOGY ORDER PUT ON-HOLD]
@@ -26,7 +142,7 @@ EL30 ; Examine every rule that involves Element #30 [RADIOLOGY ORDER PUT ON-HOLD
  ;
  Q:$G(OCXOERR)
  ;
- D R11R2A^OCXOZ0K   ; Check Relation #2 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
+ D R11R2A^OCXOZ0L   ; Check Relation #2 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
  Q
  ;
 EL32 ; Examine every rule that involves Element #32 [RADIOLOGY ORDER DISCONTINUED]
@@ -34,7 +150,7 @@ EL32 ; Examine every rule that involves Element #32 [RADIOLOGY ORDER DISCONTINUE
  ;
  Q:$G(OCXOERR)
  ;
- D R11R3A^OCXOZ0L   ; Check Relation #3 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
+ D R11R3A^OCXOZ0M   ; Check Relation #3 in Rule #11 'IMAGING REQUEST CANCELLED/HELD'
  Q
  ;
 EL46 ; Examine every rule that involves Element #46 [SERVICE ORDER REQUIRES CHART SIGNATURE]
@@ -42,7 +158,7 @@ EL46 ; Examine every rule that involves Element #46 [SERVICE ORDER REQUIRES CHAR
  ;
  Q:$G(OCXOERR)
  ;
- D R16R1A^OCXOZ0L   ; Check Relation #1 in Rule #16 'SERVICE ORDER REQUIRES CHART SIGNATURE'
+ D R16R1A^OCXOZ0M   ; Check Relation #1 in Rule #16 'SERVICE ORDER REQUIRES CHART SIGNATURE'
  Q
  ;
 EL76 ; Examine every rule that involves Element #76 [STAT LAB RESULT]
@@ -50,7 +166,7 @@ EL76 ; Examine every rule that involves Element #76 [STAT LAB RESULT]
  ;
  Q:$G(OCXOERR)
  ;
- D R18R1A^OCXOZ0L   ; Check Relation #1 in Rule #18 'STAT RESULTS AVAILABLE'
+ D R18R1A^OCXOZ0M   ; Check Relation #1 in Rule #18 'STAT RESULTS AVAILABLE'
  Q
  ;
 EL75 ; Examine every rule that involves Element #75 [STAT IMAGING RESULT]
@@ -58,7 +174,7 @@ EL75 ; Examine every rule that involves Element #75 [STAT IMAGING RESULT]
  ;
  Q:$G(OCXOERR)
  ;
- D R18R2A^OCXOZ0M   ; Check Relation #2 in Rule #18 'STAT RESULTS AVAILABLE'
+ D R18R2A^OCXOZ0N   ; Check Relation #2 in Rule #18 'STAT RESULTS AVAILABLE'
  Q
  ;
 EL110 ; Examine every rule that involves Element #110 [STAT CONSULT RESULT]
@@ -66,223 +182,77 @@ EL110 ; Examine every rule that involves Element #110 [STAT CONSULT RESULT]
  ;
  Q:$G(OCXOERR)
  ;
- D R18R3A^OCXOZ0M   ; Check Relation #3 in Rule #18 'STAT RESULTS AVAILABLE'
+ D R18R3A^OCXOZ0N   ; Check Relation #3 in Rule #18 'STAT RESULTS AVAILABLE'
  Q
  ;
-EL56 ; Examine every rule that involves Element #56 [PATIENT DISCHARGE]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R19R1A^OCXOZ0M   ; Check Relation #1 in Rule #19 'PATIENT DISCHARGE'
- Q
- ;
-EL47 ; Examine every rule that involves Element #47 [ORDER REQUIRES CO-SIGNATURE]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R22R1A^OCXOZ0N   ; Check Relation #1 in Rule #22 'ORDER REQUIRES CO-SIGNATURE'
- Q
- ;
-EL5 ; Examine every rule that involves Element #5 [HL7 FINAL LAB RESULT]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R24R1A^OCXOZ0N   ; Check Relation #1 in Rule #24 'ORDERER FLAGGED RESULTS AVAILABLE'
- D R66R1A^OCXOZ0Y   ; Check Relation #1 in Rule #66 'LAB RESULTS'
- D R69R1A^OCXOZ10   ; Check Relation #1 in Rule #69 'LAB THRESHOLD'
- Q
- ;
-EL49 ; Examine every rule that involves Element #49 [ORDER FLAGGED FOR RESULTS]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R24R1A^OCXOZ0N   ; Check Relation #1 in Rule #24 'ORDERER FLAGGED RESULTS AVAILABLE'
- Q
- ;
-EL55 ; Examine every rule that involves Element #55 [CONSULT FINAL RESULTS]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R24R1A^OCXOZ0N   ; Check Relation #1 in Rule #24 'ORDERER FLAGGED RESULTS AVAILABLE'
- Q
- ;
-EL101 ; Examine every rule that involves Element #101 [HL7 FINAL IMAGING RESULT]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R24R1A^OCXOZ0N   ; Check Relation #1 in Rule #24 'ORDERER FLAGGED RESULTS AVAILABLE'
- Q
- ;
-EL60 ; Examine every rule that involves Element #60 [NEW OBR STAT ORDER]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R28R1A^OCXOZ0O   ; Check Relation #1 in Rule #28 'STAT ORDER PLACED'
- Q
- ;
-EL61 ; Examine every rule that involves Element #61 [NEW ORC STAT ORDER]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R28R1A^OCXOZ0O   ; Check Relation #1 in Rule #28 'STAT ORDER PLACED'
- Q
- ;
-EL42 ; Examine every rule that involves Element #42 [PATIENT TRANSFERRED FROM PSYCH WARD]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R32R1A^OCXOZ0O   ; Check Relation #1 in Rule #32 'PATIENT TRANSFERRED FROM PSYCHIATRY TO ANOTHER UNIT'
- Q
- ;
-EL20 ; Examine every rule that involves Element #20 [HL7 LAB ORDER CANCELLED]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R35R1A^OCXOZ0P   ; Check Relation #1 in Rule #35 'LAB ORDER CANCELLED'
- Q
- ;
-EL40 ; Examine every rule that involves Element #40 [HL7 LAB REQUEST CANCELLED]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R35R1A^OCXOZ0P   ; Check Relation #1 in Rule #35 'LAB ORDER CANCELLED'
- Q
- ;
-EL6 ; Examine every rule that involves Element #6 [HL7 NEW OERR ORDER]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R38R1A^OCXOZ0P   ; Check Relation #1 in Rule #38 'NEW ORDER PLACED'
- Q
- ;
-EL126 ; Examine every rule that involves Element #126 [HL7 DCED OERR ORDER]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R38R2A^OCXOZ0P   ; Check Relation #2 in Rule #38 'NEW ORDER PLACED'
- Q
- ;
-EL23 ; Examine every rule that involves Element #23 [HL7 LAB ORDER RESULTS ABNORMAL]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R42R1A^OCXOZ0Q   ; Check Relation #1 in Rule #42 'ABNORMAL LAB RESULTS'
- Q
- ;
-EL103 ; Examine every rule that involves Element #103 [HL7 LAB TEST RESULTS ABNORMAL]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R42R2A^OCXOZ0Q   ; Check Relation #2 in Rule #42 'ABNORMAL LAB RESULTS'
- Q
- ;
-EL48 ; Examine every rule that involves Element #48 [ORDER REQUIRES ELECTRONIC SIGNATURE]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R44R1A^OCXOZ0Q   ; Check Relation #1 in Rule #44 'ORDER REQUIRES ELECTRONIC SIGNATURE'
- Q
- ;
-EL58 ; Examine every rule that involves Element #58 [NEW SITE FLAGGED ORDER]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R48R1A^OCXOZ0R   ; Check Relation #1 in Rule #48 'SITE FLAGGED ORDER'
- D R48R2A^OCXOZ0R   ; Check Relation #2 in Rule #48 'SITE FLAGGED ORDER'
- Q
- ;
-EL127 ; Examine every rule that involves Element #127 [INPATIENT]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R48R1A^OCXOZ0R   ; Check Relation #1 in Rule #48 'SITE FLAGGED ORDER'
- D R49R1A^OCXOZ0S   ; Check Relation #1 in Rule #49 'SITE FLAGGED RESULT'
- Q
- ;
-EL128 ; Examine every rule that involves Element #128 [OUTPATIENT]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R48R2A^OCXOZ0R   ; Check Relation #2 in Rule #48 'SITE FLAGGED ORDER'
- D R49R2A^OCXOZ0T   ; Check Relation #2 in Rule #49 'SITE FLAGGED RESULT'
- Q
- ;
-EL59 ; Examine every rule that involves Element #59 [SITE FLAGGED FINAL LAB RESULT]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R49R1A^OCXOZ0S   ; Check Relation #1 in Rule #49 'SITE FLAGGED RESULT'
- D R49R2A^OCXOZ0T   ; Check Relation #2 in Rule #49 'SITE FLAGGED RESULT'
- Q
- ;
-EL102 ; Examine every rule that involves Element #102 [SITE FLAGGED FINAL IMAGING RESULT]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R49R1A^OCXOZ0S   ; Check Relation #1 in Rule #49 'SITE FLAGGED RESULT'
- D R49R2A^OCXOZ0T   ; Check Relation #2 in Rule #49 'SITE FLAGGED RESULT'
- Q
- ;
-EL109 ; Examine every rule that involves Element #109 [SITE FLAGGED FINAL CONSULT RESULT]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R49R1A^OCXOZ0S   ; Check Relation #1 in Rule #49 'SITE FLAGGED RESULT'
- D R49R2A^OCXOZ0T   ; Check Relation #2 in Rule #49 'SITE FLAGGED RESULT'
- Q
- ;
-EL129 ; Examine every rule that involves Element #129 [ABNORMAL RENAL RESULTS]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R50R1A^OCXOZ0T   ; Check Relation #1 in Rule #50 'BIOCHEM ABNORMALITIES/CONTRAST MEDIA CHECK'
- Q
- ;
-EL130 ; Examine every rule that involves Element #130 [CONTRAST MEDIA ORDER]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R50R1A^OCXOZ0T   ; Check Relation #1 in Rule #50 'BIOCHEM ABNORMALITIES/CONTRAST MEDIA CHECK'
- D R50R2A^OCXOZ0U   ; Check Relation #2 in Rule #50 'BIOCHEM ABNORMALITIES/CONTRAST MEDIA CHECK'
- Q
- ;
-EL133 ; Examine every rule that involves Element #133 [NO CREAT RESULTS W/IN X DAYS]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R50R2A^OCXOZ0U   ; Check Relation #2 in Rule #50 'BIOCHEM ABNORMALITIES/CONTRAST MEDIA CHECK'
- Q
- ;
-EL63 ; Examine every rule that involves Element #63 [PATIENT HAS RECENT CHOLECYSTOGRAM]
- ;  Called from SCAN+9^OCXOZ01.
- ;
- Q:$G(OCXOERR)
- ;
- D R51R1A^OCXOZ0U   ; Check Relation #1 in Rule #51 'RECENT CHOLECYSTOGRAM ORDER'
- Q
+ABREN(DFN) ;  Compiler Function: DETERMINE IF RENAL LAB RESULTS ARE ABNORMAL HIGH OR LOW
+ ;
+ N OCXFLAG,OCXVAL,OCXLIST,OCXTEST,UNAV,OCXTLIST,OCXTERM,OCXSLIST,OCXSPEC
+ S (OCXLIST,OCXTLIST)="",UNAV="0^<Unavailable>"
+ S OCXSLIST="" Q:'$$TERMLKUP("SERUM SPECIMEN",.OCXSLIST) UNAV
+ F OCXTERM="SERUM CREATININE","SERUM UREA NITROGEN" D  Q:($L(OCXLIST)>130)
+ .Q:'$$TERMLKUP(OCXTERM,.OCXTLIST)
+ .S OCXTEST=0 F  S OCXTEST=$O(OCXTLIST(OCXTEST)) Q:'OCXTEST  D  Q:($L(OCXLIST)>130)
+ ..S OCXSPEC=0 F  S OCXSPEC=$O(OCXSLIST(OCXSPEC)) Q:'OCXSPEC  D  Q:($L(OCXLIST)>130)
+ ...S OCXVAL=$$LOCL^ORQQLR1(DFN,OCXTEST,OCXSPEC),OCXFLAG=$P(OCXVAL,U,5)
+ ...I $L(OCXVAL),((OCXFLAG["H")!(OCXFLAG["L")) D 
+ ....N OCXY S OCXY=""
+ ....S OCXY=$P(OCXVAL,U,2)_": "_$P(OCXVAL,U,3)_" "_$P(OCXVAL,U,4)
+ ....S OCXY=OCXY_" "_$S($L(OCXFLAG):"["_OCXFLAG_"]",1:"")
+ ....S OCXY=OCXY_" "_$$FMTE^XLFDT($P(OCXVAL,U,7),"2P")
+ ....S:$L(OCXLIST) OCXLIST=OCXLIST_" " S OCXLIST=OCXLIST_OCXY
+ Q:'$L(OCXLIST) UNAV  Q 1_U_OCXLIST
+ ;  
+ ;
+FILE(DFN,OCXELE,OCXDFL) ;     This Local Extrinsic Function logs a validated event/element.
+ ;
+ N OCXTIMN,OCXTIML,OCXTIMT1,OCXTIMT2,OCXDATA,OCXPC,OCXPC,OCXVAL,OCXSUB,OCXDFI
+ S DFN=+$G(DFN),OCXELE=+$G(OCXELE)
+ ;
+ Q:'DFN 1 Q:'OCXELE 1 K OCXDATA
+ ;
+ S OCXDATA(DFN,OCXELE)=1
+ F OCXPC=1:1:$L(OCXDFL,",") S OCXDFI=$P(OCXDFL,",",OCXPC) I OCXDFI D
+ .S OCXVAL=$G(OCXDF(+OCXDFI)),OCXDATA(DFN,OCXELE,+OCXDFI)=OCXVAL
+ ;
+ M ^TMP("OCXCHK",$J,DFN)=OCXDATA(DFN)
+ ;
+ Q 0
+ ;
+LIST(DATA,LIST) ;   IS THE DATA FIELD IN THE LIST
+ ;
+ S:'($E(LIST,1)=",") LIST=","_LIST S:'($E(LIST,$L(LIST))=",") LIST=LIST_"," S DATA=","_DATA_","
+ Q (LIST[DATA)
+ ;
+OPIOID(ORPT) ;determine if pat is receiving opioid med
+ ; rtn 1^opioid drug 1, opioid drug 2, opioid drug3, ...
+ N ORDG,ORTN,ORNUM,ORDI,ORDCLAS,ORDERS,ORTEXT,DUP,DUPI,DUPJ,DUPLEN
+ S ORDG=0,ORTN=0,DUPI=0,DUPLEN=20
+ K ^TMP("ORR",$J)
+ S ORDG=$O(^ORD(100.98,"B","RX",ORDG))
+ D EN^ORQ1(ORPT_";DPT(",ORDG,2,"","","",0,0)
+ N J,HOR,SEQ,X S J=1,HOR=0,SEQ=0
+ S HOR=$O(^TMP("ORR",$J,HOR)) Q:+HOR<1 ORTN
+ F  S SEQ=$O(^TMP("ORR",$J,HOR,SEQ)) Q:+SEQ<1  D
+ .S X=^TMP("ORR",$J,HOR,SEQ)
+ .S ORNUM=+$P(X,";")
+ .Q:ORNUM=+$G(ORIFN)  ;quit if dup med order # = current order #
+ .S ORDI=$$VALUE^ORCSAVE2(ORNUM,"DRUG")
+ .I +$G(ORDI)>0 D
+ ..S ORDCLAS=$P(^PSDRUG(ORDI,0),U,2)  ;va drug class
+ ..I ($G(ORDCLAS)="CN101")!($G(ORDCLAS)="CN102") D  ;opioid classes
+ ...S ORTEXT=$$FULLTEXT^ORQOR1(ORNUM)
+ ...S ORTEXT=$P(ORTEXT,U)_" ["_$P(ORTEXT,U,2)_"]"
+ ...S DUPI=DUPI+1,DUP(DUPI)=" ["_DUPI_"] "_ORTEXT
+ ...S ORTN=1
+ I DUPI>0 D
+ .S DUPLEN=$P(215/DUPI,".")
+ .F DUPJ=1:1:DUPI D
+ ..I DUPJ=1 S ORDERS=$E(DUP(DUPJ),1,DUPLEN)
+ ..E  S ORDERS=ORDERS_", "_$E(DUP(DUPJ),1,DUPLEN)
+ K ^TMP("ORR",$J)
+ Q ORTN_U_$G(ORDERS)
+ ;
+TERMLKUP(OCXTERM,OCXLIST) ;
+ Q $$TERM^OCXOZ01(OCXTERM,.OCXLIST)
  ;

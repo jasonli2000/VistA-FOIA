@@ -1,4 +1,4 @@
-DVBAXS ; GENERATED FROM 'DVBA STATUS EDIT' INPUT TEMPLATE(#962), FILE 396;08/19/96
+DVBAXS ; GENERATED FROM 'DVBA STATUS EDIT' INPUT TEMPLATE(#850), FILE 396;04/27/95
  D DE G BEGIN
 DE S DIE="^DVB(396,",DIC=DIE,DP=396,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DVB(396,DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,9) S:%]"" DE(2)=% S %=$P(%Z,U,10) S:%]"" DE(5)=%,DE(9)=% S %=$P(%Z,U,11) S:%]"" DE(13)=% S %=$P(%Z,U,12) S:%]"" DE(16)=%
@@ -23,7 +23,7 @@ T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) D SET I '
  K DDER G X
 P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
- I $P(DQ(DQ),U,5)'["$",X?.1"-".N.1".".N,$P(DQ(DQ),U,5,99)["+X'=X" S X=+X
+ I $P(DQ(DQ),U,5)'["$",X?.1"-".N.1".".N S X=+X
 V D @("X"_DQ) K YS
 Z K DIC("S"),DLAYGO I $D(X),X'=U S DG(DW)=X S:DV["d" ^DISV(DUZ,"DIE",DLB)=X G A
 X W:'$D(ZTQUEUED) $C(7),"??" I $D(DB(DQ)) G Z^DIE17
@@ -45,7 +45,7 @@ SET I X'?.ANP S DDER=1 Q
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="DVBAXS",DQ=1
- S:$D(DTIME)[0 DTIME=300 S D0=DA,DIEZ=962,U="^"
+ S:$D(DTIME)[0 DTIME=300 S D0=DA,DIEZ=850,U="^"
 1 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=1 D X1 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
 X1 S CODE=$P(^DVB(396,D0,0),U,9) S:CODE="" Y="@2" S:DVBACORR="N"&(CODE'="P") Y="@2"
  Q

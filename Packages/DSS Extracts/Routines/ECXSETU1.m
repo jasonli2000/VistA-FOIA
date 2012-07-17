@@ -1,5 +1,5 @@
 ECXSETU1 ;BIR/DMA,CML,PTD-Get Movements and Treating Speciality for Setup ; [ 01/10/97  4:34 PM ]
- ;;3.0;DSS EXTRACTS;**8,24**;Dec 22, 1997
+ ;;3.0;DSS EXTRACTS;**8**;Dec 22, 1997
 EN ;entry point
  ;get movements
  S ECFILE=727.821,ECRN=0,QFLG=0
@@ -14,11 +14,10 @@ EN ;entry point
  .S ECODE=FAC_U_DFN_U_$P(D0,U,9)_U_$E($P($P(D0,U),",")_"    ",1,4)_"^3^"_$$ECXDATE^ECXUTL(ECD,ECXYM)_U
  .S ECA=$P($G(^DGPM(+$P(EC,U,14),0)),U)
  .S X1=ECD,X2=$P(EC,U) D ^%DTC S LOS=X
- .S ECODE=ECODE_U_$$ECXDATE^ECXUTL(ECA,ECXYM)_"^^"_ECDA_"^2^"_W_"^^"_LOS_"^^"_ECMT_U_ECTM_U_WTO_U_$$ECXTIME^ECXUTL(ECA)_"^^"
+ .S ECODE=ECODE_U_$$ECXDATE^ECXUTL(ECA,ECXYM)_"^^"_ECDA_"^2^"_W_"^^"_LOS_"^^"_ECMT_U_ECTM_U_WTO_U_$$ECXTIME^ECXUTL(ECA)_"^^^"
  .;fac^dfn^ssn^name^in/out^day^^adm date^disc date^mov #^type^losing ward^treat spec ^los^attending physician^movement type^mov time^gaining ward^adm time
  .S EC7=$O(^ECX(ECFILE,999999999),-1),EC7=EC7+1
  .S ^ECX(ECFILE,EC7,0)=EC7_U_ECXYM_U_U_ECODE,ECRN=ECRN+1
- .S $P(^ECX(ECFILE,EC7,1),U,2)=""
  .S DA=EC7,DIK="^ECX("_ECFILE_"," D IX^DIK K DIK,DA
  .I $D(ZTQUEUED),ECRN>499,'(ECRN#500),$$S^%ZTLOAD S QFLG=1
  S ECLAST=$O(^ECX(ECFILE,999999999),-1),ECTOTAL=$P(^ECX(ECFILE,0),U,4)+ECRN,$P(^(0),U,3,4)=ECLAST_U_ECTOTAL K ECLAST,ECTOTAL
@@ -33,11 +32,10 @@ EN ;entry point
  .S ECTRT="" F ECDA=ECCA:1:ECCA+10 S EC=$G(^DGPM(ECDA,0)) I $P(EC,U,14)=ECCA,$P(EC,U,2)=6 S ECTRT=$P($G(^DIC(45.7,+$P(EC,U,9),0)),U,2) Q
  .;get treating specialty associated with admission
  .S ECODE=U_DFN_U_$P(D0,U,9)_U_$E($P($P(D0,U),",")_"    ",1,4)_"^3^"_$$ECXDATE^ECXUTL(ECD,ECXYM)_"^^"_$$ECXDATE^ECXUTL(ECA,ECXYM)_"^^"_ECDA_"^6^^"_ECTRT_U_LOS
- .S ECODE=ECODE_U_ECPRO_$P(EC,U,19)_U_ECMT_U_ECTM_U_$$ECXTIME^ECXUTL(+ECA)_"^^^"
+ .S ECODE=ECODE_U_ECPRO_$P(EC,U,19)_U_ECMT_U_ECTM_U_$$ECXTIME^ECXUTL(+ECA)_"^^^^"
  .;fac^dfn^ssn^name^i/o^day^product^adm date^dis date^mov#^type^gaining ward^treat spec^duration^attending physician^movement type^trt time^adm time
  .S EC7=$O(^ECX(ECFILE,999999999),-1),EC7=EC7+1
  .S ^ECX(ECFILE,EC7,0)=EC7_U_ECXYM_U_U_ECODE,ECRN=ECRN+1
- .S $P(^ECX(ECFILE,EC7,1),U,8)=""
  .S DA=EC7,DIK="^ECX("_ECFILE_"," D IX^DIK K DIK,DA
  .I $D(ZTQUEUED),ECRN>499,'(ECRN#500),$$S^%ZTLOAD S QFLG=1
  S ECLAST=$O(^ECX(ECFILE,999999999),-1),ECTOTAL=$P(^ECX(ECFILE,0),U,4)+ECRN,$P(^(0),U,3,4)=ECLAST_U_ECTOTAL K ECLAST,ECTOTAL
@@ -64,7 +62,6 @@ MOVE ;
  .F EC0=0:0 S EC0=$O(^ECX(ECFR,"AM",ECYM,EC0)) Q:'EC0  S ECD=^ECX(ECFR,EC0,0),$P(ECD,U,3)=EC3 D
  ..S EC7=$O(^ECX(ECFILE,999999999),-1),EC7=EC7+1
  ..S ^ECX(ECFILE,EC7,0)=EC7_U_$P(ECD,U,2,200),ECRN=ECRN+1 S DA=EC7,DIK="^ECX("_ECFILE_"," D IX^DIK K DIK,DA
- ..S ^ECX(ECFILE,EC7,1)=^ECX(ECFR,EC0,1)
  ..S DIK="^ECX("_ECFR_",",DA=EC0 D ^DIK
  ..S ECCNT=ECCNT+1
  .S $P(^ECX(727,EC3,0),U,6)=ECRN

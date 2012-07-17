@@ -1,5 +1,5 @@
 PRCB8B ;WISC/PLT-AUTO GENERATE FMS VT-DOCUMENTS ;11/12/96  15:42
-V ;;5.1;IFCAP;**71,142**;Oct 20, 2000;Build 5
+V ;;5.1;IFCAP;**71,127**;Oct 20, 2000;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  QUIT  ;invalid entry
  ;
@@ -32,7 +32,7 @@ S S PRCRI(440.7)=$P(PRCFC,"^"),A=$P(PRCFC,"^",12),PRCSITE=$P(A,"-",2)
  . QUIT
  D SETSTAT^GECSSTAA(PRCRI(2100.1),"Q")
 EXIT S X=$G(PRCRI(2100.1))_"/"_PRCID
- L -^PRCH(440.7,PRCRI(440.7))
+ L -PRCH(440.7,PRCRI(440.7))
  QUIT
  ;
 SV2() ;create sv2

@@ -1,5 +1,5 @@
 EASEZQ ;ALB/jap - 1010EZ Quick Lookup ;02/26/2001  13:07
- ;;1.0;ENROLLMENT APPLICATION SYSTEM;;Mar 15, 2001
+ ;;1.0;ENROLLMENT APPLICATION SYSTEM;**1**;Mar 15, 2001
  ;
 EN ;Main entry point from 1010EZ menu option
  N X,Y,DIC,DA,OUT,DTOUT,DUOUT
@@ -37,28 +37,29 @@ DISPLAY ;display application data
  I $G(Y(0))'="" D
  .S APPNO=$P(Y(0),U,1),WEBID=$P(Y(0),U,2),APPNM=$P(Y(0),U,4)
  .S APPSSN=$P($P(Y(0),U,5),"&",1),APPDOB=$P($P(Y(0),U,5),"&",2)
- .S X=$P(Y(0),U,11),NEWPT=$S(X=1:"YES",1:"")
- .S X=$P(Y(0),U,13),EXPECT=$S(X=1:"YES",X=0:"NO",1:"")
- .S X=$P(Y(0),U,14),FIDIS=$S(X=1:"YES",X=0:"NO",1:"")
+ .S X=$P(Y(0),U,11),NEWPT=$S(X=1:"YES",1:"NO")
+ .S X=$P(Y(0),U,13),EXPECT=$S(X=1:"YES",1:"NO")
+ .S X=$P(Y(0),U,14),FIDIS=$S(X=1:"YES",1:"NO")
  .S Y=$P(Y(0),U,6) D DD^%DT S RECDT=Y
  .S DIQ="ARRAY",DIQ(0)="E",DA=+APPNO,DR="3.3;4;4.1;4.3;4.4;4.5;5.1;6.1;7.1;9.1;12",DIC=712 D EN^DIQ1
  .S X=$$GET1^DIQ(712,APPNO_",",13,"","COMM")
  .S X=$$CURRSTAT^EASEZU2(APPNO)
  .S CURR=$S(X="CLS":"INACTIVATED",X="FIL":"FILED",X="SIG":"SIGNED",X="PRT":"PRINTED,PENDING SIG.",X="REV":"IN REVIEW",1:"NEW")
+ .I CURR="NEW",NEWPT="NO" S NEWPT="unknown"
  .;display screen1 of data
  .;line1
  .S X=""
- .S X=$$SETSTR^VALM1("App #: ",X,1,8),X=$$SETSTR^VALM1(APPNO,X,9,6)
+ .S X=$$SETSTR^VALM1("App #: ",X,1,8),X=$$SETSTR^VALM1(APPNO,X,12,6)
  .S X=$$SETSTR^VALM1("Web ID: ",X,40,8),X=$$SETSTR^VALM1(WEBID,X,53,20)
  .W !,X
  .;line2
  .S X=""
- .S X=$$SETSTR^VALM1("To: ",X,1,7),XX=$G(ARRAY(712,APPNO,4.5,"E")),X=$$SETSTR^VALM1(XX,X,9,8)
+ .S X=$$SETSTR^VALM1("To: ",X,1,7),XX=$G(ARRAY(712,APPNO,4.5,"E")),X=$$SETSTR^VALM1(XX,X,12,8)
  .S X=$$SETSTR^VALM1("Date Rec'd: ",X,40,12),X=$$SETSTR^VALM1(RECDT,X,53,18)
  .W !,X
  .;line3
  .S X=""
- .S X=$$SETSTR^VALM1("Status: ",X,1,8),X=$$SETSTR^VALM1(IORVON_CURR_IORVOFF,X,9,30)
+ .S X=$$SETSTR^VALM1("Status: ",X,1,8),X=$$SETSTR^VALM1(IORVON_CURR_IORVOFF,X,12,30)
  .W !,X
  .;line4
  .S X=""
@@ -70,27 +71,27 @@ DISPLAY ;display application data
  .;line5
  .S X=""
  .S X=$$SETSTR^VALM1("Vet Type: ",X,1,11),XX=$G(ARRAY(712,APPNO,3.3,"E")),X=$$SETSTR^VALM1(XX,X,12,10)
- .S X=$$SETSTR^VALM1("Vet new to Vista?:",X,40,22),X=$$SETSTR^VALM1(NEWPT,X,63,4)
+ .S X=$$SETSTR^VALM1("Veteran new to Vista?:",X,40,26),X=$$SETSTR^VALM1(NEWPT,X,68,7)
  .W !,X
  .;line6
  .S X=""
  .S X=$$SETSTR^VALM1("Financial Disclosure: ",X,1,22),X=$$SETSTR^VALM1(FIDIS,X,23,4)
- .S X=$$SETSTR^VALM1("Expect copy from vet?:",X,40,22),X=$$SETSTR^VALM1(EXPECT,X,63,4)
+ .S X=$$SETSTR^VALM1("Expect copy from veteran?:",X,40,26),X=$$SETSTR^VALM1(EXPECT,X,68,4)
  .W !,X
  .W !
  .;line7
  .S X=""
- .S X=$$SETSTR^VALM1("Review start date: ",X,1,20),XX=$G(ARRAY(712,APPNO,5.1,"E")),X=$$SETSTR^VALM1(XX,X,21,14)
+ .S X=$$SETSTR^VALM1("Review start date: ",X,1,20),XX=$G(ARRAY(712,APPNO,5.1,"E")),X=$$SETSTR^VALM1(XX,X,23,14)
  .S X=$$SETSTR^VALM1("Print date: ",X,40,13),XX=$G(ARRAY(712,APPNO,6.1,"E")),X=$$SETSTR^VALM1(XX,X,53,14)
  .W !,X
  .;line8
  .S X=""
- .S X=$$SETSTR^VALM1("Sign date: ",X,1,20),XX=$G(ARRAY(712,APPNO,4.1,"E")),X=$$SETSTR^VALM1(XX,X,21,14)
+ .S X=$$SETSTR^VALM1("Sign date: ",X,1,20),XX=$G(ARRAY(712,APPNO,4.1,"E")),X=$$SETSTR^VALM1(XX,X,23,14)
  .S X=$$SETSTR^VALM1("File date: ",X,40,13),XX=$G(ARRAY(712,APPNO,7.1,"E")),X=$$SETSTR^VALM1(XX,X,53,14)
  .W !,X
  .;line9
  .S X=""
- .S X=$$SETSTR^VALM1("Inactivate date: ",X,1,20),XX=$G(ARRAY(712,APPNO,9.1,"E")),X=$$SETSTR^VALM1(XX,X,21,14)
+ .S X=$$SETSTR^VALM1("Inactivate date: ",X,1,20),XX=$G(ARRAY(712,APPNO,9.1,"E")),X=$$SETSTR^VALM1(XX,X,23,14)
  .W !,X
  .W !
  .;line10

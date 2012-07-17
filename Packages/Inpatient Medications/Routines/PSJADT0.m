@@ -1,7 +1,8 @@
 PSJADT0 ;BIR/CML3,PR,MLM-AUTO DC/HOLD CANCEL ;11 Aug 98 / 8:25 AM
- ;;5.0; INPATIENT MEDICATIONS ;**17,111,112,135,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**17,111,112,135**;16 DEC 97
  ;
  ;Reference to ^PS(55 supported by DBIA #2191.
+ ;Reference to ^PS(59.7 supported by DBIA #2181.
  ;
 ENDC ; dc active orders first, then non-verified orders
  W:'$D(PSJQUIET)&'$D(DGQUIET) !,"...discontinuing Inpatient Medication orders..."
@@ -16,7 +17,6 @@ ENDC ; dc active orders first, then non-verified orders
  .D ^PSGAL5
  .K TMP
  .S TMP(55.06,""_PSJDA_","_PSGP_","_"",28)="D"
- .S TMP(55.06,""_PSJDA_","_PSGP_","_"",136)=$S(PSGALO=1010:"DD",1:"DA")
  .D FILE^DIE("","TMP")
  .K TMP
  .S TMP(55.06,""_PSJDA_","_PSGP_","_"",34)=PSJDCDT
@@ -47,7 +47,6 @@ DC ;
  .K TMP
  K PSIVALT S PSIVAC="AD",PSIVALCK="STOP",PSIVREA="D",PSIVAL=$S('+$G(PSGALO):$G(PSIVRES),1:$P($G(^PS(53.3,+PSGALO,0)),U)) D D1^PSIVOPT2,LOG^PSIVORAL
  K TMP
- S TMP(55.01,""_+ON_","_DFN_","_"",157)=$S(PSGALO=1010:"DD",1:"DA")
  S TMP(55.01,""_+ON_","_DFN_","_"",.03)=PSJDCDT
  S TMP(55.01,""_+ON_","_DFN_","_"",121)=1
  D FILE^DIE("","TMP")

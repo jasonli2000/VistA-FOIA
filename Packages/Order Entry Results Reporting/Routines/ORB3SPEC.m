@@ -1,5 +1,5 @@
-ORB3SPEC ; slc/CLA - Support routine for ORB3 ;07/15/10  13:11
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**139,220,215,280**;Dec 17, 1997;Build 85
+ORB3SPEC ; slc/CLA - Support routine for ORB3 ;4/4/02  14:40
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**139,220,215**;Dec 17, 1997
 SPECIAL(ORN,ORBASPEC,ORBU,ORBUI,ORNUM,ORDFN,ORDATA,ORBSMSG,ORBMSG,ORBSDEV,ORBPRIM,ORBATTD) ;
  ;process special notifs to get recips (users,teams,devices)
  ; ORN: notif ien
@@ -105,7 +105,7 @@ LRALRTS(ORN,ORDFN,ORDATA,ORBSMSG,ORBMSG) ;find & delete matching alerts and gath
  Q:+$G(ORDFN)<1
  Q:+$G(ORDATA)<1
  N LRID,ORY,I,J,XQAID,XQ0,XQ1,ORNE,RECIP,ORDATAE,LRIDE,STDATE
- N ORTST,ORBMSGE,ORBMSGX,TXQAID,XQF,ORBHX,ORX,ORBI,ORTSTE
+ N ORTST,ORBMSGE,ORBMSGX,TXQAID,XQF,ORBHX,ORX,ORBI
  ;
  S LRID=$P($P(ORDATA,"|",2),"@")  ;get lab unique results id (OE IDE)
  Q:+$G(LRID)<1
@@ -134,12 +134,6 @@ LRALRTS(ORN,ORDFN,ORDATA,ORBSMSG,ORBMSG) ;find & delete matching alerts and gath
  ..S:ORBMSG["results: " ORTST=$P(ORBMSG,"results: ",2)
  .;
  .S ORBMSGE=$P(ORBMSGX,"): ",2)
- .S:ORBMSGE["[" ORTSTE=$P($P(ORBMSGE,"[",2),"]")  ;added to fix CQ #17548 (Part A) for CPRS v28.1 (TC).
- .;added to fix CQ #19497: undefined ORTSTE variable [v28.17] (TC)
- .I ORBMSGE'["[" D
- ..S:ORBMSGE["labs: " ORTSTE=$P(ORBMSGE,"labs: ",2)
- ..S:ORBMSGE["results: " ORTSTE=$P(ORBMSGE,"results: ",2)
- .E  S ORTSTE=""
  .;
  .S ORX=0
  .;if alert has recips, get recips from existing alert:
@@ -158,9 +152,8 @@ LRALRTS(ORN,ORDFN,ORDATA,ORBSMSG,ORBMSG) ;find & delete matching alerts and gath
  ;
  ;if prev alert msg for this pt, notif, lab unique id:
  I $L($G(ORBMSGE)) D
- .;S:ORBMSGE["[" ORBSMSG=$P(ORBMSGE,"]")_", "_ORTST_"]"
- .S ORBSMSG=$S(ORBMSGE["["&(ORTSTE'=ORTST):$P(ORBMSGE,"]")_", "_ORTST_"]",(ORBMSGE'["[")&(ORTSTE'=ORTST):ORBMSGE_", "_ORTST,1:ORBMSGE) ;added to fix CQ #17548 (Part A) for CPRS v28.1 (TC).
- .;S:ORBMSGE'["[" ORBSMSG=ORBMSGE_", "_ORTST
+ .S:ORBMSGE["[" ORBSMSG=$P(ORBMSGE,"]")_", "_ORTST_"]"
+ .S:ORBMSGE'["[" ORBSMSG=ORBMSGE_", "_ORTST
  ;
  Q
  ;

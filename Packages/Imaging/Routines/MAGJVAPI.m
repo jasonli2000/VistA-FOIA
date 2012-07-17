@@ -1,5 +1,5 @@
-MAGJVAPI ;WOIFO/MAT VistARad RPCs for ViX ; 28-Oct-2010 9:09pm
- ;;3.0;IMAGING;**90,115**;Mar 19, 2002;Build 1912;Dec 17, 2010
+MAGJVAPI ;WOIFO/MAT VistARad RPCs for ViX ; 2-Apr-2010 6:01pm
+ ;;3.0;IMAGING;**90**;Mar 19, 2002;Build 1764;Jun 09, 2010
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -34,7 +34,6 @@ MAGJVAPI ;WOIFO/MAT VistARad RPCs for ViX ; 28-Oct-2010 9:09pm
  ;            ^05: REMOTE ... VRad Remote Read Flag
  ;            ^06: MAGJVRV .. VRad Version
  ;            ^07: USERCLS .. VRad User Class
- ;            ^08: VIXTXID .. VRad VIX Transaction ID
  ; Returns ...
  ; ===========
  ;                ______ON_ERROR_______    ___EXPECTED___
@@ -68,11 +67,11 @@ LOGRIA01() ;
  ;
  ;--- Proceed iff no error.
  I MAGJVERR=0 D
- . N ACTION,MAGJTXT,NIMGS,PTCT,REMOTE,USERCLS,VIXTXID,VRADVER,YNRIST
+ . N ACTION,NIMGS,PTCT,REMOTE,VRADVER,USERCLS,YNRIST
  . S ACTION=$P(DATA,U,1) S:ACTION="" ACTION="Unspecified"
  . S REMOTE=$P(DATA,U,5) S:REMOTE="" REMOTE="Unspecified"
- . S NIMGS=$P(DATA,U,4),VRADVER=$P(DATA,U,6),VIXTXID=$P(DATA,U,8)
- . S USERCLS=$P(DATA,U,7),YNRIST=$S(+USERCLS:1,1:0)
+ . S NIMGS=$P(DATA,U,4),VRADVER=$P(DATA,U,6),USERCLS=$P(DATA,U,7)
+ . S YNRIST=$S(+USERCLS:1,1:0)
  . ;
  . ;--- Initialize PatientCount.
  . S PTCT=RADFN'=$G(MAGJOB("LASTPT",ACTION))
@@ -92,7 +91,6 @@ LOGRIA01() ;
  . S:REMOTE ACTION=ACTION_"/REM"
  . ;
  . ;--- Update the IMAGE ACCESS LOG file (#2006.95).
- . I VIXTXID'="" D ENTRY^MAGLOG(ACTION,DUZ,MAGIEN,MAGPACK,RADFN,NIMGS,VIXTXID) Q
  . D ENTRY^MAGLOG(ACTION,DUZ,MAGIEN,MAGPACK,RADFN,NIMGS)
  Q MAGJVERR
  ;

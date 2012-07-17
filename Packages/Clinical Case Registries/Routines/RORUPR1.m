@@ -1,9 +1,6 @@
 RORUPR1 ;HCIOFO/SG - SELECTION RULES PREPARATION  ; 11/20/05 4:56pm
- ;;1.5;CLINICAL CASE REGISTRIES;**12**;Feb 17, 2006;Build 1
+ ;;1.5;CLINICAL CASE REGISTRIES;;Feb 17, 2006
  ;
- ;01/04/2011 BAY/KAM ROR*1.5*12 Remedy Call 421530 Populate a variable
- ;                              to assist with Lab Test Result Code
- ;                              identification in GCPR^LA7QRY
  Q
  ;
  ;***** MARKS PARENT FILES TO PROCESS
@@ -88,8 +85,7 @@ LABSRCH() ;
  . S TMP=$$ERROR^RORERR(-55,,,,TMP)
  Q:RC<0 RC
  ;--- Prepare a list of Lab result codes for GCPR^LA7QRY
- ;01/04/2011 BAY/KAM ROR*1.5*12 added RORLRC variable set to next line
- S LRCODE="",RORLRC="CH"
+ S LRCODE=""
  F IR=1:1  S LRCODE=$O(RORLRC("B",LRCODE))  Q:LRCODE=""  D
  . S RORLRC(IR)=LRCODE
  K RORLRC("B")

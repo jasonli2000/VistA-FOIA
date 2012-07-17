@@ -1,7 +1,7 @@
-APSPT041 ; ;07/02/96
+APSPT041 ; ;09/17/98
  D DE G BEGIN
 DE S DIE="^APSPQA(32.4,",DIC=DIE,DP=9009032.4,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^APSPQA(32.4,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,9) S:%]"" DE(1)=% S %=$P(%Z,U,11) S:%]"" DE(2)=% S %=$P(%Z,U,12) S:%]"" DE(3)=% S %=$P(%Z,U,13) S:%]"" DE(4)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,9) S:%]"" DE(2)=% S %=$P(%Z,U,11) S:%]"" DE(3)=% S %=$P(%Z,U,12) S:%]"" DE(4)=% S %=$P(%Z,U,13) S:%]"" DE(5)=% S %=$P(%Z,U,17) S:%]"" DE(6)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -18,7 +18,7 @@ N I X="" G A:DV'["R",X:'DV,X:D'>0,A
 RD G QS:X?."?" I X["^" D D G ^DIE17
  I X="@" D D G Z^DIE2
  I X=" ",DV["d",DV'["P",$D(^DISV(DUZ,"DIE",DLB)) S X=^(DLB) I DV'["D",DV'["S" W "  "_X
-T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
+T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) I X?.ANP D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
  K DDER G X
 P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
@@ -38,40 +38,47 @@ RP D O I X="" S X=DE(DQ) G A:'DV,A:DC<2,N^DIE17
 I I DV'["I",DV'["#" G RD
  D E^DIE0 G RD:$D(X),PR
  Q
-SET I X'?.ANP S DDER=1 Q 
- N DIR S DIR(0)="SMV^"_DU,DIR("V")=1
+SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  I $D(DB(DQ)),'$D(DIQUIET) N DIQUIET S DIQUIET=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="APSPT041",DQ=1
-1 S DW="0;9",DV="S",DU="",DLB="WAS PROVIDER CONTACTED",DIFLD=.09
+1 S D=0 K DE(1) ;1200
+ S Y="OTHER FOR RECOMMENDATION^WL^^0;1^Q",DG="12",DC="^9009032.412" D DIEN^DIWE K DE(1) G A
+ ;
+2 S DW="0;9",DV="S",DU="",DLB="WAS PROVIDER CONTACTED",DIFLD=.09
  S DU="0:YES;1:NO;"
  G RE
-X1 Q
-2 S DW="0;11",DV="*P200'",DU="",DLB="PROVIDER CONTACTED",DIFLD=.11
+X2 Q
+3 S DW="0;11",DV="*P200'",DU="",DLB="PROVIDER CONTACTED",DIFLD=.11
  S DU="VA(200,"
  G RE
-X2 S DIC("S")="S X(1)=$G(^(""PS"")) I +X(1),$S('$P(X(1),""^"",4):1,1:$P(X(1),""^"",4)'<DT)" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
+X3 S DIC("S")="S X(1)=$G(^(""PS"")) I +X(1),$S('$P(X(1),""^"",4):1,1:$P(X(1),""^"",4)'<DT)" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
  Q
  ;
-3 S DW="0;12",DV="S",DU="",DLB="RECOMMENDATION ACCEPTED",DIFLD=.12
+4 S DW="0;12",DV="S",DU="",DLB="RECOMMENDATION ACCEPTED",DIFLD=.12
  S DU="0:NO;1:YES;"
  G RE
-X3 Q
-4 S DW="0;13",DV="S",DU="",DLB="AGREE WITH PROVIDER",DIFLD=.13
+X4 Q
+5 S DW="0;13",DV="S",DU="",DLB="AGREE WITH PROVIDER",DIFLD=.13
  S DU="0:YES;1:NO;"
  G RE
-X4 Q
-5 S D=0 K DE(1) ;1300
+X5 Q
+6 S DW="0;17",DV="NJ12,2",DU="",DLB="FINANCIAL COST",DIFLD=.17
+ G RE
+X6 S:X["$" X=$P(X,"$",2) K:X'?.N.1".".2N!(X>999999999)!(X<0) X
+ Q
+ ;
+7 S D=0 K DE(1) ;1300
  S Y="REASON FOR INTERVENTION^WL^^0;1^Q",DG="13",DC="^9009032.413" D DIEN^DIWE K DE(1) G A
  ;
-6 S D=0 K DE(1) ;1400
+8 S D=0 K DE(1) ;1400
  S Y="ACTION TAKEN^WL^^0;1^Q",DG="14",DC="^9009032.414" D DIEN^DIWE K DE(1) G A
  ;
-7 S D=0 K DE(1) ;1500
+9 S D=0 K DE(1) ;1500
  S Y="CLINICAL IMPACT^WL^^0;1^Q",DG="15",DC="^9009032.415" D DIEN^DIWE K DE(1) G A
  ;
-8 S D=0 K DE(1) ;1600
+10 S D=0 K DE(1) ;1600
  S Y="FINANCIAL IMPACT^WL^^0;1^Q",DG="16",DC="^9009032.416" D DIEN^DIWE K DE(1) G A
  ;
-9 G 0^DIE17
+11 G 0^DIE17

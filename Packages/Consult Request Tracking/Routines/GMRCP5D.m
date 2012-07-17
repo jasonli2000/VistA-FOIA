@@ -1,5 +1,5 @@
-GMRCP5D ;SLC/DCM,RJS,JFR,WAT - Print Consult form 513 (Gather Data - Addendums, Headers, Service reports and Comments) ;03/18/09  15:00
- ;;3.0;CONSULT/REQUEST TRACKING;**4,12,15,22,29,35,38,61,65,66**;Dec 27, 1997;Build 30
+GMRCP5D ;SLC/DCM,RJS,JFR,WAT - Print Consult form 513 (Gather Data - Addendums, Headers, Service reports and Comments) ;09/10/08
+ ;;3.0;CONSULT/REQUEST TRACKING;**4,12,15,22,29,35,38,61,65**;Dec 27, 1997;Build 7
  ;
  ;This routine invokes the following ICR(s):
  ;2056 $$GET1^DIQ, 2541 $$KSP^XUPARAM, 10103 $$FMTE^XLFDT, 10104 $$UP^XLFSTR, 10061 VADPT API
@@ -108,19 +108,14 @@ ADDEND(GMRCIFN,GMRCR0,GMRCNDX,GMRCRD,PAGEWID) ;
  Q
  ;
 HDR ; Header code for form 513
- ;GMRCPEL   ext fmt Primary Eligibiity Code
- ;GMRCELIG  ext fmt of Patient Type defined @ FORMAT^GMRCP5A
- ;CVELIG    marker to indicate if pt has active preference for Combat Veteran Eligibility status
+ ;
  ;get and format eligibility info
  N VAEL,VAPA,GMRCPEL,SUB,GMRCFROM
- N CVELIG ;WAT
+ N CVELIG,CVMARKER ;WAT
  D ELIG^VADPT
  D ADD^VADPT
- N VASV,OEFOIF D SVC^VADPT S:(VASV(11)>0)!(VASV(12)>0)!(VASV(13)>0) OEFOIF="OEF/OIF" ;WAT 66
  S GMRCPEL=$P(VAEL(1),U,2)
- I $L($G(GMRCELIG))  D
- .;if TYPE is Active Duty and VETERAN Y/N? is No, then call the pt Active Duty
- .S:$P(VAEL(6),U,1)=5&(VAEL(4)=0) GMRCELIG=$P(VAEL(6),U,2)
+ ;
  F SUB=0,1 D
  .N GMRCFLN
  .S GMRCFLN=$P($G(^DPT(GMRCDFN,0)),U,1)
@@ -136,7 +131,6 @@ HDR ; Header code for form 513
  .D BLD("HDR",SUB,0,16,$$EXDT(GMRCDOB))
  .D BLD("HDR",SUB,0,45,GMRCELIG)
  .D:$G(CVELIG)["CV" BLD("HDR",SUB,1,45,CVELIG)
- .D:$G(OEFOIF)="OEF/OIF" BLD("HDR",SUB,1,45,OEFOIF) ;WAT 66
  ;
  ;                                  ADDRESS LINES 1-3
  F GMRCX=1,2,3 D:$L(VAPA(GMRCX))
@@ -182,7 +176,6 @@ HDR ; Header code for form 513
  . D BLD("HDR",0,1,0,"Role: "_GMRCIRL)
  D BLD("HDR",0,1,0,GMRCEQL)
  ;
- D KVAR^VADPT ;WAT 66
  Q
  ;
 CENTER(X) ;

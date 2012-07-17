@@ -1,5 +1,5 @@
-DVBHQR11 ;ISC-ALBANY/PKE - parse HINQ response;6/10/09 7:39pm
- ;;4.0;HINQ;**32,35,49,63,65**;03/25/92;Build 19
+DVBHQR11 ;ISC-ALBANY/PKE-parse HINQ response ; 6/10/09 7:39pm
+ ;;4.0;HINQ;**32,35,49,63**;03/25/92 ;Build 2
  ;
  ;
 STAT ;Parse Statistics Segment for the records that have it.
@@ -131,11 +131,7 @@ ASTAT ;Statistics Segment of Type A Record.
  S $P(DVBVET,U,26)=$E(X,29,36)
  ;Blanks:
  S $P(DVBVET,U,27)=$E(X,37,40)
- ;P&T disability and dental
- S DVBPTIDT=$E(X,41,48) ;DVB*4*65
- S DVBDENTI=$E(X,49) ;DVB*4*65
- S L=50 D RON
- ;
+ S L=41 D RON
  Q
  ;
 BSTAT ;Statistics Segment of Type B Record.
@@ -162,10 +158,3 @@ CSTAT ;Statistics Segment of Type C Record.
  S $P(DVBVET,U,5)=$E(X,20,25)
  S L=86 D RON
  Q
- ;
-PENSION ;DVB*4*65
- S $P(DVBP(1),U,10)=$E(X,1,8),$P(DVBP(1),U,11)=$E(X,9,20),$P(DVBP(1),U,12)=$E(X,21,28),$P(DVBP(1),U,13)=$E(X,29,40),$P(DVBP(1),U,14)=$E(X,41,52),$P(DVBP(1),U,15)=$E(X,53,64),$P(DVBP(1),U,16)=$E(X,65,76)
- S L=77 D RON
- ;
- Q
- ;

@@ -1,12 +1,10 @@
 FBAAV5 ;AISC/GRR-CREATE TRANSACTIONS FOR CH/CNH PAYMENTS ;11 Apr 2006  2:54 PM
- ;;3.5;FEE BASIS;**3,55,89,98,116**;JAN 30, 1995;Build 30
+ ;;3.5;FEE BASIS;**3,55,89,98**;JAN 30, 1995;Build 54
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  D CKB9V^FBAAV01 I $G(FBERR) K FBERR Q
  G:FBSTAT="S"&(FBCHB="Y")&($P(Y(0),"^",18)'="Y") ^FBAAV6
 DETCH S FBTXT=0
- ; HIPAA 5010 - line items that have 0.00 amount paid are now required to go to Central Fee
- ;F K=0:0 S K=$O(^FBAAI("AC",J,K)) Q:K'>0  S Y(0)=$G(^FBAAI(K,0)),Y(2)=$G(^(2)) I Y(0)]"",+$P(Y(0),U,9) D
- F K=0:0 S K=$O(^FBAAI("AC",J,K)) Q:K'>0  S Y(0)=$G(^FBAAI(K,0)),Y(2)=$G(^(2)) I Y(0)]"" D
+ F K=0:0 S K=$O(^FBAAI("AC",J,K)) Q:K'>0  S Y(0)=$G(^FBAAI(K,0)),Y(2)=$G(^(2)) I Y(0)]"",+$P(Y(0),U,9) D
  .N FBPICN,FBY
  .S FBPICN=K
  .S FBY=$S($P(Y(2),U,2):$P(Y(2),U,2),1:$P(Y(0),U,2))_U_+$P(Y(2),U,3)

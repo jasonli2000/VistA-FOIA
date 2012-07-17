@@ -1,5 +1,5 @@
 PRCV442A ;WOIFO/CC-GET PO VALUES TO SEND TO DYNAMED;1/29/05
-V ;;5.1;IFCAP;**81,86**;Oct 20, 2000
+V ;;5.1;IFCAP;**81**;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  Q
  ;
@@ -90,7 +90,7 @@ RR(POIEN,PRCVLINE,PRCVRR,PRCVERR,ACTION) ; get receipt data for item
  ;              transmission to DynaMed or error occurred
  ;   ACTION   = flag  1 - approved report ; 2- deleted report
  ;
- N PRCV,PRCVI,PRCVDEL,PRCVR
+ N PRCV,PRCVI,PRCVCR,PRCVDEL,PRCVR
  S PRCVI=PRCVRR_","_PRCVLINE_","_POIEN_","
  D GETS^DIQ(442.08,PRCVI,"1;2;3;4","I","PRCVR")
  I $D(^TMP("DIERR",$J)) S PRCVERR=4 G RR2  ; RR not on file
@@ -100,7 +100,10 @@ RR(POIEN,PRCVLINE,PRCVRR,PRCVERR,ACTION) ; get receipt data for item
  S $P(PRCV,"^",11)=PRCVDEL_PRCVR(442.08,PRCVI,2,"I") ; total item cost (#2 NO P3)
  S $P(PRCV,"^",12)=PRCVDEL_PRCVR(442.08,PRCVI,4,"I") ; total discount for item(#4, N0 P5)
  S ^TMP("PRCV442A",$J,POIEN,PRCVLINE)=PRCV
-RR2 Q
+RR2 S PRCVCR=$$GET1^DIQ(442.11,(PRCVRR_","_POIEN_","),10,"I") ; warehouse signed(#10, N0 P11)
+ I 'PRCVERR S $P(^TMP("PRCV442A",$J,POIEN),"^",7)=PRCVCR ; D/T warehouse signed
+ I ACTION=2 D RRAUD^PRCV442B(POIEN,PRCV,PRCVCR)
+ Q
  ;
 UPD(POIEN) ; Update DynaMed of Approved POs with DynaMed items on them
  ;
@@ -152,16 +155,13 @@ REC(POIEN,PARTIAL,ACTION) ; Update DynaMed of Receiving Report activity
  ; PARTIAL  The number of the Receiving Report
  ; ACTION   1-signed ; 2-deleted
  ;
- N PRCV,PRCVDAT,PRCVERR,PRCVLINE,PRCVRR,PRCVDATA,PRCVSIG
- S PRCVSIG=$$GET1^DIQ(442.11,(PARTIAL_","_POIEN_","),10,"I") ;WH D/T signed (#10 n0p11)
- I PRCVSIG']"" Q  ; send only signed RR
+ N PRCVERR,PRCVLINE,PRCVRR,PRCVDATA
  ; Find all the items in the RR, get the fields needed
  K ^TMP("PRCV442A",$J)
  S PRCVERR=0
  D PO(POIEN,.PRCVDATA,.PRCVERR)
  I PRCVERR=1 D Q Q  ; order has MOP not used for DynaMed items
  I PRCVERR>0 S PRCVERR=PRCVERR_ACTION D TMPERR Q
- S PRCVDAT=$$NOW^XLFDT ; use for deletions
  S PRCVLINE=0
  F  S PRCVLINE=$O(^PRC(442,POIEN,2,PRCVLINE)) Q:+PRCVLINE'>0!(PRCVLINE']"")  D
  . S PRCVRR=0
@@ -170,10 +170,8 @@ REC(POIEN,PARTIAL,ACTION) ; Update DynaMed of Receiving Report activity
  . . I PRCVERR=1 Q  ; this is not a DM item
  . . I PRCVERR>0 S PRCVERR=PRCVERR_ACTION D TMPERR Q
  . . D RR(POIEN,PRCVLINE,PRCVRR,.PRCVERR,ACTION)
- . . I ACTION=2 S PRCV=$G(^TMP("PRCV442A",$J,POIEN,PRCVLINE)) D RRAUD^PRCV442B(POIEN,PRCV,PRCVSIG,PRCVDAT)
  . . I PRCVERR>1 S PRCVERR=PRCVERR_ACTION D TMPERR ; sends blanks to DM?
  I $O(^TMP("PRCV442A",$J,POIEN,""))]"" D
- . S $P(^TMP("PRCV442A",$J,POIEN),"^",7)=$S(ACTION=2:PRCVDAT,1:PRCVSIG)
  . S $P(^TMP("PRCV442A",$J,POIEN),"^",2)=$S(ACTION=2:4,1:3)
  . D EN^PRCVPOSD(POIEN)
  I $O(^TMP("PRCV442A",$J,POIEN,""))']"" S PRCVERR=1 D Q ; no item detail

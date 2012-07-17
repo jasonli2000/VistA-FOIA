@@ -1,4 +1,4 @@
-PRCST22 ; ;10/27/00
+PRCST22 ; ;11/22/00
  D DE G BEGIN
 DE S DIE="^PRCS(410,D0,""IT"",",DIC=DIE,DP=410.02,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^PRCS(410,D0,"IT",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(2)=% S %=$P(%Z,U,2) S:%]"" DE(11)=%,DE(18)=% S %=$P(%Z,U,3) S:%]"" DE(19)=% S %=$P(%Z,U,4) S:%]"" DE(9)=%,DE(15)=% S %=$P(%Z,U,5) S:%]"" DE(5)=% S %=$P(%Z,U,6) S:%]"" DE(20)=%
@@ -60,11 +60,15 @@ C2 G C2S:$D(DE(2))[0 K DB
  K ^PRCS(410,DA(1),"IT","B",$E(X,1,30),DA)
  S X=DE(2),DIC=DIE
  K ^PRCS(410,DA(1),"IT","AB",$E(X,1,30),DA)
+ S X=DE(2),DIC=DIE
+ ;
 C2S S X="" Q:DG(DQ)=X  K DB
  S X=DG(DQ),DIC=DIE
  S ^PRCS(410,DA(1),"IT","B",$E(X,1,30),DA)=""
  S X=DG(DQ),DIC=DIE
  S ^PRCS(410,DA(1),"IT","AB",$E(X,1,30),DA)=""
+ S X=DG(DQ),DIC=DIE
+ S Z(1)=$S($D(^PRCS(410,DA(1),3)):$P(^(3),U,3),1:"") S ^PRCS(410,DA(1),"IT",DA,0)=$P(^PRCS(410,DA(1),"IT",DA,0)_"^^^^^^^",U,1,7)_U_Z(1) K Z(1)
  Q
 X2 K:+X'=X!(X>999)!(X<1)!(X?.E1"."1N.N) X
  Q
@@ -158,8 +162,7 @@ C18 G C18S:$D(DE(18))[0 K DB
  S X=DE(18),DIC=DIE
  X "S E=0,E(1)="""" S:'$D(^PRCS(410,DA(1),4)) ^(4)="""" F E(0)=1:1 S E=$O(^PRCS(410,DA(1),""IT"",E)) S:E?1N.N&(E'=DA) E(1)=E(1)+($P(^(E,0),U,2)*$P(^(0),U,7)) I E'?1N.N X ^DD(410.02,2,1,1,1.4) K E Q"
 C18S S X="" Q:DG(DQ)=X  K DB
- S X=DG(DQ),DIC=DIE
- X "S E=0,E(1)="""" S:'$D(^PRCS(410,DA(1),4)) ^(4)="""" F E(0)=1:1 S E=$O(^PRCS(410,DA(1),""IT"",E)) S:E?1N.N E(1)=E(1)+($P(^(E,0),U,2)*$P(^(0),U,7)) I E'?1N.N X ^DD(410.02,2,1,1,1.4) K E Q"
+ D ^PRCST23
  Q
 X18 K:+X'=X!(X>999999)!(X<.01)!(X?.E1"."3N.N) X
  Q
@@ -178,9 +181,9 @@ X20 K:$L(X)>24!($L(X)<1)!(X'?.ANP) X
  S DE(DW)="C21^PRCST22"
  G RE
 C21 G C21S:$D(DE(21))[0 K DB
- D ^PRCST23
-C21S S X="" Q:DG(DQ)=X  K DB
  D ^PRCST24
+C21S S X="" Q:DG(DQ)=X  K DB
+ D ^PRCST25
  Q
 X21 S:X["$" X=$P(X,"$",2) Q:X?1"N/C"  K:+X'=X&(X'?.N1"."2N)!(X>9999999)!(X<0) X I $D(X) S:X=0 X="N/C"
  Q
@@ -198,4 +201,4 @@ X25 I $D(PRCSERR),PRCSERR S Y="@1"
 26 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=26 D X26 D:$D(DIEFIRE)#2 FIREREC^DIE17 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
 X26 D QRB^PRCSCK
  Q
-27 D:$D(DG)>9 F^DIE17 G ^PRCST25
+27 D:$D(DG)>9 F^DIE17 G ^PRCST26

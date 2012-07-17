@@ -1,5 +1,5 @@
-ORWCV ; SLC/KCM - Background Cover Sheet Load; ; 06/10/09
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,109,132,209,214,195,215,260,243,282,302,280**;Dec 17, 1997;Build 85
+ORWCV ; SLC/KCM - Background Cover Sheet Load; ; 3/6/08 6:34am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,109,132,209,214,195,215,260,243,282,302**;Dec 17, 1997;Build 37
  ;
  ;
  ; DBIA 1096    Reference to ^DGPM("ATID1"
@@ -47,7 +47,7 @@ BUILD ; called in background by task manager, expects DFN, JobID
  I $D(ZTQUEUED) S ZTREQ="@"
  I $G(^XTMP(NODE,"STOP")) K ^XTMP(NODE) Q  ; client no longer polling
  I '$D(^XTMP(NODE,0)) Q                    ; XTMP node has been purged
- L +^XTMP(NODE):$S($G(DILOCKTM)>0:DILOCKTM,1:5)
+ L +^XTMP(NODE)
  S ^XTMP(NODE,"DFN")=DFN
  ;N $ETRAP,$ESTACK
  ;S $ETRAP="D ERR^ORWCV Q"
@@ -105,7 +105,7 @@ POLL(LST,DFN,IP,HWND) ; poll for completed cover sheet parts
 STOP(OK,DFN,IP,HWND) ; stop cover sheet data retrieval
  S NODE="ORWCV "_IP_"-"_HWND_"-"_DFN,ILST=0,DONE=0
  S ^XTMP(NODE,"STOP")=1,OK=1
- L +^XTMP(NODE):$S($G(DILOCKTM)>0:DILOCKTM,1:5)
+ L +^XTMP(NODE)
  I $G(^XTMP(NODE,"DONE")) K ^XTMP(NODE)
  L -^XTMP(NODE)
  Q

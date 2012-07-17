@@ -1,7 +1,7 @@
-PRCHT112 ; ;10/06/97
+PRCHT112 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442,D0,2,",DIC=DIE,DP=442.01,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^PRC(442,D0,2,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,3) S:%]"" DE(1)=% S %=$P(%Z,U,6) S:%]"" DE(10)=% S %=$P(%Z,U,9) S:%]"" DE(2)=% S %=$P(%Z,U,12) S:%]"" DE(4)=% S %=$P(%Z,U,13) S:%]"" DE(11)=% S %=$P(%Z,U,16) S:%]"" DE(5)=% S %=$P(%Z,U,17) S:%]"" DE(8)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(1)=% S %=$P(%Z,U,3) S:%]"" DE(8)=% S %=$P(%Z,U,9) S:%]"" DE(9)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -43,66 +43,57 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
 BEGIN S DNM="PRCHT112",DQ=1
-1 D:$D(DG)>9 F^DIE17,DE S DQ=1,DW="0;3",DV="RP420.5'X",DU="",DLB="UNIT OF PURCHASE",DIFLD=3
- S DU="PRCD(420.5,"
- G RE
-X1 D EN6^PRCHNPO5
+1 S DW="0;2",DV="RNJ9,2",DU="",DLB="QUANTITY",DIFLD=2
+ S DE(DW)="C1^PRCHT112"
+ S X=$S($P(PRCHQUAN,U,12)'="":$P(PRCHQUAN,U,12),$P(PRCHQUAN,U,11)'="":$P(PRCHQUAN,U,11),1:"")
+ S Y=X
+ G Y
+C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
+ K DIV S DIV=X,D0=DA(1),DIV(0)=D0,D1=DA,DIV(1)=D1 S Y(1)=$S($D(^PRC(442,D0,2,D1,2)):^(2),1:"") S X=$P(Y(1),U,1) S DIU=X K Y S X=DIV S X="" X ^DD(442.01,2,1,1,2.4)
+C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+ X ^DD(442.01,2,1,1,1.3) I X S X=DIV S Y(1)=$S($D(^PRC(442,D0,2,D1,2)):^(2),1:"") S X=$P(Y(1),U,1) S DIU=X K Y X ^DD(442.01,2,1,1,1.1) X ^DD(442.01,2,1,1,1.4)
+ Q
+X1 K:+X'=X!(X>999999)!(X<.01)!(X?.E1"."3N.N) X
  Q
  ;
-2 S DW="0;9",DV="RNJ12,4XO",DU="",DLB="ACTUAL UNIT COST",DIFLD=5
- S DQ(2,2)="S Y(0)=Y S Y=$S(Y=""N/C"":""N/C"",1:""$""_$J(Y,0,4))"
- S DE(DW)="C2^PRCHT112"
- G RE
-C2 G C2S:$D(DE(2))[0 K DB S X=DE(2),DIC=DIE
- K DIV S DIV=X,D0=DA(1),DIV(0)=D0,D1=DA,DIV(1)=D1 S Y(1)=$S($D(^PRC(442,D0,2,D1,2)):^(2),1:"") S X=$P(Y(1),U,1) S DIU=X K Y S X=DIV S X="" X ^DD(442.01,5,1,1,2.4)
-C2S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
- X ^DD(442.01,5,1,1,1.3) I X S X=DIV S Y(1)=$S($D(^PRC(442,D0,2,D1,2)):^(2),1:"") S X=$P(Y(1),U,1) S DIU=X K Y X ^DD(442.01,5,1,1,1.1) X ^DD(442.01,5,1,1,1.4)
+2 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=2 D X2 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X2 I X<PRCHOLD N I F I=0:0 S I=$O(^PRC(442.8,"AC",PRCHPONO,PRCHINUM,I)) Q:'I  S PRCHTOT=PRCHTOT+$P($G(^PRC(442.8,I,0)),U,5)
  Q
-X2 S:X["$" X=$P(X,"$",2) S X=$TR(X,"nc","NC") K:(X'?1.N)&(X'?.N1".".4N)&(X'?1"N/C")!(X?.E1"."5N.N)!(X>9999999.9999)!(X<0) X D EN9^PRCHNPO5 I $D(X) W $S(X="N/C":"     N/C",1:"     $"_$J(X,0,4))
- Q
- ;
 3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X3 I $D(^PRC(442,DA(1),1)),$P(^(1),U,20)="Y" S Y="@6"
+X3 I $G(PRCHTOT)>X W !!!!!,$C(7),"****Delivery schedule total for this item (",PRCHTOT,") EXCEEDS order quantity (",X,").",!,"Edit delivery schedule(s).",!! S PRCHFLG=1,PRCHQTY=X S Y="@16"
  Q
-4 D:$D(DG)>9 F^DIE17,DE S DQ=4,DW="0;12",DV="NJ6,0X",DU="",DLB="PACKAGING MULTIPLE",DIFLD=3.1
- G RE
-X4 K:+X'=X!(X>999999)!(X<0)!(X?.E1"."1N.N) X D:$D(X) EN7^PRCHNPO6
+4 S DQ=5 ;@44
+5 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=5 D X5 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X5 I $P(PRCHQUAN,U,12)'="" I X<$P(PRCHQUAN,U,12) W !,"QUANTITY is less than the Minimum Order Quantity of ",$P(PRCHQUAN,U,12),$C(7) S Y=2
  Q
- ;
-5 S DW="0;16",DV="P420.5'X",DU="",DLB="SKU",DIFLD=9.4
- S DU="PRCD(420.5,"
- G RE
-X5 D EN6^PRCHNPO7
- Q
- ;
 6 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=6 D X6 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X6 S:X']"" Y=9
+X6 I $P(PRCHQUAN,U,9)'="" I X>$P(PRCHQUAN,U,9) W !,"QUANTITY is more than the Maximum Order Quantity of ",$P(PRCHQUAN,U,9),$C(7) S Y=2
  Q
 7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X7 S DIE("NO^")="A"
+X7 I $P(PRCHQUAN,U,11)'="" I X#$P(PRCHQUAN,U,11)'=0 W !,"QUANTITY is not a Required Order Multiple value of ",$P(PRCHQUAN,U,11),$C(7) S Y=2
  Q
-8 S DW="0;17",DV="RNJ6,0X",DU="",DLB="UNIT CONVERSION FACTOR",DIFLD=9.7
+8 D:$D(DG)>9 F^DIE17,DE S DQ=8,DW="0;3",DV="RP420.5'X",DU="",DLB="UNIT OF PURCHASE",DIFLD=3
+ S DU="PRCD(420.5,"
  G RE
-X8 K:+X'=X!(X>999999)!(X<1)!(X?.E1"."1N.N) X D:$D(X) EN7^PRCHNPO7
+X8 D EN6^PRCHNPO5
  Q
  ;
-9 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=9 D X9 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X9 K DIE("NO^")
- Q
-10 S DW="0;6",DV="FX",DU="",DLB="VENDOR STOCK NUMBER",DIFLD=9
+9 S DW="0;9",DV="RNJ12,4XO",DU="",DLB="ACTUAL UNIT COST",DIFLD=5
+ S DQ(9,2)="S Y(0)=Y S Y=$S(Y=""N/C"":""N/C"",1:""$""_$J(Y,0,4))"
+ S DE(DW)="C9^PRCHT112"
  G RE
-X10 K:$L(X)>30!($L(X)<1) X I $D(X) D EN12^PRCHNPO5
- I $D(X),X'?.ANP K X
+C9 G C9S:$D(DE(9))[0 K DB S X=DE(9),DIC=DIE
+ K DIV S DIV=X,D0=DA(1),DIV(0)=D0,D1=DA,DIV(1)=D1 S Y(1)=$S($D(^PRC(442,D0,2,D1,2)):^(2),1:"") S X=$P(Y(1),U,1) S DIU=X K Y S X=DIV S X="" X ^DD(442.01,5,1,1,2.4)
+C9S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+ X ^DD(442.01,5,1,1,1.3) I X S X=DIV S Y(1)=$S($D(^PRC(442,D0,2,D1,2)):^(2),1:"") S X=$P(Y(1),U,1) S DIU=X K Y X ^DD(442.01,5,1,1,1.1) X ^DD(442.01,5,1,1,1.4)
+ Q
+X9 S:X["$" X=$P(X,"$",2) S X=$TR(X,"nc","NC") K:(X'?1.N)&(X'?.N1".".4N)&(X'?1"N/C")!(X?.E1"."5N.N)!(X>9999999.9999)!(X<0) X D EN9^PRCHNPO5 I $D(X) W $S(X="N/C":"     N/C",1:"     $"_$J(X,0,4))
  Q
  ;
-11 S DW="0;13",DV="FX",DU="",DLB="NSN",DIFLD=9.5
- G RE
-X11 K:$L(X)>17!($L(X)<16)!'(X?4N1"-"2UN1"-"3UN1"-"4N.UN) X I $D(X) D EN1^PRCHNPO7
- I $D(X),X'?.ANP K X
+10 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=10 D X10 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X10 I $D(^PRC(442,DA(1),1)),$P(^(1),U,20)="Y" S Y="@6"
  Q
- ;
-12 S DQ=13 ;@6
-13 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=13 D X13 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X13 S:PRCHN("MP")=2 Y=4
+11 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=11 D X11 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X11 D TSTREQ1^PRCHNPO9
  Q
-14 D:$D(DG)>9 F^DIE17 G ^PRCHT113
+12 D:$D(DG)>9 F^DIE17 G ^PRCHT113

@@ -1,11 +1,8 @@
 PRCEAU0 ;WISC/LDB/BGJ-CREATE/EDIT AUTHORIZATION-CONTROL POINTS CONT. ; 07/08/93  12:03 PM
-V ;;5.1;IFCAP;**23**;Oct 20, 2000
+V ;;5.1;IFCAP;;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
 BUL ;called from PRCEAU,PRCEDRE/DRE1 to alert control about remaining balance
- Q:$P($G(^PRC(424,+$G(AUDA),0)),"^",5)=""
- ;  send bulletin, if remaining balance minus daily entry is 
- ;     smaller than 5% of the 1358 obligated balance.
- I $P(^PRC(424,+AUDA,0),U,5)-Y<($P(BAL,U)*.05) D EN^PRCEBL
+ I ($P(BAL,U,3)-Y)<($P(BAL,U)*.05) S IN=2 D EN^PRCEBL
  Q
 DEL ;delete or retain when uparrow entered
  S DIR(0)="YO",DIR("A")="Would you like to DELETE this authorization",DIR("B")="YES",DIR("?")="press <RETURN> to delete this entry, enter NO or '^' to retain entry" D ^DIR

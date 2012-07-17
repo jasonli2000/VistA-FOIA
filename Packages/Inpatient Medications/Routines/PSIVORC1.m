@@ -1,5 +1,5 @@
 PSIVORC1 ;BIR/MLM-PROCESS INCOMPLETE IV ORDER - CONT ;13 Jan 98 / 11:36 AM
- ;;5.0;INPATIENT MEDICATIONS ;**1,37,69,110,157,134,181,263**;16 DEC 97;Build 51
+ ;;5.0; INPATIENT MEDICATIONS ;**1,37,69,110,157,134**;16 DEC 97;Build 124
  ;
  ; Reference to ^DD("DD" is supported by DBIA 10017.
  ; Reference to ^DD( is supported by DBIA 2255.
@@ -8,7 +8,6 @@ PSIVORC1 ;BIR/MLM-PROCESS INCOMPLETE IV ORDER - CONT ;13 Jan 98 / 11:36 AM
  ; Reference to ^%DTC is supported by DBIA 10000.
  ; Reference to ^DID is supported by DBIA 2052.
  ; Reference to ^VALM is supported by DBIA 10118.
- ; Reference to ^PS(51.1 supported by DBIA #2177.
  ; Reference to ^PS(55 is supported by DBIA# 2191.
  ;
 53 ; IV Type
@@ -57,7 +56,6 @@ CKFLDS ; Find required fields missing data.
  .I '$D(DRG(PSIVASX)) S EDIT=EDIT_U_$S(PSIVASX="AD":57,1:58) Q
  .S DNE=0 F PSIVASY=0:0 S PSIVASY=$O(DRG(PSIVASX,PSIVASY)) Q:'PSIVASY!DNE  D
  .. I $P(DRG(PSIVASX,PSIVASY),U,3)="" S EDIT=EDIT_U_$S(PSIVASX="AD":57,1:58),DNE=1
- .. I $P(DRG(PSIVASX,PSIVASY),U,4)="See Comments",(EDIT'["57") S EDIT=EDIT_U_$S(PSIVASX="AD":57,1:58),DNE=1
  S:'P("MR") EDIT=EDIT_U_3 F X=8,6,2,3 I P(X)="" S EDIT=EDIT_U_$S(X=8:59,X=6:1,X=2:10,X=3:25,1:"")
  I P("DTYP")=1 S:P(9)="" EDIT=EDIT_U_26 S:P(11)="" EDIT=EDIT_U_39
  S:$E(EDIT,1)=U EDIT=$E(EDIT,2,999)
@@ -70,7 +68,7 @@ DONE ; Kill variables and exit
  Q
 ENHLP ; order entry fields' help
  N PSJHP,PSJX,PSJD
- ;From within this routine, F1 and F2 will refer to file 53.1,field 56, file 55.01,field 106, or file 55.01,field .04
+ ; From within this routine, F1 and F2 will refer to file 53.1,field 56, file 55.01,field 106, or file 55.01,field .04
  D FIELD^DID(F1,F2,"","HELP-PROMPT","PSJHP")
  I X="?",$D(PSJHP("HELP-PROMPT")) S F=$G(PSJHP("HELP-PROMPT")) W !?5 F F0=1:1:$L(F," ") S F3=$P(F," ",F0) W:$L(F3)+$X>78 !?5 W F3_" "
  ;
@@ -83,18 +81,10 @@ SC ;
  I F2=5!(F2=6) W !,"CHOOSE FROM:",!?8,0,?16,"NO",!?8,1,?16,"YES" Q
  Q
 COMPLTE ;
- NEW PSIVDSFG S PSIVDSFG=0
  S P16=0,PSIVEXAM=1,(PSIVNOL,PSIVCT)=1 D GTOT^PSIVUTL(P(4)) D ^PSIVCHK I $D(DUOUT) W $C(7),!,"Order Unchanged.",! Q
  G:'$D(PSIVFN1) EDIT1
  I ERR=1 S Y=0 G EDIT1
- D CKORD^PSIVORC2 I $G(PSJFNDS)!$S($G(PSIVDSFG):0,PSIVCHG:1,1:0)!$$INFRATE^PSJMISC(DFN,ON,P(8),P("DTYP")) D
- . K PSJFNDS
- . I $$SEECMENT^PSIVEDRG() S PSGORQF=1 W !!,"*** One or more Additives has an invalid value for the bottle number(s).",! D PAUSE^PSJMISC() Q
- . D IN^PSJOCDS($G(ON),"IV","")
- . Q:$G(PSGORQF)
- . Q:'PSIVCHG
- D NOW^%DTC S P("LOG")=$E(%,1,12),P("CLRK")=DUZ_U_$P($G(^VA(200,DUZ,0)),U),P("INS")=""
- Q:$G(PSGORQF)
+ D CKORD^PSIVORC2 I PSIVCHG D NOW^%DTC S P("LOG")=$E(%,1,12),P("CLRK")=DUZ_U_$P($G(^VA(200,DUZ,0)),U),P("INS")=""
  W ! D ^PSIVORLB K PSIVEXAM S Y=P(2)
  W !,"Start date: " X ^DD("DD") W $P(Y,"@")," ",$P(Y,"@",2),?30," Stop date: " S Y=P(3) X ^DD("DD") W $P(Y,"@")," ",$P(Y,"@",2),!
 EDIT ;
@@ -119,8 +109,8 @@ EDIT ;
  . K PSGPTMP,PSGRRF,PSG0XT,PSGS0Y,PSGSCH,PSGSD,PSGSDN,PSGSI,PSGSM
  . K PSGST,PSGSTAT,PSGSTN,PSJACNWP,PSJACOK,PSJCOI
 EDIT1 ;
- NEW XFLG,PSIVY S PSIVY=$G(Y)
- NEW X S X=$G(^TMP("PSJI",$J,0)),VALMBG=$S((X<17):1,1:(X-(X#16)))
+ NEW XFLG,PSIVY S PSIVY=Y
+ NEW X S X=^TMP("PSJI",$J,0),VALMBG=$S((X<17):1,1:(X-(X#16)))
  I PSIVY=0!'$G(PSIVFN1) S PSIVFN1=1 D EN^VALM("PSJ LM IV AC/EDIT") Q
  S PSIVCHG=0 D EDCHK^PSIVORC2 K PSIVCHG
  S VALMBCK="Q",PSIVACEP=1

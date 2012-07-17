@@ -1,15 +1,6 @@
 PRCHFPT1 ;WISC/RSD/RHD-CONT. OF PRINT ;5/1/98  15:59
- ;;5.1;IFCAP;**143**;Oct 20, 2000;Build 3
- ;Per VHA Directive 2004-038, this routine should not be modified.
- I $P($G(^PRC(442,D0,24)),U,3)="RMPR" D  K RMPRPO,RMPR664,RMPRR3
- . S RMPRPO=$P($P($G(^PRC(442,D0,0)),U),"-",2) Q:RMPRPO=""
- . S RMPR664=$O(^RMPR(664,"G",RMPRPO,0)) Q:RMPR664'>0
- . S RMPRR3=$G(^RMPR(664,RMPR664,3)) I $P(RMPRR3,U)="",$P(RMPRR3,U,4)="" Q
- . W !,"Prosthetics Delivery information:"
- . W !,?7,"Delivery To: ",$P(RMPRR3,U)
- . W !,?9,"Attention: ",$P(RMPRR3,U,4)
- . W ?96 F I=1:1:96 W @IOBS
- . W PRCHULN
+ ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  S Y=0 I PRCHDES="R",PRCHFPT,$D(^PRC(442,D0,11,PRCHFPT,0)),$P(^(0),U,12)]"" S X=^(0) D RR^PRCHFPT4
  D:'Y INV W !,"FOB POINT: ",$S("O"=$E($P(PRCH1,U,6)):"ORIGIN","D"=$E($P(PRCH1,U,6)):"DESTINATION",1:""),?34,"|","PROPOSAL: " S DIWL=1,DIWR=16,DIWF="",X=$P(PRCH1,U,8) K ^UTILITY($J,"W") D DIWP^PRCUTL($G(DA))
  K ^TMP($J,"W") S %X="^UTILITY($J,""W"",DIWL,",%Y="^TMP($J,""W"",DIWL," D %XY^%RCR

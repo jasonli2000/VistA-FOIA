@@ -1,7 +1,8 @@
-RTCC1 ; ;07/15/96
+RTCC1 ; ;08/25/94
  D DE G BEGIN
-DE S DIE="^RTV(190.3,",DIC=DIE,DP=190.3,DL=2,DIEL=0,DU="" K DG,DE,DB Q:$O(^RTV(190.3,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,9) S:%]"" DE(1)=% S %=$P(%Z,U,10) S:%]"" DE(2)=%
+DE S DIE="^RT(",DIC=DIE,DP=190,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^RT(DA,""))=""
+ I $D(^("CL")) S %Z=^("CL") S %=$P(%Z,U,2) S:%]"" DE(5)=% S %=$P(%Z,U,14) S:%]"" DE(8)=%
+ I $D(^("COMMENT")) S %Z=^("COMMENT") S %=$P(%Z,U,1) S:%]"" DE(1)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -9,7 +10,7 @@ W W !?DL+DL-2,DLB_": "
 O D W W Y W:$X>45 !?9
  I $L(Y)>19,'DV,DV'["I",(DV["F"!(DV["K")) G RW^DIR2
  W:Y]"" "// " I 'DV,DV["I",$D(DE(DQ))#2 S X="" W "  (No Editing)" Q
-TR R X:DTIME E  S (DTOUT,X)=U W $C(7)
+TR R X:DTIME E  S (DTOUT,X)=U W *7
  Q
 A K DQ(DQ) S DQ=DQ+1
 B G @DQ
@@ -18,14 +19,15 @@ N I X="" G A:DV'["R",X:'DV,X:D'>0,A
 RD G QS:X?."?" I X["^" D D G ^DIE17
  I X="@" D D G Z^DIE2
  I X=" ",DV["d",DV'["P",$D(^DISV(DUZ,"DIE",DLB)) S X=^(DLB) I DV'["D",DV'["S" W "  "_X
-T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
- K DDER G X
+T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) S %=$P($P(";"_DU,";"_X_":",2),";"),Y=X I %]"" X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
+ F %=1:1 S Y=$P(DU,";",%),DG=$F(Y,":"_X) G X:Y="" S YS=Y,Y=$P(Y,":") I DG X:$D(DIC("S")) DIC("S") I  Q:DG
+ W:'$D(DB(DQ)) $E(YS,DG,999) S X=$P(YS,":")
 P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
- I $P(DQ(DQ),U,5)'["$",X?.1"-".N.1".".N,$P(DQ(DQ),U,5,99)["+X'=X" S X=+X
+ I +$P(DV,",",2),X[".",$P(DQ(DQ),U,5)'["$" S X=$S($P(X,"00")="":"",$E(X)[0:$E(X,2,$L(X)),1:X) S:$E($P(X,".",2),$L($P(X,".",2)))[0 X=$E(X,1,$L(X)-1) I $P(X,".",2)=""&(X[".") S X=+X
 V D @("X"_DQ) K YS
 Z K DIC("S"),DLAYGO I $D(X),X'=U S DG(DW)=X S:DV["d" ^DISV(DUZ,"DIE",DLB)=X G A
-X W:'$D(ZTQUEUED) $C(7),"??" I $D(DB(DQ)) G Z^DIE17
+X W:'$D(ZTQUEUED) *7,"??" I $D(DB(DQ)) G Z^DIE17
  S X="?BAD"
 QS S DZ=X D D,QQ^DIEQ G B
 D S D=DIFLD,DQ(DQ)=DLB_U_DV_U_DU_U_DW_U_$P($T(@("X"_DQ))," ",2,99) Q
@@ -38,25 +40,45 @@ RP D O I X="" S X=DE(DQ) G A:'DV,A:DC<2,N^DIE17
 I I DV'["I",DV'["#" G RD
  D E^DIE0 G RD:$D(X),PR
  Q
-SET I X'?.ANP S DDER=1 Q 
- N DIR S DIR(0)="SMV^"_DU,DIR("V")=1
- I $D(DB(DQ)),'$D(DIQUIET) N DIQUIET S DIQUIET=1
- D ^DIR I 'DDER S %=Y(0),X=Y
- Q
 BEGIN S DNM="RTCC1",DQ=1
-1 S DW="0;9",DV="D",DU="",DLB="DATE/TIME OF NEXT MOVEMENT",DIFLD=9
- S X=$S('$D(RTPAST):"NOW",1:RTPAST)
- S Y=X
+1 S DW="COMMENT;1",DV="F",DU="",DLB="TEMPORARY COMMENT",DIFLD=75
+ S Y="@"
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
  G RD
-X1 S %DT="TX" D ^%DT S X=Y K:Y<1 X
+X1 K:$L(X)>75!($L(X)<2) X
+ I $D(X),X'?.ANP K X
  Q
  ;
-2 S DW="0;10",DV="P200'",DU="",DLB="USER RESPON FOR NEXT MOVEMENT",DIFLD=10
- S DU="VA(200,"
- S X=RTDUZ
- S Y=X
+2 S DQ=3 ;@11
+3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X3 S:'$P(RTCL,U,2) Y="@12"
+ Q
+4 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=4 S I(0,0)=D0 S Y(1)=$S($D(^RT(D0,"CL")):^("CL"),1:"") S X=$P(Y(1),U,2),X=X S D(0)=+X S X=$S(D(0)>0:D(0),1:"")
+ S DGO="^RTCC2",DC="^190.3^RTV(190.3," G DIEZ^DIE0
+R4 D DE G A
+ ;
+5 S DW="CL;2",DV="*P190.3",DU="",DLB="ASSOCIATED MOVEMENT",DIFLD=102
+ S DU="RTV(190.3,"
+ S Y="@"
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
- G Z
-X2 Q
-3 G 1^DIE17
+ G RD
+X5 S DIC("S")="I $D(D0),D0=+^(0)" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
+ Q
+ ;
+6 S DQ=7 ;@12
+7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X7 S:'$P(RTCL,U,14) Y="@15"
+ Q
+8 S DW="CL;14",DV="*P195.9X",DU="",DLB="ASSOCIATED BORROWER",DIFLD=114
+ S DU="RTV(195.9,"
+ S Y="@"
+ S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
+ G RD
+X8 D REC^RTDPA31 S DIC("S")="I $D(D0),$P(^RT(D0,0),U,4)=$P(^RTV(195.9,Y,0),U,3) D DICS^RTDPA31" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X
+ Q
+ ;
+9 S DQ=10 ;@15
+10 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=10 D X10 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X10 S:$S('$D(^RT(DA,"I")):1,'^("I"):1,1:0) Y="@18"
+ Q
+11 D:$D(DG)>9 F^DIE17 G ^RTCC3

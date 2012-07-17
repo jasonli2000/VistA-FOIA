@@ -1,5 +1,5 @@
 MPIFAPI ;CMC/BP-APIS FOR MPI ;DEC 21, 1998
- ;;1.0; MASTER PATIENT INDEX VISTA ;**1,3,14,16,17,21,27,28,33,35,37,43,45,44,46,48,55**;30 Apr 99;Build 3
+ ;;1.0; MASTER PATIENT INDEX VISTA ;**1,3,14,16,17,21,27,28,33,35,37,43,45,44,46,48**;30 Apr 99;Build 6
  ; Integration Agreements Utilized:
  ;   ^DPT( - #2070 and #4079
  ;   ^DPT("AICN", ^DPT("AMPIMIS", ^DPT("ASCN2" - #2070
@@ -92,11 +92,10 @@ MPIQ(DFN) ;MPI QUERY
  ..I $D(MPIFARR(2,DFN,.0906,"I")) D
  ...I MPIFARR(2,DFN,.09,"E")["P",("S"[MPIFARR(2,DFN,.0906,"I")) S MPIFP=".0906;"
  ..S DIE="^DPT(",DA=DFN,DIE("NO^")="BACK"
- ..S DR=MPIFP_".2403;.092;.093;1",DR(2,2.01)=".01;1" D ^DIE K DA,DIE,DR Q  ;*55 MPIC_1402 ALIAS SSN
+ ..S DR=MPIFP_".2403;.092;.093;1",DR(2,2.01)=".01" D ^DIE K DA,DIE,DR Q
  .I $G(DGNEW)="" D  ;Existing patient, get current values
  ..N MPIDOB,IMPRS,MPIMMN,MPICTY,MPIST
- ..S DIC=2,DR=".02;.03;.09;.0906;.092;.093;.2403;994;1",DR(2.01)=".01"
- ..;^ **44 include pseudo ssn reason to list
+ ..S DIC=2,DR=".02;.03;.09;.0906;.092;.093;.2403;994;1",DR(2.01)=".01" ;**44 include pseudo ssn reason to list
  ..S DA=DFN,DA(2.01)=1,DIQ(0)="EI",DIQ="MPIFARR"
  ..D EN^DIQ1 K DA,DIC,DIQ,DR
  ..;build DR from blank fields / imprecise DOB / pseudo SSN

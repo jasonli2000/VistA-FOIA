@@ -1,0 +1,36 @@
+DGPMXX4 ; COMPILED XREF FOR FILE #405 ; 06/24/93
+ ; 
+ S X=$P(DIKZ(0),U,14)
+ I X'="" S ^DGPM("CA",$E(X,1,30),DA)=""
+ S X=$P(DIKZ(0),U,14)
+ I X'="" K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(0)=X I "^3^5^"[("^"_$P(^DGPM(DA,0),"^",2)_"^") I X S X=DIV X ^DD(405,.14,1,3,89.2) S X=$S('$D(^DGPM(+$P(Y(101),U,17),0)):"",1:$P(^(0),U,1)) S D0=I(0,0) S DIU=X K Y S X=DIV S X=DA X ^DD(405,.14,1,3,1.4)
+ S X=$P(DIKZ(0),U,16)
+ I X'="" S ^DGPM("APTF",$E(X,1,30),DA)=""
+ S X=$P(DIKZ(0),U,17)
+ I X'="" D XREF^DGPMDDCN
+ S X=$P(DIKZ(0),U,18)
+ I X'="" K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(0)=X I "MAS MOVEMENT TYPE"'="TRANSFER IN"&("MAS MOVEMENT TYPE"'="TRANSFER OUT") I X S X=DIV S Y(1)=$S($D(^DGPM(D0,0)):^(0),1:"") S X=$P(Y(1),U,5),X=X S DIU=X K Y S X="" X ^DD(405,.18,1,1,1.4)
+ S X=$P(DIKZ(0),U,18)
+ I X'="" K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(0)=X S X=$S('$D(^DG(405.2,+Y(0),0)):"",1:$P(^(0),U,1))["DEATH" I X S X=DIV X ^DD(405,.18,1,2,89.2) S X=$P(Y(101),U,1) S D0=I(0,0) S DIU=X K Y X ^DD(405,.18,1,2,1.1) X ^DD(405,.18,1,2,1.4)
+ S X=$P(DIKZ(0),U,18)
+ I X'="" S Y=^DGPM(DA,0) I +Y,Y<DT S Y=$P(Y,U,2) I Y<4,$D(DGOTY) S DGHNYT=11 D ^DGPMGLC K DGIDX
+ S X=$P(DIKZ(0),U,18)
+ I X'="" I $P(^DGPM(DA,0),"^",2)=3 S A1B2TAG="ADM" D ^A1B2XFR
+ S X=$P(DIKZ(0),U,19)
+ I X'="" S DGPMDDF=19,DGPMDDT=1 D ^DGPMDDCN
+ S X=$P(DIKZ(0),U,22)
+ I X'="" S DGPMDDF=22 D ^DGPMDD1
+ S X=$P(DIKZ(0),U,23)
+ I X'="" S DGPMDDF=23 D ^DGPMDD1
+ S X=$P(DIKZ(0),U,24)
+ I X'="" S ^DGPM("APHY",$E(X,1,30),DA)=""
+ S DIKZ("ODS")=$S($D(^DGPM(DA,"ODS"))#2:^("ODS"),1:"")
+ S X=$P(DIKZ("ODS"),U,2)
+ I X'="" S A1B2TAG="ADM" D ^A1B2XFR
+ S X=$P(DIKZ("ODS"),U,4)
+ I X'="" S ^DGPM("AODSA",$E(X,1,30),DA)=""
+ S X=$P(DIKZ("ODS"),U,6)
+ I X'="" S A1B2TAG="ADM" D ^A1B2XFR
+ S X=$P(DIKZ("ODS"),U,7)
+ I X'="" S ^DGPM("AODSD",$E(X,1,30),DA)=""
+END Q

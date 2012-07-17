@@ -1,5 +1,5 @@
-ACKQUTL5 ;HCIOFO/BH-Quasar utilities routine ; 12/24/09 2:15pm
- ;;3.0;QUASAR;**1,4,6,8,18**;Feb 11, 2000;Build 1
+ACKQUTL5 ;HCIOFO/BH-Quasar utilities routine ; 04/01/99
+ ;;3.0;QUASAR;**1,4,6,8**;Feb 11, 2000
  ;Per VHA Directive 10-93-142, this routine SHOULD NOT be modified.
 SETREF(X,ACKVIEN,ACKTYPE) ;
  ; Maintains APCE xRef When 3 of the 4 entries are present & the 4TH
@@ -125,9 +125,9 @@ MODW ; Called from x ref of Modfr field within 509850.6
  ;
  ;
 MODS ; Screen for Modfrs input within Modifrs field of Modfrs File
- N ACKQDDD,ACKMOD,ACKMOD1
+ N ACKQDDD
  S ACKQDDD=$G(ACKVD)
- S DIC("S")="D GETS^DIQ(81.3,Y,"".01"",""I"",""ACKARR"",""ACKMSG"") S ACKMOD=$G(ACKARR(81.3,Y_"","","".01"",""I"")),ACKMOD1=$$MOD^ICPTMOD(ACKMOD) I $P($G(ACKMOD1),""^"",5)=""C""!($P($G(ACKMOD1),""^"",5)=""H""),$P($G(ACKMOD1),""^"",7)=1"
+ S DIC("S")="D GETS^DIQ(81.3,Y,"".04;5"",""I"",""ACKARR"",""ACKMSG"") I ACKARR(81.3,Y_"","",.04,""I"")=""C""!(ACKARR(81.3,Y_"","",.04,""I"")=""H""),ACKARR(81.3,Y_"","",5,""I"")'=1"
  S DIC("W")="W ""  "",$$MODTXT^ACKQUTL8(Y,"_ACKQDDD_")"
  Q
  ;

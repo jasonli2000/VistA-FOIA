@@ -1,7 +1,7 @@
-PRCHT115 ; ;10/06/97
+PRCHT115 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442.8,",DIC=DIE,DP=442.8,DL=3,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRC(442.8,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(1)=% S %=$P(%Z,U,3) S:%]"" DE(2)=% S %=$P(%Z,U,4) S:%]"" DE(3)=% S %=$P(%Z,U,5) S:%]"" DE(6)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,2) S:%]"" DE(1)=% S %=$P(%Z,U,3) S:%]"" DE(3)=% S %=$P(%Z,U,4) S:%]"" DE(4)=% S %=$P(%Z,U,5) S:%]"" DE(6)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -45,7 +45,7 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
 BEGIN S DNM="PRCHT115",DQ=1
 1 S DW="0;2",DV="RFX",DU="",DLB="ITEM",DIFLD=1
  S DE(DW)="C1^PRCHT115"
- S X=PRCHLINO
+ S X=PRCHDA
  S Y=X
  S X=Y,DB(DQ)=1 G:X="" N^DIE17:DV,A I $D(DE(DQ)),DV["I"!(DV["#") D E^DIE0 G A:'$D(X)
  G RD
@@ -54,32 +54,32 @@ C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
 C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  I $P(^PRC(442.8,DA,0),U,1)]"" S ^PRC(442.8,"AC",$P(^(0),U,1),X,DA)=""
  Q
-X1 K:X[""""!($A(X)=45) X I $D(X) K:$L(X)>5!($L(X)<1)!'(X?1N.N) X I $D(X) S Z=$O(^PRC(442,"B",$P(^PRC(442.8,DA,0),U,1),0)) K:'$O(^PRC(442,+Z,2,"B",X,0)) X K Z
+X1 K:X[""""!($A(X)=45) X I $D(X) K:$L(X)>5!($L(X)<1)!'(X?1N.N) X I $D(X) S Z=$O(^PRC(442,"B",$P(^PRC(442.8,DA,0),U,1),0)) K:'$D(^PRC(442,+Z,2,X,0)) X K Z
  I $D(X),X'?.ANP K X
  Q
  ;
-2 D:$D(DG)>9 F^DIE17,DE S DQ=2,DW="0;3",DV="RD",DU="",DLB="DELIVERY DATE",DIFLD=2
- S DE(DW)="C2^PRCHT115"
+2 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=2 D X2 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X2 S DIE("NO^")=""
+ Q
+3 D:$D(DG)>9 F^DIE17,DE S DQ=3,DW="0;3",DV="RD",DU="",DLB="DELIVERY DATE",DIFLD=2
+ S DE(DW)="C3^PRCHT115"
  G RE
-C2 G C2S:$D(DE(2))[0 K DB S X=DE(2),DIC=DIE
+C3 G C3S:$D(DE(3))[0 K DB S X=DE(3),DIC=DIE
  I $P(^PRC(442.8,DA,0),U,1)]"" K ^PRC(442.8,"AF",$E($P(^(0),U,1),1,30),X,DA)
-C2S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+C3S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  I $P(^PRC(442.8,DA,0),U,1)]"" S ^PRC(442.8,"AF",$E($P(^(0),U,1),1,30),X,DA)=""
  Q
-X2 S %DT="EX" D ^%DT S X=Y K:Y<1 X
+X3 S %DT="EX" D ^%DT S X=Y K:Y<1 X
  Q
  ;
-3 D:$D(DG)>9 F^DIE17,DE S DQ=3,DW="0;4",DV="RP410.8",DU="",DLB="LOCATION FOR DELIVERY",DIFLD=3
+4 D:$D(DG)>9 F^DIE17,DE S DQ=4,DW="0;4",DV="RP410.8",DU="",DLB="LOCATION FOR DELIVERY",DIFLD=3
  S DU="PRCS(410.8,"
  G RE
-X3 Q
-4 S DQ=5 ;@6
-5 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=5 D X5 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X5 S DIE("NO^")=""
- Q
-6 S DW="0;5",DV="RNJ9,2",DU="",DLB="QTY TO BE DELIVERED",DIFLD=4
+X4 Q
+5 S DQ=6 ;@6
+6 S DW="0;5",DV="RNJ9,0X",DU="",DLB="QUANTITY TO BE DELIVERED",DIFLD=4
  G RE
-X6 K:+X'=X!(X>999999.99)!(X<0)!(X?.E1"."3N.N) X
+X6 K:+X'=X!(X>999999999)!(X<0)!(X?.E1"."3N.N)!($D(PRCHQTY)&$D(PRCHTOT)&($G(PRCHTOT)+X-$P($G(^PRC(442.8,DA,0)),U,5)>$G(PRCHQTY)&(X'=0))) X
  Q
  ;
 7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
@@ -89,15 +89,21 @@ X7 K DIE("NO^")
 X8 S PRCHTOT=0,PRCHSCN="" F I=0:0 S PRCHSCN=$O(^PRC(442.8,"B",PRCHPONO,PRCHSCN)) Q:PRCHSCN=""  I $P(^PRC(442.8,PRCHSCN,0),U,2)=PRCHDA S PRCHTOT=PRCHTOT+$P(^(0),U,5)
  Q
 9 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=9 D X9 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X9 I PRCHTOT>$P(^PRC(442,PRCHDA1,2,PRCHDA,0),U,2) W *7,!,"Total quantity for the delivery schedules exceeds the purchase order quantity" S Y="@6"
+X9 S PRCHQTY=$P(^PRC(442,PRCHIEN,2,PRCHDA,0),U,2)
  Q
 10 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=10 D X10 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X10 I PRCHTOT<$P(^PRC(442,PRCHDA1,2,PRCHDA,0),U,2) W !,"Total quantity on delivery schedules is less than purchase order quantity",!
+X10 S PRCHMORE=$P(^PRC(442.8,DA,0),U,5),PRCHMOR2=(PRCHQTY-PRCHTOT+PRCHMORE)
  Q
 11 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=11 D X11 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X11 S DA(1)=PRCHDA1,DA=PRCHDA K PRCHDA,PRCHDA1,PRCHTOT,PRCHSCN S:X>0 Y=""
+X11 I PRCHTOT>PRCHQTY I PRCHMORE'=0 W *7,!,"Del. sched. total of ",PRCHTOT," for item ",PRCHDA," EXCEEDS the purchase",!,"order quantity of ",PRCHQTY,".",!,"Max. quantity here is ",$S(PRCHMOR2>0:PRCHMOR2,1:0),".",!! S Y="@6"
  Q
 12 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=12 D X12 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X12 W *7,!,"Delivery Schedule DELETED",!
+X12 I PRCHTOT<PRCHQTY W !,"Delivery schedule total of ",PRCHTOT," for item ",PRCHDA," is less than purchase",!,"order quantity.",!!
  Q
-13 D:$D(DG)>9 F^DIE17 G ^PRCHT116
+13 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=13 D X13 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X13 I X>0 S Y="@445"
+ Q
+14 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=14 D X14 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X14 W *7,!,"Delivery Schedule DELETED",!
+ Q
+15 D:$D(DG)>9 F^DIE17 G ^PRCHT116

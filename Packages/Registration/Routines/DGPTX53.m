@@ -1,4 +1,4 @@
-DGPTX53 ; ;04/23/09
+DGPTX53 ; ;04/12/09
  D DE G BEGIN
 DE S DIE="^DGPT(D0,""M"",",DIC=DIE,DP=45.02,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^DGPT(D0,"M",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,26) S:%]"" DE(30)=%,DE(33)=% S %=$P(%Z,U,27) S:%]"" DE(36)=%,DE(39)=% S %=$P(%Z,U,31) S:%]"" DE(24)=%,DE(27)=%

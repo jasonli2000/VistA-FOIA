@@ -1,8 +1,8 @@
-ONCOPRT ;Hines OIFO/GWB - OncoTrax reports ;03/07/11
- ;;2.11;ONCOLOGY;**24,25,26,27,36,50,51,52,53**;Mar 07, 1995;Build 31
- ;
+ONCOPRT ;Hines OIFO/GWB - OncoTrax reports ;06/23/10
+ ;;2.11;ONCOLOGY;**24,25,26,27,36,50,51**;Mar 07, 1995;Build 65
  ;This routine invokes Integration Agreement #3151
  ;
+ ;[SUS *..Casefinding/Suspense ...]
 SUS ;[SP Print Suspense List by Suspense Date (132c)]
  S BY="@75,INTERNAL(#3),@75,.01,75,2;C2"
  S (FR,TO)=DUZ(2)_",?"
@@ -36,7 +36,7 @@ DI ;[DI Disease Index]
  S DIS(0)="I $$DIDIV^ONCFUNC(D0)=""Y"""
  I SORT="[ONC DISEASE INDEX CASEFINDING]" D
  .S DIS(1)="S CODE=$P($G(^ICD9($P($G(^AUPNVPOV(D0,0)),U,1),0)),U,1) I (CODE>139.99)&(CODE<208.93)"
- .S DIS(2)="S CODE=$P($G(^ICD9($P($G(^AUPNVPOV(D0,0)),U,1),0)),U,1) I (CODE>208.99)&(CODE<209.30)"
+ .S DIS(2)="S CODE=$P($G(^ICD9($P($G(^AUPNVPOV(D0,0)),U,1),0)),U,1) I (CODE<208.99)&(CODE<209.30)"
  .S DIS(3)="I $P($G(^ICD9($P($G(^AUPNVPOV(D0,0)),U,1),0)),U,1)=209.30"
  .S DIS(4)="S CODE=$P($G(^ICD9($P($G(^AUPNVPOV(D0,0)),U,1),0)),U,1) I (CODE>209.30)&(CODE<209.37)"
  .S DIS(5)="S CODE=$P($G(^ICD9($P($G(^AUPNVPOV(D0,0)),U,1),0)),U,1) I (CODE>209.69)&(CODE<209.80)"
@@ -187,7 +187,8 @@ DISUS ;Add DISEASE INDEX case to suspense
  S X=$$GET1^DIQ(9000010,$$GET1^DIQ(9000010.07,D0,.03,"I"),.01,"I")
  S X=$P(X,".",1)
  D FILE^DICN
- K DO,DIE
+ K DO
+ K DIE
  S DA(1)=ONCIEN
  S DIE="^ONCO(160,"_DA(1)_",""SUS"","
  S (ONCSUB,DA)=+Y
@@ -196,15 +197,30 @@ DISUS ;Add DISEASE INDEX case to suspense
  S SUSCOUNT=SUSCOUNT+1
  Q
  ;
+STD ;[TD Print Suspense List by Month/Terminal Digit (132c)]
+ S BY="@75,INTERNAL(#3),#75,+12;S1;C27,@TERMINAL DIGIT;S1"
+ S (FR,TO)=DUZ(2)_",?,?"
+ S FLDS="[ONCO SUSPENSE]",DHD="[ONCO SUSPENSE/TERMDIG-HDR]"
+ G PRT60
+ ;
+SAT ;[CS Print Complete Suspense List by Term Digit (132c)]
+ S BY="@75,INTERNAL(#3),75,.01,@TERMINAL DIGIT;S1"
+ S (FR,TO)=DUZ(2)
+ S FLDS="[ONCO SUSPENSE]",DHD="[ONCO SUSPENSE-ALL/TERMDIG-HDR]"
+ W !!?10,"This option produces a list for requesting all charts"
+ W !?10,"that are currently in suspense.",!
+ G PRT60
+ ;
 DNP ;[NP Oncology Patient List-NO Primaries/Suspense]
  S BY="@75,INTERNAL(#3),@NO PRIMARY;L1,NAME"
  S (FR,TO)=DUZ(2)
  S FLDS="[ONCO PATIENT ONLY]"
  G PRT60
  ;
+ ;[ABS *..Abstracting/Printing ...]
 ABI ;[NC Print Abstract NOT Complete List]
  W !
- N BY,FLDS,FR,DIR,DIS,TO,Y
+ N Y
  K DIR
  S DIR(0)="SAO^1:Date Dx;2:Date of First Contact"
  S DIR("A")=" Select date field to be used for sorting: "
@@ -212,14 +228,12 @@ ABI ;[NC Print Abstract NOT Complete List]
  D ^DIR
  I $D(DIRUT) K DIRUT Q
  I Y<1 S OUT=1 Q
- I +Y=1 S BY="#+91,@INTERNAL(#3)"
- I +Y=2 S BY="#+91,@INTERNAL(#155)"
- S FR=",@"
- S TO=""
- S FLDS="[ONCO ABSTRACT NOT-COMPLETE]"
- S DIS(0)="I $P($G(^ONCO(165.5,D0,7)),U,2)'=3"
+ I +Y=1 S BY="[ONCO ABSTRACT NOT-COMPLETE]"
+ I +Y=2 S BY="[ONCO ABSTRACT NOT-COMPLETE 1]"
+ K DIR
  G PRT655
  ;
+ ;[FOL *..Follow-up Functions ...]
 PFH ;[FH Patient Follow-up History]
  D PAT I Y'<0 D  G EX
  .S BY="@NUMBER"
@@ -228,43 +242,34 @@ PFH ;[FH Patient Follow-up History]
  .D PRT60
  Q
  ;
+DAD ;[FA Print Due Follow-up/Admission List]
+ W ! S (BY,FLDS)="[ONCO DUE FOLLOWUP-ADM/DIS]"
+ S DIS(0)="I $$PFTD^ONCFUNC(D0)=""Y"""
+ G PRT60
+ ;
 DUF ;[DF Print Due Follow-up List by Month Due]
- W !
- N BY,FLDS,DIR,DIS,Y
- D DIR
- I $D(DIRUT) K DIRUT Q
- I Y<1 Q
- I +Y=1 S (BY,FLDS)="[ONCO DUE FOLLOWUP]"
- I +Y=2 S BY="[ONCO DUE FOLLOWUP]",FLDS="[ONCO DUE FOLLOWUP2]"
+ W ! S (BY,FLDS)="[ONCO DUE FOLLOWUP]"
+ S DIS(0)="I $$PFTD^ONCFUNC(D0)=""Y"""
+ G PRT60
+ ;
+DTD ;[TD Print Due Follow-up List by 'Terminal Digit']
+ W ! S (BY,FLDS)="[ONCO DUE FOLLOWUP/TERMDIG]"
  S DIS(0)="I $$PFTD^ONCFUNC(D0)=""Y"""
  G PRT60
  ;
 DEL ;[LF Print Delinquent (LTF) List]
- N BY,FLDS,DIR,DIS,Y
- W !!?5,"FOLLOW-UP STATUS will be changed from ""Active"" to ""LTF""."
+ W !!?5,"The FOLLOW-UP STATUS will be changed from ACTIVE to (LTF)."
  W !?5,"After 15 months the patient is considered LOST TO FOLLOW-UP."
- W !
- D DIR
- I $D(DIRUT) K DIRUT Q
- I Y<1 Q
- I +Y=1 S (BY,FLDS)="[ONCO DELINQUENT(LTF) LIST]"
- I +Y=2 S BY="[ONCO DELINQUENT(LTF) LIST]",FLDS="[ONCO DELINQUENT(LTF) LIST2]"
+ W !! S (BY,FLDS)="[ONCO DELINQUENT(LTF) LIST]"
  S DIS(0)="I $$PFTD^ONCFUNC(D0)=""Y"""
  G PRT60
- ;
-DIR ;DIR
- K DIR
- S DIR(0)="SAO^1:Standard format;2:Remote employees format"
- S DIR("A")=" Select report format: "
- S DIR("?")="Select the report format you wish to use for this report."
- D ^DIR
- Q
  ;
 FST ;[SR Follow-up Status Report by Patient (132c)]
  W ! S (BY,FLDS)="[ONCO FOLLOWUP STATUS RPT]"
  S DIS(0)="I $$PFTD^ONCFUNC(D0)=""Y"""
  G PRT60
  ;
+ ;[FP Follow-up Procedures Menu ...]
 PFR ;[FR Individual Follow-up Report]
  D PAT I Y'<0 D  G EX
  .S BY="@NUMBER"

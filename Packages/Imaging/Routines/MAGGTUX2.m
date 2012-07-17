@@ -1,5 +1,5 @@
 MAGGTUX2 ;WIOFO/GEK Imaging utility to validate INDEX values.
- ;;3.0;IMAGING;**59**;Nov 27, 2007;Build 20
+ ;;3.0;IMAGING;**59**;Mar 27, 2007;Build 15
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |

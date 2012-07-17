@@ -19,6 +19,7 @@ PRTCHK I RTWARD']"",$P(RTQ0,"^",6)'="x" Q
  ;
 HD ;
  K RTESC I RTPAGE,$E(IOST,1,2)="C-" D ESC^RTRD Q:$D(RTESC)
+ B
  S RTPAGE=RTPAGE+1,Y=RTRDT D D^DIQ
  W @IOF,!,"Record Pull List",$S(RTLIST="U":" [UPDATE ONLY]",RTLIST="N":" [NOT FILLABLE REQUESTS]",1:"")," - ",$P($P(RTAPL,"^"),";",2),?103,"Page    : ",RTPAGE,!,"[Institution : ",$P(^DIC(4,RTDV,0),"^"),"]",?103,"Run Date: ",Y
  W !,"[Sorted by: ",$S(RTSORT="C":"Clinic and Terminal Digits",RTSORT="A":"Clinic and Appointment Time",$D(RTTDFL):"Terminal Digits",1:"Name"),"]" S Y=RTDT D D^DIQ W ?97,"Requested Date: ",Y

@@ -1,4 +1,4 @@
-PRCST11 ; ;10/27/00
+PRCST11 ; ;11/22/00
  D DE G BEGIN
 DE S DIE="^PRCS(410,",DIC=DIE,DP=410,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^PRCS(410,DA,""))=""
  I $D(^(2)) S %Z=^(2) S %=$P(%Z,U,8) S:%]"" DE(1)=% S %=$P(%Z,U,9) S:%]"" DE(2)=% S %=$P(%Z,U,10) S:%]"" DE(3)=%
@@ -93,9 +93,13 @@ X7 I $D(PRCSERR),PRCSERR S Y="@1" K PRCSERR,PRCSF,PRCSI
 C8 G C8S:$D(DE(8))[0 K DB
  S X=DE(8),DIC=DIE
  X "Q:$P(^PRCS(410,DA,4),U,3)'=""""  S $P(^(4),""^"",8)="""" D TRANK^PRCSES"
+ S X=DE(8),DIC=DIE
+ X "Q:$P(^PRCS(410,DA,4),U,3)'=""""  S ^(4)=$S($D(^(4)):$P(^(4)_""^^^^^^"",U,1,7)_U,1:""^^^^^^^"") D TRANK^PRCSES"
 C8S S X="" Q:DG(DQ)=X  K DB
  S X=DG(DQ),DIC=DIE
  X "Q:$P(^PRCS(410,DA,4),U,3)'=""""  S $P(^(4),""^"",8)=X D TRANS^PRCSES"
+ S X=DG(DQ),DIC=DIE
+ X "Q:$P(^PRCS(410,DA,4),U,3)'=""""  S ^(4)=$S($D(^(4)):$P(^(4)_""^^^^^^"",U,1,7)_U_X,1:""^^^^^^^""_X) D TRANS^PRCSES"
  Q
 X8 S:X["$" X=$P(X,"$",2) K:+X'=X&(X'?.N1"."2N)!(X>9999999)!(X<0) X I $D(X) W "  $ ",$J(X,0,2)
  Q

@@ -1,6 +1,6 @@
-MAGGSIA1 ;WOIFO/GEK/SG/NST - RPC Call to Add Image File entry ; 01 Nov 2010 2:08 PM
- ;;3.0;IMAGING;**7,8,85,59,93,106,117**;Mar 19, 2002;Build 2238;Jul 15, 2011
- ;; Per VHA Directive 2004-038, this routine should not be modified.
+MAGGSIA1 ;WOIFO/GEK/SG - RPC Call to Add Image File entry ; 1/16/09 8:18am
+ ;;3.0;IMAGING;**7,8,85,59,93**;Dec 02, 2009;Build 163
+ ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |
@@ -8,6 +8,7 @@ MAGGSIA1 ;WOIFO/GEK/SG/NST - RPC Call to Add Image File entry ; 01 Nov 2010 2:08
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -20,12 +21,6 @@ PRE(MAGERR,MAGGFDA,MAGGRP,MAGGDRV,MAGREF) ;
  ;  Check on some possible problems: required fields etc.
  ;  Object Type and (Patient, or Short Desc) Required.
  N MAGRSLT,X,Z
- ; Patch 106: PRE^MAGGSIA1 is called by Import API only so
- ; if CAPTURE APPLICATION field (#8.1) is not set we set it to "I"
- ; For VI Capture and DICOM Gateway the value of #8.1 is set
- ; in ADD^MAGGTIA 
- I '$D(MAGGFDA(2005,"+1,",8.1)) S MAGGFDA(2005,"+1,",8.1)="I"
- S:$G(MAGGFDA(2005,"+1,",113))="" MAGGFDA(2005,"+1,",113)=1  ; Patch 117 Set STATUS (#113) to Viewable (1)
  I '$D(MAGGFDA(2005,"+1,",3)) D OBJTYPE
  I '$D(MAGGFDA(2005,"+1,",3)) S MAGERR="0^Need an Object Type " Q
  I '$D(MAGGFDA(2005,"+1,",5)),'$D(MAGGFDA(2005,"+1,",10)) D  Q
@@ -33,7 +28,7 @@ PRE(MAGERR,MAGGFDA,MAGGRP,MAGGDRV,MAGREF) ;
  ; IF no Procedure text we'll give it some so crossref will set.
  D PATCHK(.MAGRSLT) I 'MAGRSLT S MAGERR=MAGRSLT Q
  ; Patch 8 IAPI We Create IXCLS (#41 CLASS) and  IXPKG (#40 Package) if TYPE is in Data.
- ; But we are not making TYPE required yet for backward compatibility.
+ ; But we are not making TYPE required yet for backward compatibality.
  I $D(MAGGFDA(2005,"+1,",42)) D
  . I $$GET1^DIQ(2005.83,MAGGFDA(2005,"+1,",42),2,"E")="INACTIVE" D  S MAGRY=MAGERR Q
  . . S MAGERR="0^Index Type: "_$$GET1^DIQ(2005.83,MAGGFDA(2005,"+1,",42),.01,"E")_"is INACTIVE"

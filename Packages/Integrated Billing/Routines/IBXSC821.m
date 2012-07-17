@@ -1,4 +1,4 @@
-IBXSC821 ; ;09/05/07
+IBXSC821 ; ;06/23/08
  D DE G BEGIN
 DE S DIE="^DGCR(399,D0,""PRV"",",DIC=DIE,DP=399.0222,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^DGCR(399,D0,"PRV",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=% S %=$P(%Z,U,2) S:%]"" DE(3)=% S %=$P(%Z,U,3) S:%]"" DE(9)=% S %=$P(%Z,U,15) S:%]"" DE(5)=%
@@ -100,7 +100,7 @@ C3S S X="" G:DG(DQ)=X C3F1 K DB
  S X=DG(DQ),DIC=DIE
  X ^DD(399.0222,.02,1,2,1.3) I X S X=DIV S Y(1)=$S($D(^DGCR(399,D0,"PRV",D1,0)):^(0),1:"") S X=$P(Y(1),U,3),X=X S DIU=X K Y S X=DIV S X=$$EXTCR^IBCEU5(X) X ^DD(399.0222,.02,1,2,1.4)
  S X=DG(DQ),DIC=DIE
- X ^DD(399.0222,.02,1,3,1.3) I X S X=DIV S Y(1)=$S($D(^DGCR(399,D0,"PRV",D1,0)):^(0),1:"") S X=$P(Y(1),U,8),X=X S DIU=X K Y S X=DIV S X=$$SPEC^IBCEU(X) X ^DD(399.0222,.02,1,3,1.4)
+ X ^DD(399.0222,.02,1,3,1.3) I X S X=DIV S Y(1)=$S($D(^DGCR(399,D0,"PRV",D1,0)):^(0),1:"") S X=$P(Y(1),U,8),X=X S DIU=X K Y S X=DIV S X=$$SPEC^IBCEU(X,$P($G(^DGCR(399,D0,"U")),U)) X ^DD(399.0222,.02,1,3,1.4)
  S X=DG(DQ),DIC=DIE
  ;
  S X=DG(DQ),DIC=DIE

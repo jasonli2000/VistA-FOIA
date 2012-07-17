@@ -1,5 +1,7 @@
 DGPMBSR ;ALB/LM - BED STATUS REPORT RECALCULATION; 16 JAN 91
- ;;5.3;Registration;;Aug 13, 1993
+ ;;5.3;Registration;**34**;Aug 13, 1993
+ ;
+ ;Finds date range, and sets up for recalc.
  ;
 A I $S('$D(RC):1,'RC:1,1:0) Q  ;  RC=ReCalc from Date
  D CLEAN^DGPMGLG
@@ -9,7 +11,16 @@ A I $S('$D(RC):1,'RC:1,1:0) Q  ;  RC=ReCalc from Date
  S X1=PD,X2=-1 D C^%DTC S TSRIPD=X ;  TSR initialization previous date
  S (BS,GL,TSR)=0,DAYC=-1
  ;  Steps thru days to do Recalc
- F PP=1:1 S X1=RC,DAYC=DAYC+1,X2=DAYC D C^%DTC S (RD,X1)=X,X2=-1 D C^%DTC S PD=X Q:RD>YD!('PD)  D ^DGPMBSR1,^DGPMBSR2,^DGPMBSR3,^DGPMBSR4 I $D(^DGS(43.5,"AGL")) D DELETE
+ F  S X1=RC,DAYC=DAYC+1,X2=DAYC D  Q:RD>YD!('PD)
+ .D C^%DTC ; sets report date
+ .S (RD,X1)=X,X2=-1 D C^%DTC S PD=X ; finds previous date
+ .Q:RD>YD!('PD)  ;quits if RD>yesterday or no previous date
+ .D ^DGPMBSR1 ; initializes and sets up ^UTILITY, then continues
+ .; to process each movement
+ .D ^DGPMBSR2 ; for REMaining Totals
+ .D ^DGPMBSR3 ; Sets up Census nodes for BSR
+ .D ^DGPMBSR4 ; Sets up Census nodes for TSR
+ .I $D(^DGS(43.5,"AGL")) D DELETE
  ;  Deletes ReCalc started and ReCalc up to from file 43
  S DIE="^DG(43,",DA=1,DR="52///@;53///@" D ^DIE K DA,DIE,DR
  S RD=DGP("RD"),PD=DGP("PD"),GL=DGP("GL"),BS=DGP("BS"),TSR=DGP("TSR"),REM=DGP("REM"),RC=0

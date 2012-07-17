@@ -1,5 +1,5 @@
-LBRYSEND ;SSI/ALA - SEND TRANSACTIONS TO FORUM ;[ 04/19/2000  10:44 AM ]
- ;;2.5;LIBRARY;**8,11**;Mar 11, 1996
+LBRYSEND ;SSI/ALA-SEND TRANSACTIONS TO FORUM ;[ 04/19/2000  10:44 AM ]
+ ;;2.5;LIBRARY;**8**;Mar 11, 1996
  ;
  K ^TMP("LBRY")
  S STN=$P(^DIC(4,$P(^XMB(1,1,"XUS"),U,17),99),U),REF="           "
@@ -40,11 +40,6 @@ XM ; Take all transactions waiting for transmission and pass
  S XMDUZ=^XMB("NETNAME"),XMY("S.LBRYFSRV@"_TRNSM)=""
  S XMTEXT="^TMP(""LBRY"","
  D ^XMD
- ;
- ; Delete messages
- I XMZ'<1 D   ; If message # returns from last send - then delete it.
- .S XMSER="S.LBRYSRV" D REMSBMSG^XMA1C K XMSER
- ;
  S DIC="^LBRY(682.1,",DIE=DIC,DA=N,DR="2///^S X=""T""" D ^DIE
- K ^TMP("LBRY"),TRNSM,XMZ
+ K ^TMP("LBRY"),TRNSM
  Q

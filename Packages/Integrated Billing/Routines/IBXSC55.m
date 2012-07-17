@@ -1,4 +1,4 @@
-IBXSC55 ; ;04/03/98
+IBXSC55 ; ;04/09/01
  D DE G BEGIN
 DE S DIE="^DGCR(399,D0,""CV"",",DIC=DIE,DP=399.047,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^DGCR(399,D0,"CV",DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=% S %=$P(%Z,U,2) S:%]"" DE(2)=%
@@ -14,17 +14,17 @@ TR R X:DTIME E  S (DTOUT,X)=U W $C(7)
 A K DQ(DQ) S DQ=DQ+1
 B G @DQ
 RE G PR:$D(DE(DQ)) D W,TR
-N I X="" G A:DV'["R",X:'DV,X:D'>0,A
+N I X="" G NKEY:$D(^DD("KEY","F",DP,DIFLD)),A:DV'["R",X:'DV,X:D'>0,A
 RD G QS:X?."?" I X["^" D D G ^DIE17
  I X="@" D D G Z^DIE2
  I X=" ",DV["d",DV'["P",$D(^DISV(DUZ,"DIE",DLB)) S X=^(DLB) I DV'["D",DV'["S" W "  "_X
 T G M^DIE17:DV,^DIE3:DV["V",P:DV'["S" X:$D(^DD(DP,DIFLD,12.1)) ^(12.1) I X?.ANP D SET I 'DDER X:$D(DIC("S")) DIC("S") I  W:'$D(DB(DQ)) "  "_% G V
  K DDER G X
-P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) I DV'["*" D ^DIC S X=+Y,DIC=DIE G X:X<0
+P I DV["P" S DIC=U_DU,DIC(0)=$E("EN",$D(DB(DQ))+1)_"M"_$E("L",DV'["'") S:DIC(0)["L" DLAYGO=+$P(DV,"P",2) G:DV["*" AST^DIED D NOSCR^DIED S X=+Y,DIC=DIE G X:X<0
  G V:DV'["N" D D I $L($P(X,"."))>24 K X G Z
  I $P(DQ(DQ),U,5)'["$",X?.1"-".N.1".".N,$P(DQ(DQ),U,5,99)["+X'=X" S X=+X
 V D @("X"_DQ) K YS
-Z K DIC("S"),DLAYGO I $D(X),X'=U S DG(DW)=X S:DV["d" ^DISV(DUZ,"DIE",DLB)=X G A
+Z K DIC("S"),DLAYGO I $D(X),X'=U D:$G(DE(DW,"INDEX")) SAVEVALS G:'$$KEYCHK UNIQFERR^DIE17 S DG(DW)=X S:DV["d" ^DISV(DUZ,"DIE",DLB)=X G A
 X W:'$D(ZTQUEUED) $C(7),"??" I $D(DB(DQ)) G Z^DIE17
  S X="?BAD"
 QS S DZ=X D D,QQ^DIEQ G B
@@ -42,14 +42,22 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  I $D(DB(DQ)),'$D(DIQUIET) N DIQUIET S DIQUIET=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
+SAVEVALS S @DIEZTMP@("V",DP,DIIENS,DIFLD,"O")=$G(DE(DQ)) S:$D(^("F"))[0 ^("F")=$G(DE(DQ))
+ I $D(DE(DW,"4/")) S @DIEZTMP@("V",DP,DIIENS,DIFLD,"4/")=""
+ E  K @DIEZTMP@("V",DP,DIIENS,DIFLD,"4/")
+ Q
+NKEY W:'$D(ZTQUEUED) "??  Required key field" S X="?BAD" G QS
+KEYCHK() Q:$G(DE(DW,"KEY"))="" 1 Q @DE(DW,"KEY")
 BEGIN S DNM="IBXSC55",DQ=1+D G B
 1 S DW="0;1",DV="M*P399.1'",DU="",DLB="VALUE CODE",DIFLD=.01
  S DE(DW)="C1^IBXSC55"
  S DU="DGCR(399.1,"
  G RE:'D S DQ=2 G 2
-C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
+C1 G C1S:$D(DE(1))[0 K DB
+ S X=DE(1),DIC=DIE
  K ^DGCR(399,DA(1),"CV","B",$E(X,1,30),DA)
-C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+C1S S X="" Q:DG(DQ)=X  K DB
+ S X=DG(DQ),DIC=DIE
  S ^DGCR(399,DA(1),"CV","B",$E(X,1,30),DA)=""
  Q
 X1 S DIC("S")="I +$P($G(^DGCR(399.1,+Y,0)),U,11)" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X

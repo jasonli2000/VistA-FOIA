@@ -1,5 +1,5 @@
 NHINVLR ;SLC/MKB -- Laboratory extract
- ;;1.0;NHIN;**1**;Oct 25, 2010;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -27,8 +27,8 @@ EN(DFN,BEG,END,MAX,ID) ; -- find patient's lab results
  .. S SUB=$S("CH^MI"[NHSUB:NHSUB,1:"AP")_"(.NHITM)"
  .. D @SUB,XML(.NHITM)
  .. K ^TMP("LRRR",$J,DFN)
- ;
  D RR^LR7OR1(DFN,,BEG,END,NHSUB,,,MAX)
+ ;
  S NHSUB="" F  S NHSUB=$O(^TMP("LRRR",$J,DFN,NHSUB)) Q:NHSUB=""  D
  . S NHIDT=0 F  S NHIDT=$O(^TMP("LRRR",$J,DFN,NHSUB,NHIDT)) Q:NHIDT<1  D
  .. S NHI=0 F  S NHI=$O(^TMP("LRRR",$J,DFN,NHSUB,NHIDT,NHI)) Q:NHI<1  D
@@ -39,11 +39,10 @@ EN(DFN,BEG,END,MAX,ID) ; -- find patient's lab results
  ;
 CH(LAB) ; -- return a Chemistry result in LAB("attribute")=value
  ;      Expects ^TMP("LRRR",$J,DFN,"CH",NHIDT,NHI),LRDFN
- N CDT,LR0,LRI,X0,X,LOINC,ORD,CMMT K LAB
- S LAB("id")="CH;"_NHIDT_";"_NHI,LAB("type")="CH"
- S CDT=9999999-NHIDT,LAB("collected")=CDT
- S LR0=$G(^LR(LRDFN,"CH",NHIDT,0)),LRI=$G(^(NHI))
- S LAB("status")="completed",LAB("resulted")=$P(LR0,U,3)
+ N ID,CDT,X0,X,NUM,ORD,CMMT,LR0,LOINC K LAB
+ S ID="CH;"_NHIDT_";"_NHI,LAB("id")=ID
+ S CDT=9999999-NHIDT,LAB("collected")=CDT,LAB("status")="completed"
+ S LR0=$G(^LR(LRDFN,"CH",NHIDT,0)),LAB("resulted")=$P(LR0,U,3)
  S X0=$G(^TMP("LRRR",$J,DFN,"CH",NHIDT,NHI))
  S LAB("test")=$P($G(^LAB(60,+X0,0)),U) ;$P(X0,U,10)?
  S:$L($P(X0,U,2)) LAB("result")=$P(X0,U,2)
@@ -51,13 +50,13 @@ CH(LAB) ; -- return a Chemistry result in LAB("attribute")=value
  S:$L($P(X0,U,3)) LAB("interpretation")=$P(X0,U,3)
  S X=$P(X0,U,5) I $L(X),X["-" S LAB("low")=$P(X,"-"),LAB("high")=$P(X,"-",2)
  S LAB("localName")=$S($L($P(X0,U,15)):$P(X0,U,15),1:LAB("test"))
- S LAB("groupName")=$P(X0,U,16) ;accession#
- S X=$P($P(LRI,U,3),"!",3) S:X LOINC=$$GET1^DIQ(95.3,X_",",.01)
+ S NUM=$P(X0,U,16),LAB("groupID")=NUM
+ S X=$P(NUM," "),LAB("type")=$$TYPE(X)
+ S X=$P($P(LR0,U,3),"!",3) S:X LOINC=$$GET1^DIQ(95.3,X_",",.01)
  S X=+$P(X0,U,19) I X D  ;specimen
- . N VUID,IENS,NHY S VUID="",IENS=X_","
- . D GETS^DIQ(61,IENS,".01;2",,"NHY")
- . S LAB("specimen")=$G(NHY(61,IENS,2))_U_$G(NHY(61,IENS,.01)) ;SNOMED^name
- . S LAB("sample")=$$GET1^DIQ(61,X_",",4.1) ;name
+ . N VUID S VUID=""
+ . S LAB("specimen")=$$GET1^DIQ(61,X_",",2) ;SNOMED
+ . S LAB("sample")=$$GET1^DIQ(61,X_",",4.1)
  . ; LOINC=+$G(^LAB(60,+X0,1,X,95.3))
  . S:'$G(LOINC) LOINC=$$GET1^DIQ(60.01,X_","_+X0_",",95.3)
  . I LOINC S LAB("loinc")=LOINC,VUID=$$VUID^NHINV(+LOINC,95.3)
@@ -81,17 +80,15 @@ MI(LAB) ; -- return a Microbiology result in LAB("attribute")=value
  ;    Expects ^TMP("LRRR",$J,DFN,"MI",NHIDT,NHI),LRDFN
  N ID,CDT,X0,X,CMMT,LR0 K LAB
  S X0=$G(^TMP("LRRR",$J,DFN,"MI",NHIDT,NHI)) Q:$L($P(X0,U))'>1
- S LAB("id")="MI;"_NHIDT_"#"_NHI,LAB("status")="completed"
- S LAB("type")="MI",CDT=9999999-NHIDT,LAB("collected")=CDT
+ S ID="MI;"_NHIDT_"#"_NHI,LAB("id")=ID,LAB("status")="completed"
+ S LAB("type")="MICROBIOLOGY",CDT=9999999-NHIDT,LAB("collected")=CDT
  S LR0=$G(^LR(LRDFN,"MI",NHIDT,0)),LAB("resulted")=$P(LR0,U,3)
  S:$L($P(X0,U,2)) LAB("result")=$P(X0,U,2)
  S:$L($P(X0,U,4)) LAB("units")=$P(X0,U,4)
  S:$L($P(X0,U,3)) LAB("interpretation")=$P(X0,U,3)
  S (LAB("test"),LAB("localName"))=$P(X0,U,15)
  S X=+$P(X0,U,19) I X D  ;specimen
- . N IENS,NHY S IENS=X_","
- . D GETS^DIQ(61,IENS,".01;2",,"NHY")
- . S LAB("specimen")=$G(NHY(61,IENS,2))_U_$G(NHY(61,IENS,.01)) ;SNOMED^name
+ . S LAB("specimen")=$$GET1^DIQ(61,X_",",2) ;SNOMED
  . S LAB("sample")=$$GET1^DIQ(61,X_",",4.1) ;name
  S X=$P(LR0,U,14)
  S:X LAB("facility")=$$STA^XUAF4(X)_U_$P($$NS^XUAF4(X),U)
@@ -113,7 +110,7 @@ TYPE(X) ; -- Return name of lab section
  ;
 XML(LAB) ; -- Return result as XML in @NHIN@(#)
  N ATT,X,Y,P,NAMES,TAG
- D ADD("<lab>") S NHINTOTL=$G(NHINTOTL)+1
+ D ADD("<lab>")
  S ATT="" F  S ATT=$O(LAB(ATT)) Q:ATT=""  D  D:$L(Y) ADD(Y)
  . S X=$G(LAB(ATT)),Y="" Q:'$L(X)
  . I ATT="comment" S Y="<"_ATT_" xml:space='preserve'>"_$$ESC^NHINV(X)_"</"_ATT_">" Q

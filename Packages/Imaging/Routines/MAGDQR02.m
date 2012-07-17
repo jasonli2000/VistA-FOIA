@@ -1,5 +1,5 @@
 MAGDQR02 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 07/05/2007 07:51
- ;;3.0;IMAGING;**51,54,66**;Mar 19, 2002;Build 1836;Sep 02, 2010
+ ;;3.0;IMAGING;**51,54**;03-July-2009;;Build 1424
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -18,7 +18,7 @@ MAGDQR02 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 07/05/2007 07:51
  Q
  ;
 QUERY ; --- perform actual query --- Called by TaskMan
- N ACC,ANY,FATAL,MAGD0,MAGD1,MAGD2,ERROR,FD,FT,I,IMAGE,L,LD,LT,OFFSET,P,PAT,PRMUID,SDT,SID,SSN,T,TIM,UID,V,X
+ N ACC,ANY,FATAL,MAGD0,MAGD1,MAGD2,ERROR,FD,FT,I,IMAGE,L,LD,LT,OFFSET,P,PAT,PRMUID,SID,SSN,T,TIM,UID,V,X
  ;
  K ^TMP("MAG",$J,"QR")
  S (PAT,SSN,ACC,UID,SID,SDT,TIM,ERROR,FATAL)=0

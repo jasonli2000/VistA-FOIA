@@ -1,11 +1,8 @@
-PSOLLLI ;BIR/JLC - LASER LABELS INITIALIZATION ;11/20/08 12:17pm
- ;;7.0;OUTPATIENT PHARMACY;**120,157,189,161,244,200,206,225,303,266,326,251,387**;DEC 1997;Build 13
+PSOLLLI ;BIR/JLC - LASER LABELS INITIALIZATION ; 11/20/08 12:17pm
+ ;;7.0;OUTPATIENT PHARMACY;**120,157,189,161,244,200,206,225,303,266,326**;DEC 1997;Build 11
+ ;
  ;DBIAs PSDRUG-221, PS(55-2228, SC-10040, IBARX-125, PSXSRP-2201, %ZIS-3435, DPT-3097, ^TMP($J,"PSNPPIO"-3794
  ;External reference to DRUG^PSSWRNA supported by DBIA 4449
- ;External reference to $$DS^PSSDSAPI supported by DBIA 5425
- ;External reference to ^DIC(5 supported by DBIA 4293
- ;External reference to ^SC( supported by DBIA 2675
- ;External reference to $$DS^PSSDSAPI supported by DBIA 5425
  ;
  ;*244 remove test for partial fill when testing status > 11
  ;
@@ -19,7 +16,7 @@ DQ1 I '$D(PPL) G HLEX
  I 'PSOINT D TRAIL^PSOLLL1
 HLEX K RXPI,PSORX,RXP,PSOIOS,PSOLAPPL,XXX,COPAYVAR,TECH,PHYS,MFG,NURSE,STATE,SIDE,COPIES,EXDT,ISD,PSOINST,RXN,RXY,VADT,DEA,WARN,FDT,QTY,PATST,PDA,PS,PS1,RXP,REPRINT
  K SGY,OSGY,PS2,PSL,PSNP,INRX,RR,XTYPE,SSNP,SSNPN,PNM,ADDR,PSODBQ,PSOLASTF,PSRESOLV,PSOEXREP,PSOSXQ
- K DATE,DR,DRUG,LINE,MW,PRTFL,VRPH,EXPDT,X2,DIFF,DAYS,PSZIP,PSOHZIP,PS55,PS55X,REF
+ K DATE,DR,DRUG,LINE,MW,PRTFL,VRPH,EXPDT,X2,DIFF,DAYS,PSZIP,PSOHZIP,PS55,PS55X
  K ^TMP($J,"PSNPMI"),^TMP($J,"PSOCP",+$G(PSOCPN)),PSOCPN,PSOLBLDR,PSOLBLPS,PSOLBLCP,RXPR,RXRP,RXRS,PSOCKHN,RXFLX,PSOLAPPL,PSOPDFN,PSDFNFLG,PSOZERO,NEXTRX,PSOBLALL,STA
  I '$G(PSOSUREP),'$G(PSOSUSPR) S ZTREQ="@"
  Q
@@ -47,7 +44,7 @@ C N PSOBIO S (I,PSOIO)=0 F  S I=$O(^%ZIS(2,IOST(0),55,I)) Q:'I  S X0=$G(^(I,0)) 
  . I $G(PSOPULL)!($G(RXRS(RX))) D AREC1^PSOSUTL
  . I $G(PSOSUREP) D AREC^PSOSUSRP
  . I $G(PSXREP) D AREC^PSXSRP
-  S RXY=^PSRX(RX,0),RX2=^(2),RXSTA=^("STA")
+ S RXY=^PSRX(RX,0),RX2=^(2),RXSTA=^("STA")
  K ^UTILITY("DIQ1",$J) S DA=$P($$SITE^VASITE(),"^")
  I $G(DA) S DIC=4,DIQ(0)="I",DR="99" D EN^DIQ1 S PSOINST=$G(^UTILITY("DIQ1",$J,4,DA,99,"I")) K ^UTILITY("DIQ1",$J),DA,DR,DIC
  S RXN=$P(RXY,"^"),DFN=+$P(RXY,"^",2),PSOLBLPS=+$P(RXY,"^",3),PSOLBLDR=+$P(RXY,"^",6)
@@ -72,8 +69,7 @@ C N PSOBIO S (I,PSOIO)=0 F  S I=$O(^%ZIS(2,IOST(0),55,I)) Q:'I  S X0=$G(^(I,0)) 
 ORIG S TECH=$P($G(^VA(200,+$P(RXY,"^",16),0)),"^"),PHYS=$S($D(^VA(200,+$P(RXY,"^",4),0)):$P(^(0),"^"),1:"UKN")
  S DAYS=$P(RXY,"^",8),QTY=$P(RXY,"^",7)
  D 6^VADPT,PID^VADPT6 S SSNPN=""
-STA ;
- S STATE=$S($D(^DIC(5,+$P(PS,"^",8),0)):$P(^(0),"^",2),1:"UKN")
+STA S STATE=$S($D(^DIC(5,+$P(PS,"^",8),0)):$P(^(0),"^",2),1:"UKN")
  S DRUG=$$ZZ^PSOSUTL(RX),DEA=$P($G(^PSDRUG(+$P(RXY,"^",6),0)),"^",3),WARN=$P($G(^(0)),"^",8)
  S WARN=$$DRUG^PSSWRNA(+$P(RXY,"^",6),+$P(RXY,"^",2))
  S SIDE=$S($P($G(RXRP(RX)),"^",3):1,1:0)
@@ -86,7 +82,7 @@ STA ;
  .;PSO*7*266
  .S RXF=RXFL(RX) S:'$G(RXP) MW=$P($G(^PSRX(RX,1,RXF,0)),"^",2) F I=0:0 S I=$O(^PSRX(RX,1,I)) Q:'I  I +^PSRX(RX,1,I,0)'<FDT S FDT=+^(0)
  I MW="W",$G(^PSRX(RX,"MP"))]"" D
- .N PSJ S PSMP=^PSRX(RX,"MP"),PSJ=0 F PSI=1:1:$L(PSMP) S PSMP(PSI)="",PSJ=PSJ+1 F PSJ=PSJ:1 S PSMP(PSI)=PSMP(PSI)_$P(PSMP," ",PSJ)_" " Q:($L(PSMP(PSI))+$L($P(PSMP," ",PSJ+1))>30)
+ .S PSMP=^PSRX(RX,"MP"),PSJ=0 F PSI=1:1:$L(PSMP) S PSMP(PSI)="",PSJ=PSJ+1 F PSJ=PSJ:1 S PSMP(PSI)=PSMP(PSI)_$P(PSMP," ",PSJ)_" " Q:($L(PSMP(PSI))+$L($P(PSMP," ",PSJ+1))>30)
  .K PSMP(PSI)
  ;New mail codes for CMOP
  S MAILCOM=""
@@ -116,21 +112,8 @@ STA ;
  I $G(^TMP($J,"PSOCP",PSOCPN))="" S ^(PSOCPN)=PSOCPN
  S ^TMP($J,"PSOCP",PSOCPN,INRX)=INRX_"^"_$$ZZ^PSOSUTL(RX)_"^"_+$G(DAYS),COPAYVAR="COPAY" K ZDRUG
 LBL I $G(PSOIO("LLI"))]"" X PSOIO("LLI")
- ;
- N PSODDFLG,PSODWARN,PSOSIGNIF S PSODWARN=0 D
- .I $D(^PSRX(RX,"DRI")),$P(^PSRX(RX,"DRI"),"^")[1 S PSODWARN=1 ;must have a critical drug interaction to print tech warning label
- .I '$D(^PSRX(RX,"DRI")),$D(^PS(52.4,RX,0)),$P(^PS(52.4,RX,0),"^",9)[1 S PSODWARN=1 ;must have a critical drug interaction to print tech warning label
- .I $D(^PS(52.4,RX,0)),$P(^PS(52.4,RX,0),"^",9)'[1,$P(^PS(52.4,RX,0),"^",9)[2 S PSOSIGNIF=1
- .I $$DS^PSSDSAPI,($D(^PS(52.4,RX,1))) S PSODWARN=1 ;dose warnings should print a tech warning label
- ;
- G ^PSOLLL8:($P(RXSTA,"^")=4!$G(PSODWARN))&'$G(RXF)&'$G(RXP) ;print warning label for critical interaction and dose warnings
- I '$G(PSODGETA) D ^PSOLLL8:$D(^PSRX(RX,"DRI"))&('$G(RXF))&('$G(RXP)) ;print warning label for significant interactions
- I '$G(PSODGETA),$G(PSOSIGNIF),$D(^PSRX(RX,"DRI"))&('$G(RXF))&('$G(RXP)) S PSODGETA=1 D C
- K PSODGETA
- I $$DS^PSSDSAPI,'$G(RXF),'$G(RXP) Q:$D(^PS(52.4,RX,1))  ;already printed warning label above, quit if dose warning and don't print bottle label
- Q:(($P(^PSRX(RX,"STA"),"^")=4!($P($G(^PSRX(RX,"DRI")),"^",1)[1))&('$G(RXF))&('$G(RXP)))
- ;
-LBL2 ;
+ I $P(RXSTA,"^")=4 D ^PSOLLL8 Q  ;for a critical interaction entered by a tech - don't allow a label to be printed
+ I $D(^PSRX(RX,"DRI")),'$G(RXF),'$G(RXP) D ^PSOLLL8
  I $P($G(^PSRX(RX,3)),"^",6),'$G(RXF),'$G(RXP) D ^PSOLLL9
  S PSOINT=0 G ^PSOLLL1
 REF F XXX=0:0 S XXX=$O(^PSRX(RX,XTYPE,XXX)) Q:+XXX'>0  D

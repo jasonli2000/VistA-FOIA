@@ -6,7 +6,7 @@ XMRONT ;(SF-ISC)/RWF - OpenM-NT TCP/IP INETD and Front End ;04/30/2002  07:24
  ; It takes the place of the INETD Unix process
  ;
 GO ;Open port 25 in Accept mode.
- S XMRSOCK=25
+ S XMRSOCK=9005
  D LISTEN^%ZISTCPS(XMRSOCK,"SOC25^XMRONT")
  ;HALT
  G HALT

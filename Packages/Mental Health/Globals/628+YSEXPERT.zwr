@@ -1,3 +1,9 @@
 YSEXPERT
 ZWR
-^YS(628,0)="YSEXPERT^628^^"
+^YS(628,0)="YSEXPERT^628^1^1"
+^YS(628,1,0)="TOM'S SYSTEM"
+^YS(628,1,1,0)="^628.02^1^1"
+^YS(628,1,1,1,0)="craziness"
+^YS(628,1,1,1,2,0)="^628.23^^0"
+^YS(628,1,1,"B","craziness",1)=""
+^YS(628,"B","TOM'S SYSTEM",1)=""

@@ -1,13 +1,11 @@
-DVBHQM2 ;ISC-ALBANY/PKE - MAIL DELIVERY PROGRAM;6/10/09 6:01pm
- ;;4.0;HINQ;**49,63,65**;03/25/92;Build 19
+DVBHQM2 ;ISC-ALBANY/PKE-MAIL DELIVERY PROGRAM ; 6/10/09 6:01pm
+ ;;4.0;HINQ;**49,63**;03/25/92 ;Build 2
  G EN
 LIN S CT=CT+1,A1=A_CT_",0)",@A1=T1 Q
 DD S:Y Y=$S($E(Y,4,5):$P("JAN^FEB^MAR^APR^MAY^JUN^JUL^AUG^SEP^OCT^NOV^DEC","^",+$E(Y,4,5))_" ",1:"")_$S($E(Y,6,7):+$E(Y,6,7)_",",1:"")_($E(Y,1,3)+1700)_$P("@"_$E(Y_0,9,10)_":"_$E(Y_"000",11,12),"^",Y[".") Q
  ;
 EN ;P&T now sent by VBA, 2=no, 3=yes, else null
  I $D(DVBPTI),((DVBPTI=2)!(DVBPTI=3)) S DVBPTI=$S(DVBPTI=2:"No",DVBPTI=3:"Yes",1:""),T1="    Perm.,Total Disability = "_DVBPTI D LIN
- ;DVB*4*65
- I $D(DVBPTI),($G(DVBPTIDT)>0) S M=$E(DVBPTIDT,1,2) D MM^DVBHQM11 S T1="    Perm.,Total Disability Eff Date = "_M_" "_$S(+$E(DVBPTIDT,3,4)>0:$E(DVBPTIDT,3,4)_", ",1:" ")_$E(DVBPTIDT,5,8) D LIN
  I $D(DVBAAHB),((DVBAAHB="A")!(DVBAAHB="H")) S Y=DVBAAHB S Y=$S(Y="A":"A&A Paid",Y="H":"Housebound Paid",1:"") S T1="             AID & ATTEND = "_Y D LIN
  I $D(DVBFIDUC),(DVBFIDUC>0) S T1="Chief Attorney, fiduciary = "_DVBFIDUC D LIN
  ;;;I $D(DVBFIDUC),DVBFIDUC,$D(^DIC(4,DVBFIDUC,0)) S DVBFIDUC=$P(^(0),U),T1="Chief Attorney, fiduciary = "_DVBFIDUC D LIN
@@ -17,8 +15,6 @@ EN ;P&T now sent by VBA, 2=no, 3=yes, else null
  I $D(DVBCI),((DVBCI'=" ")) S DVBCI=$S(DVBCI=1!(DVBCI="C"):"Competent, or not an issue",DVBCI="I"!(DVBCI="2"):"Incompetent",1:DVBCI),T1="     Competency indicator = "_DVBCI D LIN
  ;Severence Recoup, PFOP, Competency Pay Status  and Consol Payment will
  ;no longer be sent by VBA - DVB*4*49
- ;DVB*4*65
- I $D(DVBDENTI),((DVBDENTI'=" ")) S DVBDENTI=$S(DVBDENTI="Y":"    Dental Treatment provided at discharge",DVBDENTI="N":"    No dental treatment at discharge",1:DVBDENTI),T1=DVBDENTI D LIN
  ;
  I $D(DVBP(2)) D P2^DVBHQM11
 PNX I $D(DVBSPNAM),DVBSPNAM'?10" " S T1=" " D LIN S T1="Spouse name = "_DVBSPNAM D SDB,LIN
@@ -51,7 +47,7 @@ RINC ;
  I $G(DVBINC)]"" I +$P(DVBINC,U,15)>0 S T1="                Income for VA Purposes= '$"_$P(DVBINC,U,15)_".00'" D LIN
  ;
 EX ;
- K C,T2,T1,DVBDXPCT,DVBPT,DVBPTI,DVBPTIDT,DVBDENTI,DVBAAHB,DVBFIDUC,DVBEI,DVBCI,DVBCPS,DVBSPNAM,DVBSPDOB,DVBCHILD,DVBDOB,V,DVBCHECK,Y
+ K C,T2,T1,DVBDXPCT,DVBPT,DVBPTI,DVBAAHB,DVBFIDUC,DVBEI,DVBCI,DVBCPS,DVBSPNAM,DVBSPDOB,DVBCHILD,DVBDOB,V,DVBCHECK,Y
  D ADD^DVBHQM31
  G ERR^DVBHQM3 ;with DVB*4*49 no call made to EN^DVBHQM3
  ;

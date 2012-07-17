@@ -1,5 +1,5 @@
-MAGBRTE4 ;WOIFO/EdM - Process Routing Rule Evaluation Queue ; 18 Jan 2011 3:14 PM
- ;;3.0;IMAGING;**11,30,51,85,54,39**;Mar 19, 2002;Build 2010;Mar 08, 2011
+MAGBRTE4 ;WOIFO/EdM - Process Routing Rule Evaluation Queue ; 06/08/2007 10:28
+ ;;3.0;IMAGING;**11,30,51,85,54**;03-July-2009;;Build 1424
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -78,7 +78,10 @@ EVAL ;
  . . . . Q
  . . . D LOG^MAGBRTE5("*** EVAL queue error: "_STATUS_" ***")
  . . . Q
- . . D DQUE^MAGQBUT2(QPTR)
+ . . K ^MAGQUEUE(2006.03,QPTR)
+ . . K:'CONS ^MAGQUEUE(2006.03,"B","EVAL",QPTR)
+ . . K:CONS ^MAGQUEUE(2006.03,"C",PLACE,"EVAL",QPTR)
+ . . S $P(^MAGQUEUE(2006.03,0),"^",4)=$P(^MAGQUEUE(2006.03,0),"^",4)-1
  . . Q
  . H:'ANY 1
  . D:'$D(^XTMP("MAGEVAL",ZTSK)) XTINIT^MAGDRPC5,LOG^MAGBRTE5("^XTMP was cleaned up.")

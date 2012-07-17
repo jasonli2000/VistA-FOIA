@@ -1,29 +1,16 @@
-RORX020 ;BPOIFO/ACS - RENAL FUNCTION BY RANGE ; 3/31/11 2:21pm
- ;;1.5;CLINICAL CASE REGISTRIES;**10,13,14**;Feb 17, 2006;Build 24
+RORX020 ;BPOIFO/ACS - RENAL FUNCTION BY RANGE ;11/1/09
+ ;;1.5;CLINICAL CASE REGISTRIES;**10**;Feb 17, 2006;Build 32
  ;
  ; This routine uses the following IAs:
  ;
  ; #4290         ^PXRMINDX(120.5 (controlled)
  ; #3647         $$EN^GMVPXRM (controlled)
+ ; #2056         GETS^DIQ (supported)
  ; #10061        DEM^VADPT (supported)
  ; #10105        PWR^XLFMTH (supported)
  ; #5047         $$GETIEN^GMVGETVT (supported)
  ; #3556         GCPR^LA7QRY (supported)
- ;
- ;******************************************************************************
- ;******************************************************************************
- ;                 --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*10   MAR  2010   A SAUNDERS   Routine created
- ;ROR*1.5*13   DEC  2010   A SAUNDERS   User can select specific patients,
- ;                                      clinics, or divisions for the report.
- ;                                      Modified XML tags for sort.
- ;ROR*1.5*14   APR  2011   A SAUNDERS   CALCRF: Age calculation now uses 
- ;                                      $$AGE^RORX019A.
- ;******************************************************************************
- ;******************************************************************************
+ ; #10103        $$HL7TFM^XLFDT
  Q
  ;
  ;************************************************************************
@@ -73,9 +60,6 @@ RFRANGE(RORTSK) ;
  N RORPTIEN      ; IEN of patient in the ROR registry
  N DFN           ; DFN of patient in the PATIENT file (#2)
  N RORLC         ; sub-file and array of LOINC codes to search Lab data
- N RORCDLIST     ; Flag to indicate whether a clinic or division list exists
- N RORCDSTDT     ; Start date for clinic/division utilization search
- N RORCDENDT     ; End date for clinic/division utilization search
  ;
  N REPORT,RC,I,SFLAGS,PARAMS
  ;--- Establish the root XML Node of the report and put into output
@@ -149,9 +133,6 @@ RFRANGE(RORTSK) ;
  ;--- RACE code 2054-5 = 'black or african american' in RACE file (IEN=9)
  S RORDATA("BAM")=";9;"
  ;
- ;=== Set up Clinic/Division list parameters
- S RORCDLIST=$$CDPARMS^RORXU001(.RORTSK,.RORCDSTDT,.RORCDENDT,1)
- ;
  ;--- Get registry records
  N RCC,FLAG,SKIP,TMP
  S (CNT,RORPTIEN,RC)=0
@@ -161,21 +142,16 @@ RFRANGE(RORTSK) ;
  . S TMP=$S(RORPTCNT>0:CNT/RORPTCNT,1:"")
  . S RC=$$LOOP^RORTSK01(TMP)  Q:RC<0
  . S CNT=CNT+1
- . ;--- Get the patient DFN
- . S DFN=$$PTIEN^RORUTL01(RORPTIEN)  Q:DFN'>0
- . ;--- Check for patient list and quit if not on list
- . I $D(RORTSK("PARAMS","PATIENTS","C")),'$D(RORTSK("PARAMS","PATIENTS","C",DFN)) Q
  . ;--- Check if the patient should be skipped
  . Q:$$SKIP^RORXU005(RORPTIEN,SFLAGS,SKIPSDT,SKIPEDT)
+ . ;--- Get the patient DFN
+ . S DFN=$$PTIEN^RORUTL01(RORPTIEN)  Q:DFN'>0
  . ;--- Check if patient has passed the ICD9 filter
  . S RCC=0
  . I FLAG'="ALL" D
  . . S RCC=$$ICD^RORXU010(DFN,RORREG)
  . I (FLAG="INCLUDE")&(RCC=0) Q
  . I (FLAG="EXCLUDE")&(RCC=1) Q
- . ;
- . ;--- Check for Clinic or Division list and quit if not in list
- . I RORCDLIST,'$$CDUTIL^RORXU001(.RORTSK,DFN,RORCDSTDT,RORCDENDT) Q
  . ;
  . ;--- Check for utilization in the corresponding 'utilization' date range
  . S SKIP=0 I $G(UTSDT)>0 D
@@ -246,9 +222,9 @@ PATIENT(DFN,PTAG,RORDATA,RORPTIEN,RORLC) ;
  ;---  Height value
  D ADDVAL^RORTSK11(RORTSK,"RESULT",$G(RORDATA("HGT")),TTAG)
  ;---  Calculated CRCL
- I RORDATA("IDLST")[1 D ADDVAL^RORTSK11(RORTSK,"CRCL",$G(RORDATA("SCORE",1)),PTAG,3)
+ I RORDATA("IDLST")[1 D ADDVAL^RORTSK11(RORTSK,"CRCL",$G(RORDATA("SCORE",1)),RTAG)
  ;---  Calculated eGFR
- I RORDATA("IDLST")[2 D ADDVAL^RORTSK11(RORTSK,"EGFR",$G(RORDATA("SCORE",2)),PTAG,3)
+ I RORDATA("IDLST")[2 D ADDVAL^RORTSK11(RORTSK,"EGFR",$G(RORDATA("SCORE",2)),RTAG)
  ;
  Q ($S(TTAG<0:TTAG,1:1))
  ;
@@ -374,7 +350,7 @@ CALCRF(DFN,RORDATA,RORPTIEN,RORLC) ;
  ;---CALCULATE RENAL TEST SCORES USING VALID CR VALUE
  ;
  ;--- get patient race, gender, age, and dob using DEM^VADPT
- N RORDEM,RORGENDER,RORRACE,RORM,RORF,RORAGE,VAROOT
+ N RORDEM,RORGENDER,RORRACE,RORM,RORF,RORDOB,RORAGE,VAROOT
  S (RORF,RORM)=0
  S VAROOT="RORDEM" D DEM^VADPT
  S RORGENDER=$P($G(RORDEM(5)),U,1) ;M or F
@@ -382,9 +358,12 @@ CALCRF(DFN,RORDATA,RORPTIEN,RORLC) ;
  S:RORGENDER="F" RORF=1 S:RORGENDER="M" RORM=1
  ;--- get age
  ;if 'most recent' date, use age returned from DEM^VADPT
- ;if not 'most recent', calculate age
+ ;if not 'most recent', get dob and calculate age
  I $$PARAM^RORTSK01("OPTIONS","MOST_RECENT") S RORAGE=RORDEM(4)
- E  S RORAGE=$$AGE^RORX019A(DFN,RORDATE)
+ E  D
+ . S RORDOB=$P($G(RORDEM(3)),U,1) ;date of birth
+ . S RORAGE=RORDATE-RORDOB ;age using 'as of' date
+ . S RORAGE=$S($L(RORAGE)=6:$E(RORAGE,1,2),1:$E(RORAGE,1,3))
  ;
  ;--- Cockcroft-Gault CrCl ---
  ;Calculation: (140-age) x ideal weight in kg (*.85 if female)/(creatinine*72)

@@ -1,4 +1,4 @@
-ONCOW11 ; GENERATED FROM 'ONCOW1' PRINT TEMPLATE (#874) ; 06/30/97 ; (continued)
+ONCOW11 ; GENERATED FROM 'ONCOW1' PRINT TEMPLATE (#1343) ; 08/11/99 ; (continued)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -16,7 +16,7 @@ BEGIN ;
  S I(100)="^ONCO(160,",J(100)=160 S I(0,0)=D0 S DIP(1)=$S($D(^ONCO(165.5,D0,0)):^(0),1:"") S X=$P(DIP(1),U,2),X=X S D(0)=+X S D0=D(0) I D0>0 D H1
  G H1R
 H1 ;
- S X=$G(^ONCO(160,D0,0)) S Y=$P(X,U,7) W:Y]"" $S($D(DXS(3,Y)):DXS(3,Y),1:Y)
+ S X=$G(^ONCO(160,D0,0)) S Y=$P(X,U,7) W:Y]"" $S($D(DXS(4,Y)):DXS(4,Y),1:Y)
  Q
 H1R ;
  K J(100),I(100) S:$D(I(0,0)) D0=I(0,0)

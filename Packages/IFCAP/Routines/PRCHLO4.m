@@ -1,10 +1,10 @@
-PRCHLO4 ;WOIFO/RLL/DAP-EXTRACT ROUTINE CLO REPORT SERVER ;12/30/10  15:01
- ;;5.1;IFCAP;**83,98,130,154**;Oct 20, 2000;Build 5
+PRCHLO4 ;WOIFO/RLL/DAP-EXTRACT ROUTINE CLO REPORT SERVER ;5/22/09  14:14
+ ;;5.1;IFCAP;**83,98,130**;Oct 20, 2000;Build 25
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ; Continuation of PRCHLO3
  ;
  ; PRCHLO3 routines are used to Write out the Header and data
- ; associated with each of the 29 tables created for the Clinical
+ ; associated with each of the 23 tables created for the Clinical
  ; logistics Report Server. The files are built from the extracts
  ; located in the ^TMP($J) global.
  ;
@@ -44,10 +44,6 @@ TSTFIL ; Test entry point
  D FIL410   ; FILE 410
  D FIL424   ; FILE 424
  D FIL4241  ; FILE 424.1
- D INVHDR^PRCHLO7 ;File 421.5 header
- D INVPAY^PRCHLO7 ;Subfile 421.531
- D INVFMS^PRCHLO7 ;Subfile 421.541
- D INVCERT^PRCHLO7 ;Subfile 421.51
 GIPBL1 ; GIP REPORTS
  D BLDGP1^PRCPLO3
  D BLDGP2^PRCPLO3
@@ -274,8 +270,8 @@ TSTF ; Test directory for file creation
  . W !,"$ ! This directory is used to store PO activity"
  . W !,"$ ! extracts and GIP Extracts which are transmitted"
  . W !,"$ ! to the Clinical Logistics Report Server on a monthly"
- . W !,"$ ! basis. There are 29 extract files IFCPXXXF1 through"
- . W !,"$ ! IFCPXXXF27, IFCPXXXG1 and IFCPXXXG2. In addition, there"
+ . W !,"$ ! basis. There are 25 extract files IFCPXXXF1 through"
+ . W !,"$ ! IFCPXXXF23, IFCPXXXG1 and IFCPXXXG2. In addition, there"
  . W !,"$ ! are 2 working files used for the FTP Transfer:"
  . W !,"$ ! CLRSxxx.DAT and CLRS1xxx.COM. CLRSREADMExxx.TXT is also present"
  . W !,"$ EXIT"

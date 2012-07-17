@@ -1,5 +1,5 @@
-OOPSPRT ;HIRMFO/GWB-Print Report of Accident ;3/5/98
- ;;2.0;ASISTS;;Jun 03, 2002
+OOPSPRT ;HIRMFO/GWB - Print Report of Accident ;3/5/98
+ ;;1.0;ASISTS;**2,3,5,11**;Jun 01, 1998
 SUP S DIC="^OOPS(2260,"
  S DIC("S")="I $$GET1^DIQ(2260,Y,53,""I"")=DUZ!($$GET1^DIQ(2260,Y,53.1,""I"")=DUZ)"
  G DIC
@@ -136,5 +136,5 @@ HDR ;Header
 UNION ; Union Entry point
  S UNION="Y"
  S DIC="^OOPS(2260,"
- S DIC("S")="I $$UNION^OOPSUTL2(Y)"
+ S DIC("S")="I $$UNION^OOPSUTL4(Y)"
  G DIC

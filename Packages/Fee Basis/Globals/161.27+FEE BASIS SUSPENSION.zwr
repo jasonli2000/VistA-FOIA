@@ -83,7 +83,7 @@ ZWR
 ^FBAA(161.27,18,1,2,0)="substitution."
 ^FBAA(161.27,18,2)="Payment made for Generic drug"
 ^FBAA(161.27,19,0)="J"
-^FBAA(161.27,19,1,0)="^^2^2^3020204"
+^FBAA(161.27,19,1,0)="^^2^2^3020122"
 ^FBAA(161.27,19,1,1,0)="Payment in Accordance with pricing for claims approved under 38 USC 1725"
 ^FBAA(161.27,19,1,2,0)="payer of last resort."
 ^FBAA(161.27,19,2)="Mill Bill Authority, 38 U.S.C. 1725"

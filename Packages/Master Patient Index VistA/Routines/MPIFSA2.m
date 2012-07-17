@@ -1,5 +1,5 @@
-MPIFSA2 ;SF/CMC-STAND ALONE QUERY PART 2 ;13 Aug 2010  6:13 PM
- ;;1.0; MASTER PATIENT INDEX VISTA ;**28,29,35,38,43,52,55**;30 Apr 99;Build 3
+MPIFSA2 ;SF/CMC-STAND ALONE QUERY PART 2 ; 8/25/08 12:17pm
+ ;;1.0; MASTER PATIENT INDEX VISTA ;**28,29,35,38,43,52**;30 Apr 99;Build 7
  ;
  ;Integration Agreements: $$EN^HLCSAC - #3471
  ;
@@ -103,10 +103,8 @@ DISPLAY ; display data found
  . K CHECK S NAME=$P(DATA,"^"),SSN=$P(DATA,"^",3),BIRTHDAY=$P(DATA,"^",4),ICN=$P(DATA,"^",6)
  . S SEX=$P(DATA,"^",11),SCORE=$P(DATA,"^",21),ALTRSHLD=$P(DATA,"^",22),TKTRSHLD=$P(DATA,"^",23)
  . I $G(SCORE)="" W !!,"IdM System uavailable, try again later!" S STOP=1 Q  ;Quit if no score is returned.
- . ;**55 MPIC_2218  Commented the following two lines, added the third
- . ;I SCORE>=ALTRSHLD S M="E"
- . ;I SCORE<ALTRSHLD,(SCORE>=TKTRSHLD) S M="P"
- . S M=$S(SCORE>=ALTRSHLD:"E",1:"P")
+ . I SCORE>=ALTRSHLD S M="E"
+ . I SCORE<ALTRSHLD,(SCORE>=TKTRSHLD) S M="P"
  . ;Rearranging array for sectional view display
  . S ^TMP("MPIDOQ",$J,M,SCORE,+ICN)=NAME_"^"_SSN_"^"_BIRTHDAY_"^"_SEX
  . M ^TMP("MPIDOQ",$J,M,SCORE,+ICN,"TF")=^TMP("MPIFVQQ",$J,CNT1,"TF")
@@ -196,7 +194,7 @@ BLDRDF(MPIOUT,MPICNT,MPIRS,MPICS) ;
  S MPIOUT(MPICNT)="RDF"_HL("FS")_32_HL("FS") N T,I F I=1:1 S T=$T(FIELD+I) Q:$P(T,";",3)=""  D
  . I I=1 S MPIFLDV=$P(T,";",3)_MPICS_$P(T,";",5)_MPICS_$P(T,";",6)
  . I I'=1 S MPIFLDV=MPIRS_$P(T,";",3)_MPICS_$P(T,";",5)_MPICS_$P(T,";",6)
- .N XLEN,TOTLEN
+  .N XLEN,TOTLEN
  . S TOTLEN=$L($G(MPIOUT(MPICNT)))+$L(MPIFLDV)
  . I TOTLEN'>245 S MPIOUT(MPICNT)=$G(MPIOUT(MPICNT))_MPIFLDV Q
  . I TOTLEN>245 D

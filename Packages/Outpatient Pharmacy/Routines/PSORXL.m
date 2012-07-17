@@ -1,5 +1,5 @@
-PSORXL ;BHAM ISC/SAB - action to be taken on prescriptions ;10/15/08 2:12pm
- ;;7.0;OUTPATIENT PHARMACY;**8,21,24,32,47,135,148,287,334,251**;DEC 1997;Build 202
+PSORXL ;BHAM ISC/SAB - action to be taken on prescriptions ; 10/15/08 2:12pm
+ ;;7.0;OUTPATIENT PHARMACY;**8,21,24,32,47,135,148,287,334**;DEC 1997;Build 4
  ;External reference to File #50 supported by DBIA 221
  ;External references CHPUS^IBACUS and TRI^IBACUS supported by DBIA 2030
  I $G(PSOTRVV),$G(PPL) S PSORX("PSOL",1)=PPL K PPL

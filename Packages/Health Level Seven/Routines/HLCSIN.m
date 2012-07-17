@@ -1,5 +1,5 @@
-HLCSIN ;ALB/JRP - INCOMING FILER;01-MAY-95 ;03/07/2011
- ;;1.6;HEALTH LEVEL SEVEN;**2,30,14,19,62,109,115,122,140,145,153**;Oct 13, 1995;Build 11
+HLCSIN ;ALB/JRP - INCOMING FILER;01-MAY-95 ;07/08/2009  16:23
+ ;;1.6;HEALTH LEVEL SEVEN;**2,30,14,19,62,109,115,122,140,145**;Oct 13, 1995;Build 4
  ;Per VHA Directive 2004-038, this routine should not be modified.
 STARTIN ;Main entry point for incoming background filer
  ;Create/find entry denoting this filer in the INCOMING FILER TASK
@@ -47,7 +47,7 @@ DEFACK(HLPTRFLR,HLFLG,HLEXIT) ; Process TCP links with a deferred response
  . ; patch HL*1.6*140 - change the lock node, it conflicts with
  . ; lock defined in routine, HLCSREP.
  . ; L +^HLMA("AC","I",HLXX):2 Q:'$T  ; patch HL*1.6*122
- . L +^HLMA("IN-FILER","AC","I",HLXX):0 Q:'$T  ; patch HL*1.6*122
+ . L +^HLMA("IN-FILER","AC","I",HLXX):2 Q:'$T  ; patch HL*1.6*122
  . S HLD0=0,HLFLG=1
  . ; HL*1.6*109 changes in for loop below, and post-quit code placed
  . ; on following lines.

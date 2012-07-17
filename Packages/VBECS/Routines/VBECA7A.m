@@ -1,5 +1,5 @@
 VBECA7A ;HOIFO/SAE - Workload API ; 9/30/04 5:38pm
- ;;1.0;VBECS;**10**;Apr 14, 2005;Build 15
+ ;;1.0;VBECS;;Apr 14, 2005;Build 35
  ;
  ; Note: This routine supports data exchange with an FDA registered
  ; medical device. As such, it may not be changed in any way without
@@ -96,9 +96,8 @@ GETVISTA(VBY) ; get file entries from VBECS WORKLOAD CAPTURE (#6002.01) file
  ;              PROCESSED DATE (#4) field - not null
  ;              STATUS         (#5) field - (S)UCCESSFULLY PROCESSED
  ;
- S X1=DT,X2=-14 D C^%DTC S VBOFF=X
  S VBECFLDS="@;.01;5I;4I;20;99"
- S VBECSCR("S")="I ($P(^(0),U,4)>VBOFF)&($P(^(0),U,6)=""S"")" ;RLM 6-1-2010
+ S VBECSCR("S")="I $P(^(0),U,5)'=""""&($P(^(0),U,6)=""S"")"
  D LIST^DIC(6002.01,"",VBECFLDS,"P","","","","",.VBECSCR,"","VBY")
  S VBLOOP=0 F  S VBLOOP=$O(VBY("DILIST",VBLOOP)) Q:'VBLOOP  S $P(VBY("DILIST",VBLOOP,0),"^",4)=$P(VBY("DILIST",VBLOOP,0),"^",4)_$E("0000000.000000",$L($P(VBY("DILIST",VBLOOP,0),"^",4)),13)
  ;Added formatting to ensure a six digit time. RLM 4/2/2008

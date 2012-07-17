@@ -1,5 +1,5 @@
-HLOSITE ;ALB/CJM/OAK/PIJ-HL7 - API for getting site parameters ;12/30/2010
- ;;1.6;HEALTH LEVEL SEVEN;**126,138,147,153**;Oct 13, 1995;Build 11
+HLOSITE ;ALB/CJM/OAK/PIJ-HL7 - API for getting site parameters ;08/12/2010
+ ;;1.6;HEALTH LEVEL SEVEN;**126,138,147**;Oct 13, 1995;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
 SYSPARMS(SYSTEM) ;Gets system parameters from file 779.1
@@ -65,7 +65,7 @@ COUNT777() ;
  F  S IEN=$O(^HLA(IEN)) Q:'IEN  S COUNT=COUNT+1
  Q COUNT
  ;
-UPDCNTS(WORK) ;update the record counts for file 777,778
+UPDCNTS ;update the record counts for file 777,778
  N COUNT
  S COUNT=$$COUNT777^HLOSITE
  S $P(^HLA(0),"^",4)=COUNT

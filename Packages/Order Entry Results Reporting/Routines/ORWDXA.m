@@ -1,7 +1,7 @@
-ORWDXA ; SLC/KCM/JLI - Utilites for Order Actions ;03/29/10  09:26
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,116,132,148,141,149,187,213,195,215,243,280**;Dec 17, 1997;Build 85
+ORWDXA ; SLC/KCM/JLI - Utilites for Order Actions; 10/07/2007 ; 2/7/08 11:48am
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**10,85,116,132,148,141,149,187,213,195,215,243**;Dec 17, 1997;Build 242
  ;
-VALID(VAL,ORID,ACTION,ORNP,ORWNAT) ; Is action valid for order?
+VALID(VAL,ORID,ACTION,ORNP,ORWNAT) ; Return error message if not valid action for order
  N ORACT,ORVP,ORVER,ORIFN,PRTID S VAL="",PRTID=0
  I +ORID=0 S VAL="This order has been deleted." Q
  I '$D(^OR(100,+ORID,0)) S VAL="This order has been deleted!" Q
@@ -10,8 +10,8 @@ VALID(VAL,ORID,ACTION,ORNP,ORWNAT) ; Is action valid for order?
  I (ACTION="RN") D VALSCH^ORWNSS(.ORNSS,ORID)
  I ORNSS=0 S VAL="This order contains an invalid administration schedule." Q
  I (ACTION="RN") D ISVALIV^ORWDPS33(.VAL,ORID,ACTION) I $L(VAL)>0 Q
- S ORIFN=ORID,ORVP=$P(^OR(100,+ORID,0),U,2)  ; ORCACT0 expects
- I (ACTION="RN") D  Q:$L(VAL)
+ S ORIFN=ORID,ORVP=$P(^OR(100,+ORID,0),U,2)  ; ORCACT0 expects defined
+ I (ACTION="RN") D  Q:$L(VAL)  ; ** There's got to be a better way!
  . N DLG S DLG=$P(^OR(100,+ORID,0),U,5) Q:DLG'[";ORD(101.41,"
  . I $G(^ORD(101.41,+DLG,3))'["PROVIDER^ORCDPSIV" Q
  . D AUTH^ORWDPS32(.VAL,ORNP)
@@ -36,24 +36,22 @@ VALID(VAL,ORID,ACTION,ORNP,ORWNAT) ; Is action valid for order?
  . I DLG D FORMID^ORWDXM(.FRM,+DLG)
  . I '(DLG&FRM) D
  . . S VAL="Copy & Change are not implemented for this order that predates CPRS."
- N OREBUILD
+ N OREBUILD  ; sometimes left defined by $$VALID
  ;I (ACTION="RW")!(ACTION="XFR")!(ACTION="RN") D ISVALIV^ORWDPS33(.VAL,ORID,ACTION) I $L(VAL)>0 Q
  I $$VALID^ORCACT0(ORID,ACTION,.VAL,$G(ORWNAT)) S VAL="" ; VAL=error
- I ACTION="RN",$$UPCTCHK(ORID) S VAL="Cannot renew this order due to an illegal character ""^"" in the comments or patient instructions."
- I ACTION="RW",$$UPCTCHK(ORID) S VAL="Cannot copy this order due to an illegal character ""^"" in the comments or patient instructions."
  Q
  ;
-HOLD(REC,ORID,ORNP) ; Place order on hold
+HOLD(REC,ORID,ORNP) ; Place an order on hold
  N ACTDA
  S ACTDA=$$ACTION^ORCSAVE("HD",+ORID,ORNP)
  D GETBYIFN^ORWORR(.REC,+ORID_";"_ACTDA)
  Q
-UNHOLD(REC,ORID,ORNP) ; Release order from hold
+UNHOLD(REC,ORID,ORNP) ; Release an order from hold
  N ACTDA
  S ACTDA=$$ACTION^ORCSAVE("RL",+ORID,ORNP)
  D GETBYIFN^ORWORR(.REC,+ORID_";"_ACTDA)
  Q
-DC(REC,ORID,ORNP,ORL,REASON,DCORIG,ISNEWORD) ; Discontinue/Cancel/Delete order
+DC(REC,ORID,ORNP,ORL,REASON,DCORIG,ISNEWORD) ; Discontinue/Cancel/Delete an order
  N NATURE,CREATE,PRINT,STATUS,ACTDA,SIGSTS
  N X3,X8,CURRACT
  Q:'+ORID
@@ -61,7 +59,7 @@ DC(REC,ORID,ORNP,ORL,REASON,DCORIG,ISNEWORD) ; Discontinue/Cancel/Delete order
  S CURRACT=0
  S ORL(2)=ORL_";SC(",ORL=ORL(2),NATURE=""
  I REASON S NATURE=$P(^ORD(100.02,$P(^ORD(100.03,REASON,0),U,7),0),U,2)
- S:NATURE="" NATURE="W"  ; S:ORNP=DUZ NATURE="E"
+ S:NATURE="" NATURE="W"  ; S:ORNP=DUZ NATURE="E" 
  ;change the way create work to support forcing signature for all DC
  ;reasons
  S CREATE=1,PRINT=$$PRINT^ORCACT2(NATURE)
@@ -117,10 +115,10 @@ DC(REC,ORID,ORNP,ORL,REASON,DCORIG,ISNEWORD) ; Discontinue/Cancel/Delete order
  . S XMB(3)=$P($G(^DPT(XMB(3),0)),U)
  . D ^XMB
  Q
-DCREQIEN(VAL) ; Return IEN for Req Phys Cancelled reason
+DCREQIEN(VAL) ; Return the IEN for Requesting Physician Cancelled reason
  S VAL=$O(^ORD(100.03,"S","REQ",0))
  Q
-COMPLETE(REC,ORID,ESCODE) ; Complete order (generic)
+COMPLETE(REC,ORID,ESCODE) ; Complete an order (generic orders)
  ;N X S X=+$E($$NOW^XLFDT,1,12)
  ;D DATES^ORCSAVE2(+ORID,,X)
  ;D STATUS^ORCSAVE2(+ORID,2)
@@ -128,23 +126,23 @@ COMPLETE(REC,ORID,ESCODE) ; Complete order (generic)
  D COMP^ORCSAVE2(ORID)
  D GETBYIFN^ORWORR(.REC,ORID)
  Q
-VERIFY(REC,ORID,ESCODE,ORVER) ; Verify order
+VERIFY(REC,ORID,ESCODE,ORVER) ; Verify an order
  ; validate ESCode
  S ORVER=$G(ORVER,$S($D(^XUSEC("ORELSE",DUZ)):"N",$D(^XUSEC("OREMAS",DUZ)):"C",1:U))
  I ORVER'=U D
  . N ORIFN,ORES,ORI
- . ; VERIFY any replaced orders:
+ . ; to match 56, need to VERIFY any replaced orders:
  . S ORIFN=ORID,ORES(ORIFN)="" D REPLCD^ORCACT1
  . S ORI="" F  S ORI=$O(ORES(ORI)) Q:ORI=""  D EN^ORCSEND(ORI,"VR","",""),UNLK1^ORX2(+ORI):ORI'=ORID ;ORID locked prior
  D GETBYIFN^ORWORR(.REC,ORID)
  Q
-ALERT(DUMMY,ORID,ORDUZ) ; alert user (ORDUZ) when order (ORID) resulted
- ;if no user passed, use ordering provider:
+ALERT(DUMMY,ORID,ORDUZ) ;send alert to user (ORDUZ) when order (ORID) resulted
+ ;if no user passed from GUI, use ordering provider:
  I $G(ORDUZ)<1 S ORDUZ=+$$ORDERER^ORQOR2(+ORID)
  I $L($G(ORDUZ))<1 S ORDUZ=DUZ
  S DUMMY=1,$P(^OR(100,+ORID,3),U,10)=ORDUZ
  Q
-FLAG(REC,ORIFN,OREASON,ORNP) ; Flag order
+FLAG(REC,ORIFN,OREASON,ORNP) ; Flag an order
  N ORB,ORVP,DA,ORPS
  D BULLETIN
  S DA=$P(ORIFN,";",2),ORVP=+$P(^OR(100,+ORIFN,0),U,2)
@@ -155,7 +153,7 @@ FLAG(REC,ORIFN,OREASON,ORNP) ; Flag order
  S ORB=+ORVP_U_+ORIFN_U_ORNP_"^1" D EN^OCXOERR(ORB) ; notification
  D GETBYIFN^ORWORR(.REC,ORIFN)
  Q
-BULLETIN ; flagged order bulletin
+BULLETIN ; Send flagged order bulletin (USED BY FLAG)
  N OR0,OR3,ORDTXT,XMB,XMY,XMDUZ,ORENT,BULL,ORSRV,ORUSR
  S OR0=$G(^OR(100,+ORIFN,0)),OR3=$G(^(3))
  ;CLA - 3/21/96:
@@ -163,7 +161,7 @@ BULLETIN ; flagged order bulletin
  S ORSRV=$G(^VA(200,ORUSR,5)) I +ORSRV>0 S ORSRV=$P(ORSRV,U)
  S ORENT="USR.`"_ORUSR_"^SRV.`"_$G(ORSRV)_"^DIV^SYS^PKG"
  S BULL=$$GET^XPAR(ORENT,"ORB FLAGGED ORDERS BULLETIN",1,"Q")
- Q:$G(BULL)'="Y"   ;quit if parm val not 'Y'es
+ Q:$G(BULL)'="Y"   ;quit if parameter value is not 'Y'es
  ;
  S XMB="OR FLAGGED ORDER",XMDUZ=DUZ,XMY(+$P(OR0,U,4))=""
  S XMB(1)=$P(^DPT(+$P(OR0,U,2),0),U),XMB(2)=$P(^(0),U,9),XMB(3)="" ;sb AGE
@@ -174,7 +172,7 @@ BULLETIN ; flagged order bulletin
  S XMB(11)=$P($G(^ORD(100.01,+$P(OR3,U,3),0)),U)
  D EN^XMB
  Q
-UNFLAG(REC,ORIFN,OREASON) ; Unflag order
+UNFLAG(REC,ORIFN,OREASON) ; Unflag an order
  N DA,ORB,ORNP,ORVP,ORPS
  S DA=$P(ORIFN,";",2),ORVP=+$P(^OR(100,+ORIFN,0),U,2)
  S $P(^OR(100,+ORIFN,8,DA,3),U)=0,$P(^(3),U,6,8)=+$E($$NOW^XLFDT,1,12)_U_DUZ_U_OREASON D MSG^ORCFLAG(ORIFN)
@@ -183,22 +181,22 @@ UNFLAG(REC,ORIFN,OREASON) ; Unflag order
  S ORB=+ORVP_U_+ORIFN_U_ORNP_"^0" D EN^OCXOERR(ORB) ; notification
  D GETBYIFN^ORWORR(.REC,ORIFN)
  Q
-FLAGTXT(LST,ORID) ; flag reason
+FLAGTXT(LST,ORID) ; Return flag reason
  N FLAG
  S FLAG=$G(^OR(100,+ORID,8,$P(ORID,";",2),3))
  S LST(1)="FLAGGED: "_$$FMTE^XLFDT($P(FLAG,U,3))_" by "_$P($G(^VA(200,+$P(FLAG,U,4),0)),U)
  S LST(2)=$P(FLAG,U,5) ; reason
  Q
-WCGET(LST,ORID) ; ward comments
+WCGET(LST,ORID) ; Return ward comments
  N I,ORIFN,ACT S ORIFN=+ORID,ACT=+$P(ORID,";",2)
  S I=0 F  S I=$O(^OR(100,ORIFN,8,ACT,5,I)) Q:'I  S LST(I)=$G(^(I,0))
  Q
-WCPUT(ERR,ORID,WCLST) ; Set ward comments
+WCPUT(ERR,ORID,WCLST) ; Set ward comments for order
  N DIERR,ERRLST,ORIFN,ACT S ORIFN=+ORID,ACT=+$P(ORID,";",2)
  D WP^DIE(100.008,ACT_","_ORIFN_",",50,"","WCLST","ERRLST")
  S ERR="" I $D(DIERR) S ERR="An error occurred while saving comments."
  Q
-OFCPLX(ORY,ORID,PRTORDER) ; is ORID child of PRTORDER
+OFCPLX(ORY,ORID,PRTORDER) ;Check if ORID is an child of the PRTORDER
  N NUMCHDS,NOWID,NOWVAL,X3,ORDA,ISNOW
  Q:'$D(^OR(100,+ORID,0))
  S ISNOW=0
@@ -220,18 +218,7 @@ OFCPLX(ORY,ORID,PRTORDER) ; is ORID child of PRTORDER
  I NOWVAL=1 Q
  E  S ORY="COMPLEX-PSI"_U_PRTORDER
  Q
-ISACTOI(ORY,OI) ; Is ord item active?
+ISACTOI(ORY,OI) ;If it's an active orderable item
  I $G(^ORD(101.43,+OI,.1)),^(.1)'>$$NOW^XLFDT D
  . S ORY=$P($G(^ORD(101.43,OI,0)),U)_" has been inactivated and may not be ordered anymore."
  Q
-UPCTCHK(ORID) ;
- ;ORID=ORDER NUMBER
- ;RETURNS 1 IF THERE IS AN UPCARET IN THE ORDER'S COMMENTS
- N RET,COMMID,WPCNT,PIID S RET=0
- S COMMID=$O(^OR(100,+ORID,4.5,"ID","COMMENT",0))
- I COMMID S WPCNT=0 F  S WPCNT=$O(^OR(100,+ORID,4.5,COMMID,2,WPCNT)) Q:'WPCNT!(RET)  D
- .I $G(^OR(100,+ORID,4.5,COMMID,2,WPCNT,0))["^" S RET=1
- S PIID=$O(^OR(100,+ORID,4.5,"ID","PI",0))
- I PIID S WPCNT=0 F  S WPCNT=$O(^OR(100,+ORID,4.5,PIID,2,WPCNT)) Q:'WPCNT!(RET)  D
- .I $G(^OR(100,+ORID,4.5,PIID,2,WPCNT,0))["^" S RET=1
- Q RET

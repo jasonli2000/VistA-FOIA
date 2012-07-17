@@ -1,5 +1,5 @@
-OOPSWCSE ;WIOFO/LLH-Workers' Comp Sign for Employee ;01/20/01
- ;;2.0;ASISTS;;Jun 03, 2002
+OOPSWCSE ;WIOFO/LLH - Workers' Comp Sign for Employee ; 01/20/01
+ ;;1.0;ASISTS;**10**;Jun 01, 1998
  ;
 EN1(CALLER) ; Entry point for routine
  ;  Input:   CALLER = "S" for Safety Officer

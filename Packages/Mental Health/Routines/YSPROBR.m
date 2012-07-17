@@ -1,12 +1,5 @@
-YSPROBR ;SLC/DKG-PRINTS PROBLEM LIST ;11/16/90  08:57 ; 6/10/09 2:57pm
- ;;5.01;MENTAL HEALTH;**37,96**;Dec 30, 1994;Build 46
- ;Reference to %ZIS APIs supported by DBIA #10086
- ;Reference to %ZTLOAD APIs supported by DBIA #10063
- ;Reference to ^VA(200, supported by DBIA #10060
- ;Reference to ^DIC(3.1, supported by DBIA #1234
- ;Reference to ICDCODE APIs supported by DBIA #3990
- ;Reference to XLFDT APIs supported by DBIA #10103
- ;Reference to ^ICD9( supported by DBIA #5388
+YSPROBR ;SLC/DKG-PRINTS PROBLEM LIST ;11/16/90  08:57 ;08/12/93 14:06
+ ;;5.01;MENTAL HEALTH;**37**;Dec 30, 1994
 A ;
  R !!!?3,"(A)ctive, (H)istorical, (C)omplete, (S)hort or (Q)uit? A// ",A:DTIME S YSTOUT='$T,YSUOUT=A["^" G:YSTOUT!YSUOUT END S A=$TR($E(A_"A"),"ahcsq","AHCSQ") I A="Q" G END
  I A="S" D ^YSPROB5 G END:YSLFT,END^YSPROBR1
@@ -58,8 +51,7 @@ FS ; Called by routine YSPRBR2
  S YSST(YSSN)=$P(^YS(615,YSDFN,P4,YSNP,2,YSSN,0),U,2),DS(YSSN)=$P(^(0),U) S:YSST(YSSN)="RF" YSRF=$P(^(0),U,3),N1=$P(^(0),U,4)
  I YSST(YSSN)]"" S YSST(YSSN)=$S(YSST(YSSN)="AC":"   ACTIVE",YSST(YSSN)="IN":"  INACTIVE",YSST(YSSN)="RA":"REACTIVATED",YSST(YSSN)="RF":"REFORMULATED",YSST(YSSN)="RS":"  RESOLVED",1:"  ??")
  I $D(YSRF) S R=$S(YSRF="EP":"EXISTING PROBLEM",YSRF="NP":"NEW PROBLEM",YSRF="OT":"OTHER PROBLEM",YSRF="DSM":"DSM DIAGNOSIS",YSRF="ICD":"ICD9 DIAGNOSIS",1:" ??")
- I $D(YSRF),N1]"" S YSRTL=$S(YSRF="EP"!(YSRF="NP")!(YSRF="OT"):$P(^DIC(620,+N1,0),U),YSRF="DSM":$P(^DIC(627,+N1,0),U),1:" ??") ;asf 4/22/09
- I $D(YSRF),N1]"" I $G(YSRF)="ICD" N YSDXZZ S YSDXZZ=$$ICDD^ICDCODE($P(^ICD9(+N1,0),U),"YSDXZZ") S YSRTL=YSDXZZ(1) ;asf 4/22/09
+ I $D(YSRF),N1]"" S YSRTL=$S(YSRF="EP"!(YSRF="NP")!(YSRF="OT"):$P(^DIC(620,+N1,0),U),YSRF="DSM":$P(^DIC(627,+N1,0),U),YSRF="ICD":$P(^ICD9(+N1,0),U,3),1:" ??")
  I $D(YSRF),N1="" S YSRTL="*** Alert: "_R_" not specified ***"
  I DS(YSSN)]"" S Z=DS(YSSN) D DC S DS(YSSN)=Z
  Q

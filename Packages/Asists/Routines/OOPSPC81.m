@@ -1,5 +1,5 @@
-OOPSPC81 ;HIRMFO/YH-INSTRUCTIONS FOR COMPLETING FORM CA-2 (PART 2) ;5/4/98
- ;;2.0;ASISTS;;Jun 03, 2002
+OOPSPC81 ;HIRMFO/YH-INSTRUCTIONS FOR COMPLETING FORM CA-2 (PART 2) ; 5/4/98
+ ;;1.0;ASISTS;**4,6**;Jun 01, 1998
 EN1 ;
  W !,"PU.5,16.4;LBa) Describe in detail the work performed by the employee. Identify@;"
  W !,"PU11,16.4;LBc) Attach a record of the employee's absence from work caused@;"

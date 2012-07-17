@@ -1,5 +1,5 @@
 RORX001 ;HOIFO/SG,VAC - LIST OF REGISTRY PATIENTS ;4/16/09 11:53am
- ;;1.5;CLINICAL CASE REGISTRIES;**8,10,14**;Feb 17, 2006;Build 24
+ ;;1.5;CLINICAL CASE REGISTRIES;**8,10**;Feb 17, 2006;Build 32
  ;
  ; This routine uses the following IAs:
  ;
@@ -10,15 +10,6 @@ RORX001 ;HOIFO/SG,VAC - LIST OF REGISTRY PATIENTS ;4/16/09 11:53am
  ; This routine modified March 2009 to handle ICD9 Filter for Include
  ;    or Exclude
  Q
- ;******************************************************************************
- ;******************************************************************************
- ;                       --- ROUTINE MODIFICATION LOG ---
- ;        
- ;PKG/PATCH    DATE        DEVELOPER    MODIFICATION
- ;-----------  ----------  -----------  ----------------------------------------
- ;ROR*1.5*14   APR  2011   A SAUNDERS   Added column and data for 'FIRSTDIAG'.
- ;******************************************************************************
- ;******************************************************************************
  ;
  ;***** OUTPUTS THE REPORT HEADER
  ;
@@ -41,7 +32,7 @@ HEADER(PARTAG) ;
  . S TMP=$$ADDVAL^RORTSK11(RORTSK,"COLUMN",,COLUMNS)
  . D ADDATTR^RORTSK11(RORTSK,TMP,"NAME",COL)
  ;--- Additional columns
- F COL="DOD","CSSN","LAST4","SELRULES","SELDT","CONFDT","PENDCOMM","FIRSTDIAG"  D
+ F COL="DOD","CSSN","LAST4","SELRULES","SELDT","CONFDT","PENDCOMM"  D
  . Q:'$$OPTCOL^RORXU006(COL)
  . S TMP=$$ADDVAL^RORTSK11(RORTSK,"COLUMN",,COLUMNS)
  . D ADDATTR^RORTSK11(RORTSK,TMP,"NAME",COL)
@@ -103,14 +94,9 @@ PATIENT(IENS,PARTAG) ;
  ;--- Pending Comment
  D:$$OPTCOL^RORXU006("PENDCOMM")
  . S TMP=$G(RORBUF(798,IENS,12,"I"))
+ . ;I $L($G(TMP))>0 D ADDVAL^RORTSK11(RORTSK,"PENDCOMM",TMP,PTAG,1)
  . S TMP=$S($L(TMP)>0:TMP,1:"")
  . D ADDVAL^RORTSK11(RORTSK,"PENDCOMM",TMP,PTAG,1)
- ;--- First Healthcare Setting to Diagnose HIV
- D:$$OPTCOL^RORXU006("FIRSTDIAG")
- . K RORBUF,RORMSG D GETS^DIQ(799.4,IENS,12.08,"I","RORBUF","RORMSG")
- . S TMP=$G(RORBUF(799.4,IENS,12.08,"I"))
- . S TMP=$S($G(TMP)=1:"Yes",$G(TMP)=0:"No",$G(TMP)=9:"Unknown",1:"")
- . D ADDVAL^RORTSK11(RORTSK,"FIRSTDIAG",$G(TMP),PTAG,1)
  ;
  Q 0
  ;

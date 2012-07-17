@@ -1,5 +1,5 @@
 NHINVPSI ;SLC/MKB -- Inpatient Pharmacy extract
- ;;1.0;NHIN;**1**;Oct 25, 2010;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -53,14 +53,13 @@ IN(ID,MED) ; -- return a medication in MED("attribute")=value
  . N SIO M SIO=PS("SIO")
  . S MED("sig")=MED("sig")_$C(13,10)_$$STRING^NHINV(.SIO)
  I $D(PS("P",0)) S MED("orderingProvider")=PS("P",0)
- I $G(PS("CLINIC",0)) S MED("IMO")=1
  S MED("facility")=$$FAC^NHINV ;local stn#^name
  S ORDER=+$P(PS0,U,8) D:ORDER ORD
  Q
  ;
 IN1(ID,MED) ; -- return a medication in MED("attribute")=value
  ; [expects OEL^PSOORRL data]
- N X,PS,PS0,ORDER,DOSE,UNTS,RTE,SCH,OI,PSOI,DRUG,LOC K MED
+ N X,PS,PS0,ORDER,DOSE,UNTS,RTE,SCH,OI,PSOI,LOC K MED
  M PS=^TMP("PS",$J) S PS0=PS(0)
  S MED("id")=ID,MED("vaType")="I"
  S X=$P(PS0,U,5) S:X MED("start")=X
@@ -76,10 +75,10 @@ IN1(ID,MED) ; -- return a medication in MED("attribute")=value
  I $D(PS("P",0)) S MED("orderingProvider")=PS("P",0)
  S MED("facility")=$$FAC^NHINV ;local stn#^name
  S ORDER=+$P(PS0,U,11) D:ORDER ORD
- I $D(^SC("AE",1,+$G(LOC))) S MED("IMO")=1
  Q
  ;
 ORD ; get rest of inpatient data from ORDER
+ S MED("orderID")=ORDER
  S OI=$$OI^ORX8(ORDER),PSOI=+$P(OI,U,3)
  S MED("name")=$P(OI,U,2) I PSOI D
  . D ZERO^PSS50P7(PSOI,,,"OI")
@@ -91,48 +90,40 @@ ORD ; get rest of inpatient data from ORDER
  . S $P(MED("dose",1),U,1,4)=DOSE
  S:'DRUG DRUG=+$$VALUE^ORX8(ORDER,"DRUG")
  D:DRUG NDF^NHINVPS(DRUG)
- K ^TMP($J,"OI")
-ORDLOC ; enter here for just order# and location
- S MED("orderID")=ORDER
  S LOC=+$$GET1^DIQ(100,ORDER_",",6,"I") I LOC D
- . S MED("location")=LOC_U_$P($G(^SC(LOC,0)),U)
+ . S MED("location")=$P($G(^SC(LOC,0)),U)
  . S MED("facility")=$$FAC^NHINV(LOC)
+ K ^TMP($J,"OI")
  Q
  ;
 IV(ID,MED) ; -- return an infusion in MED("attribute")=value
  ; [expects PS0,OCL^PSOORRL data]
- N PS,X,ORDER,LOC K MED
+ N PS,X K MED
  M PS=^TMP("PS",$J,NHI)
  S MED("id")=ID,MED("vaType")="V",MED("name")=$P(PS0,U,2)
  S X=$P(PS0,U,15) S:X MED("start")=X
  S X=$P(PS0,U,4) S:X MED("stop")=X
  S MED("vaStatus")=$P(PS0,U,9),X=$E($P(PS0,U,9),1,3)
  S MED("status")=$S(X="DIS"!(X="PEN"):"not active",X="EXP"!(X="PUR"):"historical",X="HOL":"hold",1:"active")
- S MED("dose",1)="^^^^"_$G(PS("MDR",1,0))_U_$P($G(PS("SCH",1,0)),U)
- S MED("rate")=$P(PS0,U,3) D IVP
- S X=$G(PS("IVLIM",0)) S:$L(X) MED("ivLimit")=$$IVLIM(X)
- I $G(PS("CLINIC",0)) S MED("IMO")=1
- I $G(PS("P",0)) S MED("orderingProvider")=PS("P",0)
+ S MED("dose",1)=$P(PS0,U,3)_"^^^^"_$G(PS("MDR",1,0))_U_$P($G(PS("SCH",1,0)),U)
  S MED("facility")=$$FAC^NHINV ;local stn#^name
- S ORDER=+$P(PS0,U,8) D:ORDER ORDLOC
- Q
+ I $G(PS("P",0)) S MED("orderingProvider")=PS("P",0)
+ D IVP
+ Q 
  ;
 IV1(ID,MED) ; -- return an infusion in MED("attribute")=value
  ; [expects OEL^PSOORRL data]
- N PS,PS0,X,ORDER,LOC K MED
+ N PS,PS0,X K MED
  M PS=^TMP("PS",$J) S PS0=PS(0)
  S MED("id")=ID,MED("vaType")="V",MED("name")=$P(PS0,U)
  S X=$P(PS0,U,5) S:X MED("start")=X
  S X=$P(PS0,U,3) S:X MED("stop")=X
  S MED("vaStatus")=$P(PS0,U,6),X=$E($P(PS0,U,6),1,3)
  S MED("status")=$S(X="DIS"!(X="PEN"):"not active",X="EXP"!(X="PUR"):"historical",X="HOL":"hold",1:"active")
- S MED("dose",1)="^^^^"_$G(PS("MDR",1,0))_U_$P($G(PS("SCH",1,0)),U)
- S MED("rate")=$P(PS0,U,2) D IVP
- S X=$G(PS("IVLIM",0)) S:$L(X) MED("ivLimit")=$$IVLIM(X)
- I $G(PS("P",0)) S MED("orderingProvider")=PS("P",0)
+ S MED("dose",1)=$P(PS0,U,2)_"^^^^"_$G(PS("MDR",1,0))_U_$P($G(PS("SCH",1,0)),U)
  S MED("facility")=$$FAC^NHINV ;local stn#^name
- S ORDER=+$P(PS0,U,11) D:ORDER ORDLOC
- I $D(^SC("AE",1,+$G(LOC))) S MED("IMO")=1
+ I $G(PS("P",0)) S MED("orderingProvider")=PS("P",0)
+ D IVP
  Q
  ;
 IVP ; -- add IV products for ID,DFN
@@ -152,17 +143,3 @@ IVP ; -- add IV products for ID,DFN
  . D:DRUG NDF^NHINVPS(DRUG,.N) S:'DRUG N=N+1
  . S MED("product",N)=IEN_U_LIST(.01,"E")_"^^B^"_LIST(1,"E")
  Q
- ;
-IVLIM(X) ; -- Return expanded version of IV Limit X
- I '$L($G(X)) Q ""
- N Y,VAL,UNT,I
- S Y="",X=$$UP^XLFSTR(X)
- I X?1"DOSES".E S X="A"_$P(X,"DOSES",2)
- S UNT=$E(X),VAL=0 F I=2:1:$L(X) I $E(X,I) S VAL=$E(X,I,$L(X)) Q
- I UNT="A" S Y=+VAL_$S(+VAL>1:" doses",1:" dose")
- I UNT="D" S Y=+VAL_$S(+VAL>1:" days",1:" day")
- I UNT="H" S Y=+VAL_$S(+VAL>1:" hours",1:" hour")
- I UNT="C" S Y=+VAL_" CC"
- I UNT="M" S Y=+VAL_" ml"
- I UNT="L" S Y=+VAL_" L"
- Q Y

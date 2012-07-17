@@ -1,37 +1,36 @@
-PRCBP ;WISC/CTB-PRINT OPTIONS FOR PRCB ;10/31/01 12:50pm
-V ;;5.1;IFCAP;**3,43,139**;Oct 20, 2000;Build 16
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCBP ;WISC/CTB-PRINT OPTIONS FOR PRCB ; 5/15/01 4:19pm
+V ;;5.1;IFCAP;**3**;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
 SE W !!,$C(7),"ENTRY TO THIS ROUTINE IS ONLY PERMITTED THROUGH THE APPROPRIATE",!,"MENU OR DRIVER" Q
-OUT K %,%Y,DIJ,DP,IOX,IOY,POP,PRCB,PRCF,PRC("CP"),X,Y,NOLCK Q
+OUT K %,%Y,DIJ,DP,IOX,IOY,POP,PRCB,PRCF,PRC("CP"),X,Y Q
 EN1 ;PRINT RANGE OF TRANSACTIONS
  S PRCF("X")="ABFS" D ^PRCFSITE G:'% OUT
-R1 S C="R1",D=1 W !,"START WITH TRANSACTION NUMBER: 1// " R X:$S($D(DTIME):DTIME,1:300) S:X="" X=1 G:X["^" OUT G:X["?"!(X'?1.5N)!(+X'=X)!(X<1)!(X>PRCB("LAST")) Q1 S FR=X K X
+R1 S C="R1",D=1 W !,"START WITH TRANSACTION NUMBER: 1// " R X:$S($D(DTIME):DTIME,1:300) S:X="" X=1 G:X["^" OUT G:X["?"!(X'?1.4N)!(+X'=X)!(X<1)!(X>PRCB("LAST")) Q1 S FR=X K X
 R2 S C="R2",D=FR R !!,"GO TO TRANSACTION NUMBER: LAST// ",X:$S($D(DTIME):DTIME,1:300) S:X="" X=PRCB("LAST") G:X["^" OUT G:X["?"!(X'?1.4N)!(+X'=X)!(X<FR)!(X>PRCB("LAST")) Q1 S TO=X
- S X="0000"_FR,X=$E(X,$L(X)-4,$L(X)),FR=PRCF("SIFY")_"-"_X S X="0000"_TO,X=$E(X,$L(X)-4,$L(X)),TO=PRCF("SIFY")_"-"_X
+ S X="000"_FR,X=$E(X,$L(X)-3,$L(X)),FR=PRCF("SIFY")_"-"_X S X="000"_TO,X=$E(X,$L(X)-3,$L(X)),TO=PRCF("SIFY")_"-"_X
  D ZIS G:POP OUT S FLDS=$S(IOM<81:"[PRCB TRANS RANGE DISPLAY]",1:"[PRCB TRANS RANGE LIST]")
  S DIC="^PRCF(421,",BY="[PRCB BY TRANSACTION NUMBER]",L=0 D EN1^DIP D H G OUT
 Q1 W !!,$C(7),"ENTER A NUMBER BETWEEN ",D," AND ",PRCB("LAST"),".  ('^' TO EXIT)" G @(C)
  ;
 EN2 ;PRINT SELECTED CONTROL POINTS
  ;Patch 3: This section no longer calls the PRCFQ. It calls %ZTLOAD.
- S NOTSK=0,NOLCK=0,EN2Q=0,EN2P=0,RECFLG=0
  K DIC("A") S PRCF("X")="ABFS" D ^PRCFSITE G:'% OUT
  S ^XTMP("PRCBP",$J)=""
  S DIC("A")="Select FUND CONTROL POINT: "
- F ZX=1:1 D  Q:$G(Y)<0!($G(Y)="")  Q:$G(OUT)=1
+ S NOTSK=0,NOLCK=0,EN2Q=0,EN2P=0
+ F ZX=1:1 D  Q:Y<0
  .S DIC(0)="AEQZMN",DIC="^PRC(420,PRC(""SITE""),1,"
  .D ^DIC K DIC("A")
  .Q:Y<0
  .S CP=+Y
  .D EN23
- .I X=U K ^XTMP("PRCBP",$J) S OUT=1 Q
+ .I NOLCK=1 G CLNUP
+ .I X=U K ^XTMP("PRCBP",$J) G OUT
  .I RECFLG=0 D
  ..D EOP^PRC0A(.X,.Y,"No TXN for selected STATION, FISCAL, and Fund Control Point.","AO","")
  .S DIC("A")="ANOTHER FUND CONTROL POINT: "
  K ZX
- I $G(OUT)=1 K OUT G OUT
  I X=U K ^XTMP("PRCBP",$J) G CLNUP
- I '$O(^XTMP("PRCBP",$J,"AM",0)) G CLNUP
  K IO("Q"),IOP,ZTSK,%ZIS,IOC,ZTIO
  S %ZIS="NQ",%ZIS("B")="" D ^%ZIS I POP K ^XTMP("PRCBP",$J) G CLNUP
  I '$D(IO("Q")) S CP=9999 D EN23 S EN2P=1,EN2Q=0 G EN2P
@@ -66,6 +65,9 @@ ERRMSG ;Write the error messages.
  I NOTSK=1 D
  .W !,"Could not get a Task Number. Enter RETURN or '^' to exit. "
  .R !,ANS:DTIME
+ I NOLCK=1 D
+ .W !,"Cannot create a record. Enter RETURN or '^' to exit. " R !,ANS:DTIME
+ Q
  ;
 CLNUP ;Clean variables that no longer needed.
  ;
@@ -78,6 +80,8 @@ CLNUP ;Clean variables that no longer needed.
 EN2P ;Print the Task(s).
  ;
  D:$D(ZTQUEUED) KILL^%ZTLOAD
+ L +^PRCF(421,0):5
+ E  S NOLCK=1 D ERRMSG G CLNUP
  S AM=0,AQ=0
  S FLDS=$S(IOM<81:"[PRCB FCP DISPLAY]",1:"[PRCB FCP LIST]")
  S DIC="^PRCF(421,",BY="[PRCB BY SEARCH/FCP/TRANS]"
@@ -91,21 +95,28 @@ EN2P ;Print the Task(s).
  ..S ^PRCF(421,"AM",1,AQ)=""
  .K ^XTMP("PRCBP",TSKNUM)
  D EN1^DIP
+ L -^PRCF(421,0)
  K ^PRCF(421,"AM")
  G CLNUP
  ;
 EN23 ;Setup the temp file with selected records (FCP).
  ;
- S N=0,RECFLG=0
+ S N=0,RECFLG=0,NOLCK=0
+ L +^PRCF(421,0):5
+ E  S NOLCK=1 D ERRMSG G CLNUP
+ L +^XTMP("PRCBP",$J):5
+ E  S NOLCK=1 D ERRMSG G CLNUP
  F I=1:1 S N=$O(^PRCF(421,"AC",PRCF("SIFY")_"-"_CP,N)) Q:N=""  D
  .S RECFLG=1
  .S ^XTMP("PRCBP",$J,"AM",1,N)=""
  .S $P(^PRCF(421,N,2),"^",14)=1
  .W:CP'=9999 "."
+ L -^XTMP("PRCBP",$J)
+ L -^PRCF(421,0)
  Q
 EN3 ;PRINT BY TDA NUMBER
  S PRCF("X")="ABFS" D ^PRCFSITE G:'% OUT
- S FR=$O(^PRCF(421,"B",PRCF("SIFY")_"-00000")) I FR="" W !,"NO TRANSACTIONS IN FY ",PRC("FY") R X:2 G OUT
+ S FR=$O(^PRCF(421,"B",PRCF("SIFY")_"-0000")) I FR="" W !,"NO TRANSACTIONS IN FY ",PRC("FY") R X:2 G OUT
 Q31 D DD^PRC0A(.X,.Y,"Beginning TDA Number","421,3O",1)
  G EN3:Y=""!(Y["^")
  S PRCA=Y

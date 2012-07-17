@@ -1,4 +1,4 @@
-RTPURGE ;PKE/ISC-ALBANY-Purge Data Routine; ; 5/27/87  11:45 AM ;
+RTPURGE ;PKE/ISC-ALBANY-Purge Data Routine; ; 5/27/87  11:45 AM ; [ 02/19/93  11:10 AM ]
  ;;v 2.0;Record Tracking;;10/22/91 
  D DIP W !!,"Record Type Purge Parameters:",!,"-----------------------------"
 DIE S DIC("A")="Select RECORD TYPE: ",DIC="^DIC(195.2,",DIC(0)="AEMQ" D ^DIC K DIC G Q:X="^" I Y>0 S DA=+Y,DR="[RT PURGE PROFILE]",DIE="^DIC(195.2," D ^DIE K DE,DQ W ! G DIE

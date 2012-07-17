@@ -1,5 +1,5 @@
-PRCHLO4A ;WOIFO/RLL/DAP-EXTRACT ROUTINE CLO REPORT SERVER ;12/30/10  14:58
- ;;5.1;IFCAP;**83,104,98,130,154**;Oct 20, 2000;Build 5
+PRCHLO4A ;WOIFO/RLL/DAP-EXTRACT ROUTINE CLO REPORT SERVER ;5/22/09  14:14
+ ;;5.1;IFCAP;**83,104,98,130**;Oct 20, 2000;Build 25
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ; Continuation of PRCHLO4
  ;
@@ -38,7 +38,7 @@ CRTWIN ; Create CLRSxxxWFTP.TXT  file to transfer file(s)
  I CLRSERR'=3  D
  . N PONN  ; File number for File type
  . S PONN=1
- . F PONN=1:1:27  D
+ . F PONN=1:1:23  D
  . . N FTY  ; File type F=Po Activity , G=GIP
  . . ;
  . . S FTY="F"
@@ -187,7 +187,7 @@ FTPCOM ; Issue the FTP command after CLRSxxxWFTP.TXT file is built
  ;
  N LPP1,LPP2
  S LPP1=0,LPP2="F"
- F LPP1=1:1:27  D  ; run the FTP command for the 27 PO files
+ F LPP1=1:1:23  D  ; run the FTP command for the 23 PO files
  . D RUNFTPT
  . Q
  S LPP1=0,LPP2="G"
@@ -217,7 +217,7 @@ DELWIN ; Delete windows files
  I CKOS["NT"  D
  . N LPP1,LPP2
  . S LPP1=0,LPP2="F"
- . F LPP1=1:1:27  D  ; run the FTP command for the 27 PO files
+ . F LPP1=1:1:23  D  ; run the FTP command for the 23 PO files
  . . D DELFTPF
  . . Q
  . Q

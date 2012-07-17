@@ -1,5 +1,5 @@
 PSOP1 ;BHAM ISC/SAB - prints short medication profile ;02/25/94
- ;;7.0;OUTPATIENT PHARMACY;**15,46,103,132,148,233,326,251**;DEC 1997;Build 202
+ ;;7.0;OUTPATIENT PHARMACY;**15,46,103,132,148,233,326**;DEC 1997;Build 11
  ;External reference to ^PSDRUG supported by DBIA 221
  ;External reference to ^PS(50.605 supported by DBIA 696
  K RX,DTOUT,DIRUT,DIROUT,DUOUT
@@ -14,7 +14,7 @@ W I $Y+6>IOSL,$E(IOST)="C" D DIR W @IOF Q:$D(PQT)  D HD
  N PSOBADR
  U IO I IO'=IO(0),$Y+6>IOSL W @IOF D HD
  I $E(IOST)'="C",$Y+6>IOSL W @IOF D HD
- D STAT^PSOFUNC S STA="A^N^R^H^N^S^^^^^^E^DC^^DP^DE^PH",ST=$P(STA,"^",(ST0+1)) K STA
+ D STAT^PSOFUNC S STA="A^N^R^H^P^S^^^^^^E^DC^^DC^DE^PH",ST=$P(STA,"^",(ST0+1)) K STA
  S PSOBADR=$O(^PSRX(J,"L",9999),-1)
  I PSOBADR'="" S PSOBADR=$G(^PSRX(J,"L",PSOBADR,0)) I PSOBADR["(BAD ADDRESS)" S PSOBADR="B"
  I PSOBADR'="B" S PSOBADR=""
@@ -33,7 +33,7 @@ W I $Y+6>IOSL,$E(IOST)="C" D DIR W @IOF Q:$D(PQT)  D HD
  ;D SIG
  K RST Q
 HD D:PAGE>1
- .W !,"Patient: "_$P(^DPT(DFN,0),"^")_" ("_$E($P(^DPT(DFN,0),"^",9),6,9)_")",?70,"Page: "_PAGE
+ .W !,"Patient: "_$P(^DPT(DFN,0),"^"),?70,"Page: "_PAGE
  .W !?(80-$L("Medication Profile Sorted by "_HDR))/2,"Medication Profile Sorted by "_HDR W:$G(FR)]"" !?(80-$L(FR_" to "_TO))/2,FR_" to "_TO
  W !?57,"REF",!?1,"Rx#",?13,"Drug",?54,"ST",?57,"REM",?62,"Issued",?70,"Last Fill",!,PSOPLINE S PAGE=PAGE+1
  Q

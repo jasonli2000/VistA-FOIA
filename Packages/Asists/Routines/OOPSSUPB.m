@@ -1,5 +1,5 @@
 OOPSSUPB ;WIOFO/LLH-S/E Supervisor Edit for CA1 ;04/25/2000
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**8**;Jun 01, 1998
  ;;
  ; Note:  This routine used to be part of OOPSSUP2, but had to be split
  ; due to size limitations.  This routine collects the Supervisor

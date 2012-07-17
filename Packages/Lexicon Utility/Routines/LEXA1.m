@@ -1,10 +1,6 @@
-LEXA1 ;ISL/KER - Lexicon Look-up (Loud) ;01/03/2011
- ;;2.0;LEXICON UTILITY;**3,4,6,11,15,38,55,73**;Sep 23, 1996;Build 10
+LEXA1 ;ISL/KER - Lexicon Look-up (Loud) ;11/30/2008
+ ;;2.0;LEXICON UTILITY;**3,4,6,11,15,38,55**;Sep 23, 1996;Build 11
  ;
- ; Local Variables NEWed or KILLed by calling application
- ; 
- ;     DIC,DTOUT,DUOUT,LEXCAT,LEXQUIET,LEXSRC
- ;     
 EN ; Initialize
  ; Fileman Inquire Option
  I $D(DIC(0)),$G(DIC(0))["A" K X
@@ -118,17 +114,16 @@ Y1 ; ICD in Y(1) and CPT in Y(81)
  . S Y(81)=$P($G(LEX("SEL","VAS",LEXVAS)),"^",3)
  K:Y(1)="" Y(1) K:Y(81)="" Y(81)
  I $D(Y(1)) D
- .W:'$D(LEXQUIET) !!,">>>  Code  :  "
- .I $D(IOINHI)&($D(IOINORM)) W:'$D(LEXQUIET) IOINHI,Y(1),IOINORM,! Q 
- .W:'$D(LEXQUIET) Y(1),!
+ .W !!,">>>  Code  :  "
+ .I $D(IOINHI)&($D(IOINORM)) W IOINHI,Y(1),IOINORM,! Q 
+ .W Y(1),!
  Q
 ASK ; Get user input
  N DIR,DIRUT,DIROUT S:$L($G(LEXDICA)) DIC("A")=LEXDICA
  S DIR("A")=DIC("A") W:'$L($G(X))&('$L($G(LEXDICB))) !
  I '$L($G(X)),$L($G(LEXDICB)) S DIR("B")=LEXDICB
- S DIR("?")="      "_$$SQ^LEXHLP
- S DIR("??")="^D INPHLP^LEXA1",DIR("?")=$G(DIR("??"))
- N Y S DIR(0)="FAO^0:245" K X
+ S DIR("?")="    "_$$SQ^LEXHLP
+ S DIR("??")="^D INPHLP^LEXA1" N Y S DIR(0)="FAO^0:245" K X
  D ^DIR
  K DIC("B") D:$E(X,1)=" " RSBR
  W:$E(X,1)'=" " !
@@ -137,24 +132,11 @@ ASK ; Get user input
  I $D(DTOUT)!(X="^") S X=""
  S:X[U DUOUT=1 K DIRUT,DIROUT Q
 INPHLP ; Look-up help
- W !,"      Enter a ""free text"" term.  Best results occur using one to "
- W !,"      three full or partial words without a suffix"
- W:$G(X)'["??" "."
- W:$G(X)["??" " (i.e., ""DIABETES"","
- W:$G(X)["??" !,"      ""DIAB MELL"",""DIAB MELL INSUL"")"
- W !,"  or  "
- W !,"      Enter a classification code (ICD/CPT etc) to find the single "
- W !,"      term associated with the code."
- W:$G(X)["??" "  Example, a lookup of code 239.0 "
- W:$G(X)["??" !,"      returns one and only one term, that is the preferred "
- W:$G(X)["??" !,"      term for the code 239.0, ""Neoplasm of unspecified nature "
- W:$G(X)["??" !,"      of digestive system"""
- W !,"  or  "
- W !,"      Enter a classification code (ICD/CPT etc) followed by a plus"
- W !,"      sign (+) to retrieve all terms associated with the code."
- W:$G(X)["??" "  Example,"
- W:$G(X)["??" !,"      a lookup of 239.0+ returns all terms that are linked to the "
- W:$G(X)["??" !,"      code 239.0."
+ N X S X="" S:$L($G(DIR("?"))) X=$G(DIR("?")) S:'$L(X) X="    "_$$SQ^LEXHLP
+ W:$L(X) !!,X,!
+ W !,"    Best results occur using one to three full or partial words without"
+ W !,"    a suffix (i.e., ""DIABETES"",""DIAB MELL"",""DIAB MELL INSUL"") or"
+ W !,"    a classification code (ICD, CPT, HCPCS, etc)"
  Q
 CHK ; Check Fileman look-up variables
  K DIC("DR"),DIC("P"),DIC("V"),DLAYGO,DINUM

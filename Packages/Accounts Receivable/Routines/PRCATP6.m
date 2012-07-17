@@ -1,4 +1,4 @@
-PRCATP6 ; GENERATED FROM 'PRCAP RETURN BILL' PRINT TEMPLATE (#416) ; 06/27/96 ; (FILE 430, MARGIN=80)
+PRCATP6 ; GENERATED FROM 'PRCAP RETURN BILL' PRINT TEMPLATE (#805) ; 05/26/95 ; (FILE 430, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -27,12 +27,12 @@ BEGIN ;
  S X=$G(^PRCA(430,D0,100)) D N:$X>48 Q:'DN  W ?48 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^DIC(49,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
  D T Q:'DN  D N D N:$X>33 Q:'DN  W ?33 W "<< SERVICE >>"
  D N:$X>0 Q:'DN  W ?0 W "APPROV. BY:"
- S X=$G(^PRCA(430,D0,104)) D N:$X>12 Q:'DN  W ?12 S Y=$P(X,U,1) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,35)
+ S X=$G(^PRCA(430,D0,104)) D N:$X>12 Q:'DN  W ?12 S Y=$P(X,U,1) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
  D N:$X>39 Q:'DN  W ?39 W "DATE:"
  D N:$X>45 Q:'DN  W ?45 S Y=$P(X,U,3) D DT
  D T Q:'DN  D N D N:$X>33 Q:'DN  W ?33 W "<< FISCAL >>"
  D N:$X>0 Q:'DN  W ?0 W "RETN'D BY:"
- S X=$G(^PRCA(430,D0,3)) D N:$X>12 Q:'DN  W ?12 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,35)
+ S X=$G(^PRCA(430,D0,3)) D N:$X>12 Q:'DN  W ?12 S Y=$P(X,U,2) S Y=$S(Y="":Y,$D(^VA(200,Y,0))#2:$P(^(0),U,1),1:Y) W $E(Y,1,30)
  D N:$X>39 Q:'DN  W ?39 W "DATE:"
  D N:$X>46 Q:'DN  W ?46 S Y=$P(X,U,1) D DT
  D N:$X>0 Q:'DN  W ?0 W "RETN'D REASON:"

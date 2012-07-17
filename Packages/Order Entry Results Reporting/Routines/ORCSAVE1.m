@@ -1,5 +1,5 @@
-ORCSAVE1 ; SLC/MKB - Save Order Text ;02/24/09  13:52
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**92,132,141,163,187,223,243,280**;Dec 17, 1997;Build 85
+ORCSAVE1 ; SLC/MKB - Save Order Text ;02/22/07
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**92,132,141,163,187,223,243**;Dec 17, 1997;Build 242
  ;
  ; ^ORD(101.41,+ORDIALOG,10,ITM,2)=Seq#^Format^Omit^Lead Text^Trail Text
  ; ^ORD(101.41,+ORDIALOG,10,"ATXT",Seq#,ITM)=""
@@ -116,15 +116,3 @@ DIGTEXT(ORDER,ORDEA,ORSIGNER)  ;Build text used to create Digital Signature
  S ORSET(7)=$H
  S ORSET=7
  Q
-DELALRT(ORDER) ; deletes "Order requires electronic signature" alert for all intended recipients after all orders have lapsed
- ; Fixes CQ #17536: When orders are lapsed, the unsigned order notification does NOT go away (TC). [v28.1]
- N ORPROV,ORATIFN S ORATIFN=0
- S ORPROV=$P(^OR(100,+ORDER,8,1,0),U,3) Q:'ORPROV
- F  S ORATIFN=$O(^XTV(8992.1,"R",ORPROV,ORATIFN)) Q:ORATIFN'>0  D
- .N ORDNUM S ORDNUM=$$GET1^DIQ(8992.1,ORATIFN,2,"I") ;DBIA #2818
- .I $D(ORDNUM)&($P(ORDNUM,"@")=+ORDER) D
- ..N ORXQAID,XQAID,XQAKILL S ORXQAID=$$GET1^DIQ(8992.1,ORATIFN,.01,"I"),XQAID=ORXQAID,XQAKILL=0
- ..D DELETE^XQALERT K ORXQAID,XQAID,XQAKILL
- K ORPROV,ORATIFN,ORDNUM
- Q
- ;

@@ -1,7 +1,7 @@
-PRCHT38 ; ;10/06/97
+PRCHT38 ; ;11/25/98
  D DE G BEGIN
 DE S DIE="^PRC(442,D0,2,",DIC=DIE,DP=442.01,DL=2,DIEL=1,DU="" K DG,DE,DB Q:$O(^PRC(442,D0,2,DA,""))=""
- I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(1)=% S %=$P(%Z,U,2) S:%]"" DE(6)=% S %=$P(%Z,U,5) S:%]"" DE(2)=%
+ I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(2)=% S %=$P(%Z,U,5) S:%]"" DE(4)=%
  K %Z Q
  ;
 W W !?DL+DL-2,DLB_": "
@@ -42,71 +42,59 @@ SET N DIR S DIR(0)="SV"_$E("o",$D(DB(DQ)))_U_DU,DIR("V")=1
  I $D(DB(DQ)),'$D(DIQUIET) N DIQUIET S DIQUIET=1
  D ^DIR I 'DDER S %=Y(0),X=Y
  Q
-BEGIN S DNM="PRCHT38",DQ=1+D G B
-1 S DW="0;1",DV="MRNJ2,0X",DU="",DLB="LINE ITEM NUMBER",DIFLD=.01
- S DE(DW)="C1^PRCHT38"
- G RE:'D S DQ=2 G 2
-C1 G C1S:$D(DE(1))[0 K DB S X=DE(1),DIC=DIE
+BEGIN S DNM="PRCHT38",DQ=1
+1 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=1 D X1 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X1 S (PRCHREC,PRCHINUM)=DA,PRCHQUAN="",Z="",PRCHTOT=0
+ Q
+2 S DW="0;1",DV="MRNJ2,0X",DU="",DLB="LINE ITEM NUMBER",DIFLD=.01
+ S DE(DW)="C2^PRCHT38"
+ G RE
+C2 G C2S:$D(DE(2))[0 K DB S X=DE(2),DIC=DIE
  K DIV S DIV=X,D0=DA(1),DIV(0)=D0,D1=DA S Y(1)=$S($D(^PRC(442,D0,0)):^(0),1:"") S X=$P(Y(1),U,14) S DIU=X K Y X ^DD(442.01,.01,1,1,2.1) X ^DD(442.01,.01,1,1,2.4)
- S X=DE(1),DIC=DIE
+ S X=DE(2),DIC=DIE
  K ^PRC(442,DA(1),2,"B",$E(X,1,30),DA)
- S X=DE(1),DIC=DIE
+ S X=DE(2),DIC=DIE
  K ^PRC(442,DA(1),2,"C",X,DA)
-C1S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+ S X=DE(2),DIC=DIE
+ X "N DAA,DS,DIK,PR S DAA=DA N DA S PR=$G(PRCHPONO,$P(^PRC(442,D0,0),U)),DS="""",DIK=""^PRC(442.8,"" F  S DS=$O(^PRC(442.8,""AC"",PR,DAA,DS)) Q:DS=""""  S DA=DS D ^DIK"
+C2S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  K DIV S DIV=X,D0=DA(1),DIV(0)=D0,D1=DA S Y(1)=$S($D(^PRC(442,D0,0)):^(0),1:"") S X=$P(Y(1),U,14) S DIU=X K Y X ^DD(442.01,.01,1,1,1.1) X ^DD(442.01,.01,1,1,1.4)
  S X=DG(DQ),DIC=DIE
  S ^PRC(442,DA(1),2,"B",$E(X,1,30),DA)=""
  S X=DG(DQ),DIC=DIE
  I ('$D(^PRC(442,DA(1),2,DA,2)))!($P(^(0),"^",2)>$S($D(^(2)):$P(^(2),"^",8),1:0)) S ^PRC(442,DA(1),2,"C",X,DA)=""
+ S X=DG(DQ),DIC=DIE
+ ;
  Q
-X1 K:+X'=X!(X>999)!(X<1)!(X?.E1"."1N.N) X
+X2 K:+X'=X!(X>999)!(X<1)!(X?.E1"."1N.N) X
  Q
  ;
-2 D:$D(DG)>9 F^DIE17,DE S DQ=2,DW="0;5",DV="*P441'X",DU="",DLB="ITEM MASTER FILE NO.",DIFLD=1.5
- S DE(DW)="C2^PRCHT38"
+3 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=3 D X3 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X3 S PRCHOLD=$P($G(^PRC(442,PRCHIEN,2,PRCHINUM,0)),U,2)
+ Q
+4 D:$D(DG)>9 F^DIE17,DE S DQ=4,DW="0;5",DV="*P441'X",DU="",DLB="ITEM MASTER FILE NO.",DIFLD=1.5
+ S DE(DW)="C4^PRCHT38"
  S DU="PRC(441,"
  G RE
-C2 G C2S:$D(DE(2))[0 K DB S X=DE(2),DIC=DIE
+C4 G C4S:$D(DE(4))[0 K DB S X=DE(4),DIC=DIE
  X "Q:'$D(PRC(""SITE""))!($P(^PRC(442,DA(1),0),U,3)="""")!($P(^(1),U,1)="""")  S PRCHCCP=$P($P(^(0),U,3),"" "",1),PRCHCPD=+$P(^(1),U,15),PRCHCI=X,PRCHCPO=DA(1) D EN4^PRCHCRD"
- S X=DE(2),DIC=DIE
+ S X=DE(4),DIC=DIE
  K ^PRC(442,DA(1),2,"AE",$E(X,1,30),DA)
-C2S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
+C4S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
  X "Q:'$D(PRC(""SITE""))!($P(^PRC(442,DA(1),0),U,3)="""")!($P(^(1),U,1)="""")  S PRCHCCP=$P($P(^(0),U,3),"" "",1),PRCHCV=$P(^(1),U,1),PRCHCPD=+$P(^(1),U,15),PRCHCI=X,PRCHCPO=DA(1) D EN3^PRCHCRD"
  S X=DG(DQ),DIC=DIE
  S ^PRC(442,DA(1),2,"AE",$E(X,1,30),DA)=""
  Q
-X2 S DIC("S")="I 1",DIC(0)=DIC(0)_"O" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X I $D(X) D EN5^PRCHNPO5
+X4 S DIC("S")="I 1",DIC(0)=DIC(0)_"O" D ^DIC K DIC S DIC=DIE,X=+Y K:Y<0 X I $D(X) D EN5^PRCHNPO5
  Q
  ;
-3 D:$D(DG)>9 F^DIE17,DE S DQ=3,D=0 K DE(1) ;1
+5 D:$D(DG)>9 F^DIE17,DE S DQ=5,D=0 K DE(1) ;1
  S Y="DESCRIPTION^W^^0;1^Q",DG="1",DC="^442.05" D DIEN^DIWE K DE(1) G A
  ;
-4 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=4 D X4 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X4 S (PRCHQUAN,Z)="" I $D(^PRC(442,DA(1),1)) S Z=$S($D(^PRC(441,+$P(^PRC(442,DA(1),2,DA,0),U,5),2,+^PRC(442,DA(1),1),0)):^(0),1:"")
+6 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=6 D X6 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
+X6 I $D(^PRC(442,DA(1),1)) S Z=$S($D(^PRC(441,+$P(^PRC(442,DA(1),2,DA,0),U,5),2,+^PRC(442,DA(1),1),0)):^(0),1:"")
  Q
-5 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=5 D X5 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X5 K:Z="" Z I $D(Z) W:$P(Z,U,12)'="" !,"    Minimum Order Qty.: ",$P(Z,U,12) W:$P(Z,U,9) !,"    Maximum Order Qty.: ",$P(Z,U,9) W:$P(Z,U,11) !,"    Required Order Multiple: ",$P(Z,U,11) S PRCHQUAN=Z K Z
- Q
-6 S DW="0;2",DV="RNJ9,2",DU="",DLB="QUANTITY",DIFLD=2
- S DE(DW)="C6^PRCHT38"
- S X=$S($P(PRCHQUAN,U,12)'="":$P(PRCHQUAN,U,12),$P(PRCHQUAN,U,11)'="":$P(PRCHQUAN,U,11),1:"")
- S Y=X
- G Y
-C6 G C6S:$D(DE(6))[0 K DB S X=DE(6),DIC=DIE
- K DIV S DIV=X,D0=DA(1),DIV(0)=D0,D1=DA,DIV(1)=D1 S Y(1)=$S($D(^PRC(442,D0,2,D1,2)):^(2),1:"") S X=$P(Y(1),U,1) S DIU=X K Y S X=DIV S X="" X ^DD(442.01,2,1,1,2.4)
-C6S S X="" Q:DG(DQ)=X  K DB S X=DG(DQ),DIC=DIE
- X ^DD(442.01,2,1,1,1.3) I X S X=DIV S Y(1)=$S($D(^PRC(442,D0,2,D1,2)):^(2),1:"") S X=$P(Y(1),U,1) S DIU=X K Y X ^DD(442.01,2,1,1,1.1) X ^DD(442.01,2,1,1,1.4)
- Q
-X6 K:+X'=X!(X>999999)!(X<.01)!(X?.E1"."3N.N) X
- Q
- ;
 7 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=7 D X7 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X7 I $P(PRCHQUAN,U,12)'="" I X<$P(PRCHQUAN,U,12) W !,"QUANTITY is less than Minimum Order Quantity.",$C(7) S Y=2
+X7 K:Z="" Z I $D(Z) W:$P(Z,U,12)'="" !,"    Minimum Order Qty.: ",$P(Z,U,12) W:$P(Z,U,9) !,"    Maximum Order Qty.: ",$P(Z,U,9) W:$P(Z,U,11) !,"    Required Order Multiple: ",$P(Z,U,11) S PRCHQUAN=Z K Z
  Q
-8 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=8 D X8 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X8 I $P(PRCHQUAN,U,9)'="" I X>$P(PRCHQUAN,U,9) W !,"QUANTITY is more than Maximum Order Quantity.",$C(7) S Y=2
- Q
-9 D:$D(DG)>9 F^DIE17,DE S Y=U,DQ=9 D X9 G A:$D(Y)[0,A:Y=U S X=Y,DIC(0)="F",DW=DQ G OUT^DIE17
-X9 I $P(PRCHQUAN,U,11)'="" I X#$P(PRCHQUAN,U,11)'=0 W !,"QUANTITY is not a Required Order Multiple value.",$C(7) S Y=2
- Q
-10 D:$D(DG)>9 F^DIE17 G ^PRCHT311
+8 D:$D(DG)>9 F^DIE17 G ^PRCHT311

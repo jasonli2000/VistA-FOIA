@@ -1,5 +1,5 @@
 ECXAMOV ;ALB/JAP - MOV Extract Audit Report ;Oct 10, 1997
- ;;3.0;DSS EXTRACTS;**8,33**;Dec 22, 1997
+ ;;3.0;DSS EXTRACTS;**8**;Dec 22, 1997
  ;
 EN ;entry point for MOV extract audit report
  N %X,%Y,X,Y,DIC,DA,DR,DIQ,DIR
@@ -48,7 +48,7 @@ EN ;entry point for MOV extract audit report
  ;
 PROCESS ;process data in file #727.808
  N X,Y,W,JJ,DATE,DATA,DIV,IEN,MOV,TL,ORDER,SORD,GTOT,STOT,WARD,TMOV,QQFLG,CNT,LINETOT
- K ^TMP($J,"ECXWARD"),^TMP($J,"ECXORDER"),^TMP($J,"MISWRD")
+ K ^TMP($J,"ECXWARD"),^TMP($J,"ECXORDER")
  S (CNT,QQFLG)=0
  S ECXEXT=ECXARRAY("EXTRACT"),ECXDEF=ECXARRAY("DEF")
  S X=ECXARRAY("START") D ^%DT S ECXSTART=Y S X=ECXARRAY("END") D ^%DT S ECXEND=Y
@@ -73,9 +73,6 @@ PROCESS ;process data in file #727.808
  .;convert free text date to fm internal format date
  .S $E(DATE,1,2)=$E(DATE,1,2)-17
  .Q:$L(DATE)<7  Q:(DATE<ECXSTART)  Q:(DATE>ECXEND)
- .;track missing wards
- .I WARD="" D  Q
- ..S ^TMP($J,"MISWRD")=$G(^TMP($J,"MISWRD"))+1,^("MISWRD",IEN)=""
  .;if ward is among those selected, then tally movement data
  .I $D(^TMP($J,"TL",WARD)) D
  ..S $P(^TMP($J,"TL",WARD),U,TMOV)=$P(^TMP($J,"TL",WARD),U,TMOV)+1
@@ -99,8 +96,7 @@ PROCESS ;process data in file #727.808
  Q
  ;
 PRINT ;print the movement data by division and ward order
- N JJ,SS,LN,NM,TNM,PG,QFLG,WRDNM,WRDTOT,GRPNM,GRPTOT,DIVTOT,DATA,DATA1
- N TYPE,DIC,DA,DR,DIR,DIRUT,DTOUT,DUOUT,W1,W2,ADMDT,IEN,FAC
+ N JJ,SS,LN,NM,TNM,PG,QFLG,WRDNM,WRDTOT,GRPNM,GRPTOT,DIVTOT,DATA,DATA1,TYPE,DIC,DA,DR,DIR,DIRUT,DTOUT,DUOUT,W1,W2
  U IO
  I $D(ZTQUEUED),$$S^%ZTLOAD S ZTSTOP=1 K ZTREQ Q
  S (QFLG,PG)=0,$P(LN,"-",132)="",DIV=""
@@ -141,19 +137,6 @@ PRINT ;print the movement data by division and ward order
  ...S GTOT=$P(GTOT(DIV),U,MOV),TAB=TAB+6 W ?TAB,$$RJ^XLFSTR(GTOT,5," ") S LINETOT=LINETOT+GTOT
  ..S TAB=TAB+8 W ?TAB,$$RJ^XLFSTR(LINETOT,5," ")
  ..I $E(IOST)'="C" D LEGEND
- ;print patients with missing wards
- I $D(^TMP($J,"MISWRD")) D
- .S DIV="MISWRD",ECXDIV(DIV)="^^^^^*** MISSING WARDS ***^",TYPE=0
- .D HEADER S WRDTOT=$G(^TMP($J,"MISWRD"))
- .W !,?5,"MISSING WARD",?45,$$RJ^XLFSTR(WRDTOT,5," "),!!
- .D HEAD S IEN=""
- .F  S IEN=$O(^TMP($J,"MISWRD",IEN)) Q:'IEN  D  I QFLG Q
- ..S DATA=$G(^ECX(727.808,IEN,0)),ADMDT=$P(DATA,U,11) Q:DATA=""
- ..S FAC=$P(DATA,U,4) S:FAC'="" FAC=$$GET1^DIQ(42,FAC,.01,"E")
- ..W !?2,$P(DATA,U,7),?8,$P(DATA,U,5),?25,$E(FAC,1,14),?45
- ..W $E(ADMDT,5,6)_"/"_$E(ADMDT,7,8)_"/"_$E(ADMDT,1,4)," "
- ..W $E($P(DATA,U,22),1,2)_":"_$E($P(DATA,U,22),3,4)
- ..D:($Y+3>IOSL) HEADER,HEAD Q:QFLG
  I $E(IOST)'="C" D
  .W @IOF S PG=PG+1
  .W !,ECXARRAY("TYPE")_" ("_ECXHEAD_") Extract Audit Report"
@@ -165,11 +148,6 @@ PRINT ;print the movement data by division and ward order
  I $E(IOST)="C",'QFLG D
  .S SS=22-$Y F JJ=1:1:SS W !
  .S DIR(0)="E" W ! D ^DIR K DIR
- Q
- ;
-HEAD ;header for missing wards
- W !,?2,"NAME",?8,"PATIENT DFN",?25,"FACILITY",?45,"ADMISSION DATE"
- W !,?2,"====",?8,"===========",?25,"========",?45,"=============="
  Q
  ;
 HEADER ;header and page control
@@ -186,10 +164,10 @@ HEADER ;header and page control
  W !,"Report Run Date/Time:    "_ECXRUN
  I DSSID="" W !,"Medical Center Division: "_$P(ECXDIV(DIV),U,2)_" ("_$P(ECXDIV(DIV),U,3)_")",?120,"Page: "_PG
  I DSSID]"" W !,"Medical Center Division: "_$P(ECXDIV(DIV),U,2)_" ("_$P(ECXDIV(DIV),U,3)_")"_" <"_DSSID_">",?120,"Page: "_PG
- S TAB=$S(TYPE=2:28,1:20) W !!
- I TYPE=2 W "Ward <DSS Dept.>",?TAB,"MAS Movement ("_TNM_") Types",!
- I TYPE=3 W "Ward",?TAB,"MAS Movement ("_TNM_") Types",!
- S MOV="",TAB=$S(TYPE=0:40,TYPE=2:20,1:10)
+ S TAB=$S(TYPE=2:28,1:20)
+ I TYPE=2 W !!,"Ward <DSS Dept.>",?TAB,"MAS Movement ("_TNM_") Types",!
+ I TYPE=3 W !!,"Ward",?TAB,"MAS Movement ("_TNM_") Types",!
+ S MOV="",TAB=$S(TYPE=2:20,1:10)
  F  S MOV=$O(^TMP($J,"MOV",TYPE,MOV)) Q:MOV=""  S TAB=TAB+6 W ?TAB,$$RJ^XLFSTR(MOV,5," ")
  S TAB=TAB+8 W ?TAB,$$RJ^XLFSTR("Total",5," ")
  W !,LN,!

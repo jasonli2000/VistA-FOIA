@@ -1,5 +1,5 @@
 VBECRPCD ;DALOI/RLM - Lookup HOSPITAL LOCATION based on DIVISION ;12 January 2004
- ;;1.0;VBECS;**3,10**;Apr 14, 2005;Build 15
+ ;;1.0;VBECS;**3**;Apr 14, 2005;Build 21
  ;
  ; Note: This routine supports data exchange with an FDA registered
  ; medical device. As such, it may not be changed in any way without
@@ -28,11 +28,7 @@ LOC(RESULTS,DIV) ; Main RPC Entry
 LOOK ;
  S VBECA=0 F  S VBECA=$O(^SC(VBECA)) Q:'VBECA  D
   . Q:'$P(^SC(VBECA,0),U,15)  ;No Division
-  . S IDATE=$P($G(^SC(VBECA,"I")),"^",1) ;inactivate date
-  . S RDATE=$P($G(^SC(VBECA,"I")),"^",2) ;reactivate date
-  . I IDATE]"",IDATE<DT,RDATE="" Q  ;past inactivate date, no reactivate date
-  . I IDATE]"",IDATE<DT,RDATE>DT Q  ;past inactivate date, future reactivate date
-  . ;Q:$D(^SC(VBECA,"I"))  ;Inactive Location???
+  . Q:$D(^SC(VBECA,"I"))  ;Inactive Location???
   . Q:"CWOR"'[$P(^SC(VBECA,0),U,3)  ;Clinic, Ward, or Operating Room
   . I DIV=$P($$SITE^VASITE(DT,+$P(^SC(VBECA,0),U,15)),U,3) D
   . . D BEGROOT^VBECRPC("Location")

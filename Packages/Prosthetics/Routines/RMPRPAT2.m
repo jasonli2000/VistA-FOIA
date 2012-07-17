@@ -1,6 +1,5 @@
 RMPRPAT2 ;PHX/RFM/JLT/HNC-DISPLAY PATIENT ITEM ACTIVITY ;10/19/1993
- ;;3.0;PROSTHETICS;**32,34,29,44,99,75,137,146,162**;Feb 09, 1996;Build 5
- N BDAT,HITM
+ ;;3.0;PROSTHETICS;**32,34,29,44,99,75,137,146,155**;Feb 09, 1996;Build 4
  D HDR N RMPRMERG S RMPRMERG=0
  S (RA,AN,ANS,RK,RZ)=0 K ^TMP($J,"TT"),^TMP($J,"AG"),IT
  MERGE ^TMP($J,"TT")=^RMPR(660,"AC",RMPRDFN)
@@ -19,9 +18,8 @@ RMPRPAT2 ;PHX/RFM/JLT/HNC-DISPLAY PATIENT ITEM ACTIVITY ;10/19/1993
  . .I ND S ND=$P(^RMPR(661.1,ND,0),U,8)
  . .S:ND="" ND=2
  . .S:GN="" GN=BC
- . .S ^TMP($J,"AG",GN,BC,ND)=B  ;set linked grouper counter structure differently in array;RMPR*3.0*162
+ . .S ^TMP($J,"AG",GN,BC,ND)=B
  ;COMBINE ITEMS FOR CALC FLAG
- ;modified linked grouper structure determination in patch RMPR*3.0*162
  S B=""
  F  S B=$O(^TMP($J,"AG",B)),ITM=0,HITM=0 Q:+B=0  D
  .F  S ITM=$O(^TMP($J,"AG",B,ITM)),BC=0 Q:+ITM=0  D
@@ -51,8 +49,8 @@ END I RC=0 W !,"No Appliances or Repairs exist for this veteran!",!! H 3 G EXIT
  ;
  I RC>0 W !!,"End of Appliance/Repair records for this veteran!" D OVER I $G(RK)+1'>$G(RC)&($G(IT($G(RK)+1))) D DIS
  ;
-EXIT K I,J,L,R0,IT,RA,AMIS,AN,CST,DEL,FL,FRM,ITM,PAGE,QTY,RC,RK,REM
- K RMPRCNUM,RZ,SN,TRANS,TRANS1,TYPE,VEN
+EXIT K I,J,L,R0,IT,RA,AMIS,AN,BC,BDAT,CST,DATA,DEL,DTOUT,DUOUT,FL,FRM,GN,HITM,ITM,ND,PAGE,QTY,RC,RK,REM
+ K RMPRDFN,RMPRCNUM,RZ,SN,TRANS,TRANS1,TYPE,VEN
  K ^TMP($J,"TTT")
  Q:'$D(RMPRDFN)
  W !
@@ -105,8 +103,8 @@ PRT S DATE=$P(Y,U,3),TYPE=$P(Y,U,6),QTY=$P(Y,U,7)
 OVER ;
  N ANS
  S RZ=RK W !,"+=Turned-In  *=Historical Data  I=Initial  X=Repair  S=Spare  R=Replacement",!,"Enter 1-",RK," to show full entry, '^' to exit or `return` to continue.  " R ANS:DTIME S:'$T ANS="^"
- I ANS="^^" S ANS="^" S DUOUT=1 Q  ;modified escape as it left a DO loop hanging due to GOTO, patch RMPR*3.0*162
- I ANS="^" S DUOUT=1 Q   ;modified escape as it left a DO loop hanging due to GOTO, patch RMPR*3.0*162
+ I ANS="^^" S ANS="^" G ASK1^RMPRPAT Q
+ I ANS="^" G ASK1^RMPRPAT Q
  I ANS="",RK+1'>RC&($G(IT(RK+1))) D HDR Q
  I ANS="" Q
  I ANS'?1N.N!(ANS>RK)!(+ANS=0)!(+ANS'=ANS) W $C(7),!," Must be between 1 and ",RK," to be valid" G OVER

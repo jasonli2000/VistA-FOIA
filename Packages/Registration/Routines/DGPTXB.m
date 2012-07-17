@@ -1,4 +1,4 @@
-DGPTXB ; GENERATED FROM 'DG PTF PT BRIEF LIST' PRINT TEMPLATE (#217) ; 03/30/98 ; (FILE 45, MARGIN=80)
+DGPTXB ; GENERATED FROM 'DG PTF PT BRIEF LIST' PRINT TEMPLATE (#1097) ; 03/27/98 ; (FILE 45, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(217,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(1097,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D N:$X>0 Q:'DN  W ?0 S Y=D0 W:Y]"" $J(Y,7,0)
  S X=$G(^DGPT(D0,0)) D N:$X>9 Q:'DN  W ?9 S Y=$P(X,U,6) W:Y]"" $S($D(DXS(1,Y)):DXS(1,Y),1:Y)
  D N:$X>24 Q:'DN  W ?24 S Y=$P(X,U,2) D DT

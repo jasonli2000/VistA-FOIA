@@ -1,5 +1,5 @@
-MAGDQR06 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 17 Feb 2010 9:53 AM
- ;;3.0;IMAGING;**54,66**;Mar 19, 2002;Build 1836;Sep 02, 2010
+MAGDQR06 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 08 Aug 2008 9:53 AM
+ ;;3.0;IMAGING;**54**;03-July-2009;;Build 1424
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -25,7 +25,23 @@ Q0080050 ;R  Accession Number
  . S V(T)=$E(WRKDT,4,7)_$E(WRKDT,2,3)_"-0000"
  . Q
  ; no
- S V(T)=$G(ACCESSION)
+ D:TYPE="R"
+ . S X=$P($G(^RADPT(MAGDFN,"DT",MAGRORD,"P",MAGINTERP,0)),"^",17) ; IA # 1172
+ . S V(T)=$P($G(^RARPT(+X,0)),"^",1) ; IA # 1171
+ . Q
+ D:TYPE="C"
+ . N R2,TIUNUM,CONSIX
+ . S R2=$G(^MAG(2005,MAGIEN,2)) Q:R2=""
+ . I $P(R2,"^",6)=2006.5839 D  Q
+ . . S CONSIX=$P(R2,"^",7)
+ . . S V(T)="GMRC-"_CONSIX
+ . . Q
+ . I $P(R2,"^",6)=8925 D  Q
+ . . S TIUNUM=$P(R2,"^",7) Q:'TIUNUM
+ . . S CONSIX=$P($G(^TIU(8925,TIUNUM,14)),"^",5)
+ . . S:$P(CONSIX,";",2)="GMR(123," V(T)="GMRC-"_$P(CONSIX,";",1)
+ . . Q
+ . Q
  Q
  ;
 Q0200010 ;R  Study ID
@@ -38,7 +54,7 @@ Q0200010 ;R  Study ID
  . S V(T)=$P($G(^RADPT(MAGDFN,"DT",MAGRORD,"P",MAGINTERP,0)),"^",1) ; IA # 1172
  . Q
  D:TYPE="C"
- . S V(T)=$P($G(ACCESSION),"-",2)
+ . S V(T)=$P($G(ACCNUM),"-",2)
  . Q
  Q
  ;
@@ -61,12 +77,11 @@ Q0080090 ;O  Referring Physician's Name
  D:TYPE="C"
  . N G0
  . I IMAGE="" S V(T)="" Q
- . S G0=$$GMRC($G(ACCESSION),MAGIEN) I 'G0 S V(T)="" Q
+ . S G0=$$GMRC($G(ACCNUM),MAGIEN) I 'G0 S V(T)="" Q
  . S V(T)=$$GET1^DIQ(123,G0,10,"E") ; IA # 4110
  . Q
  ; MLH: do not match per WP 3/25/09
  ;;;S:'$$COMPARE^MAGDQR03(T,V(T)) OK=0
- S V(T)=$$VA2DCM^MAGDQR01(V(T)) ; return w/commas
  Q
  ;
 Q0081030 ;O  Study Description
@@ -89,7 +104,7 @@ Q0080100 ;O  >Code Value
  D:TYPE="C"
  . N G0
  . I IMAGE="" S V(T)="" Q
- . S G0=$$GMRC($G(ACCESSION),IMAGE) I 'G0 S V(T)="" Q
+ . S G0=$$GMRC($G(ACCNUM),IMAGE) I 'G0 S V(T)="" Q
  . S V(T)=$$GET1^DIQ(123,G0,4,"I") ; IA # 4110
  . Q
  Q
@@ -104,7 +119,7 @@ Q0080104 ;O  >Code Meaning
  D:TYPE="C"
  . N G0
  . I IMAGE="" S V(T)="" Q
- . S G0=$$GMRC($G(ACCESSION),IMAGE) I 'G0 S V(T)="" Q
+ . S G0=$$GMRC($G(ACCNUM),IMAGE) I 'G0 S V(T)="" Q
  . S V(T)=$$GET1^DIQ(123,G0,4,"E") ; IA # 4110
  . Q
  Q
@@ -122,7 +137,6 @@ Q0081060 ;O  Name of Physician(s) Reading Study
  Q:TYPE="C"
  ; MLH:  do not match per WP 3/25/09
  ;;;S:'$$COMPARE^MAGDQR03(T,V(T)) OK=0
- S V(T)=$$VA2DCM^MAGDQR01(V(T)) ; return w/commas
  Q
  ;
 Q0081080 ;O  Admitting Diagnosis Description

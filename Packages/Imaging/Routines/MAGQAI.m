@@ -76,12 +76,12 @@ MMGRP ;CREATES REMOTE MAIL GROUP TO HANDLE IMAGE ERROR MESSAGES
  . ;ADD installer as local mail recipient
  . S IEN=$$MG^XMBGRP(MAGDATA,"","","",.MAGY,"",MAGG)
  . ;Add G.MAG SERVER @ development site as remote recipient
- . S MAGM="G.IMAGING DEVELOPMENT TEAM@FORUM.DOMAIN.EXT"
+ . S MAGM="G.IMAGING DEVELOPMENT TEAM@FORUM.VA.GOV"
  . I '$$FIND1^DIC(3.812,","_MAGDATA_",","MX",MAGM,"","","ERR") D
  . . S MAGE(3.812,"+1,"_MAGDATA_",",.01)=MAGM
  . . D UPDATE^DIE("E","MAGE")
  . ;Remove development domain mailgroup reference
- . S MAGX=$E("G.MAG SERVER@LAVC.ISC-WASH.DOMAIN.EXT",1,30)
+ . S MAGX=$E("G.MAG SERVER@LAVC.ISC-WASH.VA.GOV",1,30)
  . S IEN=$$FIND1^DIC(3.812,","_MAGDATA_",","MX",MAGX,"","","ERR")
  . I +IEN>0 D
  . . K MAGE

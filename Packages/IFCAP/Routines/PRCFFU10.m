@@ -1,5 +1,5 @@
 PRCFFU10 ;WISC/SJG-OBLIGATION PROCESSING UTILITIES ;7/24/00  23:16
-V ;;5.1;IFCAP;**58**;Oct 20, 2000
+V ;;5.1;IFCAP;;Oct 20, 2000
  ;Per VHA Directive 10-93-142, this routine should not be modified.
  ;
  QUIT
@@ -22,12 +22,7 @@ OVCOM N PARAM,AMT,TYPE
 OV1 ;S PARAM=PRC("SITE")_U_+$P(PO(0),U,3)_U_PRC("FY")_U_PRC("QTR")
  ;S PRCFA("OVCOM")=$$YEAR^PRC0C(PRC("FY"))'<$$DATE^PRC0C("N","E")
  ;S:PRCFA("OVCOM") PRCFA("OVCOM")=$$OVCOM^PRCS0A(PARAM,AMT,1)
- ;
- ; **Add call to OBLDAT^PRCFFUD1 as part of PRC*5.1*58
- S PRCFA("OVCOM")=$$OVCOM^PRCS0A(PRC("SITE")_"^"_+PRC("CP")_"^"_$P($$DATE^PRC0C($$OBLDAT^PRCFFUD1(PRC("RBDT"),$G(PRC("AMENDT"))),"I"),"^",1,2),AMT,1)
- K OBLDAT
- ; **End fix for PRC*5.1*58
- ;
+ S PRCFA("OVCOM")=$$OVCOM^PRCS0A(PRC("SITE")_"^"_+PRC("CP")_"^"_$P($$DATE^PRC0C(PRC("RBDT"),"I"),"^",1,2),AMT,1)
  Q
 POFAIL ; Display error message for P.O if failure
  W !!,"  This Purchase Order would overcommit the funds available for the"

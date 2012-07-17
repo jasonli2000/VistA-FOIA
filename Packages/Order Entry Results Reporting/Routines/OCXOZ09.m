@@ -1,4 +1,4 @@
-OCXOZ09 ;SLC/RJS,CLA - Order Check Scan ;MAR 8,2011 at 13:52
+OCXOZ09 ;SLC/RJS,CLA - Order Check Scan ;NOV 3,2010 at 19:22
  ;;3.0;ORDER ENTRY/RESULTS REPORTING;**32,221,243**;Dec 17,1997;Build 242
  ;;  ;;ORDER CHECK EXPERT version 1.01 released OCT 29,1998
  ;
@@ -44,7 +44,7 @@ CHK192 ; Look through the current environment for valid Event/Elements for this 
  Q
  ;
 CHK196 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK163+19^OCXOZ07.
+ ;  Called from CHK163+13^OCXOZ07.
  ;
  Q:$G(OCXOERR)
  ;
@@ -53,16 +53,20 @@ CHK196 ; Look through the current environment for valid Event/Elements for this 
  ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
  ; OCXDF(67) ---> Data Field: CONTRAST MEDIA CODE (FREE TEXT)
  ; OCXDF(73) ---> Data Field: ORDERABLE ITEM IEN (NUMERIC)
+ ; OCXDF(156) --> Data Field: ALLERGY ASSESSMENT (BOOLEAN)
  ;
  ;      Local Extrinsic Functions
+ ; ALRGY( -----------> ALLERGY ASSESSMENT
  ; CLIST( -----------> STRING CONTAINS ONE OF A LIST OF VALUES
+ ; FILE(DFN,136, ----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: NO ALLERGY ASSESSMENT)
  ;
  S OCXDF(2)=$P($G(OCXPSD),"|",2) I $L(OCXDF(2)) D CHK198
- S OCXDF(73)=$P($G(OCXPSD),"|",1) I $L(OCXDF(73)) S OCXDF(67)=$$CM^ORQQRA(OCXDF(73)) I $L(OCXDF(67)),$$CLIST(OCXDF(67),"M,I,N") S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) D CHK458^OCXOZ0E
+ S OCXDF(73)=$P($G(OCXPSD),"|",1) I $L(OCXDF(73)) S OCXDF(67)=$$CM^ORQQRA(OCXDF(73)) I $L(OCXDF(67)),$$CLIST(OCXDF(67),"M,I,N") S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) D CHK458^OCXOZ0F
+ S OCXDF(37)=$G(DFN) I $L(OCXDF(37)) S OCXDF(156)=$$ALRGY(OCXDF(37)) I $L(OCXDF(156)),'(OCXDF(156)) S OCXOERR=$$FILE(DFN,136,"") Q:OCXOERR 
  Q
  ;
 CHK198 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK196+14.
+ ;  Called from CHK196+17.
  ;
  Q:$G(OCXOERR)
  ;
@@ -70,7 +74,7 @@ CHK198 ; Look through the current environment for valid Event/Elements for this 
  ; OCXDF(2) ----> Data Field: FILLER (FREE TEXT)
  ;
  I (OCXDF(2)="RA") D CHK199
- I ($E(OCXDF(2),1,2)="PS") D CHK360^OCXOZ0C
+ I ($E(OCXDF(2),1,2)="PS") D CHK360^OCXOZ0D
  Q
  ;
 CHK199 ; Look through the current environment for valid Event/Elements for this patient.
@@ -102,7 +106,7 @@ CHK201 ; Look through the current environment for valid Event/Elements for this 
  ; RECBAR( ----------> RECENT BARIUM STUDY
  ;
  S OCXDF(65)=$$ORCHK^GMRAOR(OCXDF(37),"CM","") I $L(OCXDF(65)),(OCXDF(65)) S OCXDF(73)=$P($G(OCXPSD),"|",1) I $L(OCXDF(73)) S OCXDF(67)=$$CM^ORQQRA(OCXDF(73)) D CHK207
- S OCXDF(69)=$P($$RECBAR(OCXDF(37),48),"^",1) I $L(OCXDF(69)),(OCXDF(69)) S OCXDF(73)=$P($G(OCXPSD),"|",1) I $L(OCXDF(73)) S OCXDF(67)=$$CM^ORQQRA(OCXDF(73)) D CHK217
+ S OCXDF(69)=$P($$RECBAR(OCXDF(37),48),"^",1) I $L(OCXDF(69)),(OCXDF(69)) S OCXDF(73)=$P($G(OCXPSD),"|",1) I $L(OCXDF(73)) S OCXDF(67)=$$CM^ORQQRA(OCXDF(73)) D CHK217^OCXOZ0A
  Q
  ;
 CHK207 ; Look through the current environment for valid Event/Elements for this patient.
@@ -134,24 +138,12 @@ CHK211 ; Look through the current environment for valid Event/Elements for this 
  S OCXOERR=$$FILE(DFN,66,"66,159") Q:OCXOERR 
  Q
  ;
-CHK217 ; Look through the current environment for valid Event/Elements for this patient.
- ;  Called from CHK201+16.
- ;
- Q:$G(OCXOERR)
- ;
- ;    Local CHK217 Variables
- ; OCXDF(37) ---> Data Field: PATIENT IEN (NUMERIC)
- ; OCXDF(67) ---> Data Field: CONTRAST MEDIA CODE (FREE TEXT)
- ; OCXDF(70) ---> Data Field: RECENT BARIUM STUDY TEXT (FREE TEXT)
- ; OCXDF(121) --> Data Field: RECENT BARIUM STUDY ORDER STATUS (FREE TEXT)
- ;
- ;      Local Extrinsic Functions
- ; FILE(DFN,67, -----> FILE DATA IN PATIENT ACTIVE DATA FILE  (Event/Element: RECENT BARIUM STUDY ORDERED)
- ; RECBAR( ----------> RECENT BARIUM STUDY
- ; RECBARST( --------> RECENT BARIUM ORDER STATUS
- ;
- I $L(OCXDF(67)),(OCXDF(67)["B") S OCXDF(70)=$P($$RECBAR(OCXDF(37),48),"^",3),OCXDF(121)=$P($$RECBARST(OCXDF(37),48),"^",2),OCXOERR=$$FILE(DFN,67,"70,121") Q:OCXOERR 
- Q
+ALRGY(ORPT)   ; determine if pt has an allergy assessment
+ ; rtn 0 if no allergy assessment, 1 if allergy assessment or NKA
+ N ORALRGY
+ D EN1^GMRAOR1(ORPT,"ORALRGY")
+ Q:$G(ORALRGY)="" 0
+ Q 1
  ;
 CLIST(DATA,LIST) ;   DOES THE DATA FIELD CONTAIN AN ELEMENT IN THE LIST
  ;
@@ -209,13 +201,6 @@ RECBAR(DFN,HOURS) ;  Compiler Function: RECENT BARIUM STUDY
  ;
  Q:'$G(DFN) 0 Q:'$G(HOURS) 0 N OUT S OUT=$$RECENTBA^ORKRA(DFN,HOURS) Q:'$L(OUT) 0 Q 1_U_OUT
  ;  
- ;
-RECBARST(DFN,HOURS)    ;  Compiler Function: RECENT BARIUM ORDER STATUS
- ;
- Q:'$G(DFN) 0 Q:'$G(HOURS) 0
- N ORDER S ORDER=$P($$RECENTBA^ORKRA(DFN,HOURS),U) Q:'$L(ORDER) 0
- N STATUS S STATUS=$P($$STATUS^ORQOR2(ORDER),U,2) Q:'$L(STATUS) 0
- Q 1_U_STATUS
  ;
 TERMLKUP(OCXTERM,OCXLIST) ;
  Q $$TERM^OCXOZ01(OCXTERM,.OCXLIST)

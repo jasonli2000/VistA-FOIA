@@ -1,5 +1,5 @@
 PXRMEXU1 ; SLC/PKR/PJH - Reminder exchange repository utilities, #1.;07/14/2009
- ;;2.0;CLINICAL REMINDERS;**6,12,16**;Feb 04, 2005;Build 119
+ ;;2.0;CLINICAL REMINDERS;**6,12**;Feb 04, 2005;Build 73
  ;=====================================================
 DELETE(LIST) ;Delete the repository entries in LIST.
  N DA,DIK
@@ -125,7 +125,7 @@ SAVHIST ;Save the installation history in the repository.
  ;=====================================================
  ;Extract TIU Objects/Templates from any WP text
 TIUSRCH(GLOB,IEN,NODE,OLIST,TLIST) ;
- N OCNT,SUB,TCNT,TEXT
+ N OCNT,TCNT,TEXT
  ;Add to existing arrays
  S OCNT=+$O(OLIST(""),-1),TCNT=+$O(TLIST(""),-1),SUB=0
  ;Scan WP fields

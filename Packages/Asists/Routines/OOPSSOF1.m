@@ -1,5 +1,5 @@
 OOPSSOF1 ;HINES/WAA-SOF/E Safety officer Edit Routine ;3/30/98
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**1,5,8**;Jun 01, 1998
  ;;
  ; The call to $$SAFETY^OOPSUTL2 filters cases that have not been
  ; signed by the Supervisor.  Only signed cases can be selected.

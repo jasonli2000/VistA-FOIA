@@ -1,5 +1,5 @@
 MAGDQR01 ;WOIFO/EdM - Imaging RPCs for Query/Retrieve ; 14 Oct 2008 3:45 PM
- ;;3.0;IMAGING;**51,54,66**;Mar 19, 2002;Build 1836;Sep 02, 2010
+ ;;3.0;IMAGING;**51,54**;03-July-2009;;Build 1424
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -115,36 +115,15 @@ FIND(OUT,TAGS,RESULT,OFFSET,MAX) ; RPC = MAG CFIND QUERY
  Q
  ;
 DCM2VA(NAME) N I,P
- ; P66T70: Normalize PN VR from legacy comma to current carat before processing
- D:NAME'=""
- . S NAME=$TR(NAME,"abcdefghijklmnopqrstuvwxyz,","ABCDEFGHIJKLMNOPQRSTUVWXYZ^")
- . ; Ignore prefixes and suffices
- . F I=1:1:3 D
- . . S P(I)=$P(NAME,"^",I)
- . . F  Q:$E(P(I),1)'=" "   S P(I)=$E(P(I),2,$L(P(I)))
- . . F  Q:$E(P(I),$L(P(I)))'=" "   S P(I)=$E(P(I),1,$L(P(I))-1)
- . . Q
- . S NAME=P(1)_","_P(2) S:P(3)'="" NAME=NAME_" "_P(3)
- . S:$E(NAME,$L(NAME))="," NAME=NAME_"*"
+ S NAME=$TR(NAME,"abcdefghijklmnopqrstuvwxyz","ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+ ; Ignore prefixes and suffices
+ F I=1:1:3 D
+ . S P(I)=$P(NAME,"^",I)
+ . F  Q:$E(P(I),1)'=" "   S P(I)=$E(P(I),2,$L(P(I)))
+ . F  Q:$E(P(I),$L(P(I)))'=" "   S P(I)=$E(P(I),1,$L(P(I))-1)
  . Q
- Q NAME
- ;
-VA2DCM(NAME) N I,P
- ; P66T70: Prepare name for return to caller with consistent comma delimiter
- ; Also strip leading, trailing, interior spaces
- D:NAME'=""
- . S P(1)=$P(NAME,",",1),P(2)=$P(NAME,",",2)
- . F I=1,2 D
- . . F  Q:$E(P(I),1)'=" "  S P(I)=$E(P(I),2,$L(P(I)))
- . . F  Q:$E(P(I),$L(P(I)))'=" "  S P(I)=$E(P(I),1,$L(P(I))-1)
- . . Q
- . S:P(2)[" " P(3)=$P(P(2)," ",2,999),P(2)=$P(P(2)," ",1)
- . F I=1:1:3 D:$D(P(I))
- . . F  Q:$E(P(I),1)'=" "  S P(I)=$E(P(I),2,$L(P(I)))
- . . F  Q:P(I)'["  "  S P(I)=$P(P(I),"  ",1)_" "_$P(P(I),"  ",2,999)
- . . Q
- . S NAME=P(1)_","_P(2) S:$D(P(3)) NAME=NAME_","_P(3)
- . Q
+ S NAME=P(1)_","_P(2) S:P(3)'="" NAME=NAME_" "_P(3)
+ S:$E(NAME,$L(NAME))="," NAME=NAME_"*"
  Q NAME
  ;
 ERR(X) S ERROR=ERROR+1,ERROR(ERROR)=X

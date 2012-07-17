@@ -1,5 +1,5 @@
 OOPSPC71 ;HIRMFO/YH-INSTRUCTIONS FOR COMPLETING FORM CA-1 (PART 2) ;5/8/98
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**4,6**;Jun 01, 1998
 EN1 ;
  W !,"PU.5,18.5;LBIf the employing agency controverts COP, the employee should#;"
  W !,"PU11,18.4;LBa) The disability was not caused by a traumatic injury.#;"

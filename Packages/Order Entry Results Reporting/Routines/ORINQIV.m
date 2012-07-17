@@ -1,15 +1,14 @@
-ORINQIV ; SLC/AGP - Utility report for Order Dialogs ; 12/6/10
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**301,296,337**;DEC 17, 1997;Build 84
+ORINQIV ; SLC/AGP - Utility report for Order Dialogs ; 11/18/08
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**301,296**;DEC 17, 1997;Build 19
  ;
  ; DBIA 5133: reading ^PXRMD file #801.41
  ; 
  Q
  ;
-ASK(PROMPT,QUEST,HELP,DEFAULT) ;
+ASK(PROMPT,QUEST,HELP) ;
  N DIR,STR,Y
- S STR=QUEST_";K:SKIP THIS QUICK ORDER;Q:QUIT THE CONVERSION UTILITY"
+ S STR=QUEST_";S:SKIP THIS QUICK ORDER;Q:QUIT THE CONVERSION UTILITY"
  S DIR("A")=PROMPT
- I DEFAULT'="" S DIR("B")=DEFAULT
  S DIR(0)="S^"_STR
  S DIR("??")="^D HELP^ORINQIV("_HELP_")"
  D ^DIR
@@ -64,7 +63,7 @@ RETRY ;
  S CNT=0,LC=0 F  S CNT=$O(TEXT(CNT)) Q:CNT'>0  D
  .S LC=LC+1,^XMB(3.9,XMZ,2,LC,0)=TEXT(CNT)
  S ^XMB(3.9,XMZ,2,0)="^3.92^"_LC_"^"_LC_"^"_DT
- ;S $P(^XMB(3.9,XMZ,0),U,12)="Y"
+ S $P(^XMB(3.9,XMZ,0),U,12)="Y"
  D ENT2^XMD
  Q
  ;
@@ -93,15 +92,15 @@ EDIT(IEN,PERQOAR) ;
  ;
 CONVERT ;
  W !!,"Convert the above Quick Order to an Infusion Quick Order?"
- S UPDDSG=$$ASK("Convert?","Y:YES;N:NO",1,"")
+ S UPDDSG=$$ASK("Convert?","Y:YES;N:NO",1)
  I UPDDSG="Q"!(UPDDSG=U)!(UPDDSG="^^") S EXIT=1 G EDITX
  I UPDDSG'="Y" G EDITX
 IVTYPE ;
  W !!,"Select the IV Type for this Quick Order."
- S IVTYPE=$$ASK("IV TYPE","C:CONTINUOUS;I:INTERMITTENT",2,"")
+ S IVTYPE=$$ASK("IV TYPE","C:CONTINUOUS;I:INTERMITTENT",2)
  I IVTYPE=U G CONVERT
  I IVTYPE="^^"!(IVTYPE="Q") S EXIT=1 G EDITX
- I IVTYPE="K" G EDITX
+ I IVTYPE="S" G EDITX
  ;
 ADDIT ;
  I ASKADD=1 D
@@ -110,10 +109,10 @@ ADDIT ;
  ..W !,"Orderable item "_OINAME_"  is not marked as a solution."
  ..W !,"This orderable item will be moved to the additive value."
  .W !!,"Change orderable item "_OINAME_" to an additive?"
- .S UPDADD=$$ASK("Convert to Additive?","Y:YES;N:NO",3,"")
+ .S UPDADD=$$ASK("Convert to Additive?","Y:YES;N:NO",3)
  .I UPDADD=U G IVTYPE
  .I UPDADD="^^"!(UPDADD="Q") S EXIT=1 G EDITX
- .I UPDADD="K" G EDITX
+ .I UPDADD="S" G EDITX
  ;
 CONFIRM ;
  W !!,"Please confirm the selected changes below."
@@ -123,10 +122,10 @@ CONFIRM ;
  W !!,"Convert to Infusion Quick Order: YES"
  W !,"IV TYPE: "_$S(IVTYPE="I":"Intermittent",1:"Continuous")
  I UPDADD="Y" W !,"Change orderable item "_OINAME_" to an additive: YES"
- S CONF=$$ASK("Confirm Changes?","Y:YES;N:NO",4,"")
+ S CONF=$$ASK("Confirm Changes?","Y:YES;N:NO",4)
  I CONF=U G:ASKADD=1 ADDIT I ASKADD=0 G IVTYPE
  I CONF="^^"!(CONF="Q") S EXIT=1 G EDITX
- I CONF="K"!(CONF="N") G EDITX
+ I CONF="S"!(CONF="N") G EDITX
  ;
 UPDATES ;Do updates
  W !
@@ -339,26 +338,8 @@ HELP(NUM) ;
  .S CNT=CNT+1,TEXT(CNT)="Possible conflicts at the time of conversion will be displayed before entering"
  .S CNT=CNT+1,TEXT(CNT)="the editor. An example of a conflict may be that the user should review the"
  .S CNT=CNT+1,TEXT(CNT)="strength associated with the additive in the editor."
- I NUM=7 D
- .S CNT=CNT+1,TEXT(CNT)=" "
- .S CNT=CNT+1,TEXT(CNT)="This conversion utility enables users to edit an existing Continuous IV quick"
- .S CNT=CNT+1,TEXT(CNT)="order's Additive Frequency field. This utility will display the additive and the"
- .S CNT=CNT+1,TEXT(CNT)="possible additive frequency values. The default value for the additive"
- .S CNT=CNT+1,TEXT(CNT)="frequency prompt is loaded from the pharmacy package."
- I NUM=8 D
- .S CNT=CNT+1,TEXT(CNT)="Select YES add Additive Frequency values to the quick order"
- I NUM=9 D
- .S CNT=CNT+1,TEXT(CNT)="The default value for this prompt is provided from "
- .S CNT=CNT+1,TEXT(CNT)="the pharmacy package. However, you can select one of the three"
- .S CNT=CNT+1,TEXT(CNT)="possible values for an additive frequency"
- I NUM=10 D
- .S CNT=CNT+1,TEXT(CNT)="Select Yes to update the quick order with the additive frequency values."
- .S CNT=CNT+1,TEXT(CNT)="When the update is complete you will be drop into the"
- .S CNT=CNT+1,TEXT(CNT)="quick order editor to make any changes to the quick order."
- .S CNT=CNT+1,TEXT(CNT)=" "
- .S CNT=CNT+1,TEXT(CNT)="Select No to stop the conversion process for this quick order."
  S CNT=CNT+1,TEXT(CNT)=" "
- I NUM<6!(NUM>7) S CNT=CNT+1,TEXT(CNT)="Select QUIT THE CONVERSION UTILITY to exit this utility."
+ I NUM<6 S CNT=CNT+1,TEXT(CNT)="Select QUIT THE CONVERSION UTILITY to exit this utility."
  S CNT=0 F  S CNT=$O(TEXT(CNT)) Q:CNT'>0  W !,TEXT(CNT)
  Q
  ;

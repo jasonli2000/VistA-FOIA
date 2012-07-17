@@ -1,4 +1,4 @@
-DGPTX110 ; ;01/12/06
+DGPTX110 ; ;03/22/06
  S X=DE(12),DIC=DIE
  K DIV S DIV=X,D0=DA,DIV(0)=D0 S Y(1)=$S($D(^DPT(D0,.11)):^(.11),1:""),Y=$P(Y(1),U,7) X:$D(^DD(2,.117,2)) ^(2) S X=Y S DIU=X K Y S X=DIV S X="" X ^DD(2,.115,1,1,2.4)
  S X=DE(12),DIC=DIE

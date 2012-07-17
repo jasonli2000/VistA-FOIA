@@ -1,4 +1,4 @@
-MCAROPV ; GENERATED FROM 'MCAROPV' PRINT TEMPLATE (#990) ; 10/04/96 ; (FILE 698.1, MARGIN=80)
+MCAROPV ; GENERATED FROM 'MCAROPV' PRINT TEMPLATE (#2058) ; 07/22/97 ; (FILE 698.1, MARGIN=80)
  G BEGIN
 N W !
 T W:$X ! I '$D(DIOT(2)),DN,$D(IOSL),$S('$D(DIWF):1,$P(DIWF,"B",2):$P(DIWF,"B",2),1:1)+$Y'<IOSL,$D(^UTILITY($J,1))#2,^(1)?1U1P1E.E X ^(1)
@@ -11,7 +11,7 @@ M D @DIXX
  Q
 BEGIN ;
  S:'$D(DN) DN=1 S DISTP=$G(DISTP),DILCT=$G(DILCT)
- I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(990,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
+ I $D(DXS)<9 F X=0:0 S X=$O(^DIPT(2058,"DXS",X)) Q:'X  S Y=$O(^(X,"")) F X=X:0 Q:Y=""  S DXS(X,Y)=^(Y),Y=$O(^(Y))
  D N:$X>32 Q:'DN  W ?32 X DXS(1,9) K DIP K:DN Y W X
  D T Q:'DN  D N D N:$X>2 Q:'DN  W ?2 S DIP(1)=$S($D(^MCAR(698.1,D0,0)):^(0),1:"") S X="MODEL: "_$S('$D(^MCAR(698.4,+$P(DIP(1),U,3),0)):"",1:$P(^(0),U,1)) K DIP K:DN Y W X
  D N:$X>44 Q:'DN  W ?44 S DIP(1)=$S($D(^MCAR(698.1,D0,0)):^(0),1:"") S X="MANUFACTURER: "_$S('$D(^MCAR(698.6,+$P(DIP(1),U,4),0)):"",1:$P(^(0),U,1)) K DIP K:DN Y W X

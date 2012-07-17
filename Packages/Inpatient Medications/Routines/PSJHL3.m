@@ -1,5 +1,5 @@
 PSJHL3 ;BIR/RLW-PHARMACY ORDER SEGMENTS ;04 Aug 98 / 10:10 AM
- ;;5.0; INPATIENT MEDICATIONS ;**1,11,14,40,42,47,50,56,58,92,101,102,123,110,111,152,134,226**;16 DEC 97;Build 46
+ ;;5.0; INPATIENT MEDICATIONS ;**1,11,14,40,42,47,50,56,58,92,101,102,123,110,111,152,134**;16 DEC 97;Build 124
  ;
  ; Reference to ^PS(50.606 is supported by DBIA# 2174.
  ; Reference to ^PS(50.607 is supported by DBIA# 2221.        
@@ -114,14 +114,12 @@ RXC ;component segments
  ; This could be a reference to either ^PS(53.1 or ^PS(55
  S AD="AD",SOL="SOL" F TYPE="AD","SOL" S SUB=0 F  S SUB=$O(@(PSJORDER_TYPE_","_SUB_")")) Q:SUB=""  S NODE1=$G(^(SUB,0)) Q:NODE1=""  D
  .S FIELD(1)=$S(TYPE="AD":"A",1:"B")
- .I FIELD(1)="A",($P(NODE1,U,3)="") S $P(NODE1,U,3)="A"
  .S PTR=+$S(TYPE="AD":+$P($G(^PS(52.6,$P(NODE1,"^"),0)),"^",11),1:+$P($G(^PS(52.7,$P(NODE1,"^"),0)),"^",11))
  .S FIELD(2)="^^^"_$S($G(PSJBCBU):+$P(NODE1,"^"),1:PTR)_"^"_$S($G(PSJBCBU):$S(TYPE="AD":$P($G(^PS(52.6,+$P(NODE1,"^"),0)),"^"),1:$P($G(^PS(52.7,+$P(NODE1,"^"),0)),"^")_" "_$P($G(^(0)),U,4)),1:$P($G(^PS(50.7,PTR,0)),"^"))
  .S:(TYPE="AD"&$G(PSJBCBU)) FIELD(2)=FIELD(2)_$S($P(NODE1,"^",3)]"":" BOTTLE: "_$P(NODE1,"^",3),1:"")
  .S FIELD(2)=FIELD(2)_"^99PSP"
  .S FIELD(3)=$P($P(NODE1,"^",2)," ")
  .S FIELD(4)=$P($P(NODE1,"^",2)," ",2)
- .S FIELD(5)=$P(NODE1,"^",3)
  .F XTMP=1:1:14 S UTMP($P("ML^LITER^MCG^MG^GM^UNITS^IU^MEQ^MM^MU^THOUU^MG-PE^NANOGRAM^MMOL","^",XTMP))="PSIV-"_XTMP
  .S NUM="" S:FIELD(4)'="" NUM=$G(UTMP(FIELD(4)))
  .S FIELD(4)="^^^"_NUM_"^"_FIELD(4)_"^99OTH"

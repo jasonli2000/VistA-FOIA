@@ -1,5 +1,5 @@
-ORMPS2 ;SLC/MKB - Process Pharmacy ORM msgs cont ;10/01/2009
- ;;3.0;ORDER ENTRY/RESULTS REPORTING;**94,116,129,134,186,190,195,215,265,243,280**;Dec 17, 1997;Build 85
+ORMPS2 ;SLC/MKB - Process Pharmacy ORM msgs cont ;04/01/2008
+ ;;3.0;ORDER ENTRY/RESULTS REPORTING;**94,116,129,134,186,190,195,215,265,243**;Dec 17, 1997;Build 242
  ;;Per VHA Directive 2004-038, this routine should not be modified.
  ;
 FINISHED() ; -- new order [SN^ORMPS] due to finishing?
@@ -17,7 +17,7 @@ WPX() ; -- Compare comments in @ORMSG@(NTE) with order ORIFN
 WQ Q Y
  ;
 IVX() ; -- Compare ORMSG to Inpt order ORIFN if IV, return 0 if 'diff or 'IV
- N Y,ADDFREQ,RXC,DG,OI,PSOI,XC,X,RATE,RXR,ORA,ORB,ORX,I,J,OI0,INST,VOL,STR,UNT
+ N Y,RXC,DG,OI,PSOI,XC,X,RATE,RXR,ORA,ORB,ORX,I,J,OI0,INST,VOL,STR,UNT
  S RXC=$$RXC^ORMPS,Y=0 I RXC'>0 Q Y  ;not IV of any kind
  S DG=+$P($G(^OR(100,+ORIFN,0)),U,11),DG=$P($G(^ORD(100.98,DG,0)),U,3)
  I DG'="IV RX",DG'="TPN" D  Q Y  ;not fluid
@@ -36,9 +36,9 @@ IV1 S RATE=$$FIND^ORM(+RXE,24),UNT=$P($$FIND^ORM(+RXE,25),U,5)
  I $P($P(RXR,"|",2),U,4)'=$$VALUE("ROUTE") S Y=1 Q Y
  S ORB=+$$PTR("ORDERABLE ITEM"),ORA=+$$PTR("ADDITIVE"),I=+RXC
  F  S XC=@ORMSG@(I) Q:$E(XC,1,3)'="RXC"  D  S I=$O(@ORMSG@(I)) Q:I'>0
- . S ORX($P(XC,"|",2),+$P(XC,U,4))=$P(XC,"|",4)_U_$P($P(XC,"|",5),U,5)_U_$P(XC,"|",6)
- . ;ORX("A",PSOI)=str^units^bag or ORX("B",PSOI)=volume^units^null
- F I="STRENGTH","UNITS","VOLUME","ADDFREQ" D  ;ORX(I,inst)=value
+ . S ORX($P(XC,"|",2),+$P(XC,U,4))=$P(XC,"|",4)_U_$P($P(XC,"|",5),U,5)
+ . ;ORX("A",PSOI)=str^units or ORX("B",PSOI)=volume^units
+ F I="STRENGTH","UNITS","VOLUME" D  ;ORX(I,inst)=value
  . S J=0 F  S J=$O(^OR(100,+ORIFN,4.5,"ID",I,J)) Q:J'>0  D
  .. S INST=+$P($G(^OR(100,+ORIFN,4.5,J,0)),U,3)
  .. S:INST ORX(I,INST)=$G(^OR(100,+ORIFN,4.5,J,1))
@@ -47,10 +47,8 @@ IV1 S RATE=$$FIND^ORM(+RXE,24),UNT=$P($$FIND^ORM(+RXE,25),U,5)
  . S PSOI=+$P($G(^ORD(101.43,OI,0)),U,2)
  . I $P(OI0,U,2)=ORA,$G(ORX("A",PSOI)) D  Q
  .. S INST=$P(OI0,U,3),STR=+ORX("A",PSOI),UNT=$P(ORX("A",PSOI),U,2)
- .. S ADDFREQ=$P(ORX("A",PSOI),U,3)
  .. I STR'=$G(ORX("STRENGTH",INST)) S Y=1 Q
  .. I UNT'=$G(ORX("UNITS",INST)) S Y=1 Q
- .. I $$ADDFRQCV^ORMBLDP1(ADDFREQ,"I")'=$G(ORX("ADDFREQ",INST)) S Y=1 Q
  .. K ORX("A",PSOI) ;same
  . I $P(OI0,U,2)=ORB,$G(ORX("B",PSOI)) D  Q
  .. S INST=$P(OI0,U,3),VOL=+$G(ORX("B",PSOI))

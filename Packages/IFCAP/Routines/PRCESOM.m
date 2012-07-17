@@ -1,30 +1,11 @@
-PRCESOM ;WISC/SJG/ASU - CONTINUATION OF 1358 ADJUST OBLIAGTION PRCEADJ1 ;4/27/94  2:13 PM
-V ;;5.1;IFCAP;**148,153**;Oct 20, 2000;Build 10
- ;Per VHA Directive 2004-038, this routine should not be modified.
+PRCESOM ;WISC/SJG-CONTINUATION OF 1358 ADJUST OBLIAGTION PRCEADJ1 ;4/27/94  2:13 PM
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  N TI,PRCFASYS,IOINLOW,IOINHI,IOINORM,DIR,AMT,OLDTT,CS,HASH,DIE,DR,LAUTH,LBAL,TAUTH,TBAL,DLAYGO
  D SCREEN
  S PRC("CP")=$P(TRNODE(0),"-",4)
  S PRC("RBDT")=$P(TRNODE(0),U,11)
  I $G(PRCRGS)<1 D OVCOM1^PRCFFU10 I PRCFA("OVCOM")=1!(PRCFA("OVCOM")=2) D REQFAIL^PRCFFU10,MSG G OUT
- ; PRC*5.1*148 start
- ; if Obligator is a requestor, violation to segregation of duties
- I $P($G(TRNODE(7)),"^",1)=DUZ D  S Y=0 D MSG G OUT
- . W !!,"You are the CP Clerk (Requestor) on this 1358 transaction."
- . W !,"Per Segregation of Duties, the CP Clerk (Requestor)"
- . W " is not permitted to "
- . W $S($G(PRCFA("RETRAN")):"Rebuild/Retransmit",1:"Obligate")," the 1358."
- . I '$G(PRCFA("RETRAN")) Q
- . W ! D EN^DDIOL("  ** Press RETURN to continue **")
- . R X:DTIME Q
- ; if Obligator is a approver, violation to segregation of duties
- I $P($G(TRNODE(7)),"^",3)=DUZ D  S Y=0 D MSG G OUT
- . W !!,"You are the Approver on this 1358 transaction."
- . W !,"Per Segregation of Duties, the Approver is not permitted to "
- . W $S($G(PRCFA("RETRAN")):"Rebuild/Retransmit",1:"Obligate")," the 1358."
- . I '$G(PRCFA("RETRAN")) Q
- . W ! D EN^DDIOL("  ** Press RETURN to continue **")
- . R X:DTIME Q
- ; PRC*5.1*148 end
  ;
  D OKAY2^PRCFFU ; ask 'OK to continue?'
  I 'Y!($D(DIRUT)) D MSG G OUT
@@ -171,12 +152,6 @@ Z S (X,Z)=$P(PO(0),U)
  S DA=DA(1358)
  S DR=".02///^S X=PODA;.03///^S X=""A"";.06///^S X=$P(TRNODE(4),U,8);.07///^S X=TI;.08////^S X=DUZ;1.1////^S X=""ADJUSTMENT OBLIGATION"";.15////^S X=TRDA"
  D ^DIE W "...adjustment completed..."
- ;
- ;Generate 1358 transaction message to OLCS. Messages will be generated
- ;upon obligation of a new 1358 or an adjustment. Messages will not be
- ;sent for a rebuild or retransmission to FMS. (PRC*5.1*153)
- I $G(PRCFA("RETRAN"))=0 D OLCSMSG^PRCFDO
- ;
  G OUT
  Q
  ;

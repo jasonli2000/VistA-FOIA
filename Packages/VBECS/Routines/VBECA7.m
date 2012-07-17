@@ -1,5 +1,5 @@
 VBECA7 ;DALOI/RLM - Workload API ; 8/18/04 10:40am
- ;;1.0;VBECS;**10**;Apr 14, 2005;Build 15
+ ;;1.0;VBECS;;Apr 14, 2005;Build 35
  ;
  ; Note: This routine supports data exchange with an FDA registered
  ; medical device. As such, it may not be changed in any way without
@@ -8,7 +8,6 @@ VBECA7 ;DALOI/RLM - Workload API ; 8/18/04 10:40am
  ; Integration Agreements:
  ;  VBECS workload capture supported by IA 4627
  ; Reference to EN^MXMLPRSE supported by IA #4149
- ; Reference to $$FIND1^DIC supported by IA #2051
  ; Reference to UPDATE^DIE supported by IA #2053
  ; 
  QUIT
@@ -48,16 +47,15 @@ STELE(ELE,ATR) ;File the data for each attribute in the FDA array
  I $D(ATR) D
   . I ELE["Trans",$D(ATR("id")) S FDA(1,6002.01,"+1,",.01)=ATR("id"),NEWWKLD=1
   . I $D(ATR("type")) S FDA(1,6002.01,"+1,",1)=ATR("type")
-  . I $D(ATR("division")) S ATR("division")=$TR(ATR("division")," ",""),FDA(1,6002.01,"+1,",2)=$$FIND1^DIC(4,,"MX",ATR("division")) ;RLM 9/22/2010
+  . I $D(ATR("division")) S FDA(1,6002.01,"+1,",2)=$TR(ATR("division")," ","")
   . I $D(ATR("accessionArea")) D
   . . S FDA(1,6002.01,"+1,",14)=ATR("accessionArea")
   . I $D(ATR("dateTime")) S FDA(1,6002.01,"+1,",3)=ATR("dateTime")
   . I $D(ATR("status")) S FDA(1,6002.01,"+1,",5)=ATR("status")
   . I $D(ATR("code")) D
-  . . ;S FDA(1,6002.01,"+1,",6)=$$WKLDPTR(ATR("code"))
-  . . S FDA(1,6002.01,"+1,",6)=$$WKLDPTR1(ATR("code"),ATR("method")) ;RLM 6-3-10
-  . I $D(ATR("method")) D  ;RLM 6-3-10
-  . . S FDA(1,6002.01,"+1,",7)=$$MTHDPTR(ATR("method")) ;RLM 6-3-10
+  . . S FDA(1,6002.01,"+1,",6)=$$WKLDPTR(ATR("code"))
+  . I $D(ATR("method")) D
+  . . S FDA(1,6002.01,"+1,",7)=ATR("method")
   . I $D(ATR("multiplyFactor")) S FDA(1,6002.01,"+1,",8)=ATR("multiplyFactor")
   . I $D(ATR("dfn")) D
   . . I $D(^DPT(ATR("dfn"),-9)) S ATR("dfn")=+^DPT(ATR("dfn"),-9)
@@ -89,30 +87,23 @@ CHAR(TEXT) ;This one isn't necessary, but we'll report an error
  ;if text is found.
  S VBERR("DIERR",999999,"TEXT",999999)="TEXT was returned unexpectedly"
  Q
+ZEOR ;VBECA7
+ ;This sets up test data, delete it before shipping the routine.
+ ;ZL VBECA7 D ZEOR,PARSE ;To test
+ S ^TMP("VBEC_XML_RES",$J,1)="<BloodBank><WorkloadTransactions><Transaction id=""FIRST"" type=""P"" division=""589"" dateTime=""3040614"" status=""S""><Workload code=""Acetone"" method=""ACUTE"" multiplyFactor=""1"" />"
+ S ^TMP("VBEC_XML_RES",$J,2)="<Patient dfn=""262768"" /><VbecsUser duz=""7"" /><Lab accessionNumber=""789"" testPerformed=""ABG"" /><Unit id=""A1"" /></Transaction></WorkloadTransactions>"
+ Q
+ ;
 WKLDPTR(CODE) ; Gets the pointer to the workload code file 64
  I $L($P(CODE,".",2))'=5 D
  . S VBSUFX=$P(CODE,".",2)
  . F I=1:1 S VBSUFX=VBSUFX_" " Q:$L(VBSUFX)=5
  . S $P(CODE,".",2)=VBSUFX
  Q $S($D(^LAM("C",CODE)):$O(^LAM("C",CODE,0)),1:0)
- Q
-WKLDPTR1(CODE,CODE1) ; Gets the pointer to the workload code file 64 SWITCH TO E X-REF
- S CODE=$P(CODE,"."),CODE1=$TR(CODE1,".","") S:'CODE1 CODE1="0000"
- Q $S($D(^LAM("E",CODE_"."_CODE1)):$O(^LAM("E",CODE_"."_CODE1,0)),1:0)
- Q
-MTHDPTR(CODE) ; Gets the pointer to the workload code file 64
- S LRSUF=$$FIND1^DIC(64.2,"","O","."_CODE_" ","C","","ERR")
- Q $S(LRSUF:LRSUF,1:"") ;
+ ;
  ; ----------------------------------------------------------
  ;      Private Method Supports IA 4767
  ; ----------------------------------------------------------
 UPDTWKLD ; Update VBECS Workload
  D UPDTWKLD^VBECA7A
  Q
-TESTSET ;This sets up test data.
- Q  ;ZL VBECA7 D ZEOR,PARSE ;To test
- S ^TMP("VBEC_XML_RES",$J,1)="<BloodBank><WorkloadTransactions><Transaction id=""FIRST"" type=""P"" division=""589"" dateTime=""3040614"" status=""S""><Workload code=""Acetone"" method=""ACUTE"" multiplyFactor=""1"" />"
- S ^TMP("VBEC_XML_RES",$J,2)="<Patient dfn=""262768"" /><VbecsUser duz=""7"" /><Lab accessionNumber=""789"" testPerformed=""ABG"" /><Unit id=""A1"" /></Transaction></WorkloadTransactions>"
- Q
- ;
-ZEOR ;VBECA7

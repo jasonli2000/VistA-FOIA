@@ -1,6 +1,6 @@
 PRCB1E1 ;WISC/PLT/BGJ-PRCB1E continue ;1/8/97  12:55
-V ;;5.1;IFCAP;**145**;Oct 20, 2000;Build 3
- ;Per VHA Directive 2004-038, this routine should not be modified.
+V ;;5.1;IFCAP;;Oct 20, 2000
+ ;Per VHA Directive 10-93-142, this routine should not be modified.
  QUIT  ;invalid entry
  ;
  ;prcduz - user id #
@@ -44,16 +44,15 @@ FCPUOB(PRCA,PRCB) ;carry forward all unobligated request to new quarte and
  S PRCC=$$QTRDT^PRC0G(PRCRI(420)_"^"_PRCRI(420.01)_"^"_+$P(PRCA,"^",2)_"^"_"F")
  QUIT:$P(PRCA,"^",5)'<$P(PRCC,"^",2)  ;last qtr always open
  S PRCD=$P(PRCA,"^",5)_"-"_PRC("SITE")_"-"_$P(PRC("CP")," ")_"-",PRCE=PRCD_"~"
- F  S PRCD=$O(^PRCS(410,"RB",PRCD)),PRCRI(410)=0 QUIT:PRCD]PRCE!'PRCD  D
- . F  S PRCRI(410)=$O(^PRCS(410,"RB",PRCD,PRCRI(410))) Q:'PRCRI(410)  D
- .. S PRCF=$G(^PRCS(410,PRCRI(410),0)),PRCG=$P(PRCF,"^",12),PRCH=-$P($G(^(4)),"^",8)
- .. ;credit back the approved requests committed charge
- .. I PRCG="A" S B=$P(PRCA,"^",2) D EBAL^PRCSEZ(PRCRI(420)_"^"_PRCRI(420.01)_"^"_$E(B,3,4)_"^"_$P(B,"-",2)_"^"_PRCH,"C")
- .. I "EA"[PRCG D EDIT^PRC0B(.X,"410;^PRCS(410,;"_PRCRI(410),"449////"_$P(PRCA,"^",6),"LS")
- .. ;if approved charge to new quarter
- .. I PRCG="A" S B=$P(PRCA,"^",7) D EBAL^PRCSEZ(PRCRI(420)_"^"_PRCRI(420.01)_"^"_$E(B,3,4)_"^"_$P(B,"-",2)_"^"_-PRCH,"C")
- .. I "EA"[PRCG W !,$P(PRCF,"^",1),?20,$S(PRCG="E":"ENTERED",1:"APPROVED")
- .. QUIT
+ F  S PRCD=$O(^PRCS(410,"RB",PRCD)) QUIT:PRCD]PRCE!'PRCD  S PRCRI(410)=$O(^(PRCD,"")) I PRCRI(410) D
+ . S PRCF=$G(^PRCS(410,PRCRI(410),0)),PRCG=$P(PRCF,"^",12),PRCH=-$P($G(^(4)),"^",8)
+ .;credit back the approved requests committed charge
+ . I PRCG="A" S B=$P(PRCA,"^",2) D EBAL^PRCSEZ(PRCRI(420)_"^"_PRCRI(420.01)_"^"_$E(B,3,4)_"^"_$P(B,"-",2)_"^"_PRCH,"C")
+ . I "EA"[PRCG D EDIT^PRC0B(.X,"410;^PRCS(410,;"_PRCRI(410),"449////"_$P(PRCA,"^",6),"LS")
+ .;if approved charge to new quarter
+ . I PRCG="A" S B=$P(PRCA,"^",7) D EBAL^PRCSEZ(PRCRI(420)_"^"_PRCRI(420.01)_"^"_$E(B,3,4)_"^"_$P(B,"-",2)_"^"_-PRCH,"C")
+ . I "EA"[PRCG W !,$P(PRCF,"^",1),?20,$S(PRCG="E":"ENTERED",1:"APPROVED")
+ . QUIT
  QUIT
  ;
  ;prca = prcopt, prcb=fund control point ri

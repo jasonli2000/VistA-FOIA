@@ -1,5 +1,5 @@
-MAGGTU4L ;WOIFO/SG/NST - VERSION CONTROL (CLINICAL UTILITIES) ; 08 Mar 2011 2:52 PM
- ;;3.0;IMAGING;**93,94,106,117**;Mar 19, 2002;Build 2238;Jul 15, 2011
+MAGGTU4L ;WOIFO/SG - VERSION CONTROL (CLINICAL UTILITIES) ; 19 May 2010 8:51 AM
+ ;;3.0;IMAGING;**93,94**;Mar 19, 2002;Build 1744;May 26, 2010
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -23,9 +23,9 @@ CLVERCT ;***** VERSION CONTROL TABLE FOR THE CLINICAL UTILITIES
  ;;==================================================================
  ;;| Version |Build|Seq #|                Comment                   |
  ;;|---------+-----+------------------------------------------------|
- ;;| 3.0.117 |   8 |  45 | Jul 2011                                 |
- ;;| 3.0.106 |  13 |  40 | Feb 2011                                 |
- ;;| 3.0.94  |  12 |  35 | May 2010                                 |
+ ;;| 3.0.94  |  12 |     | May 2010                                 |
+ ;;| 3.0.93  |  15 |     | Dec 2009                                 |
+ ;;| 3.0.72  |  30 |  58 | Feb 2009                                 |
  ;;==================================================================
  ;
  ; Each row of the version control table contains the version and

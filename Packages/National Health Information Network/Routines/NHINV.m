@@ -1,5 +1,5 @@
 NHINV ;SLC/MKB - Serve VistA data as XML via RPC
- ;;1.0;NHIN;**1**;Oct 25, 2010;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -14,18 +14,18 @@ NHINV ;SLC/MKB - Serve VistA data as XML via RPC
  ;
 GET(NHIN,DFN,TYPE,START,STOP,MAX,ID) ; -- Return search results as XML in @NHIN@(n)
  ; RPC = NHIN GET VISTA DATA
- N ICN,NHINI,NHINTOTL
- S NHIN=$NA(^TMP("NHINV",$J)) K @NHIN
+ N ICN,NHINI
+ S NHIN=$NA(^TMP($J,"NHINV")) K @NHIN
  ;
  ; parse & validate input parameters
  S ICN=+$P(DFN,";",2),DFN=+$G(DFN)
  I 'DFN S DFN=+$$GETDFN^MPIF001(ICN)
  I DFN<1!'$D(^DPT(DFN)) D ERR(1,DFN) G GTQ
  S TYPE=$G(TYPE) I TYPE="" S TYPE=$$ALL
- S:'$G(START) START=1410101 S:'$G(STOP) STOP=9999998 S:'$G(MAX) MAX=9999
+ S START=$G(START),STOP=$G(STOP),MAX=$G(MAX),ID=$G(ID)
+ S:'START START=1410101 S:'STOP STOP=9999998 S:'MAX MAX=999999
  I START,STOP,STOP<START N X S X=START,START=STOP,STOP=X  ;switch
  I STOP,$L(STOP,".")<2 S STOP=STOP_".24"
- S ID=$G(ID)
  ;
  ; extract data
  N NHINTYPE,NHINP,RTN
@@ -35,41 +35,39 @@ GET(NHIN,DFN,TYPE,START,STOP,MAX,ID) ; -- Return search results as XML in @NHIN@
  . D @(RTN_"(DFN,START,STOP,MAX,ID)")
  D ADD("</results>")
  ;
- I $G(NHINTOTL),$G(@NHIN@(1))="<results>" S @NHIN@(1)="<results total='"_NHINTOTL_"' >"
- ;
 GTQ ; end
  Q
  ;
-RTN(X) ; -- Return name of NHINVxxx routine for clinical domain X
- S X=$$UP^XLFSTR(X),Y="NHINV"
- I X="ACCESSION"    S Y="NHINVLRA"
+UPD(DFN,TYPE,ID) ; -- send message that TYPE/ID has been updated
+ Q
+ ;
+RTN(X) ; -- Return name of NHINVxxx routine for clinical type X
+ S X=$$UP^XLFSTR(X),Y=""
  I X="ALLERGY"      S Y="NHINVART"
- I X="APPOINTMENT"  S Y="NHINVAPT"
- ; X="CONSULT"      S Y="NHINVCON"
+ I X="CONSULT"      S Y="NHINVCON"
  I X="DOCUMENT"     S Y="NHINVTIU"
  I X="IMMUNIZATION" S Y="NHINVIMM"
  I X="LAB"          S Y="NHINVLR"
- I X="PANEL"        S Y="NHINVLRO"
  I X="MED"          S Y="NHINVPS"
  I X="RX"           S Y="NHINVPSO"
- ; X="ORDER"        S Y="NHINVOR"
+ I X="ORDER"        S Y="NHINVOR"
  I X="PATIENT"      S Y="NHINVPT"
  I X="PROBLEM"      S Y="NHINVPL"
- I X="PROCEDURE"    S Y="NHINVPRC"
+ I X="PROCEDURE"    S Y="NHINVMC"
  I X="SURGERY"      S Y="NHINVSR"
  I X="VISIT"        S Y="NHINVSIT"
+ ; X="VISITDATA"    S Y="NHINVPCE"
  I X="VITAL"        S Y="NHINVIT"
- I X="RADIOLOGY"    S Y="NHINVRA"
- I X="NEW"          S Y="NHINVPR"
+ I X="XRAY"         S Y="NHINVRA"
  Q Y
  ;
 ALL() ; -- return string for all types of data
- Q "patient;allergy;problem;vital;lab;med;immunization;visit;appointment;document;procedure"
+ Q "patient;allergy;problem;vital;lab;med;immunization;visit;document"
  ;
 ERR(X,VAL) ; -- return error message
- N MSG  S MSG="Error"
+ N MSG
  I X=1  S MSG="Patient with dfn '"_$G(VAL)_"' not found"
- I X=2  S MSG="Requested domain type '"_$G(VAL)_"' not recognized"
+ I X=2  S MSG="Requested data type '"_$G(VAL)_"' not found"
  I X=99 S MSG="Unknown request"
  ;
  D ADD("<error>")
@@ -99,14 +97,13 @@ STRING(ARRAY) ; -- Return text in ARRAY(n) or ARRAY(n,0) as a string
  S Y=$S($D(ARRAY(I,0)):ARRAY(I,0),1:$G(ARRAY(I)))
  F  S I=$O(ARRAY(I)) Q:I<1  D
  . S X=$S($D(ARRAY(I,0)):ARRAY(I,0),1:ARRAY(I))
- . I $E(X)=" " S Y=Y_$C(13,10)_X Q
- . S Y=Y_$S($E(Y,$L(Y))=" ":"",1:" ")_X
+ . S Y=Y_$C(13,10)_X
  Q Y
  ;
 FAC(X) ; -- return Institution file station# for location X
  N HLOC,FAC,Y0,Y S Y=""
  S HLOC=$G(^SC(+$G(X),0)),FAC=$P(HLOC,U,4) ;Institution ien
- ; Get P:4 via Med Ctr Div, if not directly linked
+ ; Get P4 via Med Ctr Div, if not directly linked
  I 'FAC,$P(HLOC,U,15) S FAC=$$GET1^DIQ(40.8,+$P(HLOC,U,15)_",",.07,"I")
  S Y0=$S(FAC:$$NS^XUAF4(FAC),1:$P($$SITE^VASITE,U,2,3)) ;name^stn#
  S:$L(Y0) Y=$P(Y0,U,2)_U_$P(Y0,U) ;switch to stn#^name

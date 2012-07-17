@@ -1,5 +1,5 @@
 NHINVPSO ;SLC/MKB -- Outpatient Pharmacy extract
- ;;1.0;NHIN;**1**;Dec 01, 2009;Build 11
+ ;;1.0;NHIN;;Oct 25, 2010;Build 14
  ;
  ; External References          DBIA#
  ; -------------------          -----
@@ -54,8 +54,8 @@ RX(ID,MED) ; -- return a prescription in MED("attribute")=value
  S STOP=$P(RX0,U,12) S:STOP MED("stop")=STOP ;_".2359"?
  S X=$$GET1^DIQ(52,+ID_",",26,"I") S:X MED("expires")=X
  S X=$P(RX0,U,17) S:X MED("ordered")=X
- S MED("vaStatus")=$P($P(RX0,U,4),";",2),X=$P($P(RX0,U,4),";")
- S MED("status")=$S(X="H":"hold",X="DC":"not active",X="D"!(X="E"):"historical",1:"active")
+ S MED("vaStatus")=$P($P(RX0,U,4),";",2)
+ S X=$$GET1^DIQ(52,+ID_",",100,"I"),MED("status")=$S(X=3!(X=16):"hold",X>9:"not active",1:"active")
  S MED("quantity")=$P(RX0,U,6),MED("daysSupply")=$P(RX0,U,7)
  S MED("fillsAllowed")=$P(RX0,U,8),MED("fillsRemaining")=$P(RX0,U,9)
  S MED("routing")=$P($P(RX1,U,6),";"),MED("prescription")=$P(RX0,U,5)
@@ -64,8 +64,8 @@ RX(ID,MED) ; -- return a prescription in MED("attribute")=value
  S I=0 F  S I=$O(^TMP("PSOR",$J,+ID,"RPAR",I)) Q:I<1  S X=$G(^(I,0)),$P(X,U,14)=1,FILL(+X)=X
  S (I,RFD,PRV)=0 F  S RFD=$O(FILL(RFD)) Q:RFD<1  S X=$G(FILL(RFD)) D  ;sort 1st
  . N MW,REL S I=I+1
- . S MW=$P($P(X,U,10),";"),REL=$P($P(X,U,8),".")
- . S MED("fill",I)=$P(RFD,".")_U_MW_U_REL_U_$P(X,U,4,5)_$S($P(X,U,14):"^1",1:"")
+ . S RFD=$P(RFD,"."),MW=$P($P(X,U,10),";"),REL=$P($P(X,U,8),".")
+ . S MED("fill",I)=RFD_U_MW_U_REL_U_$P(X,U,4,5)_$S($P(X,U,14):"^1",1:"")
  . S:$P(X,U,2) PRV=$P(X,U,2) ;save last provider
  . ; fill comments?
  S X=$S($P(RX0,U,11):$P(RX0,U,11),$P(RX0,U,10):$P(RX0,U,10),1:0)
@@ -98,7 +98,7 @@ PEND ; -- pending prescription
  ; [expects PS0,OCL^PSOORRL data]
  N I,X,NHIN K MED
  S MED("id")=ID,MED("vaType")="O",MED("type")="Prescription"
- S MED("vaStatus")=$P(PS0,U,9),MED("status")="not active"
+ S MED("vaStatus")=$P(PS0,U,9),MED("status")="not active" ;??
  S X=+$P(PS0,U,8) S:X MED("orderID")=X
  S X=+$P(PS0,U,12) S:X MED("quantity")=X
  D GETS^DIQ(52.41,+ID_",","101;13;19;15;5;1.1","I","NHIN")
@@ -124,7 +124,7 @@ PEN1(ID,MED) ; -- return a pending Rx in MED("attribute")=value
  N PS,PS0,I,X,NHIN K MED
  M PS=^TMP("PS",$J) S PS0=PS(0)
  S MED("id")=ID,MED("vaType")="O",MED("type")="Prescription"
- S MED("vaStatus")=$P(PS0,U,6),MED("status")="not active"
+ S MED("vaStatus")=$P(PS0,U,6),MED("status")="not active" ;??
  S X=+$P(PS0,U,11) S:X MED("orderID")=X
  S X=+$P(PS0,U,8) S:X MED("quantity")=X
  S X=+$P(PS0,U,4) S:X MED("fillsAllowed")=X

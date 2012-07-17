@@ -1,5 +1,5 @@
-PXRMRPCD ;SLC/PJH - PXRM REMINDER DIALOG ;11/04/2009
- ;;2.0;CLINICAL REMINDERS;**16**;Feb 04, 2005;Build 119
+PXRMRPCD ;SLC/PJH - PXRM REMINDER DIALOG ;06/08/2001
+ ;;2.0;CLINICAL REMINDERS;;Feb 04, 2005
  ;
  ; Used by CPRS - see DBIA #3295/#3296/#3332
  ;
@@ -21,7 +21,6 @@ CATEGORY(ORY,CIEN) ;Get category information
  .S SEQ=$P(DATA,U,2)_0
  .;Include only CPRS reminders
  .S USAGE=$P($G(^PXD(811.9,RIEN,100)),U,4) I USAGE'["C",USAGE'["*" Q
- .I USAGE["L"!(USAGE["O") Q
  .;Skip inactive reminders
  .S DATA=$G(^PXD(811.9,RIEN,0)) Q:DATA=""  Q:$P(DATA,U,6)
  .S NAME=$P(DATA,U) I NAME="" S NAME="Unknown"
@@ -75,7 +74,7 @@ EDITPAR(PAR) ;Edit CPRS GUI Version 15 parameters
  ;
  ;Check if Patch 85 has been installed
  I '$$FIND1^DIC(8989.51,"","AMX",PAR) D  Q
- .W !!,"This option requires CPRS GUI Version 15" H 1
+ .W !!,"This option requires CPRS GUI Version 15",*7 H 1
  ;
  ;Edit Parameter Definition
  D EDITPAR^XPAREDIT(PAR)
@@ -91,7 +90,6 @@ SEL(ORY) ;Selectable reminders and categories
  .F  S RIEN=$O(^PXD(811.9,"D",RPNAM,RIEN)) Q:'RIEN  D
  ..;Include only CPRS reminders
  ..S USAGE=$P($G(^PXD(811.9,RIEN,100)),U,4) I USAGE'["C",USAGE'["*" Q
- ..I USAGE["L"!(USAGE["O") Q
  ..;Skip inactive reminders
  ..S DATA=$G(^PXD(811.9,RIEN,0)) Q:DATA=""  Q:$P(DATA,U,6)
  ..S RNAM=$P(DATA,U),RCLASS=$P($G(^PXD(811.9,RIEN,100)),U)

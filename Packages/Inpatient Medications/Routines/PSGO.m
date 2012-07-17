@@ -1,7 +1,7 @@
 PSGO ;BIR/CML3,MV-PRINTS PATIENT'S ORDERS ;10 Feb 98 / 1:32 PM
- ;;5.0; INPATIENT MEDICATIONS ;**4,58,110,181**;16 DEC 97;Build 190
+ ;;5.0; INPATIENT MEDICATIONS ;**4,58,110**;16 DEC 97
  ;
- ; Reference to ^PS(55 is supported by DBIA #2191.
+ ; Reference to ^PS(55 is is supported by DBIA #2191.
  ;
  K ^TMP("PSJON",$J),PSGONF S PSGOH="U N I T   D O S E   P R O F I L E" D ENGORD^PSGOU
  ;
@@ -42,7 +42,7 @@ P2 S ND=$G(@(F_+O_",0)")),SCH=$G(^(2)),ND4=$G(^(4)),ND6=$G(^(6)),DO=$G(^(.2))
  .W $S($P(DO,U,4)="D":"d",1:" ")_$S(V:"->",1:"  ")
  ;I C="CA"!(C["B") W $S($P(ND4,"^",12):"D",1:" "),$S(PSJSYSU:"->",1:"") I C["B" S PSGONF=$S('$G(PSGONF):ON_U_ON,1:+PSGONF_U_ON)
  I C="CA"!(C["B") W $S($P(ND4,"^",12):"D",1:" ") I C["B" S PSGONF=$S('$G(PSGONF):ON_U_ON,1:+PSGONF_U_ON)
- S SM=2-$S('$P(ND,"^",5):2,1:$P(ND,"^",6)),STS=$S($P(ND,U,28)]"":$P(ND,U,28),$P(ND,"^",9)]"":$P(ND,"^",9),1:"NF"),PF=$E("*",$P(ND,"^",20)>0),PSGID=$P(SCH,"^",2),SD=$P(SCH,"^",4) I C["C" S (PSGID,SD)="",PSGOD="********"
+ S SM=2-$S('$P(ND,"^",5):2,1:$P(ND,"^",6)),STS=$S($P(ND,"^",9)]"":$P(ND,"^",9),1:"NF"),PF=$E("*",$P(ND,"^",20)>0),PSGID=$P(SCH,"^",2),SD=$P(SCH,"^",4) I C["C" S (PSGID,SD)="",PSGOD="********"
  I STS="A",($P(ND,U,27)="R") S STS="R"
  S WS=0,PSGOD=$$ENDTC^PSGMI(PSGID)
  S:PSJPWD WS=$$WS^PSJO(PSJPWD,PSGP,F,+O)
@@ -58,7 +58,7 @@ P2 S ND=$G(@(F_+O_",0)")),SCH=$G(^(2)),ND4=$G(^(4)),ND6=$G(^(6)),DO=$G(^(.2))
  ;
 TF ;
  NEW SLS S SLS="",$P(SLS," -",40)=""
- S LN2=$S(C="A":$$TXT^PSJO("A"),C["CC":$$TXT^PSJO("PR"),C["CD":$$TXT^PSJO("PC"),C["C":$$TXT^PSJO("P"),C["BD":$$TXT^PSJO("NC"),C["B":$$TXT^PSJO("N"),C="DF":$$TXT^PSJO("DF"),1:$$TXT^PSJO("NA"))
+ S LN2=$S(C="A":"A C T I V E",C["CC":"P E N D I N G   R E N E W A L S",C["CD":"P E N D I N G  C O M P L E X",C["C":"P E N D I N G ",C["BD":"N O N - V E R I F E D  C O M P L E X",C["B":"N O N - V E R I F I E D",1:"N O N - A C T I V E")
  W:$D(^TMP("PSG",$J,C)) !,$E($E(SLS,1,(80-$L(LN2))/2)_" "_LN2_$E(SLS,1,(80-$L(LN2))/2),1,80)
  S F="^PS("_$S(C["C":"53.1,",C["B":"53.1,",1:"55,"_PSGP_",5,",1:"53.1,") S TF=$S(C["C":0,1:TF)
  Q

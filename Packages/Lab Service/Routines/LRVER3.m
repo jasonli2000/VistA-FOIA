@@ -1,5 +1,5 @@
 LRVER3 ;DALOI/CJS/JAH - DATA VERIFICATION ;8/10/04
- ;;5.2;LAB SERVICE;**42,100,121,140,171,153,221,286,291,406**;Sep 27, 1994;Build 1
+ ;;5.2;LAB SERVICE;**42,100,121,140,171,153,221,286,291**;Sep 27, 1994
  ;
  D V1
  I $D(LRLOCKER)#2 L -@(LRLOCKER) K LRLOCKER
@@ -108,7 +108,7 @@ CHG ; Check for changes, save results and create audit trail
  S LRUP=""
  F  S LRCHG=$O(LRSB(LRCHG)) Q:LRCHG<1  D
  . I '$D(LRSA(LRCHG)) S LRUP=1 Q
- . I $P(LRSA(LRCHG),"^")=""!($P(LRSA(LRCHG),"^")="pending") S LRSA(LRCHG,3)=1,LRUP=1 Q
+ . I $P(LRSA(LRCHG),"^")=""!($P(LRSA(LRCHG),"^")="pending") S LRUP=1 Q
  . I $P(LRSA(LRCHG),"^")'=$P(LRSB(LRCHG),"^") S LRUP=1,$P(LRSA(LRCHG,2),"^")=1 ; results changed
  . I $P(LRSA(LRCHG),"^",2)'=$P(LRSB(LRCHG),"^",2) S LRUP=1,$P(LRSA(LRCHG,2),"^",2)=1 ; normalcy flag changed
  . I $P(LRSA(LRCHG),"^",5)'=$P(LRSB(LRCHG),"^",5) D  ; units/normals changed

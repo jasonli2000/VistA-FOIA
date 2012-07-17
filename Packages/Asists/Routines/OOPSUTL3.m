@@ -1,5 +1,5 @@
 OOPSUTL3 ;HINES/WAA-Utilities Routines ;3/24/98
- ;;2.0;ASISTS;;Jun 03, 2002
+ ;;1.0;ASISTS;**8,10**;Jun 01, 1998
  ;;
 CHECK(IEN,FORM) ; Checks to see if there was data enter for a form
  N ANS,I,LIST,FIELD

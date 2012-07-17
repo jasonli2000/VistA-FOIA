@@ -1,5 +1,5 @@
-MAGGTU31 ;WOIFO/GEK/SG/NST - Silent calls for Imaging ; 04 Nov 2010 10:55 AM
- ;;3.0;IMAGING;**46,59,93,117**;Mar 19, 2002;Build 2238;Jul 15, 2011
+MAGGTU31 ;WOIFO/GEK/SG - Silent calls for Imaging ; 1/16/09 4:44pm
+ ;;3.0;IMAGING;**46,59,93**;Dec 02, 2009;Build 163
  ;; Per VHA Directive 2004-038, this routine should not be modified.
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
@@ -8,6 +8,7 @@ MAGGTU31 ;WOIFO/GEK/SG/NST - Silent calls for Imaging ; 04 Nov 2010 10:55 AM
  ;; | to execute a written test agreement with the VistA Imaging    |
  ;; | Development Office of the Department of Veterans Affairs,     |
  ;; | telephone (301) 734-0100.                                     |
+ ;; |                                                               |
  ;; | The Food and Drug Administration classifies this software as  |
  ;; | a medical device.  As such, it may not be changed in any way. |
  ;; | Modifications to this software may result in an adulterated   |
@@ -60,43 +61,35 @@ USERKEYS(MAGK) ; RPC [MAGGUSERKEYS]  (called from MAGGTU3)
  . I MAGKS(I)["MAGCAP MED" S MAGMED=1
  I MAGMED S J=J+1,MAGK(J)="MAGCAP MED"
  Q
-GETINFO(MAGRY,IEN,MAGFLAGS) ; RPC [MAG4 GET IMAGE INFO]
- ; MAGFLAGS     Flags that control the execution (can be combined):
- ;                 D  Deleted Image Information is relevant
- ;                 
+GETINFO(MAGRY,IEN) ; RPC [MAG4 GET IMAGE INFO]Called from MAGGTU3
  ; Call (3.0p8) to get information on 1 image 
  ; and Display in the Image Information Window
- N Y,J,JI,I,CT,IENC,FLAGS,SNGRP,Z,M40,T,QACHK,OBJTYP,VAL,LBL,MAGFILE,MAGISDEL
- S MAGFLAGS=$G(MAGFLAGS)
+ N Y,J,JI,I,CT,IENC,FLAGS,SNGRP,Z,M40,T,QACHK,OBJTYP,VAL,LBL
  S I=0,CT=0
- S MAGRY(CT)=$S($$ISGRP^MAGGI11(IEN):"Group ID#:     "_IEN,1:"Image ID#:     "_IEN)
- S MAGFILE=2005
- S MAGISDEL=$$ISDEL^MAGGI11(IEN)
- I MAGISDEL  D
+ S MAGRY(CT)="Image ID#:      "_IEN
+ I $$ISDEL^MAGGI11(IEN)  D  Q
+ . N MAGFILE
  . S MAGFILE=$$FILE^MAGGI11(IEN)  S:MAGFILE'>0 MAGFILE=2005
- . S CT=CT+1,MAGRY(CT)="Deleted By:    "_$$GET1^DIQ(MAGFILE,IEN,30,"E")
- . S CT=CT+1,MAGRY(CT)="Deleted Reason:"_$$GET1^DIQ(MAGFILE,IEN,30.2,"E")
- . S CT=CT+1,MAGRY(CT)="Deleted Date:  "_$$GET1^DIQ(MAGFILE,IEN,30.1,"E")
+ . S CT=CT+1,MAGRY(CT)="    STATUS:  "_"HAS BEEN DELETED. !!"
+ . S CT=CT+1,MAGRY(CT)="Deleted By: "_$$GET1^DIQ(MAGFILE,IEN,30,"E")
+ . S CT=CT+1,MAGRY(CT)="    Reason: "_$$GET1^DIQ(MAGFILE,IEN,30.2,"E")
+ . S CT=CT+1,MAGRY(CT)="      Date: "_$$GET1^DIQ(MAGFILE,IEN,30.1,"E")
  . Q
- S M40=$G(^MAG(MAGFILE,IEN,40)),T=$P(M40,"^",3)
- S Z=$P($G(^MAG(MAGFILE,IEN,0)),"^",10)  ; Get the parent IEN
- I Z D
- . S CT=CT+1,MAGRY(CT)=" is in Group#: "_Z_"  ("_$$CNTIMGS(Z,MAGFLAGS)_" images)"
- . I '$$ISDEL^MAGGI11(Z) D
- . . D CHK^MAGGSQI(.QACHK,Z) Q:QACHK(0) 
- . . S CT=CT+1,MAGRY(CT)=" QA Warning - Group#: "_Z_" "_$P(QACHK(0),"^",2)
- . . Q
+ S M40=$G(^MAG(2005,IEN,40)),T=$P(M40,"^",3)
+ S Z=$P($G(^MAG(2005,IEN,0)),"^",10) I Z D
+ . S CT=CT+1,MAGRY(CT)=" is in Group#: "_Z_"  ("_+$P(^MAG(2005,Z,1,0),"^",4)_" images)"
+ . D CHK^MAGGSQI(.QACHK,Z) Q:QACHK(0) 
+ . S CT=CT+1,MAGRY(CT)=" QA Warning - Group#: "_Z_" "_$P(QACHK(0),"^",2)
  . Q
- S OBJTYP=$P(^MAG(MAGFILE,IEN,0),"^",6)
+ S OBJTYP=$P(^MAG(2005,IEN,0),"^",6)
  S SNGRP="FLDS"
- I (+$O(^MAG(MAGFILE,IEN,1,0)))!(OBJTYP=11)!(OBJTYP=16) D
- . S CT=CT+1,MAGRY(CT)=$P($G(^MAG(MAGFILE,IEN,40)),"^",1)_" Group of "_+$$CNTIMGS(IEN,MAGFLAGS)
+ I (+$O(^MAG(2005,IEN,1,0)))!(OBJTYP=11)!(OBJTYP=16) D
+ . S CT=CT+1,MAGRY(CT)=$P($G(^MAG(2005,IEN,40)),"^",1)_" Group of "_+$P($G(^MAG(2005,IEN,1,0)),U,4)
  . S SNGRP="FLDG"
  . Q
- I 'MAGISDEL D
- . K QACHK
- . D CHK^MAGGSQI(.QACHK,IEN) I 'QACHK(0) D
- . . S CT=CT+1,MAGRY(CT)=" QA Warning - Image#: "_IEN_" "_$P(QACHK(0),"^",2)
+ K QACHK
+ D CHK^MAGGSQI(.QACHK,IEN) I 'QACHK(0) D
+ . S CT=CT+1,MAGRY(CT)=" QA Warning - Image#: "_IEN_" "_$P(QACHK(0),"^",2)
  N MAGOUT,MAGERR,MAGVAL,PKG
  S IENC=IEN_","
  S FLAGS="EN"
@@ -110,10 +103,10 @@ GETINFO(MAGRY,IEN,MAGFLAGS) ; RPC [MAG4 GET IMAGE INFO]
  . . S MAGVAL=$S('T:"",'$D(^MAG(2005.83,T,0)):"",1:$P(^MAG(2005.82,$P(^MAG(2005.83,T,0),"^",2),0),"^",1))
  . . S MAGRY(CT)=MAGRY(CT)_" "_MAGVAL
  . . Q
- . D GETS^DIQ(MAGFILE,IEN,JI,FLAGS,"MAGOUT","MAGERR")
+ . D GETS^DIQ(2005,IEN,JI,FLAGS,"MAGOUT","MAGERR")
  . ; Get Extension from FileRef
- . I J=1 S MAGVAL=$P($G(MAGOUT(MAGFILE,IENC,J,"E")),".",2)
- . E  S MAGVAL=$G(MAGOUT(MAGFILE,IENC,J,"E"))
+ . I J=1 S MAGVAL=$P($G(MAGOUT(2005,IENC,J,"E")),".",2)
+ . E  S MAGVAL=$G(MAGOUT(2005,IENC,J,"E"))
  . S MAGVAL=$TR(MAGVAL,"&","+")
  . I J=40 S PKG=MAGVAL
  . I ((J>=50)&(J<=54)) D  Q
@@ -122,47 +115,34 @@ GETINFO(MAGRY,IEN,MAGFLAGS) ; RPC [MAG4 GET IMAGE INFO]
  . . Q
  . S MAGRY(CT)=MAGRY(CT)_" "_MAGVAL
  ; Compare Parent Association Date with Date/Time Note Signed.
- I $P(^MAG(MAGFILE,IEN,0),"^",10) S IEN=$P(^MAG(MAGFILE,IEN,0),"^",10),MAGFILE=$$FILE^MAGGI11(IEN)  S:MAGFILE'>0 MAGFILE=2005
- I $P(^MAG(MAGFILE,IEN,2),"^",6)=8925 S CT=CT+1,MAGRY(CT)=$$ATTSTAT^MAGGTU31(IEN)
+ I $P(^MAG(2005,IEN,0),"^",10) S IEN=$P(^MAG(2005,IEN,0),"^",10)
+ I $P(^MAG(2005,IEN,2),"^",6)=8925 S CT=CT+1,MAGRY(CT)=$$ATTSTAT^MAGGTU31(IEN)
  ;
- I (OBJTYP=11),($P($G(^MAG(MAGFILE,IEN,100)),"^",6)="") D
- . I MAGFILE=2005.1 S IEN=+$O(^MAG(MAGFILE,"AGP",IEN,"")) Q  ; Get IEN of child from AGP index for deleted image
- . S X=$O(^MAG(MAGFILE,IEN,1,0))
- . S IEN=+$G(^MAG(MAGFILE,IEN,1,X,0))
+ I (OBJTYP=11),($P($G(^MAG(2005,IEN,100)),"^",6)="") D
+ . S X=$O(^MAG(2005,IEN,1,0))
+ . S IEN=+$G(^MAG(2005,IEN,1,X,0))
  . Q
- I $P($G(^MAG(MAGFILE,IEN,100)),"^",6)]"" D
+ I $P($G(^MAG(2005,IEN,100)),"^",6)]"" D
  . I OBJTYP=11 D  ; If a Group, get Object Type of First Child
- . . S Z=$O(^MAG(MAGFILE,IEN,1,0))
+ . . S Z=$O(^MAG(2005,IEN,1,0))
  . . I 'Z Q
- . . S Z=+$G(^MAG(MAGFILE,IEN,1,Z,0))
- . . S OBJTYP=+$P($G(^MAG(MAGFILE,Z,0)),"^",6) ; Object of First Child
+ . . S Z=+$G(^MAG(2005,IEN,1,Z,0))
+ . . S OBJTYP=+$P($G(^MAG(2005,Z,0)),"^",6) ; Object of First Child
  . . Q
  . S OBJTYP=","_OBJTYP_","
  . S LBL="",VAL=""
  . I ",3,9,10,12,100,"[OBJTYP S LBL="Image Creation Date: "           ; "Acquisition Date";
  . I ",15,101,102,103,104,105,"[OBJTYP S LBL="Document Creation Date: "
  . I LBL="" S LBL="Image Creation Date: "
- . S VAL=$$GET1^DIQ(MAGFILE,IEN,110,"E") S:(VAL="") VAL="N/A"
+ . S VAL=$$GET1^DIQ(2005,IEN,110,"E") S:(VAL="") VAL="N/A"
  . S CT=CT+1,MAGRY(CT)=LBL_VAL
  . Q
- I $$GET1^DIQ(MAGFILE,IEN,112,"I") D  Q
- . S CT=CT+1,MAGRY(CT)="Controlled Image :  "_$$GET1^DIQ(MAGFILE,IEN,112,"E")
- . ;S CT=CT+1,MAGRY(CT)="Controlled By    : "_$$GET1^DIQ(MAGFILE,IEN,112.2,"E")
- . ;S CT=CT+1,MAGRY(CT)="Controlled Date  : "_$$GET1^DIQ(MAGFILE,IEN,112.1,"E")
+ I $$GET1^DIQ(2005,IEN,112,"I") D  Q
+ . S CT=CT+1,MAGRY(CT)="Controlled Image :  "_$$GET1^DIQ(2005,IEN,112,"E")
+ . ;S CT=CT+1,MAGRY(CT)="Controlled By    : "_$$GET1^DIQ(2005,IEN,112.2,"E")
+ . ;S CT=CT+1,MAGRY(CT)="Controlled Date  : "_$$GET1^DIQ(2005,IEN,112.1,"E")
  . Q
  Q
- ;
-CNTIMGS(GRPIEN,FLAGS) ; Return number of images in a group
- ; GRPIEN = IEN of the group
- ; FLAGS = If "D" is included then count the deleted images as well 
- N CNT,IEN
- S CNT=0
- I FLAGS["D" D  ; Get deleted images count
- . S IEN=0
- . F  S IEN=$O(^MAG(2005.1,"AGP",GRPIEN,IEN)) Q:'IEN  S CNT=CNT+1
- . Q
- S CNT=CNT+$P($G(^MAG(2005,GRPIEN,1,0)),"^",4)
- Q CNT
  ;
 FLDS ;;Format:       ;3;;
  ;;Extension:    ;1;;

@@ -1,5 +1,5 @@
-MAGGSU1 ;WOIFO/GEK - Utilities for Imaging  ; 01 Nov 2001 12:32 PM 
- ;;3.0;IMAGING;**7**;Jul 12, 2002
+MAGGSU1 ;WOIFO/GEK - Utilities for Imaging
+ ;;3.0;IMAGING;**7**;Apr 17, 2002
  ;; +---------------------------------------------------------------+
  ;; | Property of the US Government.                                |
  ;; | No permission to copy or redistribute this software is given. |

@@ -1,5 +1,5 @@
-HLOTRACE ;;OIFO-OAK/PIJ/CJM ;03/07/2011
- ;;1.6;HEALTH LEVEL SEVEN;**146,147,153** ;Oct 13, 1995;Build 11
+HLOTRACE ;;OIFO-OAK/PIJ/CJM ;08/23/2010
+ ;;1.6;HEALTH LEVEL SEVEN;**146,147** ;Oct 13, 1995;Build 15
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;;
  ;; HLO CLIENT TRACE Tool
@@ -67,8 +67,7 @@ SETBREAKS ;
  ;set break at ZB7 in client (end of $$TRANSMIT^HLOCLNT1)
  ZB ZB7^HLOCLNT1:"N":1:"D WRITE^HLOTRACE(""Message transmitted!"")"
  ;set break at ZB8 in client (start of $$READACK^HLOCLNT1)
- ;ZB ZB8^HLOCLNT1:"N":1:"D WRITE^HLOTRACE(""Beginning to read commit acknowledgment...."")"
- ZB ZB8^HLOCLNT1:"N":1:"D ZB8^HLOTRACE"
+ ZB ZB8^HLOCLNT1:"N":1:"D WRITE^HLOTRACE(""Beginning to read commit acknowledgment...."")"
  ;set break at ZB9 in client (end of $$READACK^HLOCLNT1)
  ;ZB ZB9^HLOCLNT1:"N":1:"D WRITE^HLOTRACE(""Commit acknowledgment received!"")"
  ZB ZB9^HLOCLNT1:"N":1:"D ZB9^HLOTRACE"
@@ -98,8 +97,6 @@ SETBREAKS ;
  ZB ZB23^HLOCLNT:"N":1:"D ZB23^HLOTRACE"
  ZB ZB24^HLOCLNT1:"N":1:"D ZB24^HLOTRACE"
  ZB ZB25^HLOCLNT:"N":1:"D WRITE^HLOTRACE(""Calling DEQUE..."")"
- ZB ZB31^HLOTCP:"N":1:"D WRITE^HLOTRACE(""Beginning READ over TCP..."")"
- ZB ZB32^HLOTCP:"N":1:"D ZB32^HLOTRACE"
  Q
 WRITE(MSG) ;
  N OLD
@@ -156,9 +153,6 @@ ZB4 ;
 ZB2 ;
  W !,$S('HLCSTATE("CONNECTED"):"Connection Failed!",1:"Connected!")
  Q
-ZB8 ;
- D WRITE^HLOTRACE("Beginning to read commit acknowledgment....")
- Q
 ZB9 ;
  I $G(SUCCESS) D
  .D WRITE^HLOTRACE("Commit acknowledgment received!")
@@ -166,17 +160,16 @@ ZB9 ;
  .D WRITE^HLOTRACE("Read of commit acknowledgment FAILED!")
  Q
 ZB10 ;
- D WRITE^HLOTRACE("Getting message header...")
+ D WRITE^HLOTRACE("Reading header...")
  Q
-ZB11 ;
- I $D(HDR) D WRITE2^HLOTRACE("",.HDR)
- D WRITE^HLOTRACE($S(SUCCESS:"Got message header!",1:"**** FAILED TO READ MESSAGE HEADER! *****"))
+ZB11 I $D(HDR) D WRITE2^HLOTRACE("",.HDR)
+ D WRITE^HLOTRACE($S(SUCCESS:"Completed!",1:"**** FAILED TO COMPLETE *****"))
  Q
 ZB12 ;
- D WRITE^HLOTRACE("Getting next segment...")
+ D WRITE^HLOTRACE("Reading next segment...")
  Q
 ZB13 I $D(SEG) D WRITE2^HLOTRACE("",.SEG)
- D WRITE^HLOTRACE($S(RETURN:"Got next segment!",$G(HLCSTATE("MESSAGE ENDED")):"No more segments!",1:"**** FAILED TO COMPLETE READING NEXT SEGMENT *****"))
+ D WRITE^HLOTRACE($S(RETURN:"Completed!",$G(HLCSTATE("MESSAGE ENDED")):"No more segments!",1:"**** FAILED TO COMPLETE *****"))
  Q
 ZB14 ;
  D WRITE2^HLOTRACE("Writing next segment...",.SEG)
@@ -207,12 +200,6 @@ ZB23 ;
  Q
 ZB24 ;S HLOCSTATE("CONNECTED")=1
  S HLCSTATE("LINK","SHUTDOWN")=0
- Q
-ZB32 D:('$G(RETURN)) WRITE^HLOTRACE("**** FAILED ****")
- D:$G(RETURN) WRITE3^HLOTRACE("")
- D:$G(RETURN) WRITE3^HLOTRACE($G(BUF))
- D:$G(RETURN) WRITE3^HLOTRACE("")
- D:$G(RETURN) WRITE^HLOTRACE("READ over TCP completed! #Characters read: "_$L($G(BUF)))
  Q
  ; 
 ASKQUE(SUB) ;
