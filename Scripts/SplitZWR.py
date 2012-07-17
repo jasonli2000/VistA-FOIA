@@ -85,6 +85,9 @@ def main():
         if f[-4:].lower() != '.zwr':
             sys.stderr.write('Skipping non-.zwr file: %s\n' % f)
             continue
+        if f.find("+") < 0:
+            sys.stderr.write('Skipping non-fileman file: %s\n' % f)
+            continue
         if os.stat(f).st_size > maxSize:
             splitZWR(f, maxSize)
 
