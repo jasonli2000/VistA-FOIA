@@ -72,8 +72,8 @@ SETLL16(STATION,RLLN,SLLN) ;
  ;
  ; Sending Logical Link
  S SLLN="LL"_VISN_"VISN"
- ;S ADDR="127.0.0.1"  ;HEC development
- S ADDR="127.0.0.1"  ;HEC production
+ ;S ADDR="10.4.221.116"  ;HEC development
+ S ADDR="10.4.221.103"  ;HEC production
  S RET=$$LL16^IVM16PF(SLLN,"TCP","NC",10,ADDR,PORT,"C","N","")
  I +RET<0 D ERROR(RET,"v1.6 Send Link:"_SLLN) Q 1
  ;

@@ -54,7 +54,7 @@ HECMSG ; Send message to HEC Legacy that install is complete.
  S PRODFLG=$$GET1^DIQ(869.3,"1,",.03,"I")="P"
  S XMDUZ="EVC I2 Install"
  S XMSUB=XMDUZ_" - "_STATN_" (DG*5.3*688)"
- S:PRODFLG XMY("S.IVMB*2*860 MESSAGE@IVM.DOMAIN.EXT")=""
+ S:PRODFLG XMY("S.IVMB*2*860 MESSAGE@IVM.MED.VA.GOV")=""
  S:'PRODFLG XMY(DUZ)=""
  S XMTEXT="MSG("
  S $P(MSG(1),U)="IVMB*2*860"

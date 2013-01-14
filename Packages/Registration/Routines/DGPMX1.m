@@ -1,4 +1,4 @@
-DGPMX1 ; GENERATED FROM 'DGPM ADMIT' INPUT TEMPLATE(#446), FILE 405;01/14/13
+DGPMX1 ; GENERATED FROM 'DGPM ADMIT' INPUT TEMPLATE(#446), FILE 405;11/15/12
  D DE G BEGIN
 DE S DIE="^DGPM(",DIC=DIE,DP=405,DL=1,DIEL=0,DU="" K DG,DE,DB Q:$O(^DGPM(DA,""))=""
  I $D(^(0)) S %Z=^(0) S %=$P(%Z,U,1) S:%]"" DE(2)=% S %=$P(%Z,U,4) S:%]"" DE(13)=% S %=$P(%Z,U,5) S:%]"" DE(16)=% S %=$P(%Z,U,6) S:%]"" DE(21)=% S %=$P(%Z,U,7) S:%]"" DE(22)=% S %=$P(%Z,U,10) S:%]"" DE(17)=% S %=$P(%Z,U,11) S:%]"" DE(10)=%

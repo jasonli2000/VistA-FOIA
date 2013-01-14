@@ -28,7 +28,7 @@ SETLL16(STATION,RLLN,SLLN) ;
  ; Sending Logical Link
  S SLLN="LLEDBOUT"
  S PORT=33001            ;e*Gate Port#
- S ADDR="127.0.0.1"  ;e*Gate production
+ S ADDR="10.224.132.101"  ;e*Gate production
  S RET=$$LL16(SLLN,ADDR,PORT,1)
  I +RET<0 D ERROR(RET,"Edb Send Link:"_SLLN) Q 1
  ;

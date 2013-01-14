@@ -4,8 +4,8 @@ PSOTPENV ;BIR/RTR-Patch 146 Environment Check routine ;07/27/03
  ;
  ;Check for Domain
  N DIR,DIC,DA,X,Y
- K DIC S DIC(0)="X",DIC=4.2,X="TPB-AUSTIN.DOMAIN.EXT" D ^DIC K DIC
- I +Y'>0 W !!,"Aborting Install!",!,"You will need to create a domain name of 'TPB-AUSTIN.DOMAIN.EXT' for the",!,"HL7 extracts of TPB Patient information. See patch 'XM*DBA*155' for details." D  S XPDABORT=2 Q
+ K DIC S DIC(0)="X",DIC=4.2,X="TPB-AUSTIN.MED.VA.GOV" D ^DIC K DIC
+ I +Y'>0 W !!,"Aborting Install!",!,"You will need to create a domain name of 'TPB-AUSTIN.MED.VA.GOV' for the",!,"HL7 extracts of TPB Patient information. See patch 'XM*DBA*155' for details." D  S XPDABORT=2 Q
  .W ! K DIR S DIR(0)="E",DIR("A")="Press Return to Continue" D ^DIR K DIR
  K Y
  ;

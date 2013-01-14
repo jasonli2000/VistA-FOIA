@@ -16,10 +16,10 @@ ENT(RESULTS,INPUT) ; Non-interactive GUI Entry Point for transmitting data
  S MAN=1                       ; force manual xmit flag
  I RTN="DOL" D
  . S MAILG="OOPS DOL XMIT DATA"
- . S QUE="Q-AST.DOMAIN.EXT"
+ . S QUE="Q-AST.MED.VA.GOV"
  I RTN="NDB" D
  . S MAILG="OOPS XMIT 2162 DATA"
- . S QUE="Q-ASI.DOMAIN.EXT"
+ . S QUE="Q-ASI.MED.VA.GOV"
  ;Check for security keys
  I '$D(^XUSEC(MAILG,DUZ)) D  Q
  .S RESULTS(0)="ERROR"

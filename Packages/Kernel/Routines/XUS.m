@@ -93,9 +93,9 @@ CHECKAV(X1) ;Check A/V code return DUZ or Zero. (Called from XUSRB)
  S X1=$$UP(X1) S:X1[":" XUTT=1,X1=$TR(X1,":")
  S X=$P(X1,";") Q:X="^" -1 S:XUF %1="Access: "_X
  Q:X'?1.20ANP 0
- S X=$$EN^ROUTINE(X) I '$D(^VA(200,"A",X)) D LBAV Q 0
+ S X=$$EN^XUSHSH(X) I '$D(^VA(200,"A",X)) D LBAV Q 0
  S %1="",IEN=$O(^VA(200,"A",X,0)),XUF(.3)=IEN D USER(IEN)
- S X=$P(X1,";",2) S:XUF %1="Verify: "_X S X=$$EN^ROUTINE(X)
+ S X=$P(X1,";",2) S:XUF %1="Verify: "_X S X=$$EN^XUSHSH(X)
  I $P(XUSER(1),"^",2)'=X D LBAV Q 0
  I $G(XUFAC(1)) S DIK="^XUSEC(4,",DA=XUFAC(1) D ^DIK
  Q IEN

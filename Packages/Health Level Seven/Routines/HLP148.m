@@ -3,7 +3,7 @@ HLP148 ;OIFO-O/RJH - HL*1.6*148 ENVIRONMENT AND POST-INSTALL ROUTINE ;09/29/2010
  ;Per VHA Directive 2004-038, this routine should not be modified.
  ;
  ; check "TEXAS VALLEY COASTAL BEND HCS" entry in Institution file(#4),
- ; and "VALLEYCOASTALBEND.DOMAIN.EXT" entry in Domain file(#4.2)
+ ; and "VALLEYCOASTALBEND.MED.VA.GOV" entry in Domain file(#4.2)
  ;
  N HLPARAM,HLSITE
  ;
@@ -16,9 +16,9 @@ HLP148 ;OIFO-O/RJH - HL*1.6*148 ENVIRONMENT AND POST-INSTALL ROUTINE ;09/29/2010
  .. S XPDQUIT=2
  .. D BMES^XPDUTL("'TEXAS VALLEY COASTAL BEND HCS' entry with station number as 740 ")
  .. D MES^XPDUTL("does not exist in Institution file.")
- . I '$O(^DIC(4.2,"B","VALLEYCOASTALBEND.DOMAIN.EXT",0)) D
+ . I '$O(^DIC(4.2,"B","VALLEYCOASTALBEND.MED.VA.GOV",0)) D
  .. S XPDQUIT=2
- .. D BMES^XPDUTL("'VALLEYCOASTALBEND.DOMAIN.EXT' entry does not exist in Domain file,")
+ .. D BMES^XPDUTL("'VALLEYCOASTALBEND.MED.VA.GOV' entry does not exist in Domain file,")
  .. D MES^XPDUTL(" patch XM*999*173 must be installed first.")
  . I $G(XPDQUIT) D BMES^XPDUTL("Aborting installation...")
  Q
@@ -68,7 +68,7 @@ UPDATE ;
  N HLJ
  N DIE,DR,X
  ;
- S HLDOM="HL7.VALLEYCOASTALBEND.DOMAIN.EXT"
+ S HLDOM="HL7.VALLEYCOASTALBEND.MED.VA.GOV"
  S HLPARAM=$$PARAM^HLCS2
  S HLSITE("DEFAULT-PROCESSING-ID")=$P(HLPARAM,"^",3)
  S HLSITE("INSTITUTION IEN")=$P(HLPARAM,"^",4)
@@ -116,8 +116,8 @@ UPDATE ;
  . S $P(^HLCS(870,HLLINK,200),"^",10)=""
  . ; remove data from DNS DOMAIN field
  . S $P(^HLCS(870,HLLINK,0),"^",8)=""
- . K ^HLCS(870,"DNS","HL7.VALLEYCOASTALBEND.DOMAIN.EXT")
- . K ^HLCS(870,"DNS2","HL7.VALLEYCOASTALBEND.DOMAIN.EXT")
+ . K ^HLCS(870,"DNS","HL7.VALLEYCOASTALBEND.MED.VA.GOV")
+ . K ^HLCS(870,"DNS2","HL7.VALLEYCOASTALBEND.MED.VA.GOV")
  . ; remove data from TCP/IP ADDRESS field
  . S IP=$P(^HLCS(870,HLLINK,400),"^")
  . I IP D

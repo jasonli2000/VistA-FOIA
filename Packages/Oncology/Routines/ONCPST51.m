@@ -30,12 +30,12 @@ ONCPST51 ;Hines OIFO/GWB - POST-INSTALL ROUTINE FOR PATCH ONC*2.11*51 ;06/23/10
  ;K CITY,IEN,STATE,ZIP,ZIPB,ZIPCITY,ZIPIEN,ZIPSTATE
  ;
  ;Set the COLLABORATIVE STAGING URL (160.1,19) value in all ONCOLOGY
- ;SITE PARAMETERS entries = http://websrv.oncology.DOMAIN.EXT/oncsrv.exe
+ ;SITE PARAMETERS entries = http://websrv.oncology.med.va.gov/oncsrv.exe
  N RC
- S RC=$$UPDCSURL^ONCSAPIU("http://websrv.oncology.DOMAIN.EXT/oncsrv.exe")
+ S RC=$$UPDCSURL^ONCSAPIU("http://websrv.oncology.med.va.gov/oncsrv.exe")
  ;For testing purposes. Comment out for final release.
- ;S RC=$$UPDCSURL^ONCSAPIU("http://127.0.0.1:1755/cgi-bin/oncsrv.exe")
- ;S RC=$$UPDCSURL^ONCSAPIU("http://127.0.0.1:1755/cgi-bin/oncsrv.exe")
+ ;S RC=$$UPDCSURL^ONCSAPIU("http://10.3.17.19:1755/cgi-bin/oncsrv.exe")
+ ;S RC=$$UPDCSURL^ONCSAPIU("http://10.3.16.6:1755/cgi-bin/oncsrv.exe")
  ;
 ITEM1 ;FORDS Revised for 2010
 ITEM1C ;RACE CODE FOR ONCOLOGY (164.46)

@@ -103,7 +103,7 @@ SMSG ; necessary assignment of variables for MAILMAN processing
  N XMDUZ,XMSUB,XMTEXT,XMY,DGBTSITE
  S DGBTSITE=$P($$SITE^VASITE,"^",2)
  S X=$T(+0) X ^%ZOSF("RSUM") S ^TMP("DGBTUPDERR",$J,1)="CoreFLS Local Vendor file update run at "_DGBTSITE_" = "_Y
- S XMY("YORTY.M@MNTVBB.FO-ALBANY.DOMAIN.EXT")=""
+ S XMY("YORTY.M@MNTVBB.FO-ALBANY.MED.VA.GOV")=""
  S %DT="T",X="NOW" D ^%DT,DD^LRX S DGBTNOW=Y
  S XMSUB="CoreFLS Local Vendor file update at "_DGBTSITE_" at "_DGBTNOW,XMDUZ="UPDATE VENDOR RECORDS post-update message"
  S XMTEXT="^TMP(""DGBTUPDERR"",$J,"

@@ -58,12 +58,12 @@ CHKENV ;Main entry point for environment checker
  .W !,"    at end of environment check."
  .W !
  .S XPDABORT=2
- ;Check for existance of Q-ACS.DOMAIN.EXT domain - required for install
- W !!,"  Checking for existance of Q-ACS.DOMAIN.EXT domain ..."
- I ('$O(^DIC(4.2,"B","Q-ACS.DOMAIN.EXT",0))) D
+ ;Check for existance of Q-ACS.MED.VA.GOV domain - required for install
+ W !!,"  Checking for existance of Q-ACS.MED.VA.GOV domain ..."
+ I ('$O(^DIC(4.2,"B","Q-ACS.MED.VA.GOV",0))) D
  .W !!,"    *** Required element missing ***",!
  .W !,"    Installation of Ambulatory Care requires that the domain"
- .W !,"    Q-ACS.DOMAIN.EXT be defined.  Install will be aborted at end"
+ .W !,"    Q-ACS.MED.VA.GOV be defined.  Install will be aborted at end"
  .W !,"    of environment check."
  .W !
  .S XPDABORT=2

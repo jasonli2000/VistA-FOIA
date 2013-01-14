@@ -56,10 +56,10 @@ MAILQ ;   Quit Mail
  ; Miscellaneous
 ADR(LEX) ;   Mailing Address
  N DIC,DTOUT,DUOUT,X,Y
- S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="FO-SLC.DOMAIN.EXT" D ^DIC Q:+Y>0 LEX
- S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="FO-SLC.DOMAIN.EXT" D ^DIC Q:+Y>0 LEX
- S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="ISC-SLC.DOMAIN.EXT" D ^DIC Q:+Y>0 LEX
- Q "ISC-SLC.DOMAIN.EXT"
+ S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="FO-SLC.MED.VA.GOV" D ^DIC Q:+Y>0 LEX
+ S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="FO-SLC.VA.GOV" D ^DIC Q:+Y>0 LEX
+ S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="ISC-SLC.MED.VA.GOV" D ^DIC Q:+Y>0 LEX
+ Q "ISC-SLC.VA.GOV"
 ED(X) ;   External Date
  N Y S Y=$$FMTE^XLFDT($G(X)) S:Y["@" Y=$P(Y,"@",1)_"  "_$P(Y,"@",2,299) S:$L(Y) X=Y
  Q X

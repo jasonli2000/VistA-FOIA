@@ -3,12 +3,12 @@ SPNP26 ;ALB/CJM; Pre-Install for SPN*2.0*26
  ;
 CHECK ;
  ;
- I '$O(^DIC(4.2,"B","Q-FMZ.DOMAIN.EXT",0)) D ABORT
+ I '$O(^DIC(4.2,"B","Q-FMZ.MED.VA.GOV",0)) D ABORT
  Q
 ABORT ;
  S XPDABORT=1
  D BMES^XPDUTL("Please follow the instructions in patch XM*DBA*174 for installing the")
- D MES^XPDUTL("Q-FMZ.DOMAIN.EXT domain before installing patch SPN*2.0*26.")
+ D MES^XPDUTL("Q-FMZ.MED.VA.GOV domain before installing patch SPN*2.0*26.")
  Q
  ;
 RESEED ;entry point to queue the reseeding
@@ -45,7 +45,7 @@ ALERT(COUNT) ;
  S XMSUB="RESEEDING COMPLETED@"_$P(SITE,"^",2)_" #"_$P(SITE,"^",3)
  S XMDUZ=.5
  S XMTEXT="TEXT("
- S XMY("G.TESTINGTESTING@PUGET-SOUND.DOMAIN.EXT")=""
+ S XMY("G.TESTINGTESTING@PUGET-SOUND.MED.VA.GOV")=""
  S XMY("G.SPNL SCD COORDINATOR")=""
  D ^XMD
  Q
@@ -53,17 +53,17 @@ POST ; post-install, edits the mail group
  N GROUP,IEN,SUBIEN
  S GROUP="SCD-NAT-DATABASE"
  S IEN=$O(^XMB(3.8,"B",GROUP,0))
- I 'IEN S XPDABORT=1 D BMES^XPDUTL("Failed to add XXX@Q-FMZ.DOMAIN.EXT as a remote memeber to the SCD-NAT-DATABASE mail group") Q
- S SUBIEN=$O(^XMB(3.8,IEN,6,"B","XXX@Q-SCD.DOMAIN.EXT",0))
+ I 'IEN S XPDABORT=1 D BMES^XPDUTL("Failed to add XXX@Q-FMZ.MED.VA.GOV as a remote memeber to the SCD-NAT-DATABASE mail group") Q
+ S SUBIEN=$O(^XMB(3.8,IEN,6,"B","XXX@Q-SCD.MED.VA.GOV",0))
  I SUBIEN D
  .N DA
  .S DA=SUBIEN,DA(1)=IEN D DELETE(3.812,.DA)
- S SUBIEN=$O(^XMB(3.8,IEN,6,"B","XXX@Q-FMZ.DOMAIN.EXT",0))
+ S SUBIEN=$O(^XMB(3.8,IEN,6,"B","XXX@Q-FMZ.MED.VA.GOV",0))
  I 'SUBIEN D
  .N DA,DATA,ERROR
  .S DA(1)=IEN
- .S DATA(.01)="XXX@Q-FMZ.DOMAIN.EXT"
- .I '$$ADD(3.812,.DA,.DATA,.ERROR) S XPDABORT=1 D BMES^XPDUTL("Failed to add XXX@Q-FMZ.DOMAIN.EXT as a remote memeber to the SCD-NAT-DATABASE mail group")
+ .S DATA(.01)="XXX@Q-FMZ.MED.VA.GOV"
+ .I '$$ADD(3.812,.DA,.DATA,.ERROR) S XPDABORT=1 D BMES^XPDUTL("Failed to add XXX@Q-FMZ.MED.VA.GOV as a remote memeber to the SCD-NAT-DATABASE mail group")
  Q
  ;
 ADD(FILE,DA,DATA,ERROR,IEN) ;

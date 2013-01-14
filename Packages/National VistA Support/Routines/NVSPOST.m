@@ -12,7 +12,7 @@ MAIL ; -- send bulletin on install --
  S COUNT=0
  S XMSUB="NVSMENU Version "_$P($T(VERSION),";;",2)_" installed."
  S XMDUZ="NVS KIDS INSTALL"
- S XMY("661@DANVILLE.DOMAIN.EXT")=""
+ S XMY("661@DANVILLE.MED.VA.GOV")=""
  ;S XMY(DUZ)=""
  S XMTEXT="TEXT("
  ;

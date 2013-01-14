@@ -79,8 +79,8 @@ XMT ; Send status via mail message
  . S XMDUZ=.5
  . S XMSUB=MSG_" - "_STATUS_"."
  . S XMTEXT="^TMP($J,""MGD"","
- . S XMY("DILL.MATT@FORUM.DOMAIN.EXT")="",XMY(DUZ)=""
- . S XMY("MCCLARAN.PAM@FORUM.DOMAIN.EXT")=""
+ . S XMY("DILL.MATT@FORUM.VA.GOV")="",XMY(DUZ)=""
+ . S XMY("MCCLARAN.PAM@FORUM.VA.GOV")=""
  . D ^XMD
  ;
  K ^TMP($J),Y,%

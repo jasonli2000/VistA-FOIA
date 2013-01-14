@@ -245,7 +245,7 @@ EXIT ;common exit point
  Q
 MAIL ;send to PCM full dataset
  S XMY("G.RMPR SERVER")=""
- S XMY("G.PROSTHETICS@PSAS.DOMAIN.EXT")=""
+ S XMY("G.PROSTHETICS@PSAS.MED.VA.GOV")=""
  S XMDUZ=.5
  S XMSUB="Full DOR From Station: "_STNX
  N LASTIEN
@@ -264,7 +264,7 @@ MAIL ;send to PCM full dataset
 MAILG ;Mail message to local staff
  S XMDUZ=.5
  S XMY("G.RMPR SERVER")=""
- S XMY("VHACOPSASPIPReport@DOMAIN.EXT")=""
+ S XMY("VHACOPSASPIPReport@MED.VA.GOV")=""
  S XMSUB="DOR From Station: "_STNX
  S RMPRMSG(1)="The Automated Delayed Order Report has transmitted to Prosthetics HQ."
  S RMPRMSG(2)="This was activated by "_$P(XMFROM,"@",1)

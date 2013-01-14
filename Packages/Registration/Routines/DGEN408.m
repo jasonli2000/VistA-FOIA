@@ -123,10 +123,10 @@ SEND(DGDATA,DGMSG,DGDEST) ;  Build and send individual mailman messages
  ;
  S XMDUZ="HEC MPI SEEDING"
  I DGDEST=1 D                                 ;send to production
- . S XMY("S.IVMB MPI SERVER@IVM.DOMAIN.EXT")=""
+ . S XMY("S.IVMB MPI SERVER@IVM.MED.VA.GOV")=""
  E  D                                       ;send to a test account
  . N TMP
- . S TMP="S.IVMB MPI SERVER@"_DGDEST_"DQMGR.IVM.DOMAIN.EXT"
+ . S TMP="S.IVMB MPI SERVER@"_DGDEST_"DQMGR.IVM.MED.VA.GOV"
  . S XMY(TMP)=""
  ;
  S XMY(.5)=""

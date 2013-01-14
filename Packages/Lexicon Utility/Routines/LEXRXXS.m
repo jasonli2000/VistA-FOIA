@@ -253,12 +253,12 @@ ERR ;   Error Summary
  . S LEXC=$O(^TMP("LEXRX",$J,"MSG"," "),-1)+1
  . S ^TMP("LEXRX",$J,"MSG",LEXC,0)=LEXT
  Q
-ADR(LEX) ; Mailing Address -G.LEXINS@FO-SLC.DOMAIN.EXT,
+ADR(LEX) ; Mailing Address -G.LEXINS@FO-SLC.MED.VA.GOV,
  N DIC,DTOUT,DUOUT,X,Y
- S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="FO-SLC.DOMAIN.EXT" D ^DIC Q:+Y>0 LEX
- S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="FO-SLC.DOMAIN.EXT" D ^DIC Q:+Y>0 LEX
- S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="ISC-SLC.DOMAIN.EXT" D ^DIC Q:+Y>0 LEX
- Q "ISC-SLC.DOMAIN.EXT"
+ S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="FO-SLC.MED.VA.GOV" D ^DIC Q:+Y>0 LEX
+ S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="FO-SLC.VA.GOV" D ^DIC Q:+Y>0 LEX
+ S DIC="^DIC(4.2,",DIC(0)="M",(LEX,X)="ISC-SLC.MED.VA.GOV" D ^DIC Q:+Y>0 LEX
+ Q "ISC-SLC.VA.GOV"
 FN(X) ;   Filename
  Q:$D(^LEX(+($G(X)),0)) $$TITLE^XLFSTR($P($G(^LEX(+($G(X)),0)),"^",1))
  Q:$D(^LEXT(+($G(X)),0)) $$TITLE^XLFSTR($P($G(^LEXT(+($G(X)),0)),"^",1))
