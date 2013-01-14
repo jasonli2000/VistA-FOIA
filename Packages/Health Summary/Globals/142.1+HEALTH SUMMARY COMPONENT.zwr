@@ -542,7 +542,7 @@ ZWR
 ^GMT(142.1,69,3.5,1,0)="This component displays the Display Result"
 ^GMT(142.1,69,3.5,2,0)="of the Consults procedure and the TIU documents for"
 ^GMT(142.1,69,3.5,3,0)="the procedure."
-^GMT(142.1,71,0)="MENTAL HEALTH PHYSICAL EXAM^MAIN;GMTSMHPE^Y^MHPE^Y^^^Requires Mental Health version 5 or later^MH Physical Exam"
+^GMT(142.1,71,0)="MENTAL HEALTH PHYSICAL EXAM^MAIN;GMTSMHPE^Y^MHPE^Y^P^^DEACTIVATED BY HEALTH SUMMARY PATCH GMTS*2.7*102^MH Physical Exam"
 ^GMT(142.1,71,3.5,0)="^^4^4^2950823^"
 ^GMT(142.1,71,3.5,1,0)="The Mental Health Physical Exam component contains the results of the"
 ^GMT(142.1,71,3.5,2,0)="physical examination concerning patient's overall condition associated"

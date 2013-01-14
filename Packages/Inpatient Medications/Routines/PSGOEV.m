@@ -1,5 +1,5 @@
 PSGOEV ;BIR/CML3-VERIFY (MAKE ACTIVE) ORDERS ; 4/16/10 9:18am
- ;;5.0; INPATIENT MEDICATIONS ;**5,7,15,28,33,50,64,58,77,78,80,110,111,133,171,207,241**;16 DEC 97;Build 10
+ ;;5.0;INPATIENT MEDICATIONS;**5,7,15,28,33,50,64,58,77,78,80,110,111,133,171,207,241,267**;16 DEC 97;Build 158
  ;
  ; Reference to ^ORD(101 supported by DBIA #872.
  ; Reference to ^PS(50.7 supported by DBIA #2180.
@@ -64,7 +64,6 @@ VFY ; change status, move to 55, and change label record
  NEW X S X=0 I $G(PSGONF),(+$G(PSGODDD(1))'<+$G(PSGONF)) S X=1
  I +PSJSYSU=3,PSGORD'["O",$S(X:0,'$P(VND4,"^",9):1,1:$P(VND4,"^",15)) D EN^PSGPEN(+PSGORD)
  S $P(VND4,"^",+PSJSYSU=1+9)=1 S:'$P(VND4,U,+PSJSYSU=3+9) $P(VND4,U,+PSJSYSU=3+9)=+$P(VND4,U,+PSJSYSU=3+9)
- ;S $P(VND4,"^",+PSJSYSU=1+9)=1,$P(VND4,U,+PSJSYSU=3+9)=0
  I PSJSYSL>1 S $P(^PS(55,PSGP,5,+PSGORD,7),U)=PSGDT S:$P(^(7),U,2)="" $P(^(7),U,2)="N"_$S($P(^PS(55,PSGP,5,+PSGORD,0),"^",24)="E":"E",1:"") S PSGTOL=2,PSGUOW=DUZ,PSGTOO=1,DA=+PSGORD D ENL^PSGVDS
  S:$P(VND4,"^",15)&'$P(VND4,"^",16) $P(VND4,"^",15)="" S:$P(VND4,"^",18)&'$P(VND4,"^",19) $P(VND4,"^",18)="" S:$P(VND4,"^",22)&'$P(VND4,"^",23) $P(VND4,"^",22)="" S $P(VND4,"^",PSJSYSU,PSJSYSU+1)=DUZ_"^"_PSGDT,^PS(55,PSGP,5,+PSGORD,4)=VND4
  I '$P(VND4,U,9) S ^PS(55,"APV",PSGP,+PSGORD)=""
@@ -91,6 +90,7 @@ CHK(ND,DRG,ND2) ; checks for data in required fields
  ; Input: ND  - ^(PS(53.1,PSGORD,0)
  ;        DRG - ^(.2)
  ;        ND2 - ^(2)
+ S Y=$G(Y)
  S CHK="" I DRG,$D(^PS(50.7,+DRG,0))
  E  S CHK=1
  I ND="" S CHK=CHK_23
@@ -108,9 +108,10 @@ CHK(ND,DRG,ND2) ; checks for data in required fields
  W $C(7)
  ;
 CHKM ;
- D FULL^VALM1
+ D FULL^VALM1 K:CHK Y
  ; changed to remove ^DD ref
- W !!,"THE FOLLOWING ",$S($L(CHK)>1:"ARE",1:"IS")," EITHER INVALID OR MISSING FROM THIS ORDER:" F X=1:1:7 W:CHK[X !?5,$P("ORDERABLE ITEM^MED ROUTE^SCHEDULE TYPE^SCHEDULE^START DATE/TIME^STOP DATE/TIME^DISPENSE DRUG","^",X)
+ ; PSJ*5*267 VMP Add the 8th condition
+ W !!,"THE FOLLOWING ",$S($L(CHK)>1:"ARE",1:"IS")," EITHER INVALID OR MISSING FROM THIS ORDER:" F X=1:1:8 W:CHK[X !?5,$P("ORDERABLE ITEM^MED ROUTE^SCHEDULE TYPE^SCHEDULE^START DATE/TIME^STOP DATE/TIME^DISPENSE DRUG^DOSAGE ORDERED","^",X)
  I CHK=7 W !,"Orders with no dispense drugs or multiple dispense drugs",!,"require dosage ordered"
  W:CHK]"" !!,$S($L(CHK)>1:"THESE FIELDS ARE",1:"THIS FIELD IS")," NECESSARY FOR VERIFICATION."
  N DIR S DIR(0)="E" D ^DIR I $D(DUOUT)!$D(DTOUT) S CHK=1 Q
@@ -119,7 +120,7 @@ CHKM ;
 CONT() ;
  NEW DIR,DIRUT,Y
  W ! K DIR,DIRUT
- S DIR(0)="Y",DIR("A")="Would you like to continue verifying the order",DIR("B")="Yes"
+ S DIR(0)="Y",DIR("A")="Would you like to continue verifying the order",DIR("B")="No"
  D ^DIR
  Q Y
  ;
@@ -155,4 +156,7 @@ ACTLOG(PSGORDP,DFN,PSGORD)  ;Store 53.1 activity log in local array to be moved 
  . S PSGAL531=$G(^PS(53.1,+PSGORDP,"A",PSGX,0))
  . S QQ=$G(^PS(55,DFN,5,+PSGORD,9,0)) S:QQ="" QQ="^55.09D" F Q=$P(QQ,U,3)+1:1 I '$D(^(Q)) S $P(QQ,U,3,4)=Q_U_Q,^(0)=QQ,PSGXDA=Q Q
  . S ^PS(55,DFN,5,+PSGORD,9,PSGXDA,0)=PSGAL531
+ . N TXTLN S TXTLN="" F  S TXTLN=$O(^PS(53.1,+PSGORDP,"A",PSGX,1,TXTLN)) Q:TXTLN=""  D
+ .. I TXTLN=0 S ^PS(55,DFN,5,+PSGORD,9,PSGXDA,1,TXTLN)=^PS(53.1,+PSGORDP,"A",PSGX,1,TXTLN) Q
+ .. S ^PS(55,DFN,5,+PSGORD,9,PSGXDA,1,TXTLN,0)=^PS(53.1,+PSGORDP,"A",PSGX,1,TXTLN,0)
  Q

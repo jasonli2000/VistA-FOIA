@@ -1,5 +1,5 @@
 FBCHEP1 ;AISC/DMK-EDIT PAYMENT FOR CONTRACT HOSPITAL ;7/8/2003
- ;;3.5;FEE BASIS;**38,61,122,133,108**;JAN 30, 1995;Build 115
+ ;;3.5;FEE BASIS;**38,61,122,133,108,124**;JAN 30, 1995;Build 20
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 EDIT ;ENTRY POINT TO EDIT PAYMENT
  N LASTDX,LASTPROC
@@ -65,6 +65,17 @@ END K DA,DFN,DIC,DIE,DR,FBAAOUT,FBDX,FBI,FBIN,FBLISTC,FBN,FBPROC,FBSTAT,FBVEN,FB
  K FBFPPSC,FBFPPSL,FBADJ,FBADJD,FBRRMK,FBRRMKD
  D END^FBCHDI
  Q
+ ;
+BADDATE(INVRCVDT,TEMPDA) ;Compare edited Invoice Received Date to Treatment Date, reject if before. Called from [FBCH EDIT PAYMENT] template. 
+ I INVRCVDT="" Q 0 ;Inv Date not changed, no check necessary
+ N TDAT,SHODAT S TDAT=$$GET1^DIQ(162.5,TEMPDA_",",6,"I") I TDAT]"" S SHODAT="TO"
+ I TDAT="" S TDAT=$$GET1^DIQ(162.5,TEMPDA_",",5,"I"),SHODAT="FROM"
+ I INVRCVDT<TDAT D  Q 1 ;Reject entered date
+ .N SHOTDAT S SHOTDAT=$E(TDAT,4,5)_"/"_$E(TDAT,6,7)_"/"_$E(TDAT,2,3) ;Convert TDAT into display format for error message 
+ .N MSG1,MSG2 S MSG1="*** Invoice Received Date cannot be before",MSG2=" Treatment "_SHODAT_" Date ("_SHOTDAT_") !!!"
+ .W !!?5,*7,MSG1,!?8,MSG2
+ Q 0 ;Date entered is OK
+ ;
 LAST(FBDA,FBNODE) ; Returns number (0-25) of last code in node for invoice
  D RMVGAP(FBDA,0)  ;Insure that gaps were not created outside normal processes
  N FBI,FBRET,FBX

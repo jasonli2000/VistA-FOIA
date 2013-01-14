@@ -1,5 +1,6 @@
-ONCACDU2 ;Hines OIFO/GWB - Utility routine ;03/09/11
- ;;2.11;Oncology;**12,18,20,21,22,24,26,27,29,30,31,32,34,36,37,38,39,41,46,47,49,50,51,52,53**;Mar 07, 1995;Build 31
+ONCACDU2 ;Hines OIFO/GWB - Utility routine ;05/03/12
+ ;;2.11;Oncology;**12,18,20,21,22,24,26,27,29,30,31,32,34,36,37,38,39,41,46,47,49,50,51,52,53,56**;Mar 07, 1995;Build 10
+ ;rvd - 05/03/12 p56.  Use ICD API (#3990) instead of direct global read.
  ;
 VAFLD(ACDANS) ;Convert data to NAACCR format
  I ACDANS="N" S ACDANS=0
@@ -49,11 +50,13 @@ WORD(IEN,NODE,LEN) ;Get word processing data
  N X
  S X=""
  I $D(^ONCO(165.5,IEN,NODE,0)) D
- .N CNT,LINE
+ .N CNT,LINE,ONCLINE
  .S CNT=0
- .S LINE=""
- .F  S CNT=$O(^ONCO(165.5,IEN,NODE,CNT)) Q:CNT<1  D  Q:($L(LINE)>LEN)
+ .S (LINE,ONCLINE)=""
+ .F  S CNT=$O(^ONCO(165.5,IEN,NODE,CNT)) Q:CNT<1  D  Q:($L(ONCLINE)>LEN)
  ..Q:'$D(^ONCO(165.5,IEN,NODE,CNT,0))
+ ..S ONCLINE=LINE_^ONCO(165.5,IEN,NODE,CNT,0)_" "
+ ..I ($L(ONCLINE)>LEN) S LINE=$E(ONCLINE,1,LEN) Q
  ..S LINE=LINE_^ONCO(165.5,IEN,NODE,CNT,0)_" "
  .S X=LINE
  S X=$TR(X,$C(10,12,13),"   ")
@@ -218,7 +221,7 @@ CSTST(ACD160) ;
  ;
 ICD(ICD) ;ICD Code
  N X
- S ICD=$S(ICD'="":$P($G(^ICD9(ICD,0)),U),1:"0000")
+ S ICD=$S(ICD'="":$P($$ICDDX^ICDCODE(ICD),U,2),1:"0000")
  I ICD["." S ICD=$P(ICD,".")_$P(ICD,".",2)
  S:$L(ICD)=3 ICD=ICD_9
  S:$L(ICD)<4 ICD=$E("0000",1,4-$L(ICD))_ICD

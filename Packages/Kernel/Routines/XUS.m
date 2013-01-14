@@ -1,5 +1,6 @@
-XUS ;SFISC/STAFF - SIGNON ;2/13/07  14:44
- ;;8.0;KERNEL;**16,26,49,59,149,180,265,337,419,434**;Jul 10, 1995;Build 6
+XUS ;SFISC/STAFF - SIGNON ;11/29/2011
+ ;;8.0;KERNEL;**16,26,49,59,149,180,265,337,419,434,584**;Jul 10, 1995;Build 6
+ ;Per VHA Directive 2004-038, this routine should not be modified
  ;Sign-on message numbers are 30810.51 to 30810.99
  S U="^" D INTRO^XUS1A()
  K  K ^XUTL("ZISPARAM",$I)
@@ -92,9 +93,9 @@ CHECKAV(X1) ;Check A/V code return DUZ or Zero. (Called from XUSRB)
  S X1=$$UP(X1) S:X1[":" XUTT=1,X1=$TR(X1,":")
  S X=$P(X1,";") Q:X="^" -1 S:XUF %1="Access: "_X
  Q:X'?1.20ANP 0
- S X=$$EN^XUSHSH(X) I '$D(^VA(200,"A",X)) D LBAV Q 0
+ S X=$$EN^ROUTINE(X) I '$D(^VA(200,"A",X)) D LBAV Q 0
  S %1="",IEN=$O(^VA(200,"A",X,0)),XUF(.3)=IEN D USER(IEN)
- S X=$P(X1,";",2) S:XUF %1="Verify: "_X S X=$$EN^XUSHSH(X)
+ S X=$P(X1,";",2) S:XUF %1="Verify: "_X S X=$$EN^ROUTINE(X)
  I $P(XUSER(1),"^",2)'=X D LBAV Q 0
  I $G(XUFAC(1)) S DIK="^XUSEC(4,",DA=XUFAC(1) D ^DIK
  Q IEN
@@ -107,8 +108,8 @@ USER(IX) ;Build XUSER
  S XUSER(0)=$G(^VA(200,+IX,0)),XUSER(1)=$G(^(.1)),XUSER(1.1)=$G(^(1.1))
  Q
  ;
-XUVOL ;Setup XUENV, XUCI,XQVOL,XUVOL
- S U="^" D GETENV^%ZOSV S XUENV=Y,XUCI=$P(Y,U,1),XQVOL=$P(Y,U,2)
+XUVOL ;Setup XUENV, XUCI,XQVOL,XUVOL,XUOSVER
+ S U="^" D GETENV^%ZOSV S XUENV=Y,XUCI=$P(Y,U,1),XQVOL=$P(Y,U,2),XUOSVER=$$VERSION^%ZOSV
  S X=$O(^XTV(8989.3,1,4,"B",XQVOL,0)),XUVOL=$S(X>0:^XTV(8989.3,1,4,X,0),1:XQVOL_"^y^1")
  Q
  ;

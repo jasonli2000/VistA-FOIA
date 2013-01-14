@@ -1,5 +1,5 @@
 PSJOEA2 ;BIR/MLM-INPATIENT ORDER ENTRY ; 5/11/09 7:50am
- ;;5.0; INPATIENT MEDICATIONS ;**127,133,200**;16 DEC 97;Build 14
+ ;;5.0;INPATIENT MEDICATIONS;**127,133,200,267**;16 DEC 97;Build 158
  ;
  ; Reference to ^PS(55 is supported by DBIA #2191.
  ; Reference to ^PSSLOCK is supported by DBIA #2789.
@@ -9,6 +9,7 @@ CHK ;Check to be sure all the orders in the complex order series are completed, 
  .S PSGP=$P(PSGND,"^",15)
  .I $P(PSGND,U,4)="U",$P(PSGND,U,9)="A",($P(PSGND,U,24)'="R") D ^PSGOT D  Q
  ..M ^PS(55,PSGP,5,+PSGORD,4)=^PS(53.1,PSJO,4)
+ ..M ^PS(55,PSGP,5,+PSGORD,15)=^PS(53.1,PSJO,15)
  ..N PSGND2P5 S PSGND2P5=$G(^PS(53.1,+PSJO,2.5)),DUR=$P(PSGND2P5,"^",2) I $G(DUR)]"" N DA,DR,DIE S DIE="^PS(55,"_PSGP_",5,",DA(1)=PSGP,DA=+PSGORD,DR="126////"_$G(DUR) D ^DIE
  ..D ACTLOG^PSJOEA(PSJO,PSGP,PSGORD)
  ..S VND4=$G(^PS(55,PSGP,5,+PSGORD,4))

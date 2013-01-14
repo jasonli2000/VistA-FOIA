@@ -1,5 +1,5 @@
 FBNHEDPA ;AISC/GRR-EDIT PAYMENT FOR COMMUNITY NURSING HOME ;7/8/2003
- ;;3.5;FEE BASIS;**61**;JAN 30, 1995
+ ;;3.5;FEE BASIS;**61,124**;JAN 30, 1995;Build 20
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
 EDIT ;ENTRY POINT TO EDIT PAYMENT
  S IOP=$S($D(ION):ION,1:"HOME") D ^%ZIS K IOP
@@ -37,3 +37,21 @@ END K DA,DFN,DIC,DIE,DR,FBAAOUT,FBDX,FBI,FBIN,FBLISTC,FBN,FBPROC,FBSTAT,FBVEN,FB
  K FBADJ,FBADJL,FBRRMK,FBRRMKL,FBFPPSC,FBFPPSL
  D KILL^FBPAY K FBOLD,FBINODE,FBPAT,FBPRGNAM
  Q
+ ;
+BADDATE(INVRCVDT,TEMPDA) ;Compare edited Invoice Received Date to Treatment Date, reject if before 
+ I INVRCVDT="" Q 0 ;Inv Date not changed, no check necessary
+ N TDAT,SHODAT S TDAT=$$GET1^DIQ(162.5,TEMPDA_",",6,"I") I TDAT]"" S SHODAT="TO"
+ I TDAT="" S TDAT=$$GET1^DIQ(162.5,TEMPDA_",",5,"I"),SHODAT="FROM"
+ I INVRCVDT<TDAT D  Q 1 ;Reject entered date
+ .N SHOTDAT S SHOTDAT=$E(TDAT,4,5)_"/"_$E(TDAT,6,7)_"/"_$E(TDAT,2,3) ;Convert TDAT into display format for error message 
+ .N MSG1,MSG2 S MSG1="*** Invoice Received Date cannot be before",MSG2=" Treatment "_SHODAT_" Date ("_SHOTDAT_") !!!"
+ .W !!?5,*7,MSG1,!?8,MSG2
+ Q 0 ;Date entered is OK
+ ;
+BADTDATE(TDAT,INVRCVDT,SHODAT) ;Compare edited Treatment TO or FROM Date to Invoice Received Date, reject if AFTER 
+ I INVRCVDT<TDAT D  Q 1 ;Reject entered date
+ .N SHOIRDAT S SHOIRDAT=$E(INVRCVDT,4,5)_"/"_$E(INVRCVDT,6,7)_"/"_$E(INVRCVDT,2,3) ;Convert INVRCVDT into display format for error message 
+ .N MSG1,MSG2 S MSG1="*** Treatment "_SHODAT_" Date cannot be after",MSG2=" Invoice Received Date ("_SHOIRDAT_") !!!"
+ .W !!?5,*7,MSG1,!?8,MSG2
+ Q 0 ;Date entered is OK
+ ;

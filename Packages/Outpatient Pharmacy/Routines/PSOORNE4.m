@@ -1,6 +1,8 @@
 PSOORNE4 ;BIR/SAB-display renew RXs from backdoor ;07/29/96
- ;;7.0;OUTPATIENT PHARMACY;**11,27,32,36,46,75,96,103,99,117,131,225**;DEC 1997;Build 29
+ ;;7.0;OUTPATIENT PHARMACY;**11,27,32,36,46,75,96,103,99,117,131,225,386**;DEC 1997;Build 4
  ;^SC DBIA-10040;^PS(50.7-2223;^PS(50.606-2174;^PS(50.607-2221;^PS(51.2-2226;^PSDRUG-221;^PS(55-2228
+ ;External reference to EN1^ORCFLAG supported by DBIA 3620
+ ;
 EN(PSONEW) N FLD,LST,VALMCNT
 EN1 K PSOQUIT D:$G(PSONEW("ENT"))'>0  I $G(PSORENW("POE"))=1 S PSOREEDT=1 D SV
  .S PSOREEDT=1 D SV
@@ -16,7 +18,24 @@ EDTSEL S PSOLM=1,(PSONEW("DFLG"),PSONEW("FIELD"),PSONEW3)=0
  .F FLD=1:1:$L(LST,",") Q:$P(LST,",",FLD)']""  D @(+$P(LST,",",FLD)) Q:$G(PSODIR("DFLG"))!($G(PSODIR("QFLG")))
  E  S VALMBCK="" D FULL^VALM1
  Q
-ACP I $G(PKI1)=1 D REA^PSOPKIV1 G:$G(PSONEW("QFLG"))=1 PKI
+ACP ; Renewal Accept
+ N DIR,Y,DIRUT,DUOUT,DTOUT,DIR S Y=0
+ I $G(ORD),+$P($G(^PS(52.41,+ORD,0)),"^",23)=1 D  Q:$D(DIRUT)!'Y  D EN1^ORCFLAG(+$P($G(^PS(52.41,ORD,0)),"^")) H 1
+ . D FULL^VALM1
+ . I '$D(^XUSEC("PSORPH",DUZ)) D  S Y=0 Q
+ . . S DIR("A",1)="Order must be unflagged by a pharmacist before it can be finished."
+ . . S DIR("A",2)=""
+ . . S DIR(0)="E",DIR("A")="Enter RETURN to continue" W !,$C(7) D ^DIR
+ . . S VALMBCK="R"
+ . D FULL^VALM1
+ . S DIR("A",1)="This Order is flagged. In order to finish it"
+ . S DIR("A",2)="you must unflag it first."
+ . S DIR("A",3)=""
+ . S DIR(0)="Y",DIR("A")="Unflag Order",DIR("B")="NO"
+ . W ! D ^DIR I $D(DIRUT)!'Y S VALMBCK="Q"
+ I $G(ORD),+$P($G(^PS(52.41,+ORD,0)),"^",23)=1 Q
+ ;
+ I $G(PKI1)=1 D REA^PSOPKIV1 G:$G(PSONEW("QFLG"))=1 PKI
  D INST2^PSORENW S PSOFROM1=1 D:$D(^XUSEC("PSORPH",DUZ))!('$P(PSOPAR,"^",2)) VER
  K PSOFROM1
 PKI I $G(PSONEW("QFLG")) S POERR("DFLG")=1,VALMBCK="R" K PSONEW2 Q

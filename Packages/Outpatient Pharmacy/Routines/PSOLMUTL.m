@@ -1,5 +1,5 @@
 PSOLMUTL ;BIR/SAB - listman utilities ;03/07/95
- ;;7.0;OUTPATIENT PHARMACY;**19,46,84,99,131,132,148,268,225,305**;DEC 1997;Build 8
+ ;;7.0;OUTPATIENT PHARMACY;**19,46,84,99,131,132,148,268,225,305,386**;DEC 1997;Build 4
  ;External reference FULL^VALM1 supported by dbia 10116
  ;External reference $$SETSTR^VALM1 supported by dbia 10116
  ;External reference EN2^GMRAPEMO supported by dbia 190
@@ -82,6 +82,12 @@ ACTIONS1() ;screen actions on pending orders
  Q 1
 PKIACT() ;screen actions on pending orders DEA/PKI proj.
  Q:$G(PKI1)=2 0
+ N DIC,X,Y K DIC,Y S DIC="^ORD(101,"_DA(1)_",10,",X=DA,DIC(0)="ZN" D ^DIC Q:Y<0 0
+ S Y=Y(0,0)
+ I Y="PSO LM DISCONTINUE" Q $S(PSOACT["D":1,1:0)
+ I Y="PSO LM RENEW EDIT" Q $S(PSOACT["E":1,1:0)
+ I Y="PSO LM FLAG",'$G(PSOFDR) Q 0
+ I Y="PSO LM FLAG",$G(PSOFDR) Q $S(PSOACT["X":1,1:0)
  Q 1
 RFDSP ;screen action to toggle display of prescriptions between LAST FILL date and LAST RELEASE Date.
  S PSORFG='$G(PSORFG)

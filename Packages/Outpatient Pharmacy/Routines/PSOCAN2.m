@@ -1,5 +1,5 @@
-PSOCAN2 ;BHAM ISC/JMB - rx cancel with speed ability drug check ;10/23/06 11:30am
- ;;7.0;OUTPATIENT PHARMACY;**8,18,62,46,88,164,235,148,259,281,287,251,375,379**;DEC 1997;Build 28
+PSOCAN2 ;BHAM ISC/JMB - rx cancel with speed ability drug check ; 2/16/12 3:40pm
+ ;;7.0;OUTPATIENT PHARMACY;**8,18,62,46,88,164,235,148,259,281,287,251,375,379,396**;DEC 1997;Build 5
  ;External reference to ^PSDRUG supported by DBIA 221
  ;External reference to $$DS^PSSDSAPI supported by DBIA 5425
 REINS N DODR,ORN
@@ -37,13 +37,15 @@ ACT W ! F I=1:1:80 W "="
  W !?3,"Prescription #",RX_": "
  W !?6,$S('RFCNT:"  Filled",1:"  Refilled # "_LREF)_": "_XFDT,"  Printed: "_$S(LREF=RFCNT:XLPDT,1:""),"  Released: "_$G(XRELDT),!
  I FDT<DT D
- .Q:$$FIND^PSOREJUT(RXIEN)  ;No label for Rx's with claims rejects
- .Q:PSOTRIC&($$STATUS^PSOBPSUT(RXIEN,RFCNT)'["PAYABLE")  ;No labels for Tricare non-payable/in progress Rx
+ .Q:$$FIND^PSOREJUT(RXIEN)  ;No label for Rx's with unresolved claims rejects
+ .Q:PSOTRIC&($$STATUS^PSOBPSUT(RXIEN,RFCNT)["IN PROGRESS")  ;No labels for TRICARE/CHAMPVA in progress Rx *396
+ .I PSOTRIC,$P($G(^PSRX(RXIEN,"STA")),"^")=12 Q  ;No label for TRICARE/CHAMPVA if discontinued via Reject Notification screen *396
  .S DIR("A")="     ** Do you want to print the label now",DIR("B")="N",DIR(0)="Y",DIR("?")="Enter 'Y' to print the label now.  If 'N' is entered, the label may be reprinted through reprint at a later date."
  .D ^DIR K DIR Q:$G(DIRUT)!('Y)  S PPL=RXIEN D Q^PSORXL Q
  I FDT=DT D
- . Q:$$FIND^PSOREJUT(RXIEN)
- . Q:PSOTRIC&($$STATUS^PSOBPSUT(RXIEN,RFCNT)'["PAYABLE")
+ . Q:$$FIND^PSOREJUT(RXIEN)  ;No label for Rx's with unresolved claims rejects
+ . Q:PSOTRIC&($$STATUS^PSOBPSUT(RXIEN,RFCNT)["IN PROGRESS")  ;No labels for TRICARE/CHAMPVA in progress Rx *396
+ . I PSOTRIC,$P($G(^PSRX(RXIEN,"STA")),"^")=12 Q  ;No label for TRICARE/CHAMPVA if discontinued via Reject Notification screen *396
  . W !?5,"Either print the label using the reprint option "
  . W !?7,"or check later to see if the label has been printed." D WAIT^PSODRG Q
  I FDT>DT&('$G(DODR)) W !?5,"Placing Rx on suspense.  Please wait..." D SUS
@@ -142,7 +144,8 @@ LOG K ACNT F SUB=0:0 S SUB=$O(^PSRX(DA,"A",SUB)) Q:'SUB  S ACNT=$G(ACNT)+1
  S ACNT=$G(ACNT)+1
  D NOW^%DTC S ^PSRX(DA,"A",0)="^52.3DA^"_ACNT_"^"_ACNT S ^PSRX(DA,"A",ACNT,0)=%_"^R^"_DUZ_"^"_RFCNT_"^"_ACOM
  K ^PSRX("APSOD",PSODFN,DA),ACNT,RFCNT,RF,%
- S $P(^PSRX(DA,3),"^")=$P(^PSRX(DA,3),"^",5),$P(^(3),"^",2)=$P(^(3),"^",8)
+ I $P(^PSRX(DA,3),"^",10) S $P(^PSRX(DA,3),"^")=$P(^PSRX(DA,3),"^",10) ;*396
+ S $P(^PSRX(DA,3),"^",2)=$P(^PSRX(DA,3),"^",8)
  S $P(^PSRX(DA,3),"^",5)="",$P(^(3),"^",8)=""
  Q
 NVER ;Called from PSOCAN3, needs DA defined

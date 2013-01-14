@@ -1,5 +1,5 @@
 PSODGAL1 ;BIR/LC,SAB-enhanced DRUG ALLERGY REACTION CHECKING ;12/09/07  02:22
- ;;7.0;OUTPATIENT PHARMACY;**251**;DEC 1997;Build 202
+ ;;7.0;OUTPATIENT PHARMACY;**251,401**;DEC 1997;Build 10
  ;External reference to ^GMRADPT supported by DBIA 10099
  ;External reference to ORCHK^GMRAOR supported by DBIA 2378
  ;External reference to $P(^GMR(120.8,LP,3),"^",3) supp. by DBIA 2214
@@ -9,20 +9,20 @@ PSODGAL1 ;BIR/LC,SAB-enhanced DRUG ALLERGY REACTION CHECKING ;12/09/07  02:22
  ;External reference to ^TMP("GMRAOC" supported by DBIA 4848
  ;External reference to ^XUSEC("PSORPH" supported by DBIA 10076
  ;
- N PSOACK,DFN K ^TMP($J,"PSODRCLS"),DSPLQ S DFN=PSODFN
+ N PSOACK,DFN K ^TMP($J,"PSODRCLS"),DSPLQ,PSOMDC S DFN=PSODFN
  I $D(PSODRUG("NDF")) S NDF=$P(PSODRUG("NDF"),"A"),TYP=$P(PSODRUG("NDF"),"A",2),PTR=NDF_"."_TYP
  I $G(NDF) D CHK K NDF,PTR,TYP
  I '$G(NDF) D CHK1
  I $D(PSODRUG("VA CLASS")) D CLASS
  ;I $G(PSOACK)=1!$G(^TMP($J,"PSODRCLS",0))]"" D
  I $G(PSOACK)=1!$O(^TMP($J,"PSODRCLS",0)) D
- .I '$D(^XUSEC("PSORPH",DUZ)) K DIR S DIR(0)="E",DIR("?")="Press Return to continue",DIR("A")="Press Return to continue" D ^DIR K DIR,DUOUT,DIRUT Q
+ .I '$D(^XUSEC("PSORPH",DUZ)),'$D(PSOMDC) K DIR S DIR(0)="E",DIR("?")="Press Return to continue",DIR("A")="Press Return to continue" D ^DIR K DIR,DUOUT,DIRUT Q
  .S DIR("?",1)="Answer 'YES' if you DO want to enter a intervention for this medication,"
  .S DIR("?")="       'NO' if you DON'T want to enter a intervention for this medication,"
  .S DIR(0)="Y",DIR("A")="Do you want to Intervene? ",DIR("B")="Y" W ! D ^DIR
  .Q:'Y  D ^PSORXI
  K DIR,DTOUT,DIRUT,DIROUT,DUOUT,Y,DSPLQ
- K PSOACK,GMRAING,I,APTR,GMRA,GMRAL,LP
+ K PSOACK,GMRAING,I,APTR,GMRA,GMRAL,LP,PSOMDC
  K ^TMP($J,"PSODRCLS")
  Q
  ;
@@ -81,7 +81,14 @@ DRCL(DFN) ;
  N RET S RET=0 K GMRADRCL D GETDATA^GMRAOR(DFN)
  Q:'$D(^TMP("GMRAOC",$J,"APC")) 0
  N GMRACL S GMRACL="" F  S GMRACL=$O(^TMP("GMRAOC",$J,"APC",GMRACL)) Q:'$L(GMRACL)  D
- .N GMRANM,GMRALOC S GMRALOC=^TMP("GMRAOC",$J,"APC",GMRACL),GMRANM=$P(^PS(50.605,+$O(^PS(50.605,"B",GMRACL,0)),0),U,2)
+ .N GMRANM,GMRALOC S GMRALOC=^TMP("GMRAOC",$J,"APC",GMRACL) I '$O(^PS(50.605,"B",GMRACL,0)) S PSOMDC(GMRACL)="" Q
+ .S GMRANM=$P(^PS(50.605,+$O(^PS(50.605,"B",GMRACL,0)),0),U,2)
  .S GMRADRCL(GMRACL)=GMRACL_U_GMRANM_" ("_GMRALOC_")",RET=RET+1
+ I $D(PSOMDC) D
+ .W !!,"Warning: The following drug class does not exist in the VA DRUG CLASS"
+ .W !,"file (#50.605). Please do a manual Drug-Allergy order check and notify"
+ .W !,"the pharmacy ADPAC for follow up.",!
+ .S PSOMDC="" F  S PSOMDC=$O(PSOMDC(PSOMDC)) Q:PSOMDC=""  W !,"VA Drug Class: "_PSOMDC
+ .W ! S DIR("A")="Press Return to continue",DIR(0)="E",DIR("?")="Press Return to continue" D ^DIR K DIR W !
  K ^TMP("GMRAOC",$J)
  Q RET

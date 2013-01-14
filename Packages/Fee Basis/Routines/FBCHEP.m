@@ -1,5 +1,5 @@
 FBCHEP ;AISC/DMK-ENTER PAYMENT FOR CONTRACT HOSPITAL ;8/18/2004
- ;;3.5;FEE BASIS;**4,61,77,82,122,108**;JAN 30, 1995;Build 115
+ ;;3.5;FEE BASIS;**4,61,77,82,122,108,124**;JAN 30, 1995;Build 20
  ;;Per VHA Directive 10-93-142, this routine should not be modified.
  S FBAAPTC="V",FBAAOUT=0
 RD K FBAAID,FBAAVID S FBRESUB="" D GETVET^FBAAUTL1 G:DFN']"" Q
@@ -28,7 +28,7 @@ BAT S DIC="^FBAA(161.7,",DIC(0)="AEQMZ",DIC("S")="I $P(^(0),U,3)=""B9""&($P(^(0)
  S FBINC=$S($P(FBY(0),"^",10)="":0,1:$P(FBY(0),"^",10)),FBLN=$S($P(FBY(0),"^",11)="":0,1:$P(FBY(0),"^",11))
 GETNXI D GETNXI^FBAAUTL
  W !!,"Invoice # ",FBAAIN," assigned to this Invoice"
-RIN D GETINDT^FBAACO1 G Q:$G(FBAAOUT)
+RIN S CALLERID="FBCHEP" D GETINDT^FBAACO1 K CALLERID G Q:$G(FBAAOUT)
  ; ask patient control number
  S FBCSID=$$ASKPCN^FBUTL5() I FBCSID="^" G Q
  ; if U/C then get FPPS Claim ID else ask user
