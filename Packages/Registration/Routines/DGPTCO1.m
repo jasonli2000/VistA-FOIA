@@ -1,5 +1,5 @@
-DGPTCO1 ;ALB/MJK - Census Status Report ; 5/2/05 2:41pm
- ;;5.3;Registration;**136,383,432,696,729,839**;Aug 13, 1993;Build 3
+DGPTCO1 ;ALB/MJK - Census Status Report ; 4/18/2012 12:00pm
+ ;;5.3;Registration;**136,383,432,696,729,839,260001**;Aug 13, 1993;Build 7
  ;
 EN D CHKCUR W ! D DATE
  S DIC("A")="Generate PTF Census Status Report for Census date: ",DIC="^DG(45.86,",DIC(0)="AEMQ" S:Y]"" DIC("B")=Y
@@ -114,7 +114,7 @@ CHKCUR ; -- checks if new PTF Census Date record is needed
  I 'DGCLOSE S ERR=1 D ERR Q
  I $P($G(^DG(45.86,DGIEN,0)),U)<3070930 D
  . I $E(DGCLOSE,6,7)'=19 S ERR=1
- I $P($G(^DG(45.86,DGIEN,0)),U)>3070930&($P($G(^DG(45.86,DGIEN,0)),U)<=3101231) D
+ I $P($G(^DG(45.86,DGIEN,0)),U)>3070930&($P($G(^DG(45.86,DGIEN,0)),U)'>3101231) D
  . I $E(DGCLOSE,6,7)'=14 S ERR=1
  I $P($G(^DG(45.86,DGIEN,0)),U)>3101231 D
  . I $E(DGCLOSE,6,7)'="07" S ERR=1
