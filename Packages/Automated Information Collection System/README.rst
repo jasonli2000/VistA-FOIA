@@ -1,6 +1,6 @@
-=====================================
-VistA : AUTOMATED INFO COLLECTION SYS
-=====================================
+====================================
+VistA: AUTOMATED INFO COLLECTION SYS
+====================================
 
 This directory holds M routines and globals for a VistA package.
 

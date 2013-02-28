@@ -1,6 +1,6 @@
-===================
-VistA : DRG GROUPER
-===================
+==================
+VistA: DRG GROUPER
+==================
 
 This directory holds M routines and globals for a VistA package.
 

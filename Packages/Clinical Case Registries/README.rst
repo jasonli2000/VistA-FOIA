@@ -1,6 +1,6 @@
-================================
-VistA : CLINICAL CASE REGISTRIES
-================================
+===============================
+VistA: CLINICAL CASE REGISTRIES
+===============================
 
 This directory holds M routines and globals for a VistA package.
 

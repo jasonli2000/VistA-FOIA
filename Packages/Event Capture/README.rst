@@ -1,6 +1,6 @@
-=====================
-VistA : EVENT CAPTURE
-=====================
+====================
+VistA: EVENT CAPTURE
+====================
 
 This directory holds M routines and globals for a VistA package.
 

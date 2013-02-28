@@ -1,6 +1,6 @@
-=======================
-VistA : LEXICON UTILITY
-=======================
+======================
+VistA: LEXICON UTILITY
+======================
 
 This directory holds M routines and globals for a VistA package.
 

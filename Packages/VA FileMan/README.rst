@@ -1,6 +1,6 @@
-==================
-VistA : VA FILEMAN
-==================
+=================
+VistA: VA FILEMAN
+=================
 
 This directory holds M routines and globals for a VistA package.
 

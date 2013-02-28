@@ -1,6 +1,6 @@
-===========================
-VistA : ACCOUNTS RECEIVABLE
-===========================
+==========================
+VistA: ACCOUNTS RECEIVABLE
+==========================
 
 This directory holds M routines and globals for a VistA package.
 

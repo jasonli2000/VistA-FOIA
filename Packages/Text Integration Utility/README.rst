@@ -1,6 +1,6 @@
-==================================
-VistA : TEXT INTEGRATION UTILITIES
-==================================
+=================================
+VistA: TEXT INTEGRATION UTILITIES
+=================================
 
 This directory holds M routines and globals for a VistA package.
 

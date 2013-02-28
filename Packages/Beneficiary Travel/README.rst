@@ -1,6 +1,6 @@
-==========================
-VistA : BENEFICIARY TRAVEL
-==========================
+=========================
+VistA: BENEFICIARY TRAVEL
+=========================
 
 This directory holds M routines and globals for a VistA package.
 

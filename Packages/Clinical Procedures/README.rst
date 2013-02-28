@@ -1,6 +1,6 @@
-===========================
-VistA : CLINICAL PROCEDURES
-===========================
+==========================
+VistA: CLINICAL PROCEDURES
+==========================
 
 This directory holds M routines and globals for a VistA package.
 

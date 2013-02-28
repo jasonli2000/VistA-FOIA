@@ -1,6 +1,6 @@
-==============================
-VistA : EEO COMPLAINT TRACKING
-==============================
+=============================
+VistA: EEO COMPLAINT TRACKING
+=============================
 
 This directory holds M routines and globals for a VistA package.
 

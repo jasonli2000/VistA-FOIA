@@ -1,6 +1,6 @@
-======================
-VistA : WOMEN'S HEALTH
-======================
+=====================
+VistA: WOMEN'S HEALTH
+=====================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-=================================================
-VistA : EMERGENCY DEPARTMENT INTEGRATION SOFTWARE
-=================================================
+================================================
+VistA: EMERGENCY DEPARTMENT INTEGRATION SOFTWARE
+================================================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-===============================
-VistA : FUNCTIONAL INDEPENDENCE
-===============================
+==============================
+VistA: FUNCTIONAL INDEPENDENCE
+==============================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-=====================================
-VistA : AUTO REPLENISHMENT/WARD STOCK
-=====================================
+====================================
+VistA: AUTO REPLENISHMENT/WARD STOCK
+====================================
 
 This directory holds M routines and globals for a VistA package.
 

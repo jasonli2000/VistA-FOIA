@@ -1,6 +1,6 @@
-==================================
-VistA : PCE PATIENT CARE ENCOUNTER
-==================================
+=================================
+VistA: PCE PATIENT CARE ENCOUNTER
+=================================
 
 This directory holds M routines and globals for a VistA package.
 

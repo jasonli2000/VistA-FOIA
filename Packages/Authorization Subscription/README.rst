@@ -1,6 +1,6 @@
-==================================
-VistA : AUTHORIZATION/SUBSCRIPTION
-==================================
+=================================
+VistA: AUTHORIZATION/SUBSCRIPTION
+=================================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-================================
-VistA : CONSULT/REQUEST TRACKING
-================================
+===============================
+VistA: CONSULT/REQUEST TRACKING
+===============================
 
 This directory holds M routines and globals for a VistA package.
 

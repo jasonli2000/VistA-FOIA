@@ -1,6 +1,6 @@
-==========================
-VistA : INCIDENT REPORTING
-==========================
+=========================
+VistA: INCIDENT REPORTING
+=========================
 
 This directory holds M routines and globals for a VistA package.
 

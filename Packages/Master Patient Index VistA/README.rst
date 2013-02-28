@@ -1,6 +1,6 @@
-==================================
-VistA : MASTER PATIENT INDEX VISTA
-==================================
+=================================
+VistA: MASTER PATIENT INDEX VISTA
+=================================
 
 This directory holds M routines and globals for a VistA package.
 

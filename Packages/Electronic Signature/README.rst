@@ -1,6 +1,6 @@
-============================
-VistA : ELECTRONIC SIGNATURE
-============================
+===========================
+VistA: ELECTRONIC SIGNATURE
+===========================
 
 This directory holds M routines and globals for a VistA package.
 
@@ -17,10 +17,11 @@ Documentation for this package is available in the `VistA Document Library`_.
 ------------
 VA Gold Disk
 ------------
+US DVA sites standardize this package on the following routine checksums.
 
-.. csv-table:: 
-   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
+.. csv-table::
+   :header:  "Routine Source", "VA Checksum", "Current Checksum"
 
-   `XOBESIG <Routines/XOBESIG.m>`__,35924230,|check|
+   `<Routines/XOBESIG.m>`__,35924230,|check|
 
 .. |check| unicode:: U+2713

@@ -1,6 +1,6 @@
-==========================
-VistA : VISTALINK SECURITY
-==========================
+=========================
+VistA: VISTALINK SECURITY
+=========================
 
 This directory holds M routines and globals for a VistA package.
 

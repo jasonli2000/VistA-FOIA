@@ -1,6 +1,6 @@
-===============================
-VistA : NETWORK HEALTH EXCHANGE
-===============================
+==============================
+VistA: NETWORK HEALTH EXCHANGE
+==============================
 
 This directory holds M routines and globals for a VistA package.
 

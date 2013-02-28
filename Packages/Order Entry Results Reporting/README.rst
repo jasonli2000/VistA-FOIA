@@ -1,6 +1,6 @@
-=====================================
-VistA : ORDER ENTRY/RESULTS REPORTING
-=====================================
+====================================
+VistA: ORDER ENTRY/RESULTS REPORTING
+====================================
 
 This directory holds M routines and globals for a VistA package.
 

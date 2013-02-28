@@ -1,6 +1,6 @@
-================================
-VistA : INTEGRATED PATIENT FUNDS
-================================
+===============================
+VistA: INTEGRATED PATIENT FUNDS
+===============================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-========================================
-VistA : PATIENT ASSESSMENT DOCUMENTATION
-========================================
+=======================================
+VistA: PATIENT ASSESSMENT DOCUMENTATION
+=======================================
 
 This directory holds M routines and globals for a VistA package.
 

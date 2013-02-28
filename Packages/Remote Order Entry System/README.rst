@@ -1,6 +1,6 @@
-=================================
-VistA : REMOTE ORDER/ENTRY SYSTEM
-=================================
+================================
+VistA: REMOTE ORDER/ENTRY SYSTEM
+================================
 
 This directory holds M routines and globals for a VistA package.
 

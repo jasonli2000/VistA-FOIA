@@ -1,6 +1,6 @@
-==============
-VistA : ASISTS
-==============
+=============
+VistA: ASISTS
+=============
 
 This directory holds M routines and globals for a VistA package.
 

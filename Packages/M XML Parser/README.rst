@@ -1,6 +1,6 @@
-====================
-VistA : M XML PARSER
-====================
+===================
+VistA: M XML PARSER
+===================
 
 This directory holds M routines and globals for a VistA package.
 

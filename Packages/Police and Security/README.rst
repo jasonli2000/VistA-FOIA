@@ -1,6 +1,6 @@
-=========================
-VistA : POLICE & SECURITY
-=========================
+========================
+VistA: POLICE & SECURITY
+========================
 
 This directory holds M routines and globals for a VistA package.
 

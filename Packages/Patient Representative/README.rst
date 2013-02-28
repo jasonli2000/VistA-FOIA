@@ -1,6 +1,6 @@
-==============================
-VistA : PATIENT REPRESENTATIVE
-==============================
+=============================
+VistA: PATIENT REPRESENTATIVE
+=============================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-===============
-VistA : LIBRARY
-===============
+==============
+VistA: LIBRARY
+==============
 
 This directory holds M routines and globals for a VistA package.
 

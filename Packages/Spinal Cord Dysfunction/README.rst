@@ -1,6 +1,6 @@
-===============================
-VistA : SPINAL CORD DYSFUNCTION
-===============================
+==============================
+VistA: SPINAL CORD DYSFUNCTION
+==============================
 
 This directory holds M routines and globals for a VistA package.
 

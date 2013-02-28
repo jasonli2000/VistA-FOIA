@@ -1,6 +1,6 @@
-====================================
-VistA : PHARMACY BENEFITS MANAGEMENT
-====================================
+===================================
+VistA: PHARMACY BENEFITS MANAGEMENT
+===================================
 
 This directory holds M routines and globals for a VistA package.
 

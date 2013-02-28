@@ -1,6 +1,6 @@
-=================
-VistA : FEE BASIS
-=================
+================
+VistA: FEE BASIS
+================
 
 This directory holds M routines and globals for a VistA package.
 

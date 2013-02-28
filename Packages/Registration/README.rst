@@ -1,6 +1,6 @@
-====================
-VistA : REGISTRATION
-====================
+===================
+VistA: REGISTRATION
+===================
 
 This directory holds M routines and globals for a VistA package.
 

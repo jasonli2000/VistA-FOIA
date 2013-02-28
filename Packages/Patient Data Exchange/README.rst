@@ -1,6 +1,6 @@
-=============================
-VistA : PATIENT DATA EXCHANGE
-=============================
+============================
+VistA: PATIENT DATA EXCHANGE
+============================
 
 This directory holds M routines and globals for a VistA package.
 

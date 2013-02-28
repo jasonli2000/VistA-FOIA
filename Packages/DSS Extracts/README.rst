@@ -1,6 +1,6 @@
-====================
-VistA : DSS EXTRACTS
-====================
+===================
+VistA: DSS EXTRACTS
+===================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-===============
-VistA : TOOLKIT
-===============
+==============
+VistA: TOOLKIT
+==============
 
 This directory holds M routines and globals for a VistA package.
 

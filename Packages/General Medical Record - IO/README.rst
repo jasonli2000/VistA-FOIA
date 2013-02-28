@@ -1,6 +1,6 @@
-============================
-VistA : GEN. MED. REC. - I/O
-============================
+===========================
+VistA: GEN. MED. REC. - I/O
+===========================
 
 This directory holds M routines and globals for a VistA package.
 

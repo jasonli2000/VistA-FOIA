@@ -1,6 +1,6 @@
-==============================
-VistA : VIRTUAL PATIENT RECORD
-==============================
+=============================
+VistA: VIRTUAL PATIENT RECORD
+=============================
 
 This directory holds M routines and globals for a VistA package.
 

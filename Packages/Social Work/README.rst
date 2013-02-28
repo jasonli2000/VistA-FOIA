@@ -1,6 +1,6 @@
-===================
-VistA : SOCIAL WORK
-===================
+==================
+VistA: SOCIAL WORK
+==================
 
 This directory holds M routines and globals for a VistA package.
 

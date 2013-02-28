@@ -1,6 +1,6 @@
-==================================
-VistA : RADIOLOGY/NUCLEAR MEDICINE
-==================================
+=================================
+VistA: RADIOLOGY/NUCLEAR MEDICINE
+=================================
 
 This directory holds M routines and globals for a VistA package.
 

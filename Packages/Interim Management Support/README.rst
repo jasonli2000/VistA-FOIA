@@ -1,6 +1,6 @@
-==================================
-VistA : INTERIM MANAGEMENT SUPPORT
-==================================
+=================================
+VistA: INTERIM MANAGEMENT SUPPORT
+=================================
 
 This directory holds M routines and globals for a VistA package.
 

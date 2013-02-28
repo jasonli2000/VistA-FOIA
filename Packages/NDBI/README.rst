@@ -1,6 +1,6 @@
-============
-VistA : NDBI
-============
+===========
+VistA: NDBI
+===========
 
 This directory holds M routines and globals for a VistA package.
 

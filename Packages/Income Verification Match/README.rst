@@ -1,6 +1,6 @@
-=================================
-VistA : INCOME VERIFICATION MATCH
-=================================
+================================
+VistA: INCOME VERIFICATION MATCH
+================================
 
 This directory holds M routines and globals for a VistA package.
 

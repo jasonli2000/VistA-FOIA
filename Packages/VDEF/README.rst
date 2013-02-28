@@ -1,6 +1,6 @@
-============
-VistA : VDEF
-============
+===========
+VistA: VDEF
+===========
 
 This directory holds M routines and globals for a VistA package.
 

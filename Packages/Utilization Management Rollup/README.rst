@@ -1,6 +1,6 @@
-=====================================
-VistA : UTILIZATION MANAGEMENT ROLLUP
-=====================================
+====================================
+VistA: UTILIZATION MANAGEMENT ROLLUP
+====================================
 
 This directory holds M routines and globals for a VistA package.
 

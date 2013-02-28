@@ -1,6 +1,6 @@
-===================
-VistA : LAB SERVICE
-===================
+==================
+VistA: LAB SERVICE
+==================
 
 This directory holds M routines and globals for a VistA package.
 

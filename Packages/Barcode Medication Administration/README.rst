@@ -1,6 +1,6 @@
-==========================
-VistA : BAR CODE MED ADMIN
-==========================
+=========================
+VistA: BAR CODE MED ADMIN
+=========================
 
 This directory holds M routines and globals for a VistA package.
 

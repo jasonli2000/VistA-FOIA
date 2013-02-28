@@ -1,6 +1,6 @@
-=============================
-VistA : CONTROLLED SUBSTANCES
-=============================
+============================
+VistA: CONTROLLED SUBSTANCES
+============================
 
 This directory holds M routines and globals for a VistA package.
 

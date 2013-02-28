@@ -1,6 +1,6 @@
-==========================
-VistA : HEALTH LEVEL SEVEN
-==========================
+=========================
+VistA: HEALTH LEVEL SEVEN
+=========================
 
 This directory holds M routines and globals for a VistA package.
 

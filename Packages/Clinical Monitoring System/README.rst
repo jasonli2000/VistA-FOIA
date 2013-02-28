@@ -1,6 +1,6 @@
-==================================
-VistA : CLINICAL MONITORING SYSTEM
-==================================
+=================================
+VistA: CLINICAL MONITORING SYSTEM
+=================================
 
 This directory holds M routines and globals for a VistA package.
 

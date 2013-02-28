@@ -1,6 +1,6 @@
-=================================
-VistA : ADVERSE REACTION TRACKING
-=================================
+================================
+VistA: ADVERSE REACTION TRACKING
+================================
 
 This directory holds M routines and globals for a VistA package.
 

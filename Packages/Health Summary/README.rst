@@ -1,6 +1,6 @@
-======================
-VistA : HEALTH SUMMARY
-======================
+=====================
+VistA: HEALTH SUMMARY
+=====================
 
 This directory holds M routines and globals for a VistA package.
 

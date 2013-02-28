@@ -1,6 +1,6 @@
-===================
-VistA : ENGINEERING
-===================
+==================
+VistA: ENGINEERING
+==================
 
 This directory holds M routines and globals for a VistA package.
 

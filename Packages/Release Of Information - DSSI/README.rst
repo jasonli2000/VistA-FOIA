@@ -1,6 +1,6 @@
-=====================================
-VistA : RELEASE OF INFORMATION - DSSI
-=====================================
+====================================
+VistA: RELEASE OF INFORMATION - DSSI
+====================================
 
 This directory holds M routines and globals for a VistA package.
 

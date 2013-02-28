@@ -1,6 +1,6 @@
-===================================
-VistA : INCOMPLETE RECORDS TRACKING
-===================================
+==================================
+VistA: INCOMPLETE RECORDS TRACKING
+==================================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-================
-VistA : ONCOLOGY
-================
+===============
+VistA: ONCOLOGY
+===============
 
 This directory holds M routines and globals for a VistA package.
 

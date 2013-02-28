@@ -1,6 +1,6 @@
-======================================
-VistA : CLINICAL INFO RESOURCE NETWORK
-======================================
+=====================================
+VistA: CLINICAL INFO RESOURCE NETWORK
+=====================================
 
 This directory holds M routines and globals for a VistA package.
 

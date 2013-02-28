@@ -1,6 +1,6 @@
-======================================
-VistA : VISUAL IMPAIRMENT SERVICE TEAM
-======================================
+=====================================
+VistA: VISUAL IMPAIRMENT SERVICE TEAM
+=====================================
 
 This directory holds M routines and globals for a VistA package.
 

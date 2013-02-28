@@ -1,6 +1,6 @@
-==============================
-VistA : NATIONAL VISTA SUPPORT
-==============================
+=============================
+VistA: NATIONAL VISTA SUPPORT
+=============================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-==========================
-VistA : NATIONAL DRUG FILE
-==========================
+=========================
+VistA: NATIONAL DRUG FILE
+=========================
 
 This directory holds M routines and globals for a VistA package.
 

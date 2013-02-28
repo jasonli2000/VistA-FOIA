@@ -1,6 +1,6 @@
-===========================================
-VistA : NATIONAL HEALTH INFORMATION NETWORK
-===========================================
+==========================================
+VistA: NATIONAL HEALTH INFORMATION NETWORK
+==========================================
 
 This directory holds M routines and globals for a VistA package.
 

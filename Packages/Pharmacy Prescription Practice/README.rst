@@ -1,6 +1,6 @@
-======================================
-VistA : PHARMACY PRESCRIPTION PRACTICE
-======================================
+=====================================
+VistA: PHARMACY PRESCRIPTION PRACTICE
+=====================================
 
 This directory holds M routines and globals for a VistA package.
 

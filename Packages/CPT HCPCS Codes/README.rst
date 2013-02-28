@@ -1,6 +1,6 @@
-=======================
-VistA : CPT/HCPCS CODES
-=======================
+======================
+VistA: CPT/HCPCS CODES
+======================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-============
-VistA : HINQ
-============
+===========
+VistA: HINQ
+===========
 
 This directory holds M routines and globals for a VistA package.
 

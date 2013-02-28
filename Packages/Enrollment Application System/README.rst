@@ -1,6 +1,6 @@
-=====================================
-VistA : ENROLLMENT APPLICATION SYSTEM
-=====================================
+====================================
+VistA: ENROLLMENT APPLICATION SYSTEM
+====================================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-=======================
-VistA : NURSING SERVICE
-=======================
+======================
+VistA: NURSING SERVICE
+======================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-==================================
-VistA : GEN. MED. REC. - GENERATOR
-==================================
+=================================
+VistA: GEN. MED. REC. - GENERATOR
+=================================
 
 This directory holds M routines and globals for a VistA package.
 

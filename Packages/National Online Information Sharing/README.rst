@@ -1,6 +1,6 @@
-===========================================
-VistA : NATIONAL ONLINE INFORMATION SHARING
-===========================================
+==========================================
+VistA: NATIONAL ONLINE INFORMATION SHARING
+==========================================
 
 This directory holds M routines and globals for a VistA package.
 

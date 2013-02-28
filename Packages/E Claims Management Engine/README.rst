@@ -1,6 +1,6 @@
-============================
-VistA : E CLAIMS MGMT ENGINE
-============================
+===========================
+VistA: E CLAIMS MGMT ENGINE
+===========================
 
 This directory holds M routines and globals for a VistA package.
 

@@ -1,6 +1,6 @@
-=====================
-VistA : MENTAL HEALTH
-=====================
+====================
+VistA: MENTAL HEALTH
+====================
 
 This directory holds M routines and globals for a VistA package.
 

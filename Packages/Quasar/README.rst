@@ -1,6 +1,6 @@
-==============
-VistA : QUASAR
-==============
+=============
+VistA: QUASAR
+=============
 
 This directory holds M routines and globals for a VistA package.
 

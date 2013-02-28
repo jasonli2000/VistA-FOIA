@@ -1,6 +1,6 @@
-=================================
-VistA : AUTOMATED LAB INSTRUMENTS
-=================================
+================================
+VistA: AUTOMATED LAB INSTRUMENTS
+================================
 
 This directory holds M routines and globals for a VistA package.
 

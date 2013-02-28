@@ -1,6 +1,6 @@
-================================
-VistA : NATIONAL LABORATORY TEST
-================================
+===============================
+VistA: NATIONAL LABORATORY TEST
+===============================
 
 This directory holds M routines and globals for a VistA package.
 

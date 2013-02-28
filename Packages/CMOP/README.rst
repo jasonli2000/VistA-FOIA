@@ -1,6 +1,6 @@
-============
-VistA : CMOP
-============
+===========
+VistA: CMOP
+===========
 
 This directory holds M routines and globals for a VistA package.
 
