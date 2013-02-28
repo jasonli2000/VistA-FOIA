@@ -21,6 +21,6 @@ VA Gold Disk
 .. csv-table:: 
    :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
 
-   `XOBESIG<Routines/XOBESIG.m>`__,35924230,|check|
+   `XOBESIG <Routines/XOBESIG.m>`__,35924230,|check|
 
 .. |check| unicode:: U+2713
