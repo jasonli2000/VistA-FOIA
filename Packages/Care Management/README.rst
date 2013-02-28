@@ -21,21 +21,21 @@ VA Gold Disk
 .. csv-table:: 
    :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
 
-   `<Routines/ORRCACK.m>`__,69951493,|check|
-   `<Routines/ORRCDPT.m>`__,27732159,|check|
-   `<Routines/ORRCDPT1.m>`__,23709488,|check|
-   `<Routines/ORRCEVT.m>`__,52026948,|check|
-   `<Routines/ORRCLNP.m>`__,585941,|check|
-   `<Routines/ORRCLPT.m>`__,266293,|check|
-   `<Routines/ORRCOA.m>`__,11062549,|check|
-   `<Routines/ORRCOR.m>`__,48128294,|check|
-   `<Routines/ORRCQLPT.m>`__,1006284,|check|
-   `<Routines/ORRCSIG.m>`__,11096954,|check|
-   `<Routines/ORRCTIU.m>`__,31325045,|check|
-   `<Routines/ORRCTSK.m>`__,44307761,|check|
-   `<Routines/ORRCVIT.m>`__,17118495,|check|
-   `<Routines/ORRCXQ.m>`__,20320443,|check|
-   `<Routines/ORRCY7.m>`__,1627643,|check|
-   `<Routines/ORRCYP01.m>`__,1869759,|check|
+   `ORRCACK<Routines/ORRCACK.m>`__,69951493,|check|
+   `ORRCDPT<Routines/ORRCDPT.m>`__,27732159,|check|
+   `ORRCDPT1<Routines/ORRCDPT1.m>`__,23709488,|check|
+   `ORRCEVT<Routines/ORRCEVT.m>`__,52026948,|check|
+   `ORRCLNP<Routines/ORRCLNP.m>`__,585941,|check|
+   `ORRCLPT<Routines/ORRCLPT.m>`__,266293,|check|
+   `ORRCOA<Routines/ORRCOA.m>`__,11062549,|check|
+   `ORRCOR<Routines/ORRCOR.m>`__,48128294,|check|
+   `ORRCQLPT<Routines/ORRCQLPT.m>`__,1006284,|check|
+   `ORRCSIG<Routines/ORRCSIG.m>`__,11096954,|check|
+   `ORRCTIU<Routines/ORRCTIU.m>`__,31325045,|check|
+   `ORRCTSK<Routines/ORRCTSK.m>`__,44307761,|check|
+   `ORRCVIT<Routines/ORRCVIT.m>`__,17118495,|check|
+   `ORRCXQ<Routines/ORRCXQ.m>`__,20320443,|check|
+   `ORRCY7<Routines/ORRCY7.m>`__,1627643,|check|
+   `ORRCYP01<Routines/ORRCYP01.m>`__,1869759,|check|
 
 .. |check| unicode:: U+2713

@@ -21,9 +21,9 @@ VA Gold Disk
 .. csv-table:: 
    :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
 
-   `<Routines/KMPSGE.m>`__,45420632,|check|
-   `<Routines/KMPSLK.m>`__,24144588,|check|
-   `<Routines/KMPSUTL.m>`__,14249417,|check|
-   `<Routines/KMPSUTL1.m>`__,5705138,|check|
+   `KMPSGE<Routines/KMPSGE.m>`__,45420632,|check|
+   `KMPSLK<Routines/KMPSLK.m>`__,24144588,|check|
+   `KMPSUTL<Routines/KMPSUTL.m>`__,14249417,|check|
+   `KMPSUTL1<Routines/KMPSUTL1.m>`__,5705138,|check|
 
 .. |check| unicode:: U+2713

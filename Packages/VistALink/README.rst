@@ -21,21 +21,21 @@ VA Gold Disk
 .. csv-table:: 
    :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
 
-   `<Routines/XOBVLIB.m>`__,29603500,|check|
-   `<Routines/XOBVLL.m>`__,20760795,|check|
-   `<Routines/XOBVLT.m>`__,32764303,|check|
+   `XOBVLIB<Routines/XOBVLIB.m>`__,29603500,|check|
+   `XOBVLL<Routines/XOBVLL.m>`__,20760795,|check|
+   `XOBVLT<Routines/XOBVLT.m>`__,32764303,|check|
    `<XOBVPOST.m>`__,74051370,(missing)
    `<XOBVPRE.m>`__,568396,(missing)
-   `<Routines/XOBVRH.m>`__,12957948,|check|
-   `<Routines/XOBVRM.m>`__,4502318,|check|
-   `<Routines/XOBVRMX.m>`__,3008010,|check|
-   `<Routines/XOBVRPC.m>`__,55791656,|check|
-   `<Routines/XOBVRPCI.m>`__,31578368,|check|
-   `<Routines/XOBVRPCX.m>`__,22239279,|check|
-   `<Routines/XOBVSKT.m>`__,19091287,|check|
-   `<Routines/XOBVSYSI.m>`__,53927220,|check|
-   `<Routines/XOBVTCP.m>`__,48106146,|check|
-   `<Routines/XOBVTCPL.m>`__,7619114,|check|
-   `<Routines/XOBVTLS.m>`__,4033073,|check|
+   `XOBVRH<Routines/XOBVRH.m>`__,12957948,|check|
+   `XOBVRM<Routines/XOBVRM.m>`__,4502318,|check|
+   `XOBVRMX<Routines/XOBVRMX.m>`__,3008010,|check|
+   `XOBVRPC<Routines/XOBVRPC.m>`__,55791656,|check|
+   `XOBVRPCI<Routines/XOBVRPCI.m>`__,31578368,|check|
+   `XOBVRPCX<Routines/XOBVRPCX.m>`__,22239279,|check|
+   `XOBVSKT<Routines/XOBVSKT.m>`__,19091287,|check|
+   `XOBVSYSI<Routines/XOBVSYSI.m>`__,53927220,|check|
+   `XOBVTCP<Routines/XOBVTCP.m>`__,48106146,|check|
+   `XOBVTCPL<Routines/XOBVTCPL.m>`__,7619114,|check|
+   `XOBVTLS<Routines/XOBVTLS.m>`__,4033073,|check|
 
 .. |check| unicode:: U+2713
