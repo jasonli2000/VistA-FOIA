@@ -19,7 +19,7 @@ VA Gold Disk
 ------------
 
 .. csv-table:: 
-   :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
+   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
 
    `MMRSIPC <Routines/MMRSIPC.m>`__,96473573,|check|
    `MMRSIPC2 <Routines/MMRSIPC2.m>`__,35335432,|check|

@@ -22,7 +22,7 @@ Help Processor
 ^^^^^^^^^^^^^^
 
 .. csv-table:: 
-   :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
+   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
 
    `XQH <Routines/XQH.m>`__,11981874,|check|
    `XQH0 <Routines/XQH0.m>`__,14695608,|check|
@@ -38,7 +38,7 @@ Unwinder
 ^^^^^^^^
 
 .. csv-table:: 
-   :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
+   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
 
    `XQOR <Routines/XQOR.m>`__,12590953,|check|
    `XQOR1 <Routines/XQOR1.m>`__,14427761,|check|

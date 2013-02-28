@@ -19,9 +19,9 @@ VA Gold Disk
 ------------
 
 .. csv-table:: 
-   :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
+   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
 
-   ``GEC29TR``,3387178,(missing)
+   GEC29TR,3387178,(missing)
    `GECSA <Routines/GECSA.m>`__,35656,|check|
    `GECSBATC <Routines/GECSBATC.m>`__,6089878,|check|
    `GECSCALL <Routines/GECSCALL.m>`__,1444043,|check|
@@ -38,8 +38,8 @@ VA Gold Disk
    `GECSNTEG <Routines/GECSNTEG.m>`__,5168780,|check|
    `GECSPAT8 <Routines/GECSPAT8.m>`__,6174989,|check|
    `GECSPOS1 <Routines/GECSPOS1.m>`__,2156950,|check|
-   ``GECSPOST``,1779247,(missing)
-   ``GECSPPRE``,2364754,(missing)
+   GECSPOST,1779247,(missing)
+   GECSPPRE,2364754,(missing)
    `GECSPUR1 <Routines/GECSPUR1.m>`__,12926387,|check|
    `GECSPURG <Routines/GECSPURG.m>`__,8984257,|check|
    `GECSREP0 <Routines/GECSREP0.m>`__,9262523,|check|

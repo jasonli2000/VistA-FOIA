@@ -19,7 +19,7 @@ VA Gold Disk
 ------------
 
 .. csv-table:: 
-   :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
+   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
 
    `ORRCACK <Routines/ORRCACK.m>`__,69951493,|check|
    `ORRCDPT <Routines/ORRCDPT.m>`__,27732159,|check|

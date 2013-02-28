@@ -19,7 +19,7 @@ VA Gold Disk
 ------------
 
 .. csv-table:: 
-   :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
+   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
 
    `XWB2HL7 <Routines/XWB2HL7.m>`__,59516384,|check|
    `XWB2HL7A <Routines/XWB2HL7A.m>`__,24063591,|check|

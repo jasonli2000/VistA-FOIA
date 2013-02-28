@@ -19,7 +19,7 @@ VA Gold Disk
 ------------
 
 .. csv-table:: 
-   :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
+   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
 
    `KMPRBD01 <Routines/KMPRBD01.m>`__,7459434,|check|
    `KMPRBD02 <Routines/KMPRBD02.m>`__,29338515,|check|

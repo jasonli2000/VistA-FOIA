@@ -19,13 +19,13 @@ VA Gold Disk
 ------------
 
 .. csv-table:: 
-   :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
+   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
 
    `XOBWD <Routines/XOBWD.m>`__,38463620,|check|
    `XOBWENV <Routines/XOBWENV.m>`__,7338181,|check|
    `XOBWLIB <Routines/XOBWLIB.m>`__,23307912,|check|
    `XOBWLIB1 <Routines/XOBWLIB1.m>`__,32808293,|check|
-   ``XOBWPST``,17271805,(missing)
+   XOBWPST,17271805,(missing)
    `XOBWPWD <Routines/XOBWPWD.m>`__,11849037,|check|
    `XOBWSSL <Routines/XOBWSSL.m>`__,17552025,|check|
    `XOBWU <Routines/XOBWU.m>`__,8679055,|check|

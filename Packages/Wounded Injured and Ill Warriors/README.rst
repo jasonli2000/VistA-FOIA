@@ -19,7 +19,7 @@ VA Gold Disk
 ------------
 
 .. csv-table:: 
-   :header:  "RoutineName", "VA Gold Disk CheckSum", "OSEHRA CheckSum"
+   :header:  "Routine Name", "Gold Checksum", "Current Checksum"
 
    `WIIACT4 <Routines/WIIACT4.m>`__,49548626,|check|
    `WIIADT1 <Routines/WIIADT1.m>`__,13382231,|check|
