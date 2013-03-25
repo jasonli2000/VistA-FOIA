@@ -22,7 +22,7 @@ US DVA sites standardize this package on the following routine checksums.
 .. csv-table::
    :header:  "Routine Source", "VA Checksum", "Current Checksum"
 
-   `<GEC29TR.m>`__,3387178,(missing)
+   GEC29TR.m,3387178,(missing)
    `<Routines/GECSA.m>`__,35656,|check|
    `<Routines/GECSBATC.m>`__,6089878,|check|
    `<Routines/GECSCALL.m>`__,1444043,|check|
@@ -39,8 +39,8 @@ US DVA sites standardize this package on the following routine checksums.
    `<Routines/GECSNTEG.m>`__,5168780,|check|
    `<Routines/GECSPAT8.m>`__,6174989,|check|
    `<Routines/GECSPOS1.m>`__,2156950,|check|
-   `<GECSPOST.m>`__,1779247,(missing)
-   `<GECSPPRE.m>`__,2364754,(missing)
+   GECSPOST.m,1779247,(missing)
+   GECSPPRE.m,2364754,(missing)
    `<Routines/GECSPUR1.m>`__,12926387,|check|
    `<Routines/GECSPURG.m>`__,8984257,|check|
    `<Routines/GECSREP0.m>`__,9262523,|check|

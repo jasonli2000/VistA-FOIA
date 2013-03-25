@@ -26,7 +26,7 @@ US DVA sites standardize this package on the following routine checksums.
    `<Routines/XOBWENV.m>`__,7338181,|check|
    `<Routines/XOBWLIB.m>`__,23307912,|check|
    `<Routines/XOBWLIB1.m>`__,32808293,|check|
-   `<XOBWPST.m>`__,17271805,(missing)
+   XOBWPST.m,17271805,(missing)
    `<Routines/XOBWPWD.m>`__,11849037,|check|
    `<Routines/XOBWSSL.m>`__,17552025,|check|
    `<Routines/XOBWU.m>`__,8679055,|check|

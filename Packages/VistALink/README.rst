@@ -25,8 +25,8 @@ US DVA sites standardize this package on the following routine checksums.
    `<Routines/XOBVLIB.m>`__,29603500,|check|
    `<Routines/XOBVLL.m>`__,20760795,|check|
    `<Routines/XOBVLT.m>`__,32764303,|check|
-   `<XOBVPOST.m>`__,74051370,(missing)
-   `<XOBVPRE.m>`__,568396,(missing)
+   XOBVPOST.m,74051370,(missing)
+   XOBVPRE.m,568396,(missing)
    `<Routines/XOBVRH.m>`__,12957948,|check|
    `<Routines/XOBVRM.m>`__,4502318,|check|
    `<Routines/XOBVRMX.m>`__,3008010,|check|
